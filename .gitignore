@@ -1,0 +1,66 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.fuse_hidden*
+
+# Editors / IDEs
+.idea/
+*.swp
+*.swo
+*.swn
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.cursor/*.log
+
+# Environment & secrets (if tooling is added later)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Logs & temp
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+tmp/
+temp/
+*.tmp
+*.temp
+.cache/
+
+# Python (optional future scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node (optional future tooling)
+node_modules/
+
+# Build / OS artifacts
+*.orig
+*.rej
