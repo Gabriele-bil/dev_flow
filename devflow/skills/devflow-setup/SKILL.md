@@ -64,7 +64,7 @@ Collect values for template placeholders from these sources:
 |---|---|:---:|
 | `constitution.md` | architecture/layering, naming, default commands | no |
 | `docs/product.md` | project/app name (if present) | no |
-| `pubspec.yaml` / `package.json` | package/project name | no |
+| Adapter-defined project manifests (for example language/package manifests) | package/project name | no |
 | `@devflow/config.md` | adapter id | yes |
 | `@devflow/adapters/<adapter>/ADAPTER.md` | stack commands, key rules | yes |
 

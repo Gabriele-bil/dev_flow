@@ -112,6 +112,24 @@ Retry failed steps up to **3** attempts each; then stop and report full output.
 
 Same as implement: `dart format .`, `flutter analyze`, conditional `build_runner` after edits.
 
+### Beautify: Flutter-specific review axes
+
+Apply these in addition to core `devflow-beautify` axes:
+
+- **Theme-first UI:** no hardcoded colors/text styles when theme tokens exist (`flutter-theme`).
+- **Presentation boundaries:** no business/data logic leaking into widgets/screens.
+- **Riverpod scope:** avoid broad watches; use `.select()` when only a sub-field is needed (`flutter-riverpod`).
+- **Render cost:** avoid expensive work in `build()`; prefer lazy lists (`ListView.builder`/slivers) for large datasets.
+- **Responsive layout:** use `LayoutBuilder` + project breakpoints (`AppBreakpointWidth` / `AppBreakpointConstraints`) instead of raw viewport literals.
+
+### Beautify: performance profiling trigger
+
+Profile only when plan calls out performance or when a likely hotspot is found:
+
+- Use Flutter DevTools (Performance/CPU/Timeline) before major perf refactors.
+- Investigate dropped frames/scroll jank by checking rebuild scope (`Provider`/`Consumer` granularity) before micro-optimizations.
+- For large images in lists, follow project decoding/caching patterns.
+
 ## Test: layout and commands
 
 ### Placement

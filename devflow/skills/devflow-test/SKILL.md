@@ -1,6 +1,6 @@
 ---
 name: devflow-test
-description: Writes and executes unit and integration tests for the current DevFlow feature across Android emulator and Chrome, with bounded retry handling and standardized reporting. Use when the user asks to run devflow.test, validate a DevFlow feature after beautify, or execute the fifth step of the DevFlow pipeline.
+description: Writes and executes unit and integration tests for the current DevFlow feature using the active adapter targets, with bounded retry handling and standardized reporting. Use when the user asks to run devflow.test, validate a DevFlow feature after beautify, or execute the fifth step of the DevFlow pipeline.
 argument-hint: [optional-plan-path]
 disable-model-invocation: true
 ---
@@ -16,7 +16,7 @@ Run `/devflow.test [optional plan path]`.
 
 ## Purpose
 
-Write/run tests for current feature per active adapter **Test** section (for example Flutter: unit + integration on Android/Chrome). Fifth DevFlow step.
+Write/run tests for current feature per active adapter **Test** section (unit/integration targets per adapter). Fifth DevFlow step.
 
 ## When NOT to Use
 
@@ -57,7 +57,7 @@ Using `task.md`, `plan.md`, and the implement/beautify summaries:
 
 1. **Placement** — mirror source layout and integration paths per `ADAPTER.md` → **Test**.
 2. **Unit tests** — cover models, state, domain rules, and UI assertions per `ADAPTER.md` (load any technology skills it references).
-3. **Integration tests** — target user flows from `task.md` per `ADAPTER.md` (targets, devices, order).
+3. **Integration tests** — target user flows from `task.md` per `ADAPTER.md` (targets/environments and execution order).
 4. **Execute** — run the exact commands from `ADAPTER.md`; paste raw stdout/stderr in the Step 7 report.
 
 Failure handling:
@@ -83,7 +83,7 @@ Output:
 [paste actual unit test command output here]
 ```
 
-### Integration - Android
+### Integration - Target 1
 [N] passed · [N] failed
 
 Output:
@@ -91,7 +91,7 @@ Output:
 [paste actual integration test output here]
 ```
 
-### Integration - Chrome
+### Integration - Target 2
 [N] passed · [N] failed
 
 Output:

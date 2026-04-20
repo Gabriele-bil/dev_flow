@@ -35,7 +35,7 @@ Review/improve `devflow.implement` output with **multi-axis** lens: correctness,
 
 ### Step 0 - Resolve adapter
 
-Read `@devflow/config.md` and `@devflow/adapters/<adapter>/ADAPTER.md`. Use its **Beautify** commands and any stack-specific review axes (e.g. Flutter performance, theme, layout).
+Read `@devflow/config.md` and `@devflow/adapters/<adapter>/ADAPTER.md`. Use its **Beautify** commands and stack-specific review axes.
 
 ### Step 1 - Read docs
 
@@ -60,7 +60,7 @@ If the implement summary includes test files, skim them **before** deep-diving p
 
 ### Step 3 - Analysis areas (multi-axis review)
 
-The axes below are written for the **Flutter** stack (the default adapter). If `config.md` points at another adapter, follow that adapter’s `ADAPTER.md` for stack-specific axes and use these sections only where they still apply.
+The axes below are stack-agnostic defaults. For stack-specific checks, follow the active adapter `ADAPTER.md` and any technology skills it requires.
 
 Review each in-scope file against **every** axis below. Collect findings across all files before applying changes.
 
@@ -72,9 +72,9 @@ Review each in-scope file against **every** axis below. Collect findings across 
 
 #### Readability and simplification
 
-- Naming follows Dart conventions and constitution rules; names carry intent (avoid vague `data`, `result`, `temp` without context)
+- Naming follows project conventions and constitution rules; names carry intent (avoid vague `data`, `result`, `temp` without context)
 - Readability is clear: avoid unnecessary nesting, overly long methods, nested ternaries when an early return or small helper reads better
-- Responsibilities are separated (no domain/data logic leaking into widgets)
+- Responsibilities are separated (no domain/data logic leaking into presentation components)
 - **Preserve behavior:** simplifications must not change outputs, errors, side effects, or ordering. If unsure, treat as opinionated and propose first
 - **Chesterton’s fence:** before removing or inlining code, understand why it exists (performance, platform constraint, history). If unclear, propose rather than delete
 - Duplication: repeated blocks that should share a helper per `registry.md` patterns (optional extraction if it touches public API — propose first)
@@ -88,43 +88,41 @@ Review each in-scope file against **every** axis below. Collect findings across 
 - File placement respects `constitution.md`
 - Dependencies flow in the right direction (no new circular patterns)
 
-#### Security (Flutter + Supabase)
+#### Security
 
 - User and external input validated or normalized at boundaries before use in logic, storage, or queries
 - No secrets, tokens, or private keys committed in client code or logs
-- Auth-sensitive operations align with project data-layer patterns (RLS assumptions, client usage). For deep review, load the adapter’s data/auth skill (e.g. `@devflow/adapters/flutter/skills/flutter-supabase/SKILL.md` when adapter is `flutter`)
+- Auth-sensitive operations align with project data-layer patterns. For deep review, load the adapter’s data/auth skill from `ADAPTER.md`.
 
-#### Performance (heuristics — default pass)
+#### Performance (heuristics - default pass)
 
-- Missing `const` constructors are added where possible
-- Provider scope is not broader than needed
-- `.select()` is used when a widget reads only part of a provider state
-- No expensive operations are executed inside `build()`
-- Prefer lazy list construction (`ListView.builder` / slivers) for large or unbounded lists instead of eager `children: [...]` when the feature warrants it
+- Avoid unnecessary object recreation in hot paths where immutable/static alternatives exist
+- Reactive subscriptions are not broader than needed
+- Expensive operations are not executed in render loops or high-frequency callbacks
+- Prefer lazy/streamed collection rendering over eager full rendering for large or unbounded datasets when applicable
 
 ##### Performance: measure when needed
 
-Default beautify relies on the checks above. **Profile only when** the plan calls out performance, the UI is list-heavy or animation-heavy, or you flag a **Critical** / high-risk hotspot.
+Default beautify relies on the checks above. **Profile only when** the plan calls out performance or you flag a **Critical** / high-risk hotspot.
 
-- Use **Flutter DevTools** (Performance / CPU profiler, Timeline) to confirm jank or long frames before large refactors
-- Symptom hints: dropped frames, scroll lag, jank on rebuild — inspect rebuild scope (widgets, `Provider`/`Consumer` granularity), not just micro-optimizations
-- Images: consider `cacheWidth` / `cacheHeight` (or project image patterns) when decoding large bitmaps in lists
-- Heavy CPU work should not run synchronously in `build()`; consider isolates or existing project patterns only when measurement or plan justifies it
+- Use profiling tools defined by the active adapter before large refactors
+- Investigate user-visible latency/jank by checking render/update scope before micro-optimizations
+- Heavy CPU work should not run on critical UI/request paths when adapter guidance suggests background/off-main execution
 
-Do not add blanket `RepaintBoundary` / `memo`-style patterns everywhere — overuse hurts as much as underuse.
+Do not add blanket memoization or rendering boundaries everywhere - overuse hurts as much as underuse.
 
 #### UI consistency
 
-- Spacing and padding use theme values or `AppLayout`, not hardcoded numbers
-- Typography uses `Theme.of(context).textTheme`, not manual `TextStyle`
-- Colors use `Theme.of(context).colorScheme` or `AppColors`, not hardcoded hex
-- No local `TextStyle` or `Color` overrides that duplicate theme definitions
+- Spacing and padding use design-system tokens/theme values, not arbitrary literals
+- Typography uses shared style tokens, not repeated local style objects
+- Colors use semantic theme tokens/palette entries, not hardcoded values
+- Avoid local style overrides that duplicate global design-system definitions
 
-#### Responsive layout
+#### Responsiveness and layout
 
-- All three breakpoints are handled (compact / medium / expanded) for every UI screen
-- `LayoutBuilder` is used for adaptive branching, not `MediaQuery.of(context).size`
-- Prefer `AppBreakpointWidth` / `AppBreakpointConstraints` (`lib/core/layout/app_breakpoints.dart`) over raw width literals
+- Required breakpoints/form factors are handled for each affected UI view
+- Adaptive branching follows adapter conventions
+- Avoid raw viewport/layout literals when shared breakpoint tokens exist
 
 ### Step 4 - Apply changes
 
@@ -144,24 +142,24 @@ Tag every finding (including in the completion summary) so the user knows what b
 
 Apply directly without asking:
 
-- Missing `const` constructors
-- Hardcoded colors or text styles that have a theme equivalent
-- Imports not pointing to barrel files
-- Naming violations against Dart or constitution conventions
-- Obvious logic leaking into the widget layer
+- Deterministic low-risk style fixes defined by constitution/adapter conventions
+- Hardcoded visual styles that have a design-system equivalent
+- Imports violating repo import conventions
+- Naming violations against project conventions
+- Obvious logic leaking into the presentation layer
 - **Critical** issues uncovered in correctness or security (fix immediately)
 
 #### Opinable improvements
 
 Propose before applying:
 
-- Structural refactors (for example extracting widgets/files)
+- Structural refactors (for example extracting components/files)
 - Provider scope changes that can affect behavior
 - Subjective naming changes
 - Any change that modifies public API signatures
 - Simplifications where behavior preservation is not obvious
 
-**Chesterton + incrementality:** for structural or simplification proposals, state briefly why the code might exist as-is, then the proposed change. Prefer **one logical change per proposal** (or per user approval round). If tests exist for the feature, run the adapter’s unit-test command (see `ADAPTER.md` → **Test**) with a relevant path after substantive refactors when feasible.
+**Chesterton + incrementality:** for structural or simplification proposals, state briefly why the code might exist as-is, then the proposed change. Prefer **one logical change per proposal** (or per user approval round). If tests exist for the feature, run adapter test commands relevant to touched scope after substantive refactors when feasible.
 
 Use this format and wait for user response before each proposed change:
 
@@ -196,7 +194,7 @@ After completion, respond with:
 ✅ Beautify complete: feature/[NNN]-[feature-name]
 
 ### Files modified
-- `path/to/file.dart`
+- `path/to/file.ext`
 - ...
 
 ### Improvements by area
@@ -227,7 +225,7 @@ Before sending Step 6:
 
 - [ ] Scope stayed within `devflow.implement` touched files
 - [ ] `plan.md` behavior and acceptance criteria were checked for obvious gaps
-- [ ] Security boundaries (input, secrets, Supabase usage) sanity-checked on changed code
+- [ ] Security boundaries (input, secrets, auth/data-access usage) sanity-checked on changed code
 - [ ] Performance: heuristics applied; profiling only when warranted
 - [ ] **Critical** and required issues fixed or explicitly escalated to the user
 - [ ] Dead code in scope handled or listed for user decision

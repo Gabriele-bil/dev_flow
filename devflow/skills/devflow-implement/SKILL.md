@@ -103,7 +103,7 @@ This creates a rollback point without losing progress. Do NOT create save point 
 
 ### Step 5 - Codegen (conditional)
 
-If the active `ADAPTER.md` defines a **codegen** step and the implemented files match its triggers (e.g. Dart `@freezed`, `@riverpod`, `@JsonSerializable`, `@Envied`), run the adapter’s codegen command. Retry up to **3** attempts; then stop and report full output.
+If the active `ADAPTER.md` defines a **codegen** step and implemented files match its triggers (annotations, schema definitions, generated clients, localization catalogs, etc.), run the adapter codegen command. Retry up to **3** attempts; then stop and report full output.
 
 ### Step 6 - Format and analyze
 
@@ -140,11 +140,11 @@ After implementation, respond with:
 ✅ Implementation complete: feature/[NNN]-[feature-name]
 
 ### Files created
-- `path/to/file.dart`
+- `path/to/file.ext`
 - ...
 
 ### Files modified
-- `path/to/file.dart`
+- `path/to/file.ext`
 - ...
 
 ### Deviations from plan

@@ -157,10 +157,10 @@ in this order to respect dependencies.
 **Batch hints (optional):** Before the first `###` of a dependency group, add one line:
 `**Batch:** S | M | L` (S ≈ 1-2 files, M ≈ 3-5, L ≈ 6+). For `L`, add `— split across `devflow.implement` sessions if needed`.
 
-### [NNN]. `[path/to/file.dart]` - [create | modify]
+### [NNN]. `[path/to/file.ext]` - [create | modify]
 [1-2 sentences on what this file contains and why it exists.]
 
-### [NNN]. `[path/to/file.dart]` - [create | modify]
+### [NNN]. `[path/to/file.ext]` - [create | modify]
 ...
 
 ---
@@ -176,7 +176,7 @@ in this order to respect dependencies.
 
 ## Adapter-specific sections
 
-After **Implementation checkpoints**, append **every extra plan section** required by the active `ADAPTER.md` (see its heading **Plan: extra sections and templates**). Use the exact headings and table formats from that file — e.g. for `flutter`, include **Riverpod Providers**, **Widget Tree** (if UI), **Supabase Schema** (if DB). Omit adapter sections only when `ADAPTER.md` says they do not apply.
+After **Implementation checkpoints**, append **every extra plan section** required by the active `ADAPTER.md` (see its heading **Plan: extra sections and templates**). Use the exact headings and table formats from that file. Omit adapter sections only when `ADAPTER.md` says they do not apply.
 
 ---
 
@@ -200,7 +200,7 @@ Format rules:
 
 - File list is the core of the plan; it must be complete and ordered
 - Traceability maps every subtask in `task.md` to at least one file
-- Adapter-specific sections: follow formatting rules in `ADAPTER.md` (e.g. widget tree as indented list, not a diagram; DB sections only when applicable; localization per adapter)
+- Adapter-specific sections: follow formatting rules in `ADAPTER.md` (for example section layout, optional/required blocks, and localization/data rules per adapter)
 - Language: English
 - Style: concise and optimized for LLM consumption (no filler)
 - Compression: caveman-compress style — drop articles/filler/hedging; fragments OK; keep technical terms, paths, commands exact.
@@ -220,9 +220,9 @@ Continue to implementation? -> devflow.implement
 
 ## Parallelization (multi-session / multi-agent)
 
-- **Usually sequential:** Supabase migrations, shared Riverpod surface changes, router redirects with wide blast radius.
-- **Often parallelizable once contracts exist:** Focused widget tests, copy-only `slang` updates, isolated components that do not change shared providers or routes.
-- **Rule:** Lock shared types, route names, and provider signatures first; then parallelize leaf work.
+- **Usually sequential:** Schema/migration changes, shared state-contract changes, wide router changes.
+- **Often parallelizable once contracts exist:** Focused leaf tests, copy/content-only updates, isolated components/modules that do not change shared contracts.
+- **Rule:** Lock shared types/contracts first; then parallelize leaf work.
 
 ## Red flags
 
@@ -230,8 +230,8 @@ Continue to implementation? -> devflow.implement
 |---------|----------------|
 | Missing **Traceability** row for a subtask | `devflow.implement` cannot prove coverage |
 | **File list** out of dependency order (e.g. UI before migrations) | Broken or misleading implementation order |
-| UI without planned **slang** keys | Violates project conventions |
-| **Supabase** omitted when the feature mutates schema or RLS | Schema / security drift |
+| UI without planned localization keys | Violates project conventions |
+| Data/schema/security sections omitted when feature mutates backend contracts | Schema or access-control drift |
 | **Status `ready`** with unresolved **Open questions** | Implements guesses |
 | No **Implementation checkpoints** on long file lists | Hard to verify incrementally |
 
@@ -244,4 +244,4 @@ Continue to implementation? -> devflow.implement
 | Reads (adapter) | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md`; technology skills per ADAPTER table |
 | Writes | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Next step | `devflow.implement` |
-| Related skills | Per active `ADAPTER.md` → **Technology skills** (e.g. `flutter-*` under `adapters/flutter/skills/`) |
+| Related skills | Per active `ADAPTER.md` → **Technology skills** |
