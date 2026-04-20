@@ -7,7 +7,7 @@ description: Transforms a raw idea into a structured DevFlow task by reading pro
 
 ## Purpose
 
-Transform a raw idea into a structured task by reading product context and producing a user story with subtasks. This is the first step of the DevFlow pipeline.
+Turn raw idea into structured task. Read product context, output user story + subtasks. First DevFlow step.
 
 ## When NOT to Use
 
@@ -56,7 +56,7 @@ Rules:
 
 ### Step 4 - Quick stress-test
 
-Before locking Summary and scope, read **`refinement-hints.md`** in this skill directory and apply a short pass (user value, Petmate feasibility, product overlap, scope honesty, riskiest assumption). Push back kindly if the scope should shrink.
+Before locking Summary/scope, read **`refinement-hints.md`** and run short pass: user value, feasibility, overlap, scope honesty, riskiest assumption. Push back if scope too large.
 
 ### Step 5 - Propose feature name
 
@@ -176,6 +176,7 @@ Format rules:
 - **Notes**: analysis decisions only, not TODOs.
 - **Language**: English throughout.
 - **Style**: optimized for LLM consumption, concise, no filler words.
+- **Compression**: caveman-compress style — drop articles/filler/hedging; fragments OK; keep technical terms, paths, commands exact.
 
 See **`examples.md`** in this skill directory for full worked examples.
 
@@ -202,7 +203,7 @@ Continue to planning? → devflow.plan
 
 ## Relationship to `plan.md`
 
-`devflow.plan` turns this task into `plan.md`: a **file-ordered** plan with traceability, optional architecture decisions, risks, implementation checkpoints, and pre-implement checklist (see `devflow/skills/devflow-plan/SKILL.md`). **Subtasks** here stay outcome-level; file paths and provider names belong in `plan.md`, not in **Subtasks**.
+`devflow.plan` turns this task into `plan.md`: file-ordered plan with traceability, decisions, risks, checkpoints, pre-implement checklist. Keep **Subtasks** outcome-level; put paths/provider names in `plan.md`, not here.
 
 ## I/O Reference
 

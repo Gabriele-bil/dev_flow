@@ -9,7 +9,7 @@ effort: low
 
 ## Purpose
 
-Commit all changes, push the feature branch, and open a pull request toward `main`. This is the final step of the DevFlow pipeline.
+Commit all changes, push feature branch, open PR to `main`. Final DevFlow step.
 
 ---
 
@@ -36,7 +36,7 @@ Read `@devflow/config.md` and `@devflow/adapters/<adapter>/ADAPTER.md`. Use the 
 
 ## Step 1 - Determine commit type
 
-Select the type based on the nature of the feature:
+Select type by feature nature:
 
 | Type | When to use |
 |---|---|
@@ -70,7 +70,7 @@ Rules:
 
 ## Step 3 - Pre-push verification
 
-Run **every command** listed in `ADAPTER.md` → **PR** (typically analyze/typecheck, then a project-wide test command). Confirm each command’s expected success output before pushing. Do NOT proceed if any command reports issues.
+Run **every command** in `ADAPTER.md` → **PR** (usually analyze/typecheck, then project-wide tests). Confirm expected success output before push. Do NOT proceed if any command reports issues.
 
 If either command fails, stop and fix the issue before continuing to Step 4.
 

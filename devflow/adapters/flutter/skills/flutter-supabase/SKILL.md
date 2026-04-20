@@ -5,7 +5,7 @@ description: Use when implementing or refactoring Flutter data/auth/storage/real
 
 # Skill: Flutter + Supabase
 
-Use this skill for data layer work built on `supabase_flutter` in a Flutter + Riverpod architecture.
+Use for data-layer work on `supabase_flutter` in Flutter + Riverpod architecture.
 
 ## Objectives
 

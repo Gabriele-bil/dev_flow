@@ -17,7 +17,7 @@ Run `/devflow.plan [optional task path]`.
 
 ## Purpose
 
-Transform a structured task into a detailed implementation plan. Read all relevant docs and produce a file-oriented plan that fully guides `devflow.implement`. This is the second step of the DevFlow pipeline.
+Turn structured task into detailed implementation plan. Read required docs, output file-oriented plan for `devflow.implement`. Second DevFlow step.
 
 ## Planning discipline (read-only until `plan.md` is written)
 
@@ -26,7 +26,7 @@ Until `plan.md` is complete and saved:
 - **Do not** modify application code, tests, or assets except for read-only inspection.
 - **Do** read `task.md`, `constitution.md`, `registry.md`, relevant sources, and MCP docs as needed.
 
-The deliverable of this skill is **`plan.md`**, not implementation.
+Deliverable is **`plan.md`**, not implementation.
 
 ## Vertical slicing (guidance)
 
@@ -203,6 +203,7 @@ Format rules:
 - Adapter-specific sections: follow formatting rules in `ADAPTER.md` (e.g. widget tree as indented list, not a diagram; DB sections only when applicable; localization per adapter)
 - Language: English
 - Style: concise and optimized for LLM consumption (no filler)
+- Compression: caveman-compress style — drop articles/filler/hedging; fragments OK; keep technical terms, paths, commands exact.
 
 ### Step 5 - Notify user
 

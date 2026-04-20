@@ -12,7 +12,7 @@ Default stack for this repository:
 - `flutter_form_builder` for fields and form state.
 - `form_builder_validators` for composable validation.
 
-Prefer package primitives over custom controllers and ad-hoc validation logic.
+Prefer package primitives over custom controllers/ad-hoc validation.
 
 ## Standard form skeleton
 
@@ -63,7 +63,7 @@ Guidance:
 
 - Call `saveAndValidate()` before reading `.value`.
 - Use `validate()` + `instantValue` only when you need current values without save side effects.
-- Keep business mapping and submit side effects in a notifier/use-case layer, not inline in widgets.
+- Keep business mapping/submit side effects in notifier/use-case layer, not inline in widgets.
 
 ## Field patterns
 

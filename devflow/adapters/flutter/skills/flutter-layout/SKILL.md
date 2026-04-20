@@ -7,11 +7,11 @@ argument-hint: [optional-plan-path]
 # Writing Correct Flutter Layouts
 
 ## Overview
-Use this guide to build Flutter layouts that are constraint-safe, responsive, and easy to evolve.
+Build Flutter layouts that are constraint-safe, responsive, evolvable.
 
 ## Core Layout Principles
 
-Master the fundamental Flutter layout rule: **Constraints go down. Sizes go up. Parent sets position.**
+Core Flutter rule: **Constraints go down. Sizes go up. Parent sets position.**
 
 - **Pass constraints down:** Children must pick a size inside parent bounds.
 - **Pass sizes up:** Parent positions children after they report size.

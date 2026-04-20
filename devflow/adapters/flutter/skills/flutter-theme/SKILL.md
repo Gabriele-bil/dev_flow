@@ -5,7 +5,7 @@ description: Use when implementing or refactoring Flutter visual styling (colors
 
 # Skill: Flutter Theme
 
-Use this skill when touching UI styling in Flutter.
+Use when touching Flutter UI styling.
 
 ## Objectives
 

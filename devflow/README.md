@@ -5,12 +5,23 @@ This directory is the **installable DevFlow package**: core pipeline skills, sla
 ## Quick start
 
 1. **Active stack** — edit [`config.md`](config.md); set **Adapter** to `flutter` (only bundled adapter today).
-2. **Run the pipeline** — invoke commands under [`commands/`](commands/) (e.g. `devflow.task`) or load as a plugin and use your host’s namespaced invocations.
+2. **Run setup once** — execute `devflow.setup` to generate root `AGENTS.md` and `REGISTRY.md` for the consumer project.
+3. **Run the pipeline** — invoke commands under [`commands/`](commands/) (e.g. `devflow.task`) or load as a plugin and use your host’s namespaced invocations.
 
 ## Adapters
 
 - [`adapters/flutter/ADAPTER.md`](adapters/flutter/ADAPTER.md) — Flutter/Dart commands, extra `plan.md` sections, MCP hints, test and PR gates.
+- [`adapters/flutter/templates/`](adapters/flutter/templates/) — adapter-specific templates used by `devflow.setup` to generate `AGENTS.md` and `REGISTRY.md`.
 - **Add a stack:** copy `adapters/flutter/` to `adapters/<name>/`, replace `ADAPTER.md` and `skills/`, then point `config.md` at `<name>`.
+
+## Setup command
+
+`devflow.setup` is a standalone pre-pipeline command.
+
+- Target output (consumer root): `AGENTS.md`, `REGISTRY.md`
+- Default behavior: update only `devflow-managed` blocks and preserve user content outside those blocks
+- Force rewrite: pass `--force` to overwrite full file contents
+- Template resolution: adapter `templates/` first, then `skills/devflow-setup/templates/` fallback
 
 ## Claude Code
 

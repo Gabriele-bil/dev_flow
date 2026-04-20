@@ -1,6 +1,6 @@
 # Flutter adapter (DevFlow)
 
-This file is the single source of truth for Flutter-specific behavior. Pipeline skills (`devflow-plan`, `devflow-implement`, `devflow-beautify`, `devflow-test`, `devflow-pr`) **must** read `@devflow/config.md`, resolve this adapter, then follow the sections below.
+Single source of truth for Flutter behavior. Pipeline skills (`devflow-plan`, `devflow-implement`, `devflow-beautify`, `devflow-test`, `devflow-pr`) **must** read `@devflow/config.md`, resolve adapter, then follow sections below.
 
 ## Technology skills (load by feature type)
 
@@ -19,6 +19,21 @@ This file is the single source of truth for Flutter-specific behavior. Pipeline 
 - **Dart MCP** — package APIs, Flutter/Dart signatures (use in plan, implement, beautify).
 - **Context7** — third-party docs when Dart MCP is insufficient.
 - **Supabase MCP** — schema, RLS, tables when the feature touches the database.
+
+## Setup: templates
+
+`devflow.setup` uses adapter templates first, then global fallback:
+
+- Preferred: `@devflow/adapters/flutter/templates/AGENTS.template.md`
+- Preferred: `@devflow/adapters/flutter/templates/REGISTRY.template.md`
+- Fallback (if adapter templates are missing): `@devflow/skills/devflow-setup/templates/*.template.md`
+
+Template intent:
+
+- `AGENTS.template.md`: short operational rules + skill references (`@...`) only.
+- `REGISTRY.template.md`: compact pattern registry and core conventions.
+
+Output must stay token-lean, imperative, filler-free.
 
 ## Plan: extra sections and templates
 

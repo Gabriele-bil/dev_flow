@@ -17,8 +17,8 @@ description: Use when creating or refactoring Flutter domain entities, DTOs, enu
 
 ## Why Not Abstract Entities?
 
-Entities and DTOs should normally be concrete immutable value types, not abstract classes.  
-Use abstraction for behavior contracts (`abstract interface class PetRepository`), not for data containers.
+Entities/DTOs should usually be concrete immutable value types, not abstract classes.  
+Use abstraction for behavior contracts (`abstract interface class PetRepository`), not data containers.
 
 ## Required Setup
 

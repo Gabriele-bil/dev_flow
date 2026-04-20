@@ -1,6 +1,6 @@
 # Examples: devflow-task
 
-Study structure and tone, not the fictional product details.
+Study structure/tone, not fictional product details.
 
 ---
 
@@ -8,18 +8,18 @@ Study structure and tone, not the fictional product details.
 
 **User:** “We should make notifications smarter.”
 
-**Agent (after reading `docs/product.md`, constitution/registry as needed):** Restates as HMW-style problem, then uses `AskQuestion` or numbered questions: (1) For which actor (owner vs co-owner)? (2) Smarter how — priority, grouping, quiet hours, or something else? (3) What counts as success?
+**Agent (after reading `docs/product.md`, constitution/registry as needed):** Restate as HMW problem. Ask with `AskQuestion` or numbered list: (1) actor (owner vs co-owner), (2) "smarter" dimension (priority/grouping/quiet hours/other), (3) success signal.
 
 **User:** “Owners. Group by pet and don’t spam when two co-owners edit the same thing. Success is fewer taps to see what matters.”
 
-**Agent:** Applies quick stress-test from `refinement-hints.md`, proposes three `kebab-case` names via `AskQuestion` (e.g. `notification-grouping`, `pet-notification-feed`, `smart-notification-inbox`). User picks one. Agent allocates next `NNN_`, runs verification checklist, writes `task.md`.
+**Agent:** Run quick stress-test from `refinement-hints.md`. Propose three `kebab-case` names via `AskQuestion` (for example `notification-grouping`, `pet-notification-feed`, `smart-notification-inbox`). User picks one. Allocate next `NNN_`, run verification checklist, write `task.md`.
 
 **Excerpt of resulting `task.md`:**
 
 ```markdown
 ## Summary
 
-Owners receive many notifications; the app should surface them in a scannable way per pet and avoid duplicate noise when co-owners trigger the same underlying events.
+Owners receive many notifications. Surface them per pet in scannable form. Reduce duplicate noise from co-owner actions on same event.
 
 ## Problem framing (HMW)
 
@@ -68,7 +68,7 @@ How might we help pet owners see the notifications that matter for each pet with
 ```markdown
 ## Summary
 
-Users can choose light, dark, or system default appearance; the choice persists across sessions.
+Users choose light, dark, or system mode. Choice persists across sessions.
 
 ## Problem framing (HMW)
 

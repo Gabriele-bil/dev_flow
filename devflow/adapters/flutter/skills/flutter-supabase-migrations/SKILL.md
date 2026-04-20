@@ -6,7 +6,7 @@ description: Use when creating, reviewing, or applying Supabase database migrati
 # Supabase Migrations for Flutter
 
 ## Overview
-Use migration files as the single source of truth for schema changes.
+Use migration files as single source of truth for schema changes.
 Do not edit remote schema manually in Studio for production workflows.
 
 ## When to Use
@@ -68,7 +68,7 @@ supabase db push --dry-run
 
 ## Drift Recovery Workflow
 
-Use this when local/remote migration history diverges.
+Use when local/remote migration history diverges.
 
 ### Inspect mismatch
 ```bash

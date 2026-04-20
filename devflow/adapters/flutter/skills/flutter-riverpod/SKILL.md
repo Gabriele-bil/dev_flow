@@ -6,8 +6,8 @@ description: Use when implementing, refactoring, or debugging Flutter state mana
 # Flutter Riverpod Expert
 
 ## Overview
-Use Riverpod v3-style patterns to keep state predictable, testable, and performant.
-Prefer `@riverpod` code generation and explicit invalidation rules.
+Use Riverpod v3 patterns for predictable, testable, performant state.
+Prefer `@riverpod` codegen + explicit invalidation.
 
 ## When to Use
 - Building features with Riverpod in Flutter.

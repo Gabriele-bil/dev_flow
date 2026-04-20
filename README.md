@@ -26,6 +26,7 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 
 | Command | Skill | Input → Output |
 |--------|--------|----------------|
+| `devflow.setup` | [`devflow/skills/devflow-setup/SKILL.md`](devflow/skills/devflow-setup/SKILL.md) | Consumer repo context + adapter templates → root `AGENTS.md` + `REGISTRY.md` |
 | `devflow.task` | [`devflow/skills/devflow-task/SKILL.md`](devflow/skills/devflow-task/SKILL.md) | Idea → `devflow/features/[NNN]_[name]/task.md` |
 | `devflow.plan` | [`devflow/skills/devflow-plan/SKILL.md`](devflow/skills/devflow-plan/SKILL.md) | `task.md` → `plan.md` |
 | `devflow.implement` | [`devflow/skills/devflow-implement/SKILL.md`](devflow/skills/devflow-implement/SKILL.md) | `plan.md` → code on `feat|fix|…/[NNN]-[name]` |
@@ -41,9 +42,13 @@ Command wrappers live in [`devflow/commands/`](devflow/commands/) (e.g. [`devflo
 
 | File | Role | Read by |
 |------|------|---------|
+| `AGENTS.md` | Global agent operating rules (token-lean, setup-managed sections) | setup + all steps (as host memory/context) |
+| `REGISTRY.md` | Shared patterns and conventions summary | setup + plan → pr |
 | `constitution.md` | Architecture, stack, layout | plan → pr |
 | `registry.md` | Shared patterns | plan → pr |
 | `docs/product.md` | Product / feature status | task |
+
+`devflow.setup` manages root `AGENTS.md` and `REGISTRY.md` using adapter templates. By default it updates only `devflow-managed` blocks; pass `--force` to overwrite full files.
 
 ---
 

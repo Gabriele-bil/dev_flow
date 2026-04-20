@@ -16,7 +16,7 @@ Run `/devflow.beautify [optional plan path]`.
 
 ## Purpose
 
-Review and improve implementation output produced by `devflow.implement` using a **multi-axis** lens: correctness, readability and simplification, architecture, security, performance, UI consistency, and responsive layout. This is the fourth step of the DevFlow pipeline.
+Review/improve `devflow.implement` output with **multi-axis** lens: correctness, readability/simplification, architecture, security, performance, UI consistency, responsive layout. Fourth DevFlow step.
 
 ## When NOT to Use
 
@@ -46,7 +46,7 @@ Always read before starting:
 
 ### Step 2 - Scope
 
-Analyze only files touched by the current `devflow.implement` run.
+Analyze only files touched by current `devflow.implement` run.
 
 - Do not expand scope to unrelated files
 - Do not refactor pre-existing code outside the implement summary

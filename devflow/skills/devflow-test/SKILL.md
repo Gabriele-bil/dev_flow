@@ -16,7 +16,7 @@ Run `/devflow.test [optional plan path]`.
 
 ## Purpose
 
-Write and execute tests for the current feature per the active adapter’s **Test** section (e.g. Flutter: unit + integration on Android and Chrome). This is the fifth step of the DevFlow pipeline.
+Write/run tests for current feature per active adapter **Test** section (for example Flutter: unit + integration on Android/Chrome). Fifth DevFlow step.
 
 ## When NOT to Use
 
@@ -70,7 +70,7 @@ Failure handling:
 
 ### Step 7 - Notify user
 
-After execution, respond with the actual command output. Do NOT summarize results without including the raw output — "all tests passed" is not acceptable without evidence.
+After execution, include actual command output. Do NOT report "all tests passed" without raw evidence.
 
 ```text
 ✅ Tests complete: [type]/[NNN]-[feature-name]
