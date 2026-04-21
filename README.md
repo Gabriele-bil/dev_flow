@@ -82,6 +82,14 @@ The [`devflow/`](devflow/) folder is a **dual-marketplace plugin**: same tree lo
 
 More detail: [`devflow/README.md`](devflow/README.md).
 
+### Recommended companion plugin: code-review-graph
+
+Use `code-review-graph` for blast-radius aware reviews in both Cursor and Claude with one setup:
+
+- `pipx install code-review-graph` (or `pip install code-review-graph`)
+- `code-review-graph install` (auto-detects configured platforms including Cursor and Claude Code)
+- `code-review-graph build` (initial graph indexing per repository)
+
 ---
 
 ## Conventions (Flutter adapter / example app)

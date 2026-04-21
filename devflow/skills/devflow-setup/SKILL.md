@@ -11,6 +11,7 @@ disable-model-invocation: true
 
 Create or refresh global AI context files (`AGENTS.md`, `REGISTRY.md`) and product context (`docs/product.md`) in the consumer project root.
 Output must be concise, stable, and safe to re-run.
+`AGENTS.md` must keep any template-provided `code-review-graph` skill reference intact.
 
 Command is **standalone** (pre-pipeline), not feature step like `task/plan/implement`.
 

@@ -20,4 +20,5 @@
 @devflow/adapters/flutter/skills/flutter-riverpod/SKILL.md
 @devflow/adapters/flutter/skills/flutter-theme/SKILL.md
 @devflow/adapters/flutter/skills/flutter-supabase/SKILL.md
+@code-review-graph/skills/code-review-graph/SKILL.md
 <!-- devflow-managed:end:skills -->

@@ -7,6 +7,10 @@ This directory is the **installable DevFlow package**: core pipeline skills, sla
 1. **Active stack** — edit [`config.md`](config.md); set **Adapter** to `flutter` (only bundled adapter today).
 2. **Run setup once** — execute `devflow.setup` to generate root `AGENTS.md` and `REGISTRY.md` for the consumer project.
 3. **Run the pipeline** — invoke commands under [`commands/`](commands/) (e.g. `devflow.task`) or load as a plugin and use your host’s namespaced invocations.
+4. **Enable code-review-graph** — install and configure once for all detected hosts:
+   - `pipx install code-review-graph` (or `pip install code-review-graph`)
+   - `code-review-graph install`
+   - `code-review-graph build`
 
 ## Adapters
 
@@ -22,6 +26,7 @@ This directory is the **installable DevFlow package**: core pipeline skills, sla
 - Default behavior: update only `devflow-managed` blocks and preserve user content outside those blocks
 - Force rewrite: pass `--force` to overwrite full file contents
 - Template resolution: adapter `templates/` first, then `skills/devflow-setup/templates/` fallback
+- Generated `AGENTS.md` includes `code-review-graph` skill reference for graph-aware reviews.
 
 ## Claude Code
 

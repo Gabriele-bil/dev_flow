@@ -13,6 +13,7 @@ Single source of truth for Flutter behavior. Pipeline skills (`devflow-plan`, `d
 | Entities, DTOs, JSON boundaries | `@devflow/adapters/flutter/skills/flutter-models/SKILL.md` |
 | Layout, breakpoints, scrollables | `@devflow/adapters/flutter/skills/flutter-layout/SKILL.md` |
 | Form / wizard flows | `@devflow/adapters/flutter/skills/flutter-form/SKILL.md` |
+| PR review, blast radius, architecture risk checks | `@code-review-graph/skills/code-review-graph/SKILL.md` |
 
 ## MCP (when available)
 
