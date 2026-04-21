@@ -90,6 +90,12 @@ Use `code-review-graph` for blast-radius aware reviews in both Cursor and Claude
 - `code-review-graph install` (auto-detects configured platforms including Cursor and Claude Code)
 - `code-review-graph build` (initial graph indexing per repository)
 
+### Required MCP baseline
+
+- `context7`
+- `sequential-thinking` ([MCP server](https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking))
+- `dart` only on Flutter projects/adapters
+
 ---
 
 ## Conventions (Flutter adapter / example app)

@@ -17,6 +17,10 @@ Single source of truth for Flutter behavior. Pipeline skills (`devflow-plan`, `d
 
 ## MCP (when available)
 
+- Required baseline for this adapter:
+  - `context7`
+  - `sequential-thinking` (MCP server: https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking)
+  - `dart` (required on Flutter projects)
 - **Dart MCP** — package APIs, Flutter/Dart signatures (use in plan, implement, beautify).
 - **Context7** — third-party docs when Dart MCP is insufficient.
 - **Supabase MCP** — schema, RLS, tables when the feature touches the database.

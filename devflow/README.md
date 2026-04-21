@@ -11,6 +11,10 @@ This directory is the **installable DevFlow package**: core pipeline skills, sla
    - `pipx install code-review-graph` (or `pip install code-review-graph`)
    - `code-review-graph install`
    - `code-review-graph build`
+5. **Ensure required MCP baseline**:
+   - `context7`
+   - `sequential-thinking` ([server reference](https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking))
+   - `dart` for Flutter adapters/projects
 
 ## Adapters
 

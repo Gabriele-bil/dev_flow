@@ -10,6 +10,7 @@
 - Use `slang` keys for user-visible copy; no hardcoded UI strings.
 - Cover compact/medium/expanded layouts with project breakpoints.
 - Run `dart format .` then `flutter analyze` after edit batches.
+- Required MCP baseline: `context7`, `sequential-thinking`, `dart` (Flutter required).
 <!-- devflow-managed:end:rules -->
 
 <!-- devflow-managed:start:skills -->

@@ -9,6 +9,7 @@
 - Follow layer order: migrations -> domain -> data -> providers -> UI.
 - No hardcoded user strings; use i18n system.
 - Run `{{format-cmd}}` then `{{analyze-cmd}}` after edit batches.
+- Required MCP baseline: `context7`, `sequential-thinking`; add `dart` when adapter is `flutter`.
 <!-- devflow-managed:end:rules -->
 
 <!-- devflow-managed:start:skills -->
