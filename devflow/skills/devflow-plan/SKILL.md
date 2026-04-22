@@ -28,9 +28,18 @@ Until `plan.md` is complete and saved:
 
 Deliverable is **`plan.md`**, not implementation.
 
-## Vertical slicing (guidance)
+## Vertical slicing (mandatory for plans with > 5 files)
 
-`task.md` subtasks stay outcome-level (see `devflow-task`). When subtasks read like **horizontal layers** (all data, then all UI), state in **Overview** how implementation should proceed in **vertical slices** (one end-to-end user-visible increment at a time) if that improves integrability. Do **not** rewrite subtask wording. The **Traceability** table must still map **each original subtask** to file path(s).
+`task.md` subtasks stay outcome-level (see `devflow-task`). When a plan has more than 5 files, define at least **2 vertical slice increments** in the **Architecture decisions** section — each slice is one end-to-end user-visible increment (not a layer). Group **File List** entries under slice headings.
+
+Example in Architecture decisions:
+```
+- **Slice 1 — data contract + shell**: DB migration + domain model + empty UI scaffold; compiles and renders blank screen
+- **Slice 2 — state + data flow**: provider + repository impl + loading/error states wired to UI
+- **Slice 3 — full UI + i18n**: complete widget tree + localization keys + responsive layout
+```
+
+For plans with 5 or fewer files, slicing is optional — note in Overview if sequential layer ordering is clearer. Do **not** rewrite subtask wording. The **Traceability** table must still map **each original subtask** to file path(s).
 
 ## Dependency ordering (reflect in File List)
 
@@ -43,6 +52,16 @@ If order must deviate for a vertical slice, note the exception in **Architecture
 - No `task.md` exists for the feature — run `devflow.task` first
 - The `task.md` is still in `draft` status with unresolved questions — finalize the task first
 - A `plan.md` already exists with status `ready` and no task subtasks have changed — re-run only if the plan needs updating
+
+## Input contract
+
+Before proceeding, verify:
+
+- [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md`
+- [ ] `task.md` has non-empty `## Summary` and `## Subtasks` sections
+- [ ] `task.md` Status is not `draft` with unresolved questions (if `draft`: all Key assumptions resolved or explicitly deferred)
+
+If any item fails → stop, report which check failed, do not write `plan.md`.
 
 ## Input
 
@@ -142,10 +161,10 @@ state the vertical-slice execution order here.]
 
 ## Traceability
 
-| Subtask | File(s) |
-|---------|---------|
-| [Subtask description from task.md] | [file path(s)] |
-| ... | ... |
+| Subtask | Acceptance criteria | File(s) |
+|---------|---------------------|---------|
+| [Subtask description from task.md] | [acceptance criterion from task.md] | [file path(s)] |
+| ... | ... | ... |
 
 ---
 
@@ -157,10 +176,10 @@ in this order to respect dependencies.
 **Batch hints (optional):** Before the first `###` of a dependency group, add one line:
 `**Batch:** S | M | L` (S ≈ 1-2 files, M ≈ 3-5, L ≈ 6+). For `L`, add `— split across `devflow.implement` sessions if needed`.
 
-### [NNN]. `[path/to/file.ext]` - [create | modify]
+### [NNN]. `[path/to/file.ext]` - [create | modify] [pending]
 [1-2 sentences on what this file contains and why it exists.]
 
-### [NNN]. `[path/to/file.ext]` - [create | modify]
+### [NNN]. `[path/to/file.ext]` - [create | modify] [pending]
 ...
 
 ---
@@ -189,7 +208,7 @@ After **Implementation checkpoints**, append **every extra plan section** requir
 
 ## Pre-implement checklist
 
-- [ ] Every `task.md` subtask appears in **Traceability**
+- [ ] Every `task.md` subtask appears in **Traceability** with its acceptance criterion
 - [ ] **File list** order respects **Dependency ordering** (and any stated exceptions)
 - [ ] All **adapter-specific sections** from `ADAPTER.md` are present or correctly omitted per adapter rules (e.g. i18n keys for UI)
 - [ ] **Implementation checkpoints** are actionable (commands per `ADAPTER.md` — analyze / tests / smoke)

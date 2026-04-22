@@ -73,6 +73,20 @@ Use the structure and constraints from:
 
 - `@devflow/adapters/angular/skills/angular-forms/SKILL.md`
 
+## Implement: skill load decision matrix
+
+When implementing files, load technology skills based on file path patterns:
+
+| File path pattern | Load skill |
+|---|---|
+| `*.component.ts`, `*.component.html` | `angular-component` |
+| `*.service.ts`, `*http*.ts`, `*api*.ts`, `*client*.ts` | `angular-http` |
+| `*.form*.ts`, `*-form.component.ts`, `*validator*.ts` | `angular-forms` |
+| `*.store.ts`, `*state*.ts`, `*signal*.ts`, `*.facade.ts` | `angular-state` |
+| `index.ts` barrel, module boundaries, new feature folder | `angular-architecture` |
+
+Load only the skills triggered by the current batch's file paths. Do not load all skills preemptively.
+
 ## Implement: commands and checklist
 
 ### Format, lint, test, build
@@ -108,6 +122,16 @@ Adapter does orchestration only. Domain rules live in skills:
 
 Same as implement pipeline: `lint`, `test`, `build`.
 
+### Beautify: performance profiling trigger
+
+Profile only when the plan calls out performance or a **Critical**-severity hotspot is flagged:
+
+- Use Angular DevTools (Component profiler, Change detection cycles) before refactoring rendering performance.
+- Investigate excessive change-detection cycles by checking signal/Observable scope before adding `OnPush` or `trackBy`.
+- Heavy computation in templates or services called on every render cycle — move to computed signals or memoized pipes.
+
+Default beautify relies on heuristics (avoid unnecessary recalculations in getters, narrow RxJS subscriptions, avoid `combineLatest` with broad streams). Profile only when warranted.
+
 ### Beautify: Angular-specific review axes
 
 Apply core `devflow-beautify` axes, then evaluate touched code with relevant Angular skills:
@@ -118,7 +142,26 @@ Apply core `devflow-beautify` axes, then evaluate touched code with relevant Ang
 - `angular-http`
 - `angular-state`
 
+### Beautify: accessibility checks
+
+Apply these Angular-specific accessibility checks in addition to core accessibility axis:
+
+- Interactive custom components have `role` attribute set correctly (`button`, `dialog`, `menu`, etc.)
+- Icon-only buttons and controls include `aria-label` or `aria-labelledby`
+- Form fields have associated `<label>` or `aria-label`; error messages linked via `aria-describedby`
+- Modal/dialog components trap focus on open (`cdkTrapFocus` or equivalent) and restore on close
+- Keyboard navigation: custom dropdowns, menus, and carousels handle arrow key / Enter / Escape
+- Color contrast: use design-system tokens; no hardcoded hex that may fail WCAG AA
+
+Severity: **Critical** for screen-reader-blocking issues; **Required** for missing labels on form controls; **Nit** for enhancement.
+
 ## Test: layout and commands
+
+### Coverage threshold
+
+`test-coverage-threshold: 80`
+
+Any feature leaving public surfaces below this threshold must be called out explicitly in the Step 2b gap report.
 
 ### Placement
 

@@ -17,6 +17,8 @@
 @devflow/skills/devflow-task/SKILL.md
 @devflow/skills/devflow-plan/SKILL.md
 @devflow/skills/devflow-implement/SKILL.md
+@devflow/skills/devflow-beautify/SKILL.md
+@devflow/skills/devflow-test/SKILL.md
 @devflow/adapters/flutter/skills/flutter-layout/SKILL.md
 @devflow/adapters/flutter/skills/flutter-riverpod/SKILL.md
 @devflow/adapters/flutter/skills/flutter-theme/SKILL.md

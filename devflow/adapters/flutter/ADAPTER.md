@@ -79,6 +79,21 @@ Tables, columns, RLS policies per `flutter-supabase` / `flutter-supabase-migrati
 
 All user-facing copy via **slang** keys and generated accessors — no hardcoded UI strings.
 
+## Implement: skill load decision matrix
+
+When implementing files, load technology skills based on file path patterns:
+
+| File path pattern | Load skill |
+|---|---|
+| `*/domain/*.dart`, `*_entity.dart`, `*_model.dart` | `flutter-models` |
+| `*/providers/*.dart`, `*_provider.dart`, `*_notifier.dart` | `flutter-riverpod` |
+| `*/datasource*.dart`, `*_datasource.dart`, `*_repository*.dart` | `flutter-supabase` |
+| `supabase/migrations/*.sql`, `*_migration.sql` | `flutter-supabase-migrations` |
+| `*/pages/*.dart`, `*/screens/*.dart`, `*/widgets/*.dart` | `flutter-theme` + `flutter-layout` |
+| `*/forms/*.dart`, `*_form*.dart`, `*_form_*.dart` | `flutter-form` |
+
+Load only the skills triggered by the current batch's file paths. Do not load all skills preemptively.
+
 ## Implement: commands and checklist
 
 ### Format, analyze, codegen
@@ -127,6 +142,18 @@ Apply these in addition to core `devflow-beautify` axes:
 - **Render cost:** avoid expensive work in `build()`; prefer lazy lists (`ListView.builder`/slivers) for large datasets.
 - **Responsive layout:** use `LayoutBuilder` + project breakpoints (`AppBreakpointWidth` / `AppBreakpointConstraints`) instead of raw viewport literals.
 
+### Beautify: accessibility checks
+
+Apply these Flutter-specific accessibility checks in addition to core accessibility axis:
+
+- Custom interactive widgets have `Semantics` wrappers with `label`, `button`, `onTap` as appropriate
+- Image-only or icon-only buttons include `Semantics(label: ...)` or `tooltip`
+- Color contrast: use semantic theme tokens (never hardcode colors that might fail WCAG AA)
+- `ExcludeSemantics` used only when intentional (decorative content)
+- `FocusNode` management correct for keyboard navigation in custom overlays and dialogs
+
+Severity: **Critical** for screen-reader-blocking issues (missing semantics on primary actions); **Required** for contrast violations; **Nit** for enhancement.
+
 ### Beautify: performance profiling trigger
 
 Profile only when plan calls out performance or when a likely hotspot is found:
@@ -136,6 +163,12 @@ Profile only when plan calls out performance or when a likely hotspot is found:
 - For large images in lists, follow project decoding/caching patterns.
 
 ## Test: layout and commands
+
+### Coverage threshold
+
+`test-coverage-threshold: 80`
+
+Any feature leaving public surfaces below this threshold must be called out explicitly in the Step 2b gap report.
 
 ### Placement
 
