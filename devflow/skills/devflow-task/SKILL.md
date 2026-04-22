@@ -159,6 +159,13 @@ Add implicit context from product.md. Never copy the raw input verbatim.]
 
 ---
 
+## Acceptance criteria
+
+- [ ] [Observable, falsifiable condition — e.g. "user sees inline error on empty required field save"]
+- [ ] [Each criterion maps to at least one subtask; no solution detail]
+
+---
+
 ## Notes
 
 [Assumptions made, edge cases identified, decisions taken during analysis.
@@ -173,6 +180,7 @@ Format rules:
 - **Key assumptions**: omit only for trivial, low-risk tasks; otherwise include the riskiest beliefs and validation hints.
 - **User story**: always `As a / I want to / So that`.
 - **Subtasks**: atomic and verifiable, no implementation details (no class names, methods, file paths).
+- **Acceptance criteria**: observable and falsifiable; one criterion per verifiable outcome; no solution detail.
 - **Notes**: analysis decisions only, not TODOs.
 - **Language**: English throughout.
 - **Style**: optimized for LLM consumption, concise, no filler words.
@@ -180,7 +188,17 @@ Format rules:
 
 See **`examples.md`** in this skill directory for full worked examples.
 
-### Step 9 - Notify user
+### Step 9 - Update docs/product.md feature status
+
+After writing `task.md`, update the **Feature status** table in `docs/product.md`:
+
+- If the feature is new: add a row with status `in-progress` and a short note
+- If the feature already exists with status `planned`: update to `in-progress`
+- Do not modify other rows or sections outside the `devflow-managed:feature-status` block
+
+If `docs/product.md` does not exist, skip this step and note it in the notify response.
+
+### Step 10 - Notify user
 
 After writing the file, respond with:
 
@@ -188,6 +206,8 @@ After writing the file, respond with:
 ✅ Task created: devflow/features/[NNN]_[feature-name]/task.md
 
 [User story in 1 line]
+
+docs/product.md: [updated | not found — create with devflow.setup]
 
 Continue to planning? → devflow.plan
 ```

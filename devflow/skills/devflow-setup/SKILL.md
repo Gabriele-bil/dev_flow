@@ -75,6 +75,18 @@ Rules:
 - If user refuses or does not know, store `[TODO: fill]`.
 - Keep questions short and grouped by topic (product, conventions, patterns, commands).
 
+### Step 3b - Codebase scan (optional, run after questionnaire)
+
+After collecting questionnaire answers, scan the live repo to ground REGISTRY.md in real patterns:
+
+1. Run `Glob` on the adapter's primary feature directory (e.g. `lib/features/*/` for Flutter, `src/app/*/` for Angular) to enumerate existing feature/page folders
+2. Sample 2-3 existing file names from each folder to infer naming conventions in use
+3. For each observed pattern, extract: name, trigger condition (`when`), and example file path
+
+Use these observations to pre-fill `pattern-1`, `pattern-2` (and optionally `pattern-3`) in the placeholder map before rendering — replacing any questionnaire `[TODO: fill]` values for patterns with real examples from the repo.
+
+If the feature directory does not exist or is empty, skip this step and use questionnaire values.
+
 ### Step 4 - Build placeholder map from answers + context
 
 Build final values for template placeholders from:
@@ -112,15 +124,11 @@ You must collect and resolve these fields before render:
 | `product-domain` | PRODUCT | Problem space/domain |
 | `target-users` | PRODUCT | Primary actors/users |
 | `primary-outcome` | PRODUCT | Main user value |
-| `feature-1-name` | PRODUCT | Key feature label |
-| `feature-1-status` | PRODUCT | `implemented` or `planned` |
-| `feature-1-notes` | PRODUCT | Scope/status notes |
-| `feature-2-name` | PRODUCT | Key feature label |
-| `feature-2-status` | PRODUCT | `implemented` or `planned` |
-| `feature-2-notes` | PRODUCT | Scope/status notes |
-| `feature-3-name` | PRODUCT | Key feature label |
-| `feature-3-status` | PRODUCT | `implemented` or `planned` |
-| `feature-3-notes` | PRODUCT | Scope/status notes |
+| `feature-[N]-name` | PRODUCT | Key feature label (N = 1, 2, 3…) |
+| `feature-[N]-status` | PRODUCT | `implemented`, `planned`, `in-progress`, or `deprecated` |
+| `feature-[N]-notes` | PRODUCT | Scope/status notes |
+
+Collect at least 3 features. Ask: "List your key features (name, status, notes). Add as many as needed." Add one table row per feature. `devflow.task` will maintain this table as features progress.
 
 ### Step 6 - Render token-lean content
 
@@ -138,6 +146,21 @@ Budget targets:
 - `AGENTS.md`: under ~300 tokens
 - `REGISTRY.md`: under ~600 tokens
 - `docs/product.md`: under ~700 tokens
+
+### Step 6b - Token budget check (after render, before write)
+
+After rendering each file, estimate token count using word count as proxy (300 words ≈ 400 tokens):
+
+- `AGENTS.md`: warn if rendered content exceeds ~225 words
+- `REGISTRY.md`: warn if rendered content exceeds ~450 words
+- `docs/product.md`: warn if rendered content exceeds ~525 words
+
+If over budget, trim in this order:
+1. Remove worked examples or multi-sentence explanations from bullets — replace with imperative fragment
+2. Remove any sentence starting with "This section..." or "Note that..."
+3. Shorten skill reference paths only if duplicated elsewhere in the file
+
+Log the final word count per file in the Step 8 summary.
 
 ### Step 7 - Write files
 

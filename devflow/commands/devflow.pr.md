@@ -3,8 +3,8 @@ name: devflow.pr
 description: Commit, push, and open a PR for the current DevFlow feature using the devflow-pr skill workflow.
 argument-hint: [optional notes for PR body]
 disable-model-invocation: true
-model: haiku
-effort: low
+model: sonnet
+effort: medium
 ---
 
 Use `@devflow/skills/devflow-pr/SKILL.md` and execute it exactly.

@@ -24,6 +24,16 @@ Write/run tests for current feature per active adapter **Test** section (unit/in
 - Neither `devflow.implement` nor `devflow.beautify` has run for this feature — there is no code to test
 - The goal is to test a pre-existing feature not modified in this DevFlow run — open a separate task for that
 
+## Input contract
+
+Before proceeding, verify:
+
+- [ ] `devflow.implement` (and optionally `devflow.beautify`) has run for this feature
+- [ ] `plan.md` exists at `devflow/features/[NNN]_[feature-name]/plan.md`
+- [ ] Active adapter analyze/typecheck reports no errors
+
+If any item fails → stop, report which check failed, do not write test files.
+
 ## Input
 
 - List of files created/modified by `devflow.implement` and `devflow.beautify`
@@ -51,9 +61,19 @@ Test only files belonging to the current feature.
 - Do not write tests for shared/core files or pre-existing code unless they were modified in this DevFlow run
 - Keep test additions focused on files touched by current feature implementation
 
+### Step 2b - Coverage gap check
+
+Before writing any test, enumerate coverage gaps:
+
+1. List all public functions, classes, and state methods in feature files from the implement summary
+2. For each: note whether a happy-path test case and at least one error/edge-path case exist or will be written
+3. Explicitly name any public surface with no test coverage — do not silently skip
+
+Report the gap inventory before writing tests so the user can see what will and will not be covered. If the adapter defines a `test-coverage-threshold`, flag any public surface that would cause the feature to fall below it.
+
 ### Step 3 through 6 - Author and run tests
 
-Using `task.md`, `plan.md`, and the implement/beautify summaries:
+Read `task.md` **Acceptance criteria** section first — derive at least one test case per criterion. Then use `plan.md`, the coverage gap inventory from Step 2b, and the implement/beautify summaries:
 
 1. **Placement** — mirror source layout and integration paths per `ADAPTER.md` → **Test**.
 2. **Unit tests** — cover models, state, domain rules, and UI assertions per `ADAPTER.md` (load any technology skills it references).

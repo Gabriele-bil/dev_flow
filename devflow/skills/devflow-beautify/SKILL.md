@@ -24,6 +24,16 @@ Review/improve `devflow.implement` output with **multi-axis** lens: correctness,
 - The stack’s analyze/typecheck command (per active `ADAPTER.md`) still reports errors from the implement step — fix those before beautifying
 - The intent is to refactor pre-existing code not touched by this DevFlow run — that is out of scope; open a separate task instead
 
+## Input contract
+
+Before proceeding, verify:
+
+- [ ] `devflow.implement` has run and its summary lists at least one file created/modified
+- [ ] `plan.md` exists at `devflow/features/[NNN]_[feature-name]/plan.md`
+- [ ] Active adapter analyze/typecheck reports no unresolved errors
+
+If any item fails → stop, report which check failed, do not apply changes.
+
 ## Input
 
 - List of files created/modified by `devflow.implement` (from its summary)
@@ -66,7 +76,7 @@ Review each in-scope file against **every** axis below. Collect findings across 
 
 #### Correctness
 
-- Implementation matches `plan.md` acceptance criteria and stated behavior
+- Implementation matches each acceptance criterion listed in `task.md` **Acceptance criteria** section (not just plan.md behavior)
 - Edge cases and error paths are handled (null, empty, loading/error UI, async failure)
 - State updates are consistent (no obvious races or stale UI assumptions)
 
@@ -124,6 +134,16 @@ Do not add blanket memoization or rendering boundaries everywhere - overuse hurt
 - Adaptive branching follows adapter conventions
 - Avoid raw viewport/layout literals when shared breakpoint tokens exist
 
+#### Accessibility
+
+- Interactive elements have descriptive labels (button text, icon semantics, ARIA roles)
+- Custom interactive widgets expose accessibility metadata per adapter conventions (see active `ADAPTER.md`)
+- Color-only communication has a non-color fallback
+- Focus traversal order is logical for keyboard and assistive-technology navigation
+- Modal/overlay components manage focus correctly (trap on open, restore on close)
+
+For stack-specific checks, follow the **Beautify: accessibility** section of the active `ADAPTER.md`.
+
 ### Step 4 - Apply changes
 
 #### Severity labels
@@ -159,9 +179,20 @@ Propose before applying:
 - Any change that modifies public API signatures
 - Simplifications where behavior preservation is not obvious
 
-**Chesterton + incrementality:** for structural or simplification proposals, state briefly why the code might exist as-is, then the proposed change. Prefer **one logical change per proposal** (or per user approval round). If tests exist for the feature, run adapter test commands relevant to touched scope after substantive refactors when feasible.
+**Proposal grouping:** group proposals by type before presenting them. Same-type proposals (all naming changes together, all structural refactors together, all extract-component proposals together) share one approval request. Different types each get their own request.
 
-Use this format and wait for user response before each proposed change:
+**Stall-out rule:** after 3 consecutive proposal rounds with no user approval on any item, stop proposing and emit:
+
+```text
+⚠️ Beautify stalled: [N] proposals pending without approval.
+Options: (1) approve all remaining, (2) skip all remaining, (3) continue one by one
+```
+
+Wait for user choice before continuing.
+
+**Chesterton + incrementality:** for structural or simplification proposals, state briefly why the code might exist as-is, then the proposed change. If tests exist for the feature, run adapter test commands relevant to touched scope after substantive refactors when feasible.
+
+Use this format and wait for user response before each grouped proposal round:
 
 ```text
 💡 [Optional: Nit / Optional / Consider] Proposed improvement: [file path]
@@ -175,6 +206,7 @@ After edits, check **only** implement-touched files for unused imports, unreacha
 
 - Remove directly when obviously safe (unused import, dead branch after a certain refactor you just made)
 - If removal might affect callers outside the summary, list explicitly and ask: `Dead code candidates: … — remove now?`
+- **Barrel file exception:** never remove an import from a barrel/re-export file (`index.ts`, `_domain.dart`, `_data.dart`, or files matching `*_*.dart` / `*.barrel.ts`) based on local scope analysis alone — barrel imports serve external consumers that are outside the implement summary. If a barrel import looks unused locally, list it as a candidate and ask; do not remove directly.
 
 ### Step 5 - Run commands
 
@@ -205,6 +237,7 @@ After completion, respond with:
 - **Architecture**: [brief summary, or "no changes"]
 - **UI consistency**: [brief summary, or "no changes"]
 - **Responsive layout**: [brief summary, or "no changes"]
+- **Accessibility**: [brief summary, or "no changes"]
 
 ### Findings by severity (if any)
 - **Critical**: [list or "none"]
