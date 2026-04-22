@@ -154,7 +154,6 @@ Integration (sequential: Android then Chrome):
 
 ```bash
 flutter test integration_test/features/[feature-name]/ -d emulator-[ID]
-flutter test integration_test/features/[feature-name]/ -d chrome
 ```
 
 Use `flutter_test` and Riverpod test utilities; mock Supabase — no real network in unit tests.
