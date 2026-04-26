@@ -38,11 +38,24 @@ Never edit user content outside managed blocks unless `--force` is set.
 
 ## Workflow
 
-### Step 1 - Resolve adapter
+### Step 1 - Detect and resolve adapter
 
-1. Read `@devflow/config.md`.
-2. Extract `Adapter` and `Adapter root`.
-3. Build adapter contract path:
+Before loading templates, determine the active technology stack and update the configuration:
+
+1. Scan the consumer project root to detect the stack:
+   - If `pubspec.yaml` exists, adapter is `flutter`.
+   - If `angular.json` exists, or `analog` / `@angular/core` are in `package.json`, adapter is `angular`.
+2. If the stack cannot be detected automatically, ask the user: "What stack are you using? (Available adapters: angular, flutter)" and wait for their choice.
+3. Overwrite `@devflow/config.md` with the resolved adapter:
+   ```markdown
+   # DevFlow Configuration
+
+   **Adapter:** <adapter>  
+   **Adapter root:** `devflow/adapters/<adapter>/`
+
+   Pipeline skills read this file first, then load `@devflow/adapters/<adapter>/ADAPTER.md` for technology-specific commands, plan sections, checklists, and skill references.
+   ```
+4. Build adapter contract path:
    `@devflow/adapters/<adapter>/ADAPTER.md`
 
 ### Step 2 - Load contract and templates
