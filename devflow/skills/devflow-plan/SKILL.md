@@ -92,6 +92,7 @@ Always read:
 
 - `constitution.md` (architecture rules, conventions, stack)
 - `registry.md` (existing patterns and shared utilities)
+- `@devflow/adapters/common/skills/common-clean-code/SKILL.md` (clean code, SOLID rules)
 
 Then apply the **Technology skills** table in the active `ADAPTER.md`: load each listed `@devflow/adapters/.../SKILL.md` when its trigger matches the feature (DB, UI, forms, etc.).
 
@@ -259,7 +260,7 @@ Continue to implementation? -> devflow.implement
 | | |
 |---|---|
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md` |
-| Reads | `constitution.md`, `registry.md` |
+| Reads | `constitution.md`, `registry.md`, `@devflow/adapters/common/skills/common-clean-code/SKILL.md` |
 | Reads (adapter) | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md`; technology skills per ADAPTER table |
 | Writes | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Next step | `devflow.implement` |

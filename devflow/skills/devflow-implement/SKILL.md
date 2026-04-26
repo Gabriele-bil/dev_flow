@@ -105,14 +105,9 @@ Each file must:
 
 ### Save point (for large plans)
 
-If the plan has 6 or more files to implement, create an intermediate commit after every 5 files implemented:
+**Do not commit during implementation.** Never run `git commit` at any point in the implement step — not for save points, not for WIP snapshots, not for partial progress.
 
-```bash
-git add .
-git commit -m "wip: implement [feature-name] — files 1–5 of N"
-```
-
-This creates a rollback point without losing progress. Do NOT create save point commits for plans with fewer than 6 files.
+If the plan has 6 or more files, mark progress in `plan.md` (`[done]` entries) instead of committing. Commits happen only in `devflow.pr`.
 
 ### Step 5 - Codegen (conditional)
 
@@ -199,6 +194,7 @@ Continue to beautify? -> devflow.beautify
 | "I'll skip loading/error/empty—happy path first" | Incomplete async UX fails review and `devflow.beautify`; ship all states per adapter rules |
 | "I'll wire the datasource first and add the repository type later" | Contract-first boundaries prevent leaky APIs and inconsistent errors |
 | "I'll throw `Exception` here and return `String` there" | Mixed error styles break UI handling; stick to one failure/result pattern |
+| "I'll commit a save point to avoid losing progress" | Never commit during implement. Mark `[done]` in `plan.md` instead. Commits happen in `devflow.pr` only. |
 
 ## I/O Reference
 
