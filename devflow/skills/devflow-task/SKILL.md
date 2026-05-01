@@ -212,6 +212,17 @@ docs/product.md: [updated | not found — create with devflow.setup]
 Continue to planning? → devflow.plan
 ```
 
+## Common Rationalizations
+
+| Thought | Reality |
+|---------|---------|
+| “Idea clear — skip to devflow.plan” | `task.md` HMW + scope + assumptions ground `plan.md`. Skipping → undocumented scope, missing acceptance criteria |
+| “Small task — skip clarification” | Unvalidated scope → plan rework. Ask before writing when material unknowns exist |
+| “I’ll use user’s wording for Summary” | Raw input in Summary useless for planning. Rewrite and enrich with product context |
+| “Quick feature — skip stress-test” | Scope creep starts small. Run stress-test (Step 4) even on trivial ideas |
+| “NNN is probably unique” | Duplicate prefixes corrupt traceability. Read `devflow/features/` and verify before writing |
+| “Subtasks can be vague — plan.md will clarify” | Vague subtasks → vague traceability. `devflow.implement` can’t prove coverage from vague subtasks |
+
 ## Anti-patterns
 
 - Copy-pasting the user’s raw wording into **Summary** or **HMW**

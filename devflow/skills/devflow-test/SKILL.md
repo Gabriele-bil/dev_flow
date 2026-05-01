@@ -63,13 +63,15 @@ Test only files belonging to the current feature.
 
 ### Step 2b - Coverage gap check
 
+**Beyonce Rule:** if behavior matters enough to keep, it deserves a test. No "too simple to test" exceptions.
+
 Before writing any test, enumerate coverage gaps:
 
 1. List all public functions, classes, and state methods in feature files from the implement summary
 2. For each: note whether a happy-path test case and at least one error/edge-path case exist or will be written
 3. Explicitly name any public surface with no test coverage — do not silently skip
 
-Report the gap inventory before writing tests so the user can see what will and will not be covered. If the adapter defines a `test-coverage-threshold`, flag any public surface that would cause the feature to fall below it.
+Report gap inventory before writing tests so user can see what will and will not be covered. If adapter defines `test-coverage-threshold`, flag any public surface that would cause feature to fall below it.
 
 ### Step 3 through 6 - Author and run tests
 
@@ -154,5 +156,6 @@ Wait for user choice before continuing.
 | Reads | files from `devflow.implement` / `devflow.beautify` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md`, `registry.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
+| Reads (optional) | `@devflow/references/testing-patterns.md` — stack-agnostic patterns reference |
 | Writes | Test output paths per active `ADAPTER.md` → **Test** |
 | Next step | `devflow.pr` |

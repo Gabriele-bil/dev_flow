@@ -33,6 +33,7 @@ All identifiers, methods, properties, and comments use English. Universal readab
 - Comments explain "why". Code explains "what". Delete redundant comments.
 - No `else` when early return works. Reduce nesting.
 - Keep entities small (< 50 lines for classes, < 10 for methods).
+- **Rule of 500:** file over 500 lines → split. Single-responsibility breakdown signal.
 
 **Value objects:** wrap domain primitives (IDs, emails, amounts) in typed objects. Prevent misuse. Expose only valid states.
 

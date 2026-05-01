@@ -244,6 +244,17 @@ Continue to implementation? -> devflow.implement
 - **Often parallelizable once contracts exist:** Focused leaf tests, copy/content-only updates, isolated components/modules that do not change shared contracts.
 - **Rule:** Lock shared types/contracts first; then parallelize leaf work.
 
+## Common Rationalizations
+
+| Thought | Reality |
+|---------|---------|
+| "Traceability optional for small plans" | `devflow.implement` can't prove subtask coverage without it. Always include |
+| "Skip vertical slices — implement figures out order" | >5 files without slices → big-bang implement, no checkpoints, no early validation |
+| "File order doesn't matter much" | Wrong dependency order (e.g. UI before migration) → compile/runtime failures in implement |
+| "Leave Open questions, mark Status ready" | `devflow.implement` works from what's written. Unresolved questions → silent bugs |
+| "Adapter sections don't apply here" | Omitting required `ADAPTER.md` sections → `devflow.beautify` and `devflow.test` flag missing patterns |
+| "Architecture decisions during implement" | Mid-implement decisions not in `plan.md` → silent deviations, no traceability |
+
 ## Red flags
 
 | Symptom | Why it fails |
