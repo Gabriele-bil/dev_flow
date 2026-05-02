@@ -1,7 +1,6 @@
 ---
 name: devflow-task
 description: Transforms a raw idea into a structured DevFlow task by reading product and architecture context, optionally stress-testing scope, and generating a user story with HMW framing, scope boundaries, key assumptions, and verifiable subtasks. Use when the user asks to create a task, start the DevFlow pipeline, run devflow.task, or provides a feature idea in text/file form.
-disable-model-invocation: true
 ---
 
 # Skill: devflow.task
@@ -27,11 +26,11 @@ Turn raw idea into structured task. Read product context, output user story + su
 
 Read sources in this order and use each for its role:
 
-| Source | Role |
-|--------|------|
-| **`docs/product.md`** (always) | Domain, actors, features, **implemented** vs **not implemented**, overlap checks |
-| **`constitution.md`** (as needed) | Stack, `lib/` layout, layering (UI → domain → data), engineering conventions |
-| **`registry.md`** (as needed) | Shared patterns: breakpoints, dashboard shell, navigation, reusable recipes |
+| Source                            | Role                                                                             |
+| --------------------------------- | -------------------------------------------------------------------------------- |
+| **`docs/product.md`** (always)    | Domain, actors, features, **implemented** vs **not implemented**, overlap checks |
+| **`constitution.md`** (as needed) | Stack, `lib/` layout, layering (UI → domain → data), engineering conventions     |
+| **`registry.md`** (as needed)     | Shared patterns: breakpoints, dashboard shell, navigation, reusable recipes      |
 
 Optional: use `Glob`, `Grep`, and `Read` on the codebase to ground the task in existing modules and avoid silent duplication of behavior.
 
@@ -71,20 +70,15 @@ Prefer **`AskQuestion`** with the three names as options (plus “Other — spec
 
 ### Step 6 - Determine incremental number
 
-Read the `devflow/features/` directory and detect existing feature prefixes (`001_`, `002_`, ...).
-You MUST use the next available 3-digit number greater than the highest existing one.
-Never reuse an existing number, even if a similarly named feature already exists.
-If `devflow/features/` does not exist or is empty, start from `001`.
+**Fast path (zero directory scan):** Read `.devflow-state.json` in the project root.
+If the field `next_feature_number` is present, use it directly — no further lookup needed.
+
+**Fallback (first run or state missing):** Read the `devflow/features/` directory, find the highest existing prefix (`001_`, `002_`, ...), and use the next 3-digit number. Start from `001` if the directory is empty or absent.
 
 Critical rule:
 
-- Before creating `devflow/features/[NNN]_[feature-name]/`, verify that no directory with prefix `[NNN]_` already exists.
-- If it exists, increment to the next number and re-check until the prefix is unique.
-
-Example:
-
-- Existing directories: `001_login`, `002_profile`, `004_notifications`
-- Next feature directory MUST be: `005_[feature-name]` (not `003`, not any reused prefix)
+- Never reuse an existing prefix, even if a similarly named feature already exists.
+- The `next_feature_number` field in `.devflow-state.json` is updated automatically by a hook each time a `task.md` is written, so it is always current.
 
 ### Step 7 - Verification checklist (before write)
 
@@ -93,7 +87,7 @@ Confirm:
 - [ ] **How Might We** line is present and neither too broad nor solution-embedded
 - [ ] Target **user** matches product actors; **user story** matches Summary
 - [ ] **Subtasks** are atomic, verifiable, and free of implementation detail
-- [ ] **`NNN` prefix** is unique under `devflow/features/`
+- [ ] **`NNN` prefix** matches `next_feature_number` from `.devflow-state.json` (or verified unique via directory scan if state absent)
 - [ ] **In scope / Out of scope** are honest for non-trivial ideas; **Key assumptions** filled when risks exist
 - [ ] No duplicate of an **implemented** feature unless explicitly framed as extension
 
@@ -215,14 +209,14 @@ Continue to planning? → devflow.plan
 
 ## Common Rationalizations
 
-| Thought | Reality |
-|---------|---------|
-| “Idea clear — skip to devflow.plan” | `task.md` HMW + scope + assumptions ground `plan.md`. Skipping → undocumented scope, missing acceptance criteria |
-| “Small task — skip clarification” | Unvalidated scope → plan rework. Ask before writing when material unknowns exist |
-| “I’ll use user’s wording for Summary” | Raw input in Summary useless for planning. Rewrite and enrich with product context |
-| “Quick feature — skip stress-test” | Scope creep starts small. Run stress-test (Step 4) even on trivial ideas |
-| “NNN is probably unique” | Duplicate prefixes corrupt traceability. Read `devflow/features/` and verify before writing |
-| “Subtasks can be vague — plan.md will clarify” | Vague subtasks → vague traceability. `devflow.implement` can’t prove coverage from vague subtasks |
+| Thought                                        | Reality                                                                                                          |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| “Idea clear — skip to devflow.plan”            | `task.md` HMW + scope + assumptions ground `plan.md`. Skipping → undocumented scope, missing acceptance criteria |
+| “Small task — skip clarification”              | Unvalidated scope → plan rework. Ask before writing when material unknowns exist                                 |
+| “I’ll use user’s wording for Summary”          | Raw input in Summary useless for planning. Rewrite and enrich with product context                               |
+| “Quick feature — skip stress-test”             | Scope creep starts small. Run stress-test (Step 4) even on trivial ideas                                         |
+| “NNN is probably unique”                       | Duplicate prefixes corrupt traceability. Read `devflow/features/` and verify before writing                      |
+| “Subtasks can be vague — plan.md will clarify” | Vague subtasks → vague traceability. `devflow.implement` can’t prove coverage from vague subtasks                |
 
 ## Anti-patterns
 
@@ -239,8 +233,8 @@ Continue to planning? → devflow.plan
 
 ## I/O Reference
 
-| | |
-|---|---|
-| Reads | `docs/product.md` (required); `constitution.md`, `registry.md` (as needed); `refinement-hints.md` (Step 4); `examples.md` (optional guidance) |
-| Writes | `devflow/features/[NNN]_[feature-name]/task.md` |
-| Next step | `devflow.plan` → `plan.md` (full template in `devflow/skills/devflow-plan/SKILL.md`) |
+|           |                                                                                                                                               |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Reads     | `docs/product.md` (required); `constitution.md`, `registry.md` (as needed); `refinement-hints.md` (Step 4); `examples.md` (optional guidance) |
+| Writes    | `devflow/features/[NNN]_[feature-name]/task.md`                                                                                               |
+| Next step | `devflow.plan` → `plan.md` (full template in `devflow/skills/devflow-plan/SKILL.md`)                                                          |

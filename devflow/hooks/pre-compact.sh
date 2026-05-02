@@ -57,6 +57,16 @@ PENDING_JSON=$(printf '%s\n' "$PENDING_PATHS" | jq -Rn '[inputs | select(length 
 
 TOTAL=$((DONE_COUNT + PENDING_COUNT))
 
+# Compute next_feature_number from devflow/features/ directory
+NEXT_FEATURE_NUMBER="001"
+if [ -d "devflow/features" ]; then
+  HIGHEST=$(ls -1 "devflow/features" 2>/dev/null \
+    | grep -oE '^[0-9]{3}' | sort -n | tail -1)
+  if [ -n "$HIGHEST" ]; then
+    NEXT_FEATURE_NUMBER=$(printf '%03d' $((10#$HIGHEST + 1)))
+  fi
+fi
+
 # Map plan status to the next devflow pipeline step
 case "$PLAN_STATUS" in
   "ready")        NEXT_STEP="devflow.implement" ;;
@@ -78,12 +88,14 @@ jq -n \
   --argjson pending_count "$PENDING_COUNT" \
   --argjson done_files    "$DONE_JSON"     \
   --argjson pending_files "$PENDING_JSON"  \
+  --arg next_feature_number "$NEXT_FEATURE_NUMBER" \
   '{
     saved_at:       $saved_at,
     plan_path:      $plan_path,
     feature:        $feature,
     plan_status:    $plan_status,
     next_step:      $next_step,
+    next_feature_number: $next_feature_number,
     progress: {
       done:    $done_count,
       pending: $pending_count,

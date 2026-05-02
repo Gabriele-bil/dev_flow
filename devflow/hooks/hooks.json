@@ -59,6 +59,18 @@
           }
         ],
         "description": "Accumulate modified file paths to .devflow-changed-files.tmp for batch format+typecheck at Stop time."
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/post-task-create.sh",
+            "async": true,
+            "timeout": 5
+          }
+        ],
+        "description": "After writing a task.md under devflow/features/, update next_feature_number in .devflow-state.json so devflow.task can skip the directory scan."
       }
     ],
     "PreCompact": [

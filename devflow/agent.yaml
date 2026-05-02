@@ -186,6 +186,11 @@ hooks:
     script: hooks/post-edit-accumulate.sh
     async: true
     description: "Accumulate modified file paths to .devflow-changed-files.tmp for batch format+typecheck at Stop time"
+  - event: PostToolUse
+    matcher: "Write"
+    script: hooks/post-task-create.sh
+    async: true
+    description: "After writing task.md under devflow/features/, update next_feature_number in .devflow-state.json to skip directory scan on next devflow.task"
   - event: Stop
     script: hooks/stop-format-typecheck.sh
     description: "Run adapter format+analyze on files modified this response (dart format/analyze or pnpm lint/tsc)"

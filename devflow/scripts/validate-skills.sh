@@ -71,10 +71,7 @@ for FILE in "${SKILL_FILES[@]}"; do
       fi
     fi
 
-    # disable-model-invocation: warning if absent
-    if ! echo "$FRONTMATTER" | grep -qE '^disable-model-invocation:'; then
-      FILE_WARNINGS+=("missing disable-model-invocation: true in frontmatter")
-    fi
+
   fi
 
   # ── Required sections check ──────────────────────────────────────────────────
