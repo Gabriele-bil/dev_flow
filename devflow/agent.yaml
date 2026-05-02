@@ -1,0 +1,194 @@
+# DevFlow Plugin Catalog
+# Machine-readable index of all pipeline components.
+# Updated manually when commands/skills/agents are added or removed.
+
+name: devflow
+version: "1.0.0"
+description: "Spec-driven development pipeline: task → plan → implement → beautify → test → PR"
+
+pipeline:
+  steps:
+    - id: setup
+      command: /devflow.setup
+      skill: devflow-setup
+      description: "Generate or update AGENTS.md, REGISTRY.md, and docs/product.md in the consumer project root from adapter templates with a mandatory full questionnaire"
+    - id: task
+      command: /devflow.task
+      skill: devflow-task
+      description: "Transforms a raw idea into a structured DevFlow task by reading product and architecture context, optionally stress-testing scope, and generating a user story with HMW framing, scope boundaries, key assumptions, and verifiable subtasks"
+    - id: plan
+      command: /devflow.plan
+      skill: devflow-plan
+      description: "Transforms a structured DevFlow task into a detailed, file-oriented implementation plan for devflow.implement"
+    - id: implement
+      command: /devflow.implement
+      skill: devflow-implement
+      description: "Implements all files defined in a DevFlow plan using project architecture conventions, MCP-assisted API validation, and verification steps"
+    - id: beautify
+      command: /devflow.beautify
+      skill: devflow-beautify
+      description: "Reviews and improves devflow.implement output across correctness, readability, security, performance, architecture compliance, and UI consistency"
+    - id: test
+      command: /devflow.test
+      skill: devflow-test
+      description: "Writes and executes unit and integration tests for the current DevFlow feature using the active adapter targets, with bounded retry handling and standardized reporting"
+    - id: pr
+      command: /devflow.pr
+      skill: devflow-pr
+      description: "Commits all changes, pushes the current DevFlow feature branch, and opens a pull request toward main"
+
+  orchestrator:
+    command: /devflow.ship
+    skill: devflow-ship
+    description: "Pre-merge gate before devflow.pr. Dispatches code-reviewer, security-auditor, and test-engineer in parallel, synthesizes reports, and routes to devflow.pr if no blockers"
+
+agents:
+  - id: code-reviewer
+    path: agents/code-reviewer.md
+    description: "Staff-engineer-level code reviewer. Five-axis review across correctness, readability, architecture, security, performance. Use before merge or via devflow.ship fan-out"
+    invoked_by: devflow.ship
+  - id: security-auditor
+    path: agents/security-auditor.md
+    description: "Security engineer focused on exploitable vulnerabilities, threat modeling, and secure coding. Use for security-focused review or via devflow.ship fan-out"
+    invoked_by: devflow.ship
+  - id: test-engineer
+    path: agents/test-engineer.md
+    description: "QA engineer focused on test strategy, coverage gap analysis, and test quality. Use for coverage review, test design, or via devflow.ship fan-out"
+    invoked_by: devflow.ship
+
+skills:
+  core:
+    - id: devflow-setup
+      path: skills/devflow-setup/SKILL.md
+      description: "Generates or updates AGENTS.md, REGISTRY.md, and docs/product.md in the consumer project root from adapter templates using token-lean managed sections and a mandatory questionnaire"
+    - id: devflow-task
+      path: skills/devflow-task/SKILL.md
+      description: "Transforms a raw idea into a structured DevFlow task by reading product and architecture context, optionally stress-testing scope, and generating a user story with HMW framing, scope boundaries, key assumptions, and verifiable subtasks"
+    - id: devflow-plan
+      path: skills/devflow-plan/SKILL.md
+      description: "Transforms a structured DevFlow task into a detailed, file-oriented implementation plan for devflow.implement"
+    - id: devflow-implement
+      path: skills/devflow-implement/SKILL.md
+      description: "Implements all files defined in a DevFlow plan using project architecture conventions, MCP-assisted API validation, and verification steps"
+    - id: devflow-beautify
+      path: skills/devflow-beautify/SKILL.md
+      description: "Reviews and improves devflow.implement output across correctness, readability, security, performance, architecture compliance, and UI consistency"
+    - id: devflow-test
+      path: skills/devflow-test/SKILL.md
+      description: "Writes and executes unit and integration tests for the current DevFlow feature using the active adapter targets, with bounded retry handling and standardized reporting"
+    - id: devflow-pr
+      path: skills/devflow-pr/SKILL.md
+      description: "Commits all changes, pushes the current DevFlow feature branch, and opens a pull request toward main"
+    - id: devflow-discovery
+      path: skills/devflow-discovery/SKILL.md
+      description: 'Orients AI agents to the dev-flow pipeline at session start. Answers "where do I begin?" by mapping current project state to the correct pipeline entry point. Injected automatically via SessionStart hook'
+
+  adapters:
+    flutter:
+      path: adapters/flutter/ADAPTER.md
+      skills:
+        - id: flutter-theme
+          path: adapters/flutter/skills/flutter-theme/SKILL.md
+          description: "Use when implementing or refactoring Flutter visual styling (colors, typography, radii, spacing, component themes, light/dark mode). Enforces theme-first UI, semantic Material 3 tokens, and scoped overrides only when unavoidable"
+        - id: flutter-form
+          path: adapters/flutter/skills/flutter-form/SKILL.md
+          description: "Use when implementing or refactoring Flutter forms with flutter_form_builder and form_builder_validators, including validation, submit flow, edit forms, and multi-step wizards"
+        - id: flutter-layout
+          path: adapters/flutter/skills/flutter-layout/SKILL.md
+          description: "Use when implementing or fixing Flutter widget layouts, especially with overflows, unbounded constraints, nested scrollables, alignment issues, or responsive/adaptive breakpoints"
+        - id: flutter-models
+          path: adapters/flutter/skills/flutter-models/SKILL.md
+          description: "Use when creating or refactoring Flutter domain entities, DTOs, enums, failures, and repository contracts. Applies to Freezed/json_serializable model design, JSON mapping boundaries, and immutable data patterns"
+        - id: flutter-riverpod
+          path: adapters/flutter/skills/flutter-riverpod/SKILL.md
+          description: "Use when implementing, refactoring, or debugging Flutter state management with Riverpod, especially for async state, invalidation/refresh, rebuild optimization, families, and provider testing"
+        - id: flutter-supabase
+          path: adapters/flutter/skills/flutter-supabase/SKILL.md
+          description: "Use when implementing or refactoring Flutter data/auth/storage/realtime code with Supabase. Covers provider-based client access, datasource boundaries, Postgrest query patterns, storage paths, realtime streams, RPC/functions, and repository error mapping"
+        - id: flutter-supabase-migrations
+          path: adapters/flutter/skills/flutter-supabase-migrations/SKILL.md
+          description: "Use when creating, reviewing, or applying Supabase database migrations, especially for remote schema changes, migration drift, RLS updates, and safe production rollout"
+
+    angular:
+      path: adapters/angular/ADAPTER.md
+      skills:
+        - id: angular-architecture
+          path: adapters/angular/skills/angular-architecture/SKILL.md
+          description: "Use when defining or refactoring Angular app architecture (folders, boundaries, dependency flow, root wiring). Enforces standalone + signals-first and Signal Store as single state standard for global and local state"
+        - id: angular-component
+          path: adapters/angular/skills/angular-component/SKILL.md
+          description: "Create modern Angular standalone components following v20+ best practices. Use for building UI components with signal-based inputs/outputs, OnPush change detection, host bindings, content projection, and lifecycle hooks"
+        - id: angular-forms
+          path: adapters/angular/skills/angular-forms/SKILL.md
+          description: "Build signal-based forms in Angular v21+ using the new Signal Forms API. Use for form creation with automatic two-way binding, schema-based validation, field state management, and dynamic forms"
+        - id: angular-http
+          path: adapters/angular/skills/angular-http/SKILL.md
+          description: "Implement HTTP data fetching in Angular v20+ using resource(), httpResource(), and HttpClient. Use for API calls, data loading with signals, request/response handling, and interceptors"
+        - id: angular-state
+          path: adapters/angular/skills/angular-state/SKILL.md
+          description: "Build Angular state with NgRx Signal Store using withState, withProps, withComputed, withMethods, rxMethod, and withEntities. Use for global/local feature stores, async state handling, derived state, HTTP orchestration, and entity CRUD"
+        - id: angular-testing
+          path: adapters/angular/skills/angular-testing/SKILL.md
+          description: "Write unit and integration tests for Angular v20+ applications using Vitest with TestBed and modern testing patterns. Use for testing components with signals, OnPush change detection, services with inject(), HTTP interactions, and router flows"
+        - id: angular-theme
+          path: adapters/angular/skills/angular-theme/SKILL.md
+          description: "Build and refactor Angular app theme with Tailwind and shared CSS layers. Use when defining global styles, component theme classes, design tokens, dark mode, or style architecture cleanup"
+
+    common:
+      skills:
+        - id: common-clean-code
+          path: adapters/common/skills/common-clean-code/SKILL.md
+          description: "Enforce Clean Code, SOLID, and design principles across all technologies. Use when writing code, refactoring, designing architecture, or reviewing code quality"
+
+references:
+  - id: security-checklist
+    path: references/security-checklist.md
+    description: "Stack-agnostic security checklist. Pre-commit checks, auth, input validation, OWASP Top 10 baseline. Use alongside devflow-beautify security axis and adapter data/auth skill"
+  - id: testing-patterns
+    path: references/testing-patterns.md
+    description: "Stack-agnostic testing patterns. AAA structure, Beyonce Rule, Prove-It Pattern, test pyramid. Use alongside devflow-test and adapter technology test skills"
+  - id: accessibility-checklist
+    path: references/accessibility-checklist.md
+    description: "Stack-agnostic accessibility checklist. WCAG 2.1 AA baseline covering keyboard/focus, screen readers, and touch targets. Stack-specific patterns in active ADAPTER.md"
+
+hooks:
+  - event: SessionStart
+    script: hooks/session-start.sh
+    description: "Inject devflow-discovery meta-skill, suggest context file based on active pipeline step from .devflow-state.json"
+  - event: PreToolUse
+    matcher: "Write|Edit|MultiEdit"
+    script: hooks/pre-config-protect.sh
+    description: "Block modifications to linter/analyzer config files. Steers agent to fix code instead of weakening configs"
+  - event: PreToolUse
+    matcher: "*"
+    script: hooks/observe.sh
+    args: pre
+    async: true
+    description: "Log pre-tool-call events to .devflow-observe.jsonl for pattern analysis"
+  - event: PostToolUse
+    matcher: "*"
+    script: hooks/observe.sh
+    args: post
+    async: true
+    description: "Log post-tool-call events to .devflow-observe.jsonl for pattern analysis"
+  - event: PreCompact
+    script: hooks/pre-compact.sh
+    description: "Snapshot plan.md [done]/[pending] progress before context compaction. Saves .devflow-state.json and injects resume reminder"
+  - event: Stop
+    script: hooks/stop-notify.sh
+    async: true
+    description: "Send macOS desktop notification when Claude finishes a response, showing next pipeline step and feature"
+  - event: Stop
+    script: hooks/stop-debug-check.sh
+    description: "Scan modified files for debug output (print() in Dart, console.log in TypeScript) and warn without blocking"
+
+contexts:
+  - id: implement
+    path: contexts/implement.md
+    suggested_for: [devflow.implement, devflow.beautify]
+  - id: review
+    path: contexts/review.md
+    suggested_for: [devflow.ship]
+  - id: research
+    path: contexts/research.md
+    suggested_for: [devflow.task, devflow.plan]

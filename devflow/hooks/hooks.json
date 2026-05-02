@@ -7,7 +7,79 @@
             "type": "command",
             "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh"
           }
-        ]
+        ],
+        "description": "Inject devflow-discovery meta-skill and suggest context file based on active pipeline step from .devflow-state.json."
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/pre-config-protect.sh"
+          }
+        ],
+        "description": "Block modifications to linter/analyzer config files (analysis_options.yaml, eslint.config.*, tsconfig*.json, biome.json, .prettierrc). Steers agent to fix code instead of weakening configs."
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/observe.sh pre",
+            "async": true,
+            "timeout": 5
+          }
+        ],
+        "description": "Log pre-tool-call events to .devflow-observe.jsonl for continuous learning and pattern analysis."
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/observe.sh post",
+            "async": true,
+            "timeout": 5
+          }
+        ],
+        "description": "Log post-tool-call events to .devflow-observe.jsonl for continuous learning and pattern analysis."
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/pre-compact.sh"
+          }
+        ],
+        "description": "Snapshot pipeline progress (plan.md [done]/[pending]) before context compaction. Saves .devflow-state.json and injects a resume reminder into the compacted context."
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/stop-notify.sh",
+            "async": true,
+            "timeout": 10
+          }
+        ],
+        "description": "Send macOS desktop notification when Claude finishes a response. Shows next pipeline step and feature name from .devflow-state.json if available."
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/stop-debug-check.sh"
+          }
+        ],
+        "description": "Scan modified files for debug output (print() in Dart, console.log in TypeScript) and warn via stderr without blocking."
       }
     ]
   }

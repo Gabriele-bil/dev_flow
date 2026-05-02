@@ -200,6 +200,18 @@ When non-force mode cannot find valid managed markers in an existing file:
 - append rendered managed blocks to the end of the file
 - do not rewrite existing user sections
 
+### Step 7b - Gitignore (runtime artifacts)
+
+Ensure `.devflow-state.json` is listed in the consumer project's `.gitignore`.
+
+- `.gitignore` exists and already contains `.devflow-state.json` → skip
+- `.gitignore` exists and does not contain it → append:
+  ```
+  # devflow runtime state
+  .devflow-state.json
+  ```
+- `.gitignore` does not exist → skip (the `pre-compact` hook appends it automatically on first run)
+
 ### Step 8 - Notify user
 
 Respond with:
