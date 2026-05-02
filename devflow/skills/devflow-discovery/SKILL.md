@@ -1,6 +1,7 @@
 ---
 name: devflow-discovery
 description: Orients AI agents to the dev-flow pipeline at session start. Answers "where do I begin?" by mapping current project state to the correct pipeline entry point. Injected automatically via SessionStart hook.
+skip-validation: true
 ---
 
 # Skill: devflow.discovery

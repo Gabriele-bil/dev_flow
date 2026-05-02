@@ -10,15 +10,22 @@ Create standalone components for Angular v20+. Standalone default. Do NOT set `s
 ## Component Structure
 
 ```typescript
-import { Component, ChangeDetectionStrategy, input, output, computed, booleanAttribute } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  input,
+  output,
+  computed,
+  booleanAttribute,
+} from "@angular/core";
 
 @Component({
-  selector: 'app-user-card',
+  selector: "app-user-card",
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    'class': 'user-card',
-    '[class.active]': 'isActive()',
-    '(click)': 'handleClick()',
+    class: "user-card",
+    "[class.active]": "isActive()",
+    "(click)": "handleClick()",
   },
   template: `
     <img [src]="avatarUrl()" [alt]="name() + ' avatar'" />
@@ -28,8 +35,12 @@ import { Component, ChangeDetectionStrategy, input, output, computed, booleanAtt
     }
   `,
   styles: `
-    :host { display: block; }
-    :host.active { border: 2px solid blue; }
+    :host {
+      display: block;
+    }
+    :host.active {
+      border: 2px solid blue;
+    }
   `,
 })
 export class UserCard {
@@ -37,7 +48,7 @@ export class UserCard {
   name = input.required<string>();
 
   // Optional inputs
-  email = input<string>('');
+  email = input<string>("");
   showEmail = input(false);
 
   // Input transform
@@ -68,7 +79,7 @@ count = input(0);
 label = input<string>();
 
 // Alias for template binding.
-size = input('medium', { alias: 'buttonSize' });
+size = input("medium", { alias: "buttonSize" });
 
 // Transform on read.
 disabled = input(false, { transform: booleanAttribute });
@@ -78,15 +89,15 @@ value = input(0, { transform: numberAttribute });
 ## Signal Outputs
 
 ```typescript
-import { output, outputFromObservable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { output, outputFromObservable } from "@angular/core";
+import { Subject } from "rxjs";
 
 // Basic output
 clicked = output<void>();
 selected = output<Item>();
 
 // Alias
-valueChange = output<number>({ alias: 'change' });
+valueChange = output<number>({ alias: "change" });
 
 // Observable interop
 scroll$ = new Subject<number>();
@@ -103,33 +114,33 @@ Use `host` object in `@Component`. Do NOT use `@HostBinding` or `@HostListener`.
 
 ```typescript
 @Component({
-  selector: 'app-button',
+  selector: "app-button",
   host: {
     // Static attrs
-    'role': 'button',
+    role: "button",
 
     // Dynamic classes
-    '[class.primary]': 'variant() === "primary"',
-    '[class.disabled]': 'disabled()',
+    "[class.primary]": 'variant() === "primary"',
+    "[class.disabled]": "disabled()",
 
     // Dynamic styles
-    '[style.--btn-color]': 'color()',
+    "[style.--btn-color]": "color()",
 
     // Attributes
-    '[attr.aria-disabled]': 'disabled()',
-    '[attr.tabindex]': 'disabled() ? -1 : 0',
+    "[attr.aria-disabled]": "disabled()",
+    "[attr.tabindex]": "disabled() ? -1 : 0",
 
     // Events
-    '(click)': 'onClick($event)',
-    '(keydown.enter)': 'onClick($event)',
-    '(keydown.space)': 'onClick($event)',
+    "(click)": "onClick($event)",
+    "(keydown.enter)": "onClick($event)",
+    "(keydown.space)": "onClick($event)",
   },
   template: `<ng-content />`,
 })
 export class Button {
-  variant = input<'primary' | 'secondary'>('primary');
+  variant = input<"primary" | "secondary">("primary");
   disabled = input(false, { transform: booleanAttribute });
-  color = input('#007bff');
+  color = input("#007bff");
 
   clicked = output<void>();
 
@@ -145,7 +156,7 @@ export class Button {
 
 ```typescript
 @Component({
-  selector: 'app-card',
+  selector: "app-card",
   template: `
     <header>
       <ng-content select="[card-header]" />
@@ -171,7 +182,7 @@ export class Card {}
 ## Lifecycle Hooks
 
 ```typescript
-import { OnDestroy, OnInit, afterNextRender, afterRender } from '@angular/core';
+import { OnDestroy, OnInit, afterNextRender, afterRender } from "@angular/core";
 
 export class MyComponent implements OnInit, OnDestroy {
   constructor() {
@@ -199,6 +210,7 @@ export class MyComponent implements OnInit, OnDestroy {
 ## Accessibility Requirements
 
 Components MUST:
+
 - Pass AXE checks
 - Meet WCAG AA
 - Set correct ARIA for interactive UI
@@ -207,17 +219,19 @@ Components MUST:
 
 ```typescript
 @Component({
-  selector: 'app-toggle',
+  selector: "app-toggle",
   host: {
-    'role': 'switch',
-    '[attr.aria-checked]': 'checked()',
-    '[attr.aria-label]': 'label()',
-    'tabindex': '0',
-    '(click)': 'toggle()',
-    '(keydown.enter)': 'toggle()',
-    '(keydown.space)': 'toggle(); $event.preventDefault()',
+    role: "switch",
+    "[attr.aria-checked]": "checked()",
+    "[attr.aria-label]": "label()",
+    tabindex: "0",
+    "(click)": "toggle()",
+    "(keydown.enter)": "toggle()",
+    "(keydown.space)": "toggle(); $event.preventDefault()",
   },
-  template: `<span class="toggle-track"><span class="toggle-thumb"></span></span>`,
+  template: `<span class="toggle-track"
+    ><span class="toggle-thumb"></span
+  ></span>`,
 })
 export class Toggle {
   label = input.required<string>();
@@ -237,26 +251,23 @@ Use native control flow. Do NOT use `*ngIf`, `*ngFor`, `*ngSwitch`.
 ```html
 <!-- Conditionals -->
 @if (isLoading()) {
-  <app-spinner />
+<app-spinner />
 } @else if (error()) {
-  <app-error [message]="error()" />
+<app-error [message]="error()" />
 } @else {
-  <app-content [data]="data()" />
+<app-content [data]="data()" />
 }
 
 <!-- Loops -->
 @for (item of items(); track item.id) {
-  <app-item [item]="item" />
+<app-item [item]="item" />
 } @empty {
-  <p>No items found</p>
+<p>No items found</p>
 }
 
 <!-- Switch -->
-@switch (status()) {
-  @case ('pending') { <span>Pending</span> }
-  @case ('active') { <span>Active</span> }
-  @default { <span>Unknown</span> }
-}
+@switch (status()) { @case ('pending') { <span>Pending</span> } @case ('active')
+{ <span>Active</span> } @default { <span>Unknown</span> } }
 ```
 
 ## Class and Style Bindings
@@ -278,7 +289,7 @@ Do NOT use `ngClass` or `ngStyle`. Use direct bindings.
 Use `NgOptimizedImage` for static images.
 
 ```typescript
-import { NgOptimizedImage } from '@angular/common';
+import { NgOptimizedImage } from "@angular/common";
 
 @Component({
   imports: [NgOptimizedImage],
@@ -293,3 +304,11 @@ export class Hero {
 ```
 
 For advanced patterns, see [references/component-patterns.md](references/component-patterns.md).
+
+## I/O Reference
+
+|            |                                                                |
+| ---------- | -------------------------------------------------------------- |
+| Reads      | Active component files, `@devflow/adapters/angular/ADAPTER.md` |
+| Writes     | New or refactored Angular standalone component files           |
+| Invoked by | `devflow.implement`, `devflow.beautify`                        |

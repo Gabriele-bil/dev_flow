@@ -103,12 +103,12 @@ Theme(
 
 ## 7) Repository layout (`lib/core/theme`)
 
-| File | Role |
-|------|------|
-| [`_theme.dart`](lib/core/theme/_theme.dart) | Barrel: exports `theme`, `util`, `app_layout` |
-| [`theme.dart`](lib/core/theme/theme.dart) | `MaterialTheme`, `ColorScheme` values, `ThemeData` + component themes |
-| [`app_layout.dart`](lib/core/theme/app_layout.dart) | Spacing/radii/sizing tokens (`AppLayout.inputBorderRadius`, …) |
-| [`util.dart`](lib/core/theme/util.dart) | `createTextTheme` for Google Fonts merging |
+| File                                                | Role                                                                  |
+| --------------------------------------------------- | --------------------------------------------------------------------- |
+| [`_theme.dart`](lib/core/theme/_theme.dart)         | Barrel: exports `theme`, `util`, `app_layout`                         |
+| [`theme.dart`](lib/core/theme/theme.dart)           | `MaterialTheme`, `ColorScheme` values, `ThemeData` + component themes |
+| [`app_layout.dart`](lib/core/theme/app_layout.dart) | Spacing/radii/sizing tokens (`AppLayout.inputBorderRadius`, …)        |
+| [`util.dart`](lib/core/theme/util.dart)             | `createTextTheme` for Google Fonts merging                            |
 
 Optional later: `theme_extensions/*` for `ThemeExtension` domain tokens (chips, charts) instead of scattered constants.
 
@@ -133,9 +133,9 @@ Before finalizing UI changes, confirm:
 
 ## I/O Reference
 
-| | |
-|---|---|
-| Trigger | New UI screens, new components, or any change to `lib/core/theme` |
-| Reads | `lib/core/theme/` layout, `constitution.md` (styling conventions) |
-| Invoked by | `devflow.plan` (when UI is introduced), `devflow.implement`, `devflow.beautify` |
-| Related skills | `flutter-layout` |
+|                |                                                                                 |
+| -------------- | ------------------------------------------------------------------------------- |
+| Trigger        | New UI screens, new components, or any change to `lib/core/theme`               |
+| Reads          | `lib/core/theme/` layout, `constitution.md` (styling conventions)               |
+| Invoked by     | `devflow.plan` (when UI is introduced), `devflow.implement`, `devflow.beautify` |
+| Related skills | `flutter-layout`                                                                |

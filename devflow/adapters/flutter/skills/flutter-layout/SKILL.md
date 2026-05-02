@@ -7,6 +7,7 @@ argument-hint: [optional-plan-path]
 # Writing Correct Flutter Layouts
 
 ## Overview
+
 Build Flutter layouts that are constraint-safe, responsive, evolvable.
 
 ## Core Layout Principles
@@ -20,12 +21,14 @@ Core Flutter rule: **Constraints go down. Sizes go up. Parent sets position.**
 - **One primary scroll direction per region:** Nesting scrollables without bounds causes broken layouts.
 
 ## When to Use
+
 - Building new UI screens or reusable widgets.
 - Refactoring deeply nested `Row`/`Column` trees.
 - Fixing `RenderFlex overflowed`, "unbounded constraints", clipped content, or inconsistent spacing.
 - Implementing responsive or adaptive behavior for phone/tablet/desktop.
 
 ## Quick Layout Selector
+
 - **Linear horizontal/vertical:** `Row` / `Column`
 - **Distribute remaining space:** `Expanded` / `Flexible`
 - **Fixed gap:** `SizedBox(width/height: ...)`
@@ -40,21 +43,25 @@ Core Flutter rule: **Constraints go down. Sizes go up. Parent sets position.**
 ## Workflow (Constraint-First)
 
 ### 1) Decompose the UI
+
 - Split the screen into sections: header, body, footer, overlays.
 - Decide which section scrolls and which remains fixed.
 - Mark fixed-size vs flexible-size areas.
 
 ### 2) Model constraints before coding
+
 - For each section, define max/min width/height expectations.
 - In `Row`/`Column`, decide which children must flex (`Expanded`) and which stay intrinsic.
 - Identify risky spots: scrollables in flex layouts, unconstrained text/images, nested scrollables.
 
 ### 3) Implement outer-to-inner
+
 - Start with high-level structure (`Scaffold`, page sections).
 - Add spacing with `SizedBox`/`Padding`.
 - Extract repeated or deep subtrees into private stateless widgets.
 
 ### 4) Validate with tools and edge cases
+
 - Use Flutter Inspector and enable debug paint when needed.
 - Test with tiny and very large widths, text scale, and dynamic content lengths.
 - Confirm there are no overflow stripes or layout exceptions.
@@ -65,6 +72,7 @@ Core Flutter rule: **Constraints go down. Sizes go up. Parent sets position.**
 - **Adaptive:** Different widget tree by form factor (for example bottom nav on mobile, `NavigationRail` on wide layouts).
 
 ## Common Failures and Fast Fixes
+
 - **`RenderFlex overflowed` in `Row`/`Column`:**
   - Wrap expanding child with `Expanded` or reduce fixed-size siblings.
   - For long text, use `Expanded` + `maxLines` + `overflow`.
@@ -79,6 +87,7 @@ Core Flutter rule: **Constraints go down. Sizes go up. Parent sets position.**
   - Replace ad-hoc values with consistent spacing tokens/constants.
 
 ## Layout Quality Checklist (Definition of Done)
+
 - [ ] No layout exceptions in debug console.
 - [ ] No overflow warnings on target breakpoints.
 - [ ] Scroll behavior is intentional and predictable.
@@ -150,9 +159,9 @@ Widget buildAdaptiveLayout(BuildContext context) {
 
 ## I/O Reference
 
-| | |
-|---|---|
-| Trigger | Any layout overflow, unbounded constraint error, or responsive/adaptive breakpoint work |
-| Reads | `lib/core/layout/app_breakpoints.dart` (`AppBreakpointWidth`, `AppBreakpointConstraints`), `constitution.md` |
-| Invoked by | `devflow.implement` (all UI screens), `devflow.beautify` (layout area E — responsive layout) |
-| Related skills | `flutter-theme` (spacing and sizing tokens) |
+|                |                                                                                                              |
+| -------------- | ------------------------------------------------------------------------------------------------------------ |
+| Trigger        | Any layout overflow, unbounded constraint error, or responsive/adaptive breakpoint work                      |
+| Reads          | `lib/core/layout/app_breakpoints.dart` (`AppBreakpointWidth`, `AppBreakpointConstraints`), `constitution.md` |
+| Invoked by     | `devflow.implement` (all UI screens), `devflow.beautify` (layout area E — responsive layout)                 |
+| Related skills | `flutter-theme` (spacing and sizing tokens)                                                                  |

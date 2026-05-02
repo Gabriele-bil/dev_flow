@@ -6,16 +6,19 @@ description: Use when implementing, refactoring, or debugging Flutter state mana
 # Flutter Riverpod Expert
 
 ## Overview
+
 Use Riverpod v3 patterns for predictable, testable, performant state.
 Prefer `@riverpod` codegen + explicit invalidation.
 
 ## When to Use
+
 - Building features with Riverpod in Flutter.
 - Fixing stale UI, over-rebuilds, or wrong provider lifecycle behavior.
 - Designing async fetch + mutation flows.
 - Testing providers/widgets with overrides.
 
 ## Core Rules
+
 1. Prefer `@riverpod` code generation for type-safe providers.
 2. Keep a single source of truth in providers (avoid duplicated mutable widget state).
 3. In UI, use `ref.watch` for rendering, `ref.read` for actions, `ref.listen` for side effects.
@@ -23,6 +26,7 @@ Prefer `@riverpod` codegen + explicit invalidation.
 5. Make invalidation strategy explicit (`invalidate`, `refresh`, `invalidateSelf`).
 
 ## Provider Selection
+
 - **`Provider`**: immutable/computed values.
 - **`NotifierProvider`**: mutable synchronous state.
 - **`AsyncNotifierProvider`**: async state + mutations in one unit (recommended default for async features).
@@ -33,6 +37,7 @@ Prefer `@riverpod` codegen + explicit invalidation.
 ## Minimal Patterns
 
 ### Sync state with Notifier
+
 ```dart
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'counter.g.dart';
@@ -47,6 +52,7 @@ class Counter extends _$Counter {
 ```
 
 ### Async fetch + mutation
+
 ```dart
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'todos.g.dart';
@@ -67,6 +73,7 @@ class Todos extends _$Todos {
 ```
 
 ### UI consumption
+
 ```dart
 class TodoPage extends ConsumerWidget {
   const TodoPage({super.key});
@@ -95,32 +102,38 @@ class TodoPage extends ConsumerWidget {
 ```
 
 ## `watch` vs `read` vs `listen` vs `select`
+
 - **`watch`**: reactive read for rendering/derived logic.
 - **`read`**: one-shot read for callbacks/commands.
 - **`listen`**: side effects on transitions (snackbar, navigation).
 - **`select`**: rebuild only on selected field changes.
 
 Bad:
+
 ```dart
 final value = ref.read(userProvider); // in build: UI won't react to updates
 ```
 
 Good:
+
 ```dart
 final userName = ref.watch(userProvider.select((u) => u.name));
 ```
 
 ## Invalidation Semantics
+
 - **`ref.invalidate(provider)`**: mark stale; recompute when read next.
 - **`ref.refresh(provider)`**: invalidate + immediate read.
 - **`ref.invalidateSelf()`**: invalidate current provider/notifier.
 
 Use:
+
 - After a mutation in the same notifier: `invalidateSelf`.
 - Pull-to-refresh action: `refresh`.
 - External cache dependency changed: `invalidate(targetProvider)`.
 
 ## Lifecycle: autoDispose and keepAlive
+
 - Prefer auto-dispose for screen-scoped state.
 - Use keep-alive only for expensive/UX-critical caches.
 - Manage resources with `onDispose` and related lifecycle hooks.
@@ -138,6 +151,7 @@ Future<String> cachedValue(Ref ref) async {
 ## Testing
 
 ### Provider tests
+
 ```dart
 test('counter increments', () {
   final container = ProviderContainer.test();
@@ -150,6 +164,7 @@ test('counter increments', () {
 ```
 
 ### Overrides
+
 ```dart
 final container = ProviderContainer.test(
   overrides: [
@@ -159,11 +174,13 @@ final container = ProviderContainer.test(
 ```
 
 ### Widget tests
+
 - Wrap with `ProviderScope`.
 - Inject fakes with overrides.
 - Use `tester.container()` when direct container access is needed.
 
 ## Common Anti-Patterns
+
 - Using `read` in `build` to avoid rebuilds.
 - Keeping duplicated mutable state in widget + provider.
 - Mutations without invalidation/refresh of dependent providers.
@@ -172,14 +189,15 @@ final container = ProviderContainer.test(
 
 ## I/O Reference
 
-| | |
-|---|---|
-| Trigger | Implementing or debugging Riverpod providers, notifiers, async state, or families |
-| Reads | `constitution.md` (Riverpod conventions), `registry.md` (existing provider patterns) |
-| Invoked by | `devflow.plan` (Riverpod Providers section), `devflow.implement` (provider/notifier files) |
+|                |                                                                                                                     |
+| -------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Trigger        | Implementing or debugging Riverpod providers, notifiers, async state, or families                                   |
+| Reads          | `constitution.md` (Riverpod conventions), `registry.md` (existing provider patterns)                                |
+| Invoked by     | `devflow.plan` (Riverpod Providers section), `devflow.implement` (provider/notifier files)                          |
 | Related skills | `flutter-models` (domain entities consumed by providers), `flutter-supabase` (repository layer called by notifiers) |
 
 ## Pre-Ship Checklist
+
 - [ ] Correct provider type selected.
 - [ ] Async UI handles loading/data/error explicitly.
 - [ ] `watch/read/listen/select` used intentionally.

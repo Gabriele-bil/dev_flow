@@ -12,8 +12,8 @@ Fetch data in Angular with signal-first APIs: `httpResource()`, `resource()`, an
 `httpResource()` wraps `HttpClient` with signal state.
 
 ```typescript
-import { Component, signal } from '@angular/core';
-import { httpResource } from '@angular/common/http';
+import { Component, signal } from "@angular/core";
+import { httpResource } from "@angular/common/http";
 
 interface User {
   id: number;
@@ -22,7 +22,7 @@ interface User {
 }
 
 @Component({
-  selector: 'app-user-profile',
+  selector: "app-user-profile",
   template: `
     @if (userResource.isLoading()) {
       <p>Loading...</p>
@@ -36,7 +36,7 @@ interface User {
   `,
 })
 export class UserProfile {
-  userId = signal('123');
+  userId = signal("123");
 
   // Refetch when userId changes.
   userResource = httpResource<User>(() => `/api/users/${this.userId()}`);
@@ -52,13 +52,13 @@ userResource = httpResource<User>(() => `/api/users/${this.userId()}`);
 // Full request object
 userResource = httpResource<User>(() => ({
   url: `/api/users/${this.userId()}`,
-  method: 'GET',
+  method: "GET",
   headers: { Authorization: `Bearer ${this.token()}` },
-  params: { include: 'profile' },
+  params: { include: "profile" },
 }));
 
 // Default value
-usersResource = httpResource<User[]>(() => '/api/users', {
+usersResource = httpResource<User[]>(() => "/api/users", {
   defaultValue: [],
 });
 
@@ -73,11 +73,11 @@ userResource = httpResource<User>(() => {
 
 ```typescript
 // State
-userResource.value();      // T | undefined
-userResource.hasValue();   // boolean
-userResource.error();      // unknown | undefined
-userResource.isLoading();  // boolean
-userResource.status();     // 'idle' | 'loading' | 'reloading' | 'resolved' | 'error' | 'local'
+userResource.value(); // T | undefined
+userResource.hasValue(); // boolean
+userResource.error(); // unknown | undefined
+userResource.isLoading(); // boolean
+userResource.status(); // 'idle' | 'loading' | 'reloading' | 'resolved' | 'error' | 'local'
 
 // Actions
 userResource.reload();
@@ -90,14 +90,14 @@ userResource.update(fn);
 Use for non-HTTP async tasks or custom fetch logic.
 
 ```typescript
-import { Component, resource, signal } from '@angular/core';
+import { Component, resource, signal } from "@angular/core";
 
 @Component({
-  selector: 'app-search',
+  selector: "app-search",
   template: `...`,
 })
 export class SearchComponent {
-  query = signal('');
+  query = signal("");
 
   searchResource = resource({
     params: () => ({ q: this.query() }),
@@ -137,7 +137,7 @@ userResource = resource({
     return id ? { id } : undefined;
   },
   loader: async ({ params }) => {
-    return fetch(`/api/users/${params.id}`).then(r => r.json());
+    return fetch(`/api/users/${params.id}`).then((r) => r.json());
   },
 });
 ```
@@ -147,19 +147,19 @@ userResource = resource({
 Use when Observable pipelines/operators are needed.
 
 ```typescript
-import { Component, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Component, inject } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { toSignal } from "@angular/core/rxjs-interop";
 
 @Component({
-  selector: 'app-users',
+  selector: "app-users",
   template: `...`,
 })
 export class UsersComponent {
   private http = inject(HttpClient);
 
-  users = toSignal(this.http.get<User[]>('/api/users'), { initialValue: [] });
-  users$ = this.http.get<User[]>('/api/users');
+  users = toSignal(this.http.get<User[]>("/api/users"), { initialValue: [] });
+  users$ = this.http.get<User[]>("/api/users");
 }
 ```
 
@@ -192,18 +192,18 @@ deleteUser(id: string) {
 ### Request Options
 
 ```typescript
-this.http.get<User[]>('/api/users', {
+this.http.get<User[]>("/api/users", {
   headers: {
-    Authorization: 'Bearer token',
-    'Content-Type': 'application/json',
+    Authorization: "Bearer token",
+    "Content-Type": "application/json",
   },
   params: {
-    page: '1',
-    limit: '10',
-    sort: 'name',
+    page: "1",
+    limit: "10",
+    sort: "name",
   },
-  observe: 'response',
-  responseType: 'json',
+  observe: "response",
+  responseType: "json",
 });
 ```
 
@@ -213,8 +213,8 @@ Functional interceptors recommended.
 
 ```typescript
 // auth.interceptor.ts
-import { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { HttpInterceptorFn } from "@angular/common/http";
+import { inject } from "@angular/core";
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
@@ -232,27 +232,27 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
 ```typescript
 // error.interceptor.ts
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
+import { HttpErrorResponse, HttpInterceptorFn } from "@angular/common/http";
+import { inject } from "@angular/core";
+import { Router } from "@angular/router";
+import { catchError, throwError } from "rxjs";
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401) {
-        inject(Router).navigate(['/login']);
+        inject(Router).navigate(["/login"]);
       }
       return throwError(() => error);
-    })
+    }),
   );
 };
 ```
 
 ```typescript
 // app.config.ts
-import { ApplicationConfig } from '@angular/core';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { ApplicationConfig } from "@angular/core";
+import { provideHttpClient, withInterceptors } from "@angular/common/http";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -299,23 +299,32 @@ getUser(id: string) {
 @Component({
   template: `
     @switch (dataResource.status()) {
-      @case ('idle') { <p>Enter search term</p> }
-      @case ('loading') { <app-spinner /> }
-      @case ('reloading') {
+      @case ("idle") {
+        <p>Enter search term</p>
+      }
+      @case ("loading") {
+        <app-spinner />
+      }
+      @case ("reloading") {
         <app-data [data]="dataResource.value()" />
         <app-spinner size="small" />
       }
-      @case ('resolved') { <app-data [data]="dataResource.value()" /> }
-      @case ('error') {
-        <app-error [error]="dataResource.error()" (retry)="dataResource.reload()" />
+      @case ("resolved") {
+        <app-data [data]="dataResource.value()" />
+      }
+      @case ("error") {
+        <app-error
+          [error]="dataResource.error()"
+          (retry)="dataResource.reload()"
+        />
       }
     }
   `,
 })
 export class DataComponent {
-  query = signal('');
+  query = signal("");
   dataResource = httpResource<Data[]>(() =>
-    this.query() ? `/api/search?q=${this.query()}` : undefined
+    this.query() ? `/api/search?q=${this.query()}` : undefined,
   );
 }
 ```
@@ -328,3 +337,11 @@ export class DataComponent {
 - Test HTTP with `provideHttpClientTesting` + `HttpTestingController`.
 
 For advanced patterns, see [references/http-patterns.md](references/http-patterns.md).
+
+## I/O Reference
+
+|            |                                                                   |
+| ---------- | ----------------------------------------------------------------- |
+| Reads      | Active HTTP/service files, `@devflow/adapters/angular/ADAPTER.md` |
+| Writes     | New or refactored Angular HTTP resource and service files         |
+| Invoked by | `devflow.implement`, `devflow.beautify`                           |

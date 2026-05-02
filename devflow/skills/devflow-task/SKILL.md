@@ -1,6 +1,7 @@
 ---
 name: devflow-task
 description: Transforms a raw idea into a structured DevFlow task by reading product and architecture context, optionally stress-testing scope, and generating a user story with HMW framing, scope boundaries, key assumptions, and verifiable subtasks. Use when the user asks to create a task, start the DevFlow pipeline, run devflow.task, or provides a feature idea in text/file form.
+disable-model-invocation: true
 ---
 
 # Skill: devflow.task

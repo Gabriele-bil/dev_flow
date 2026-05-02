@@ -65,6 +65,7 @@ class Pet with _$Pet {
 ```
 
 Notes:
+
 - Keep JSON methods out of entities.
 - Add private constructor (`const Pet._()`) only when custom getters/methods are needed.
 - Add `placeholder()` only for entities actually used in skeleton UI.
@@ -227,9 +228,9 @@ data/
 
 ## I/O Reference
 
-| | |
-|---|---|
-| Trigger | Creating or refactoring domain entities, DTOs, enums, failures, or repository contracts |
-| Reads | `constitution.md` (three-layer architecture, naming conventions), `registry.md` (existing model patterns) |
-| Invoked by | `devflow.plan` (data layer design), `devflow.implement` (model file implementation) |
-| Related skills | `flutter-riverpod` (providers consuming models), `flutter-supabase` (DTO ↔ Supabase JSON mapping) |
+|                |                                                                                                           |
+| -------------- | --------------------------------------------------------------------------------------------------------- |
+| Trigger        | Creating or refactoring domain entities, DTOs, enums, failures, or repository contracts                   |
+| Reads          | `constitution.md` (three-layer architecture, naming conventions), `registry.md` (existing model patterns) |
+| Invoked by     | `devflow.plan` (data layer design), `devflow.implement` (model file implementation)                       |
+| Related skills | `flutter-riverpod` (providers consuming models), `flutter-supabase` (DTO ↔ Supabase JSON mapping)         |

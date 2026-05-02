@@ -39,8 +39,15 @@ pipeline:
 
   orchestrator:
     command: /devflow.ship
-    skill: devflow-ship
     description: "Pre-merge gate before devflow.pr. Dispatches code-reviewer, security-auditor, and test-engineer in parallel, synthesizes reports, and routes to devflow.pr if no blockers"
+
+  utility:
+    - command: /devflow.status
+      skill: devflow-status
+      description: "Show current pipeline state — active feature, progress, next step, adapter"
+    - command: /devflow.lint-skills
+      script: scripts/validate-skills.sh
+      description: "Validate all SKILL.md files for required structure (frontmatter, sections, style)"
 
 agents:
   - id: code-reviewer
@@ -174,6 +181,14 @@ hooks:
   - event: PreCompact
     script: hooks/pre-compact.sh
     description: "Snapshot plan.md [done]/[pending] progress before context compaction. Saves .devflow-state.json and injects resume reminder"
+  - event: PostToolUse
+    matcher: "Write|Edit|MultiEdit"
+    script: hooks/post-edit-accumulate.sh
+    async: true
+    description: "Accumulate modified file paths to .devflow-changed-files.tmp for batch format+typecheck at Stop time"
+  - event: Stop
+    script: hooks/stop-format-typecheck.sh
+    description: "Run adapter format+analyze on files modified this response (dart format/analyze or pnpm lint/tsc)"
   - event: Stop
     script: hooks/stop-notify.sh
     async: true

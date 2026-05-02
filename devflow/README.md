@@ -44,6 +44,48 @@ This directory is the **installable DevFlow package**: core pipeline skills, sla
 - Local install: `ln -s /path/to/devflow ~/.cursor/plugins/local/devflow` then reload the window.
 - Docs: [Plugins](https://cursor.com/docs/plugins)
 
+## Commands
+
+| Command | What it does |
+|---|---|
+| `devflow.task` | Define and scope a task |
+| `devflow.plan` | Generate `plan.md` from task |
+| `devflow.implement` | Execute plan step by step |
+| `devflow.beautify` | Apply design/style pass |
+| `devflow.ship` | Pre-handoff review |
+| `devflow.setup` | Generate `AGENTS.md` + `REGISTRY.md` |
+| `devflow.status` | Show current pipeline state |
+
+## Hooks
+
+Eight hooks activate automatically — no user invocation required.
+
+| Event | Script | What it does |
+|---|---|---|
+| SessionStart | `session-start.sh` | Injects discovery skill + suggests context file based on active pipeline step |
+| PreToolUse | `pre-config-protect.sh` | Blocks edits to linter/analyzer config files |
+| PreToolUse | `observe.sh pre` | Logs tool calls to `.devflow-observe.jsonl` |
+| PostToolUse | `observe.sh post` | Logs tool results to `.devflow-observe.jsonl` |
+| PostToolUse | `post-edit-accumulate.sh` | Tracks modified files for batch format check |
+| PreCompact | `pre-compact.sh` | Snapshots `plan.md` progress to `.devflow-state.json` |
+| Stop | `stop-format-typecheck.sh` | Runs adapter format+analyze after each response |
+| Stop | `stop-notify.sh` | Sends macOS desktop notification on response complete |
+| Stop | `stop-debug-check.sh` | Warns about `print()` / `console.log` in modified files |
+
+## Contexts
+
+Three context files in `devflow/contexts/` tune Claude's behavior per pipeline phase. The SessionStart hook suggests which one to load based on the active step.
+
+| Context | Suggested for | Focus |
+|---|---|---|
+| `contexts/implement.md` | devflow.implement, devflow.beautify | Code-first, follow plan.md order, mark [done] |
+| `contexts/review.md` | devflow.ship | 7-axis review, severity-ordered findings |
+| `contexts/research.md` | devflow.task, devflow.plan | Explore before acting, no application code |
+
+## Plugin Catalog
+
+`agent.yaml` at the plugin root is a machine-readable index of all pipeline components — steps, agents, skills, adapters, hooks, contexts. Use it for tooling, automation, or quick reference.
+
 ## Features output
 
 `features/[NNN]_[name]/` holds `task.md` and `plan.md`. In a **consumer app repo**, this folder can be symlinked or copied; paths in skills assume `devflow/features/` relative to the plugin root unless you fork the skills.

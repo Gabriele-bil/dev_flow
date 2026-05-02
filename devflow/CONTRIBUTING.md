@@ -90,6 +90,34 @@ Keep: technical terms exact, file paths exact, commands exact, all verbs, negati
 - Update `## I/O Reference` if reads or writes change
 - New rationalization entry requires factual counter — not restatement of problem
 
+## Adding Hooks
+
+**Hook vs skill:**
+- Hook: automated, runs on every tool call/session event, no user invocation needed
+- Skill: invoked explicitly by user or another skill, contains workflow guidance for Claude
+
+**Available events:**
+
+| Event | Notes |
+|---|---|
+| `SessionStart` | Fires once at session start; use for context injection |
+| `PreToolUse` | Fires before a tool call; block with `{"decision":"block","reason":"..."}` on stdout |
+| `PostToolUse` | Fires after a tool call; async OK; do not emit stdout (no passthrough) |
+| `PreCompact` | Fires before context compaction; output becomes part of compacted context |
+| `Stop` | Fires after each Claude response; reads full response on stdin, must write it back on stdout (passthrough); async hooks skip passthrough requirement |
+| `SessionEnd` | Fires when session closes; async OK |
+
+**Script conventions:**
+- No `set -e` — hooks must never crash the Claude session
+- Always consume stdin: `RAW=$(cat)` — do not leave stdin open
+- Stop hooks: always `printf '%s' "$RAW"` at the end (passthrough)
+- Async hooks: add `"async": true, "timeout": N` in hooks.json
+- Guard with `|| true` on all fallible commands
+- Require `jq`? Check availability first: `command -v jq >/dev/null 2>&1 || exit 0`
+- Runtime artifacts (`.tmp`, `.jsonl`, `.json`): append to `.gitignore` if `.gitignore` exists
+
+**Naming convention:** `<event>-<purpose>.sh` — e.g. `pre-config-protect.sh`, `stop-format-typecheck.sh`
+
 ## What Not to Do
 
 - No duplicate content between skills — reference other skills

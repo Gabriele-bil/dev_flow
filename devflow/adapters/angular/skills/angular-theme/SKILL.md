@@ -91,9 +91,9 @@ Before merge, confirm:
 
 ## I/O Reference
 
-| | |
-|---|---|
-| Trigger | Theme setup, style refactor, dark mode prep, CSS layer cleanup |
-| Reads | `src/styles.css`, `src/styles/*`, component stylesheets, templates |
-| Invoked by | `devflow.plan`, `devflow.implement`, `devflow.beautify` |
-| Related skills | `angular-architecture`, `angular-component` |
+|                |                                                                    |
+| -------------- | ------------------------------------------------------------------ |
+| Trigger        | Theme setup, style refactor, dark mode prep, CSS layer cleanup     |
+| Reads          | `src/styles.css`, `src/styles/*`, component stylesheets, templates |
+| Invoked by     | `devflow.plan`, `devflow.implement`, `devflow.beautify`            |
+| Related skills | `angular-architecture`, `angular-component`                        |

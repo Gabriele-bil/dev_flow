@@ -10,6 +10,11 @@ disable-model-invocation: true
 ## Purpose
 
 Create or refresh global AI context files (`AGENTS.md`, `REGISTRY.md`) and product context (`docs/product.md`) in the consumer project root.
+
+## When NOT to Use
+
+- No adapter supported by devflow is detected and user cannot identify the stack — resolve adapter choice first
+- `devflow.setup` already ran and only a specific managed section needs updating — pass `--force` and edit directly instead of re-running the full questionnaire
 Output must be concise, stable, and safe to re-run.
 `AGENTS.md` must keep any template-provided `code-review-graph` skill reference intact.
 
@@ -252,3 +257,11 @@ Before final response:
 - Expanding templates with long narrative prose
 - Using adapter templates when they do not exist without fallback
 - Skipping any required questionnaire field
+
+## I/O Reference
+
+| | |
+|---|---|
+| Reads | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md`, adapter + fallback templates |
+| Writes | `AGENTS.md`, `REGISTRY.md`, `docs/product.md` (consumer project root); `@devflow/config.md`; `.gitignore` (appends `.devflow-state.json` if missing) |
+| Next step | `devflow.task` |

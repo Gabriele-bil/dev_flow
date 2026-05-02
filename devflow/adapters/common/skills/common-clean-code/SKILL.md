@@ -39,13 +39,13 @@ All identifiers, methods, properties, and comments use English. Universal readab
 
 ## SOLID Principles
 
-| Principle | Question | Action |
-|-----------|----------|--------|
-| **SRP** — Single Responsibility | "Does this have ONE reason to change?" | Split large classes/files |
-| **OCP** — Open/Closed | "Can I extend without modifying?" | Use interfaces and abstractions |
-| **LSP** — Liskov Substitution | "Can subtypes replace base types safely?" | Remove unimplemented methods |
-| **ISP** — Interface Segregation | "Are clients forced on unused methods?" | Split fat interfaces |
-| **DIP** — Dependency Inversion | "Do high-level modules depend on abstractions?" | Inject dependencies |
+| Principle                       | Question                                        | Action                          |
+| ------------------------------- | ----------------------------------------------- | ------------------------------- |
+| **SRP** — Single Responsibility | "Does this have ONE reason to change?"          | Split large classes/files       |
+| **OCP** — Open/Closed           | "Can I extend without modifying?"               | Use interfaces and abstractions |
+| **LSP** — Liskov Substitution   | "Can subtypes replace base types safely?"       | Remove unimplemented methods    |
+| **ISP** — Interface Segregation | "Are clients forced on unused methods?"         | Split fat interfaces            |
+| **DIP** — Dependency Inversion  | "Do high-level modules depend on abstractions?" | Inject dependencies             |
 
 ## Design: Four Elements of Simple Design
 
@@ -74,14 +74,14 @@ Fight with:
 
 ## Design: Object Roles
 
-| Stereotype | Role |
-|-----------|------|
-| Information Holder | Holds data, minimal behavior |
-| Structurer | Manages relationships between objects |
-| Service Provider | Performs work, stateless operations |
-| Coordinator | Orchestrates multiple services |
-| Controller | Makes decisions, delegates work |
-| Interfacer | Transforms data between systems |
+| Stereotype         | Role                                  |
+| ------------------ | ------------------------------------- |
+| Information Holder | Holds data, minimal behavior          |
+| Structurer         | Manages relationships between objects |
+| Service Provider   | Performs work, stateless operations   |
+| Coordinator        | Orchestrates multiple services        |
+| Controller         | Makes decisions, delegates work       |
+| Interfacer         | Transforms data between systems       |
 
 ## Design: Behavioral Principles
 
@@ -97,18 +97,18 @@ Fight with:
 
 ## Code Smells
 
-| Smell | Fix |
-|-------|-----|
-| Long Method | Extract methods |
-| Large Class | Extract class, apply SRP |
-| Long Parameter List | Introduce parameter object |
-| Primitive Obsession | Wrap in value objects |
-| Feature Envy | Move method to envied class |
+| Smell                  | Fix                                |
+| ---------------------- | ---------------------------------- |
+| Long Method            | Extract methods                    |
+| Large Class            | Extract class, apply SRP           |
+| Long Parameter List    | Introduce parameter object         |
+| Primitive Obsession    | Wrap in value objects              |
+| Feature Envy           | Move method to envied class        |
 | Speculative Generality | Remove unused abstractions (YAGNI) |
-| Switch Statements | Replace with polymorphism |
-| Data Clumps | Extract class for grouped data |
-| Divergent Change | Split into focused classes |
-| Shotgun Surgery | Move related code together |
+| Switch Statements      | Replace with polymorphism          |
+| Data Clumps            | Extract class for grouped data     |
+| Divergent Change       | Split into focused classes         |
+| Shotgun Surgery        | Move related code together         |
 
 ## Red Flags
 
@@ -128,9 +128,9 @@ Stop and rethink when:
 
 ## I/O Reference
 
-| | |
-|---|---|
-| Trigger | Code creation, refactoring, PR review, architecture design |
-| Reads | All source files |
-| Invoked by | `devflow.plan`, `devflow.implement`, `devflow.beautify` |
-| Related skills | None |
+|                |                                                            |
+| -------------- | ---------------------------------------------------------- |
+| Trigger        | Code creation, refactoring, PR review, architecture design |
+| Reads          | All source files                                           |
+| Invoked by     | `devflow.plan`, `devflow.implement`, `devflow.beautify`    |
+| Related skills | None                                                       |

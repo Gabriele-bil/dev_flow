@@ -250,13 +250,13 @@ final res = await _client.functions.invoke(
 
 ## 10) Anti-patterns
 
-| Avoid | Use instead |
-|---|---|
-| `Supabase.instance.client` scattered in app | `supabaseClientProvider` |
-| Catching in datasource | Throw in datasource, map in repository |
-| Domain entities returned by datasource | Raw JSON from datasource |
-| `.single()` when row is optional | `.maybeSingle()` |
-| Realtime for every list | Realtime only where live sync matters |
+| Avoid                                                  | Use instead                                        |
+| ------------------------------------------------------ | -------------------------------------------------- |
+| `Supabase.instance.client` scattered in app            | `supabaseClientProvider`                           |
+| Catching in datasource                                 | Throw in datasource, map in repository             |
+| Domain entities returned by datasource                 | Raw JSON from datasource                           |
+| `.single()` when row is optional                       | `.maybeSingle()`                                   |
+| Realtime for every list                                | Realtime only where live sync matters              |
 | Missing `.select()` after mutations when row is needed | Chain `.select()` (+ `.single()` when appropriate) |
 
 ## Quick checklist before merging
@@ -270,9 +270,9 @@ final res = await _client.functions.invoke(
 
 ## I/O Reference
 
-| | |
-|---|---|
-| Trigger | Any feature involving Supabase data read/write, auth, storage, realtime, or RPC calls |
-| Reads | `constitution.md` (data layer conventions), `registry.md` (existing datasource/repository patterns) |
-| Invoked by | `devflow.plan` (when feature involves DB), `devflow.implement` (datasource and repository files) |
+|                |                                                                                                                                                  |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Trigger        | Any feature involving Supabase data read/write, auth, storage, realtime, or RPC calls                                                            |
+| Reads          | `constitution.md` (data layer conventions), `registry.md` (existing datasource/repository patterns)                                              |
+| Invoked by     | `devflow.plan` (when feature involves DB), `devflow.implement` (datasource and repository files)                                                 |
 | Related skills | `flutter-riverpod` (notifiers calling repositories), `flutter-models` (DTOs and domain entities), `flutter-supabase-migrations` (schema changes) |

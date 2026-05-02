@@ -25,8 +25,15 @@ Build state with `signalStore`. Keep store explicit, typed, feature-focused.
 ## Base Store Structure
 
 ```typescript
-import { computed, inject } from '@angular/core';
-import { patchState, signalStore, withComputed, withMethods, withProps, withState } from '@ngrx/signals';
+import { computed, inject } from "@angular/core";
+import {
+  patchState,
+  signalStore,
+  withComputed,
+  withMethods,
+  withProps,
+  withState,
+} from "@ngrx/signals";
 
 interface UsersState {
   users: User[];
@@ -43,14 +50,14 @@ const initialState: UsersState = {
 };
 
 export const UsersStore = signalStore(
-  { providedIn: 'root' },
+  { providedIn: "root" },
   withState(initialState),
   withProps(() => ({
     usersService: inject(UsersService),
   })),
   withComputed((store) => ({
-    selectedUser: computed(() =>
-      store.users().find(u => u.id === store.selectedId()) ?? null
+    selectedUser: computed(
+      () => store.users().find((u) => u.id === store.selectedId()) ?? null,
     ),
     hasError: computed(() => !!store.error()),
   })),
@@ -61,7 +68,7 @@ export const UsersStore = signalStore(
     clearError() {
       patchState(store, { error: null });
     },
-  }))
+  })),
 );
 ```
 
@@ -70,14 +77,12 @@ export const UsersStore = signalStore(
 ```typescript
 // Global store
 export const AuthStore = signalStore(
-  { providedIn: 'root' },
-  withState(initialState)
+  { providedIn: "root" },
+  withState(initialState),
 );
 
 // Local store (per component instance)
-export const WizardStore = signalStore(
-  withState(wizardInitialState)
-);
+export const WizardStore = signalStore(withState(wizardInitialState));
 
 @Component({
   template: `...`,
@@ -93,11 +98,17 @@ export class WizardPage {
 Use `rxMethod` for service HTTP pipelines. Always set `loading/error/value`.
 
 ```typescript
-import { inject } from '@angular/core';
-import { patchState, signalStore, withMethods, withProps, withState } from '@ngrx/signals';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { tapResponse } from '@ngrx/operators';
-import { debounceTime, distinctUntilChanged, pipe, switchMap, tap } from 'rxjs';
+import { inject } from "@angular/core";
+import {
+  patchState,
+  signalStore,
+  withMethods,
+  withProps,
+  withState,
+} from "@ngrx/signals";
+import { rxMethod } from "@ngrx/signals/rxjs-interop";
+import { tapResponse } from "@ngrx/operators";
+import { debounceTime, distinctUntilChanged, pipe, switchMap, tap } from "rxjs";
 
 interface SearchState {
   value: Book[];
@@ -129,14 +140,14 @@ export const BookSearchStore = signalStore(
               error: (err: unknown) =>
                 patchState(store, {
                   loading: false,
-                  error: err instanceof Error ? err.message : 'Request failed',
+                  error: err instanceof Error ? err.message : "Request failed",
                 }),
-            })
-          )
-        )
-      )
+            }),
+          ),
+        ),
+      ),
     ),
-  }))
+  })),
 );
 ```
 
@@ -145,14 +156,14 @@ export const BookSearchStore = signalStore(
 Use for normalized entity collections.
 
 ```typescript
-import { patchState, signalStore, withMethods } from '@ngrx/signals';
+import { patchState, signalStore, withMethods } from "@ngrx/signals";
 import {
   addEntity,
   removeEntities,
   setAllEntities,
   updateAllEntities,
   withEntities,
-} from '@ngrx/signals/entities';
+} from "@ngrx/signals/entities";
 
 type Todo = { id: number; text: string; completed: boolean };
 
@@ -169,9 +180,12 @@ export const TodosStore = signalStore(
       patchState(store, updateAllEntities({ completed: true }));
     },
     removeEmpty() {
-      patchState(store, removeEntities(({ text }) => !text.trim()));
+      patchState(
+        store,
+        removeEntities(({ text }) => !text.trim()),
+      );
     },
-  }))
+  })),
 );
 ```
 
@@ -182,7 +196,7 @@ If `withMethods` gets noisy, move pure transformations to `utils`.
 ```typescript
 // utils/users-state.utils.ts
 export function mergeUsers(existing: User[], incoming: User[]): User[] {
-  const map = new Map(existing.map(u => [u.id, u]));
+  const map = new Map(existing.map((u) => [u.id, u]));
   for (const user of incoming) map.set(user.id, user);
   return Array.from(map.values());
 }
@@ -206,3 +220,11 @@ patchState(store, (state) => ({
 - `withEntities` for entity CRUD
 
 For advanced patterns, see [references/state-patterns.md](references/state-patterns.md).
+
+## I/O Reference
+
+|            |                                                                    |
+| ---------- | ------------------------------------------------------------------ |
+| Reads      | Active store/feature files, `@devflow/adapters/angular/ADAPTER.md` |
+| Writes     | New or refactored NgRx Signal Store files                          |
+| Invoked by | `devflow.implement`, `devflow.beautify`                            |

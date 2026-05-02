@@ -158,9 +158,9 @@ Before merge, confirm:
 
 ## I/O Reference
 
-| | |
-|---|---|
-| Trigger | New app scaffold, architecture refactor, feature folder design, state boundary cleanup |
-| Reads | `src/` tree, `src/app/` boundaries, `app.config.ts`, `app.routes.ts`, `styles.css` imports |
-| Invoked by | `devflow.plan`, `devflow.implement`, `devflow.beautify` |
-| Related skills | `angular-component`, `angular-forms`, `angular-http`, `angular-state` |
+|                |                                                                                            |
+| -------------- | ------------------------------------------------------------------------------------------ |
+| Trigger        | New app scaffold, architecture refactor, feature folder design, state boundary cleanup     |
+| Reads          | `src/` tree, `src/app/` boundaries, `app.config.ts`, `app.routes.ts`, `styles.css` imports |
+| Invoked by     | `devflow.plan`, `devflow.implement`, `devflow.beautify`                                    |
+| Related skills | `angular-component`, `angular-forms`, `angular-http`, `angular-state`                      |
