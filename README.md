@@ -2,7 +2,7 @@
 
 DevFlow is a **spec-driven development pipeline** that turns a raw idea into a reviewed, tested, and merged feature. Each step maps to a skill (and optional slash command) that defines inputs, steps, outputs, and success criteria.
 
-The workflow is **technology-agnostic**: stack-specific rules live in **adapters** under [`devflow/adapters/`](devflow/adapters/). Today only the **Flutter** adapter ships with this repo; adding more stacks means adding a new adapter folder and switching [`devflow/config.md`](devflow/config.md).
+The workflow is **technology-agnostic**: stack-specific rules live in **adapters** under [`devflow/adapters/`](devflow/adapters/). Today the **Flutter** and **Angular** adapters ship with this repo; adding more stacks means adding a new adapter folder and switching [`devflow/config.md`](devflow/config.md).
 
 ---
 
@@ -15,7 +15,8 @@ idea
               └── devflow.implement
                     └── devflow.beautify
                           └── devflow.test
-                                └── devflow.pr
+                                └── devflow.ship
+                                      └── devflow.pr
 ```
 
 Each step produces an artifact that feeds the next. Do not skip steps.
@@ -32,9 +33,10 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 | `devflow.implement` | [`devflow/skills/devflow-implement/SKILL.md`](devflow/skills/devflow-implement/SKILL.md) | `plan.md` → code on `feat|fix|…/[NNN]-[name]` |
 | `devflow.beautify` | [`devflow/skills/devflow-beautify/SKILL.md`](devflow/skills/devflow-beautify/SKILL.md) | Implemented files → polished code |
 | `devflow.test` | [`devflow/skills/devflow-test/SKILL.md`](devflow/skills/devflow-test/SKILL.md) | Feature → unit + integration tests |
+| `devflow.ship` | [`devflow/commands/devflow.ship.md`](devflow/commands/devflow.ship.md) | Feature → parallel review (code + security + tests) → gate before PR |
 | `devflow.pr` | [`devflow/skills/devflow-pr/SKILL.md`](devflow/skills/devflow-pr/SKILL.md) | Branch → PR to `main` |
 
-Command wrappers live in [`devflow/commands/`](devflow/commands/) (e.g. [`devflow.task.md`](devflow/commands/devflow.task.md)).
+Command wrappers live in [`devflow/commands/`](devflow/commands/).
 
 ---
 
@@ -59,12 +61,41 @@ devflow/
 ├── .claude-plugin/plugin.json   # Claude Code plugin manifest
 ├── .cursor-plugin/plugin.json   # Cursor plugin manifest
 ├── config.md                    # Active adapter id
+├── AGENTS.md                    # Global agent rules
+├── CONTRIBUTING.md
+├── hooks/
+│   ├── hooks.json               # SessionStart hook config
+│   └── session-start.sh         # Auto-initializes project context on session start
 ├── commands/                    # Slash-command entry points
 ├── skills/                      # Core pipeline skills (devflow-*)
+│   ├── devflow-beautify/
+│   ├── devflow-discovery/
+│   ├── devflow-implement/
+│   ├── devflow-plan/
+│   ├── devflow-pr/
+│   ├── devflow-setup/
+│   ├── devflow-task/
+│   └── devflow-test/
 ├── adapters/
-│   └── flutter/
-│       ├── ADAPTER.md           # Flutter commands, plan sections, checklists
-│       └── skills/              # flutter-* domain skills
+│   ├── ADAPTER.schema.md
+│   ├── angular/
+│   │   ├── ADAPTER.md
+│   │   ├── templates/
+│   │   └── skills/              # angular-architecture, -component, -forms, -http, -state, -testing, -theme
+│   ├── flutter/
+│   │   ├── ADAPTER.md
+│   │   ├── templates/
+│   │   └── skills/              # flutter-supabase, -supabase-migrations, -theme, -riverpod, -models, -layout, -form
+│   └── common/
+│       └── skills/              # common-clean-code
+├── agents/
+│   ├── code-reviewer.md         # Architecture-focused code review
+│   ├── security-auditor.md      # Security review
+│   └── test-engineer.md         # Test validation
+├── references/
+│   ├── accessibility-checklist.md
+│   ├── security-checklist.md
+│   └── testing-patterns.md
 └── features/                    # Generated task.md / plan.md per feature
     └── [NNN]_[feature-name]/
 ```
@@ -92,37 +123,80 @@ Use `code-review-graph` for blast-radius aware reviews in both Cursor and Claude
 
 ### Required MCP baseline
 
-- `context7`
-- `sequential-thinking` ([MCP server](https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking))
-- `dart` only on Flutter projects/adapters
+| Adapter | MCP servers |
+|---------|-------------|
+| Angular | `context7`, `sequential-thinking` |
+| Flutter | `context7`, `sequential-thinking`, `dart`, `supabase` |
 
 ---
 
-## Conventions (Flutter adapter / example app)
+## Agents
 
-These apply when using the Flutter adapter against a typical Flutter repo:
+Specialized agents live in [`devflow/agents/`](devflow/agents/) and are dispatched automatically by `devflow.ship`:
 
-### Feature pages
+| Agent | File | Role |
+|-------|------|------|
+| Code Reviewer | [`agents/code-reviewer.md`](devflow/agents/code-reviewer.md) | Architecture-focused code review |
+| Security Auditor | [`agents/security-auditor.md`](devflow/agents/security-auditor.md) | Security vulnerabilities and hardening |
+| Test Engineer | [`agents/test-engineer.md`](devflow/agents/test-engineer.md) | Test coverage and quality validation |
 
-Use a dedicated folder per page under `lib/features/<feature>/pages/` and name the entry file `page.dart` (not `*_page.dart` directly under `pages/`).
+`devflow.ship` runs all three in parallel, synthesizes their reports, and routes to `devflow.pr` only if no blockers are found.
 
-### Git
+---
 
+## References
+
+Shared checklists and patterns in [`devflow/references/`](devflow/references/):
+
+| File | Purpose |
+|------|---------|
+| [`accessibility-checklist.md`](devflow/references/accessibility-checklist.md) | A11y guidelines |
+| [`security-checklist.md`](devflow/references/security-checklist.md) | Security review points |
+| [`testing-patterns.md`](devflow/references/testing-patterns.md) | Testing best practices |
+
+---
+
+## Adapters
+
+### Flutter (`devflow/adapters/flutter/`)
+
+Domain skills:
+
+| Skill | Purpose |
+|-------|---------|
+| `flutter-supabase` | Database read/write/auth, schema, RLS |
+| `flutter-supabase-migrations` | Schema migrations, SQL |
+| `flutter-theme` | UI screens, visual styling |
+| `flutter-riverpod` | Providers, notifiers, async state |
+| `flutter-models` | Entities, DTOs, JSON boundaries |
+| `flutter-layout` | Layout, breakpoints, scrollables |
+| `flutter-form` | Form/wizard flows |
+
+Git conventions:
 - **Commit:** `[type]: [short description]` — types: `feat` · `fix` · `chore` · `docs` · `perf`
 - **Branch:** `feat/[NNN]-[feature-name]` (or `fix/`, …)
 - **PR title:** `[type]: [Feature Name]`
 
----
+Feature pages: use `lib/features/<feature>/pages/` with entry file named `page.dart`.
 
-## Migration from Forge
+### Angular (`devflow/adapters/angular/`)
 
-If you used the previous **Forge** layout:
+Domain skills:
 
-| Before | After |
-|--------|--------|
-| `forge/` | `devflow/` |
-| `forge.task` | `devflow.task` |
-| `forge/skills/forge-*` | `devflow/skills/devflow-*` |
-| `forge/skills/flutter-*` | `devflow/adapters/flutter/skills/flutter-*` |
+| Skill | Purpose |
+|-------|---------|
+| `angular-architecture` | App structure, folder layout, boundaries |
+| `angular-component` | New components, refactoring, template/class |
+| `angular-forms` | Reactive forms, validation, submit flows |
+| `angular-http` | API clients, HttpClient, interceptors |
+| `angular-state` | Global & local state management |
+| `angular-testing` | Testing patterns |
+| `angular-theme` | Theme & styling with Tailwind |
 
-Optional: keep a **symlink** `forge` → `devflow` in downstream repos until tools are updated.
+Baseline: standalone + signals-first. Commands: `pnpm run lint`, `pnpm run test`, `pnpm run build`.
+
+### Common (`devflow/adapters/common/`)
+
+| Skill | Purpose |
+|-------|---------|
+| `common-clean-code` | Shared clean code patterns across all stacks |
