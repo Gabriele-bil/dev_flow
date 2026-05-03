@@ -39,7 +39,7 @@ pipeline:
 
   orchestrator:
     command: /devflow.ship
-    description: "Pre-merge gate before devflow.pr. Dispatches code-reviewer, security-auditor, and test-engineer in parallel, synthesizes reports, and routes to devflow.pr if no blockers"
+    description: "Pre-merge gate before devflow.pr. Dispatches code-reviewer, security-auditor, test-engineer, accessibility-auditor, and docs-reviewer in parallel, synthesizes reports, and routes to devflow.pr if no blockers"
 
   utility:
     - command: /devflow.status
@@ -64,6 +64,14 @@ agents:
   - id: test-engineer
     path: agents/test-engineer.md
     description: "QA engineer focused on test strategy, coverage gap analysis, and test quality. Use for coverage review, test design, or via devflow.ship fan-out"
+    invoked_by: devflow.ship
+  - id: accessibility-auditor
+    path: agents/accessibility-auditor.md
+    description: "Accessibility engineer focused on WCAG 2.1 AA compliance across keyboard/focus, screen readers, visual contrast, touch targets, and forms. Use for UI/component review or via devflow.ship fan-out"
+    invoked_by: devflow.ship
+  - id: docs-reviewer
+    path: agents/docs-reviewer.md
+    description: "Documentation engineer focused on public API coverage, accuracy, README/CHANGELOG sync, and plan traceability. Use for documentation drift review or via devflow.ship fan-out"
     invoked_by: devflow.ship
 
 skills:
