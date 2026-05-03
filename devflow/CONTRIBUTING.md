@@ -17,11 +17,12 @@ Required sections (in order):
 
 1. YAML frontmatter — `name`, `description` (+ optional `argument-hint`, `disable-model-invocation`, `model`, `effort`)
 2. `## Purpose` — one line; what it does, which pipeline step
-3. `## When NOT to Use` — conditions routing agent elsewhere
-4. `## Input contract` — checklist; fail-fast on any failure before touching files
-5. `## Workflow` — numbered steps, concrete actions
-6. `## Common Rationalizations` — table: excuses agents use + factual rebuttals
-7. `## I/O Reference` — reads, writes, next step
+3. `## Core Principles` — copy exact 4-bullet block from `ETHOS.md`; do not paraphrase
+4. `## When NOT to Use` — conditions routing agent elsewhere
+5. `## Input contract` — checklist; fail-fast on any failure before touching files
+6. `## Workflow` — numbered steps, concrete actions
+7. `## Common Rationalizations` — table: excuses agents use + factual rebuttals
+8. `## I/O Reference` — reads, writes, next step
 
 Optional (add when needed):
 

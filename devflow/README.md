@@ -55,14 +55,16 @@ This directory is the **installable DevFlow package**: core pipeline skills, sla
 | `devflow.ship` | Pre-handoff review |
 | `devflow.setup` | Generate `AGENTS.md` + `REGISTRY.md` |
 | `devflow.status` | Show current pipeline state |
+| `devflow.learn` | Log, search, list, or prune project learnings |
 
 ## Hooks
 
-Eight hooks activate automatically — no user invocation required.
+Ten hooks activate automatically — no user invocation required.
 
 | Event | Script | What it does |
 |---|---|---|
 | SessionStart | `session-start.sh` | Injects discovery skill + suggests context file based on active pipeline step |
+| SessionStart | `session-start-learnings.sh` | Injects past learnings from `.devflow-learnings.jsonl` into session context |
 | PreToolUse | `pre-config-protect.sh` | Blocks edits to linter/analyzer config files |
 | PreToolUse | `observe.sh pre` | Logs tool calls to `.devflow-observe.jsonl` |
 | PostToolUse | `observe.sh post` | Logs tool results to `.devflow-observe.jsonl` |
@@ -71,6 +73,7 @@ Eight hooks activate automatically — no user invocation required.
 | Stop | `stop-format-typecheck.sh` | Runs adapter format+analyze after each response |
 | Stop | `stop-notify.sh` | Sends macOS desktop notification on response complete |
 | Stop | `stop-debug-check.sh` | Warns about `print()` / `console.log` in modified files |
+| Stop | `stop-learn-distill.sh` | Detects file churn (≥4 edits) in `.devflow-observe.jsonl`; appends to `.devflow-learnings.jsonl` |
 
 ## Contexts
 
@@ -81,6 +84,17 @@ Three context files in `devflow/contexts/` tune Claude's behavior per pipeline p
 | `contexts/implement.md` | devflow.implement, devflow.beautify | Code-first, follow plan.md order, mark [done] |
 | `contexts/review.md` | devflow.ship | 7-axis review, severity-ordered findings |
 | `contexts/research.md` | devflow.task, devflow.plan | Explore before acting, no application code |
+
+## Core Principles
+
+`ETHOS.md` defines the four non-negotiable principles injected into every skill:
+
+| Principle | Rule |
+|---|---|
+| `spec-first` | No code before `task.md` + `plan.md` approved |
+| `traceability` | Every subtask → acceptance criterion → file(s) |
+| `vertical slices` | End-to-end increments, never layers |
+| `token-lean` | Caveman-compress: drop articles/hedging/filler; keep precision |
 
 ## Plugin Catalog
 
