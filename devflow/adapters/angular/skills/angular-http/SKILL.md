@@ -7,6 +7,13 @@ description: Implement HTTP data fetching in Angular v20+ using resource(), http
 
 Fetch data in Angular with signal-first APIs: `httpResource()`, `resource()`, and `HttpClient`.
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## `httpResource()` - Signal-Based HTTP
 
 `httpResource()` wraps `HttpClient` with signal state.

@@ -15,6 +15,13 @@ Use when changing application structure, creating new page domains, or reviewing
 - Keep one-way dependency flow: page -> state -> service -> http.
 - Keep reusable code in `shared`, single-instance infra in `core`, feature logic in `pages`.
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## 1) Architectural baseline (mandatory)
 
 - Standalone components by default.

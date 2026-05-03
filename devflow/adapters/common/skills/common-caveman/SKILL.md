@@ -9,6 +9,13 @@ description: Rewrite current response in caveman-speak — drop articles, filler
 
 Compress response into caveman-speak. Drop fluff. Keep substance. ~75% token reduction, 100% technical accuracy.
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## When NOT to Use
 
 - Security warning — write full sentences

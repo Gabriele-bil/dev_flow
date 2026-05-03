@@ -18,6 +18,13 @@ Run `/devflow.implement [optional plan path]`.
 
 Implement all files in `plan.md` per architecture conventions. Third DevFlow step.
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## When NOT to Use
 
 - No `plan.md` exists — run `devflow.plan` first

@@ -45,6 +45,9 @@ pipeline:
     - command: /devflow.status
       skill: devflow-status
       description: "Show current pipeline state — active feature, progress, next step, adapter"
+    - command: /devflow.learn
+      skill: devflow-learn
+      description: "Manage the learnings log — log project quirks, search past lessons, list recent entries, prune stale ones"
     - command: /devflow.lint-skills
       script: scripts/validate-skills.sh
       description: "Validate all SKILL.md files for required structure (frontmatter, sections, style)"
@@ -89,6 +92,9 @@ skills:
     - id: devflow-discovery
       path: skills/devflow-discovery/SKILL.md
       description: 'Orients AI agents to the dev-flow pipeline at session start. Answers "where do I begin?" by mapping current project state to the correct pipeline entry point. Injected automatically via SessionStart hook'
+    - id: devflow-learn
+      path: skills/devflow-learn/SKILL.md
+      description: "Manage the DevFlow learnings log. Sub-commands: log (record a quirk/lesson/warning), search (find past entries), list (show recent), prune (remove entries older than 30 days)"
 
   adapters:
     flutter:
@@ -201,6 +207,12 @@ hooks:
   - event: Stop
     script: hooks/stop-debug-check.sh
     description: "Scan modified files for debug output (print() in Dart, console.log in TypeScript) and warn without blocking"
+  - event: Stop
+    script: hooks/stop-learn-distill.sh
+    description: "Distill learning signals from .devflow-observe.jsonl — detect file churn (≥4 edits), write deduplicated entries to .devflow-learnings.jsonl"
+  - event: SessionStart
+    script: hooks/session-start-learnings.sh
+    description: "Inject past learnings from .devflow-learnings.jsonl into session context, filtered by active feature"
 
 contexts:
   - id: implement

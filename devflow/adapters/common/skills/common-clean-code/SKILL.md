@@ -11,6 +11,13 @@ Stack-agnostic. Apply when writing, refactoring, or reviewing any code.
 
 Produce code easy to discover, understand, add, change, remove, debug, and deploy. Testable, flexible, maintainable code reduces long-term cost.
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## Language
 
 All identifiers, methods, properties, and comments use English. Universal readability. Translate local terms.

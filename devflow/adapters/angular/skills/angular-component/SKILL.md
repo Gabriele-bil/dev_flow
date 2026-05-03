@@ -7,6 +7,13 @@ description: Create modern Angular standalone components following v20+ best pra
 
 Create standalone components for Angular v20+. Standalone default. Do NOT set `standalone: true`.
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## Component Structure
 
 ```typescript

@@ -9,6 +9,13 @@ Build type-safe, reactive forms with Signal Forms API. One model signal = source
 
 Note: Signal Forms experimental in Angular v21.
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## Basic Setup
 
 ```typescript

@@ -13,6 +13,13 @@ Pipeline dashboard. Shows current state without advancing the pipeline.
 
 Emit compact status dashboard. Answers "dove sono nel pipeline?" — no step execution, no code changes.
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## When NOT to Use
 
 - `devflow.setup` not yet run (no `devflow/config.md`) — inform user, stop

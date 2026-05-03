@@ -14,6 +14,13 @@ Use for data-layer work on `supabase_flutter` in Flutter + Riverpod architecture
 - Use current Supabase APIs safely (`single`, `maybeSingle`, `stream(primaryKey:)`, `uploadBinary`, `rpc`, `functions.invoke`)
 - Standardize auth, storage, realtime, and error handling
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## 1) Client access pattern (mandatory)
 
 Always access the client via provider injection.

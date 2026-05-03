@@ -15,6 +15,13 @@ Before analysis:
 - Active `ADAPTER.md` → **Test** section — frameworks, placement, coverage threshold
 - `@devflow/references/testing-patterns.md` — AAA, naming, mock boundaries, anti-patterns
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## Approach
 
 ### 1. Map Acceptance Criteria to Tests

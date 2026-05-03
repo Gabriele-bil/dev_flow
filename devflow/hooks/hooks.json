@@ -9,6 +9,15 @@
           }
         ],
         "description": "Inject devflow-discovery meta-skill and suggest context file based on active pipeline step from .devflow-state.json."
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/session-start-learnings.sh"
+          }
+        ],
+        "description": "Inject past learnings from .devflow-learnings.jsonl into session context. Surfaces recent churn signals and manual lessons relevant to the active feature."
       }
     ],
     "PreToolUse": [
@@ -113,6 +122,15 @@
           }
         ],
         "description": "Scan modified files for debug output (print() in Dart, console.log in TypeScript) and warn via stderr without blocking."
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/stop-learn-distill.sh"
+          }
+        ],
+        "description": "Distill learning signals from .devflow-observe.jsonl at end of each response. Detects file churn (≥4 edits) and appends deduplicated entries to .devflow-learnings.jsonl."
       }
     ]
   }

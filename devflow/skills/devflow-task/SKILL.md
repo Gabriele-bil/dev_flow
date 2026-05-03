@@ -9,6 +9,13 @@ description: Transforms a raw idea into a structured DevFlow task by reading pro
 
 Turn raw idea into structured task. Read product context, output user story + subtasks. First DevFlow step.
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## When NOT to Use
 
 - A `task.md` already exists for this feature and its status is not `done` — edit the existing file instead

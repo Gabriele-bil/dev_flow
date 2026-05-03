@@ -47,6 +47,13 @@ Order the **File list** bottom-up per `constitution.md` **and** the active adapt
 
 If order must deviate for a vertical slice, note the exception in **Architecture decisions**.
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## When NOT to Use
 
 - No `task.md` exists for the feature — run `devflow.task` first

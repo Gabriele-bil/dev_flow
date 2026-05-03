@@ -7,6 +7,13 @@ description: Write unit and integration tests for Angular v20+ applications usin
 
 Test Angular v20+ with Vitest + TestBed. Focus: signal components, services, HTTP, router, async correctness.
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## Testing Fundamentals (Zoneless Async-First)
 
 Default pattern: **Act -> Wait -> Assert**.

@@ -64,3 +64,7 @@ node_modules/
 # Build / OS artifacts
 *.orig
 *.rej
+
+# devflow learnings log
+.devflow-learnings.jsonl
+.devflow-learnings.jsonl.1

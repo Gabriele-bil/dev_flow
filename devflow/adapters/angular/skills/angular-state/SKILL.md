@@ -7,6 +7,13 @@ description: Build Angular state with NgRx Signal Store using withState, withPro
 
 Build state with `signalStore`. Keep store explicit, typed, feature-focused.
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## Store Rules
 
 - Use Signal Store for global (`providedIn: 'root'`) and local stores.

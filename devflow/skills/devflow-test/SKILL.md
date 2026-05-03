@@ -18,6 +18,13 @@ Run `/devflow.test [optional plan path]`.
 
 Write/run tests for current feature per active adapter **Test** section (unit/integration targets per adapter). Fifth DevFlow step.
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## When NOT to Use
 
 - The adapter’s analyze/typecheck command still reports errors — tests cannot be meaningful until the code compiles cleanly

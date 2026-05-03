@@ -20,6 +20,13 @@ Read `@devflow/config.md` and `@devflow/adapters/<adapter>/ADAPTER.md`. Use the 
 
 ---
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## When NOT to Use
 
 - Any unit or integration test is still failing — fix or document the failure before opening the PR

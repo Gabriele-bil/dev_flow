@@ -15,6 +15,13 @@ Before auditing:
 - Active `ADAPTER.md` → data/auth skill for stack-specific security patterns
 - `@devflow/references/security-checklist.md` — full baseline checklist
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## Audit Scope
 
 ### 1. Input Handling

@@ -14,6 +14,13 @@ Use when touching Flutter UI styling.
 - Make styling predictable, reusable, and easy to review.
 - Avoid local overrides that create design drift.
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## 1) Theme-first rule (mandatory)
 
 Never hardcode visual values in widgets. Pull from `ThemeData`, `ColorScheme`, `TextTheme`, and layout tokens (`AppLayout` in [`app_layout.dart`](lib/core/theme/app_layout.dart)).
