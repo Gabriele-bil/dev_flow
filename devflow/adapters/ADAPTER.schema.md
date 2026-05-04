@@ -36,6 +36,7 @@ Canonical section checklist for all DevFlow adapters. Use when creating a new ad
 | Codegen triggers | within `## Implement` | `[O]` — only for stacks with code generation |
 | Responsive tests | within `## Test` | `[O]` — for UI-heavy stacks |
 | Required test focus | `### Required test focus` | `[O]` — explicit test targets per concern |
+| Web Interface Guidelines review | `### Beautify: web interface guidelines` | `[O]` — UI-heavy stacks; load `common-web-interface-guidelines` skill, apply rules on UI files |
 
 ---
 

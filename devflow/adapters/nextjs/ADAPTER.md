@@ -169,6 +169,7 @@ Adapter does orchestration only. Domain rules live in skills:
 - [ ] `lint`, `test`, `build` pass (or failures documented)
 - [ ] Relevant Next.js skills loaded and applied for touched areas
 - [ ] Server/Client boundary respected (no unnecessary `use client`)
+- [ ] Web Interface Guidelines applied to modified UI files (`@devflow/adapters/common/skills/common-web-interface-guidelines/SKILL.md`)
 
 ## Beautify: commands
 
@@ -203,6 +204,15 @@ Apply core `devflow-beautify` axes, then evaluate touched code with relevant Nex
 - `nextjs-ui` — token usage, dark mode parity, responsiveness
 - `nextjs-forms` — validation schema, error display, progressive enhancement
 - `nextjs-testing` — coverage, test quality
+
+### Beautify: web interface guidelines
+
+Trigger: edit to `**/components/**`, `**/app/**/page.tsx`, `**/app/**/layout.tsx`, files importing `@/components/ui`.
+
+1. Load `@devflow/adapters/common/skills/common-web-interface-guidelines/SKILL.md`
+2. Read modified UI files
+3. Apply all rules
+4. Output `file:line — rule`. No preamble.
 
 ### Beautify: accessibility checks
 
@@ -262,4 +272,5 @@ pnpm build
 - [ ] `nextjs-architecture` constraints respected
 - [ ] Server/Client boundary documented for new components
 - [ ] `use client` scope minimal (no unnecessary promotion)
+- [ ] Web Interface Guidelines checked on modified UI files (no violations at Critical/Required severity)
 - [ ] `registry.md` updated if new patterns introduced
