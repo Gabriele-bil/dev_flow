@@ -24,7 +24,7 @@ Use when creating new routes, layouts, reorganizing feature folders, or reviewin
 
 ## 1) Baseline (mandatory)
 
-- Next.js 14+ App Router. No Pages Router.
+- Next.js 15+ App Router. No Pages Router.
 - TypeScript strict mode (`"strict": true` in `tsconfig.json`).
 - Default component = Server Component. No directive needed.
 - `'use client'` only when absolutely required (see section 5).
@@ -40,13 +40,18 @@ Each route folder can contain these reserved filenames:
 | `layout.tsx` | Persistent wrapper — wraps page and children, does NOT re-mount on navigation |
 | `loading.tsx` | Automatic Suspense boundary — shows while page/children stream |
 | `error.tsx` | Error boundary with `reset` prop — catches runtime errors in subtree |
+| `global-error.tsx` | Error boundary for root layout — must include `<html>` and `<body>` tags |
 | `not-found.tsx` | Renders when `notFound()` is called within subtree |
 | `template.tsx` | Like layout but re-mounts on every navigation — use when fresh state per nav is required |
+| `default.tsx` | Fallback for parallel route slots — return `null` when slot is inactive |
 | `route.ts` | API Route handler — no UI, named exports only (`GET`, `POST`, etc.) |
+| `opengraph-image.tsx` | Auto-generated OG image for route — runs on Edge runtime |
+| `twitter-image.tsx` | Auto-generated Twitter card image — runs on Edge runtime |
 
 Rules:
 - `layout.tsx` receives `children: React.ReactNode` — never fetch data that changes per-page inside root layout.
 - `error.tsx` MUST be a Client Component (`'use client'`). Receives `error` and `reset` props.
+- `global-error.tsx` MUST be a Client Component AND include `<html><body>` tags — replaces root layout on error.
 - `loading.tsx` wraps `page.tsx` in `<Suspense>` automatically — no manual wrapping needed.
 - `template.tsx` use case: tabs with per-tab animation, forms that must reset, auth-check per navigation.
 
@@ -172,14 +177,19 @@ page.tsx
 - No component calls external API directly.
 - No page contains raw fetch logic — delegate to service or action.
 
-## 7) Middleware
+## 7) Middleware / Proxy
 
-- File: `middleware.ts` at **project root** (sibling to `app/`, `lib/`, `components/`).
-- Never inside `app/`.
-- Use `config.matcher` to scope which paths middleware runs on.
+File at **project root** (sibling to `app/`, `lib/`, `components/`). Never inside `app/`.
+
+Next.js 16+ renamed `middleware.ts` → `proxy.ts` (codemod: `npx @next/codemod@latest upgrade`):
+
+| Version | File | Export | Matcher config |
+|---|---|---|---|
+| 14–15 | `middleware.ts` | `middleware()` | `config` |
+| 16+ | `proxy.ts` | `proxy()` | `proxyConfig` |
 
 ```ts
-// middleware.ts
+// middleware.ts (Next.js 14-15)
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
@@ -192,6 +202,24 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
+  matcher: ['/app/:path*', '/dashboard/:path*'],
+}
+```
+
+```ts
+// proxy.ts (Next.js 16+)
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+
+export function proxy(request: NextRequest) {
+  const token = request.cookies.get('session')?.value
+  if (!token) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
+  return NextResponse.next()
+}
+
+export const proxyConfig = {
   matcher: ['/app/:path*', '/dashboard/:path*'],
 }
 ```
@@ -210,7 +238,75 @@ export const config = {
 | Dynamic segments | `[]` wrapping | `[slug]/`, `[id]/` |
 | Catch-all segments | `[...]` wrapping | `[...slug]/` |
 
-## 9) Architecture Review Checklist
+## 9) Parallel Routes e Intercepting Routes
+
+### Parallel Routes — slot `@name`
+
+Rendono più pagine nello stesso layout simultaneamente (es. modale su sfondo):
+
+```
+app/
+  @modal/                    # slot parallelo
+    (.)product/[id]/         # intercepting route — cattura /product/[id]
+      page.tsx               # contenuto modale
+  product/
+    [id]/
+      page.tsx               # pagina completa (navigazione diretta / refresh)
+  layout.tsx                 # riceve { children, modal }
+  default.tsx                # ritorna null — slot fallback quando @modal inattivo
+```
+
+```tsx
+// app/layout.tsx
+export default function RootLayout({
+  children,
+  modal,
+}: {
+  children: React.ReactNode
+  modal: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        {modal}
+      </body>
+    </html>
+  )
+}
+```
+
+```tsx
+// app/default.tsx — obbligatorio per evitare 404 al refresh
+export default function Default() {
+  return null
+}
+```
+
+```tsx
+// app/@modal/(.)product/[id]/page.tsx — modale
+'use client'
+import { useRouter } from 'next/navigation'
+
+export default async function ProductModal({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const product = await getProduct(id)
+
+  return (
+    <dialog open>
+      <button onClick={() => useRouter().back()}>Chiudi</button>
+      <ProductDetail product={product} />
+    </dialog>
+  )
+}
+```
+
+**Regole:**
+- `default.tsx` obbligatorio in ogni slot parallelo — evita 404 al refresh diretto.
+- Chiudi il modale con `router.back()`, non `router.push('/')`.
+- Notazione intercepting: `(.)` = stesso livello, `(..)` = un livello su, `(...)` = root.
+
+## 10) Architecture Review Checklist
 
 Before merge, confirm:
 

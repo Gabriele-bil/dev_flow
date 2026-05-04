@@ -2,19 +2,21 @@
 
 Single source of truth for Next.js behavior. Pipeline skills (`devflow-plan`, `devflow-implement`, `devflow-beautify`, `devflow-test`, `devflow-pr`) **must** read `@devflow/config.md`, resolve adapter, then follow sections below.
 
-Baseline: **Next.js 14+ App Router · Zustand · Tailwind CSS + shadcn/ui · Server Actions + API Routes · Jest + RTL**. Keep output token-lean and imperative.
+Baseline: **Next.js 15+ App Router · Zustand · Tailwind CSS + shadcn/ui · Server Actions + API Routes · Jest + RTL**. Keep output token-lean and imperative.
 
 ## Technology skills (load by feature type)
 
 | When | Load |
 |------|------|
-| App structure, folder layout, route segments, boundaries | `@devflow/adapters/nextjs/skills/nextjs-architecture/SKILL.md` |
-| Server Components, Server Actions, API Routes, data fetching | `@devflow/adapters/nextjs/skills/nextjs-server/SKILL.md` |
-| Client Components, React hooks, interactivity, context | `@devflow/adapters/nextjs/skills/nextjs-components/SKILL.md` |
+| App structure, folder layout, route segments, boundaries, parallel/intercepting routes | `@devflow/adapters/nextjs/skills/nextjs-architecture/SKILL.md` |
+| Server Components, Server Actions, API Routes, data fetching, `'use cache'` | `@devflow/adapters/nextjs/skills/nextjs-server/SKILL.md` |
+| Client Components, React hooks, interactivity, context, hydration errors | `@devflow/adapters/nextjs/skills/nextjs-components/SKILL.md` |
 | Zustand stores, client state management | `@devflow/adapters/nextjs/skills/nextjs-state/SKILL.md` |
 | shadcn/ui, Tailwind, design tokens, dark mode, responsive | `@devflow/adapters/nextjs/skills/nextjs-ui/SKILL.md` |
 | React Hook Form, Zod validation, form flows, Server Actions | `@devflow/adapters/nextjs/skills/nextjs-forms/SKILL.md` |
 | Jest + RTL, unit/integration tests, coverage | `@devflow/adapters/nextjs/skills/nextjs-testing/SKILL.md` |
+| SEO, metadata, OG images, `generateMetadata`, sitemap, robots | `@devflow/adapters/nextjs/skills/nextjs-metadata/SKILL.md` |
+| Image optimization, font loading, script strategies, bundling | `@devflow/adapters/nextjs/skills/nextjs-performance/SKILL.md` |
 
 ## MCP (when available)
 
@@ -129,6 +131,8 @@ When implementing files, load technology skills based on file path patterns:
 | `**/components/ui/**`, files importing from `@/components/ui` | `nextjs-ui` |
 | Files with `useForm`, `zodResolver`, `z.object` | `nextjs-forms` |
 | `**/*.test.tsx`, `**/*.test.ts`, `**/__tests__/**` | `nextjs-testing` |
+| Files with `generateMetadata`, `opengraph-image`, `robots.ts`, `sitemap.ts` | `nextjs-metadata` |
+| `<img>` tags, font imports, `<script>` tags, `next.config.ts` images/font config | `nextjs-performance` |
 
 Load only skills triggered by current batch's file paths. Do not load all skills preemptively.
 
@@ -151,12 +155,14 @@ Retry failed steps up to **3** attempts each; then stop and report full output.
 Adapter does orchestration only. Domain rules live in skills:
 
 - Architecture and boundaries: `@devflow/adapters/nextjs/skills/nextjs-architecture/SKILL.md`
-- Server Components, Actions, API Routes: `@devflow/adapters/nextjs/skills/nextjs-server/SKILL.md`
-- Client Components, hooks: `@devflow/adapters/nextjs/skills/nextjs-components/SKILL.md`
+- Server Components, Actions, API Routes, `'use cache'`: `@devflow/adapters/nextjs/skills/nextjs-server/SKILL.md`
+- Client Components, hooks, hydration errors: `@devflow/adapters/nextjs/skills/nextjs-components/SKILL.md`
 - State (Zustand): `@devflow/adapters/nextjs/skills/nextjs-state/SKILL.md`
 - UI (shadcn/ui, Tailwind): `@devflow/adapters/nextjs/skills/nextjs-ui/SKILL.md`
 - Forms (RHF + Zod): `@devflow/adapters/nextjs/skills/nextjs-forms/SKILL.md`
 - Testing (Jest + RTL): `@devflow/adapters/nextjs/skills/nextjs-testing/SKILL.md`
+- SEO, metadata, OG images: `@devflow/adapters/nextjs/skills/nextjs-metadata/SKILL.md`
+- Image, font, script, bundling: `@devflow/adapters/nextjs/skills/nextjs-performance/SKILL.md`
 
 ### Pre-handoff checklist (implement)
 
