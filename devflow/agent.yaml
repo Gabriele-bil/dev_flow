@@ -155,6 +155,31 @@ skills:
           path: adapters/angular/skills/angular-theme/SKILL.md
           description: "Build and refactor Angular app theme with Tailwind and shared CSS layers. Use when defining global styles, component theme classes, design tokens, dark mode, or style architecture cleanup"
 
+    nextjs:
+      path: adapters/nextjs/ADAPTER.md
+      skills:
+        - id: nextjs-architecture
+          path: adapters/nextjs/skills/nextjs-architecture/SKILL.md
+          description: "App Router folder structure, route segments, layout nesting, and server/client boundary discipline. Load when creating or refactoring routes, layouts, or feature folder organization"
+        - id: nextjs-server
+          path: adapters/nextjs/skills/nextjs-server/SKILL.md
+          description: "Server Components, Server Actions, API Routes, and data fetching with Next.js cache extensions. Load when touching files with 'use server' directive, app/api/** routes, or **/actions.ts files"
+        - id: nextjs-components
+          path: adapters/nextjs/skills/nextjs-components/SKILL.md
+          description: "Client Components with 'use client' directive, React hooks, interactivity patterns, and context providers. Load when touching files containing 'use client' directive"
+        - id: nextjs-state
+          path: adapters/nextjs/skills/nextjs-state/SKILL.md
+          description: "Zustand client state management — stores, middleware, selectors, and decision matrix for choosing state location. Load when touching store.ts, *Store.ts, or use*Store.ts files"
+        - id: nextjs-ui
+          path: adapters/nextjs/skills/nextjs-ui/SKILL.md
+          description: "shadcn/ui components, Tailwind CSS styling, design tokens, dark mode with next-themes, and responsive layout. Load when touching components/ui/** files or components importing from @/components/ui"
+        - id: nextjs-forms
+          path: adapters/nextjs/skills/nextjs-forms/SKILL.md
+          description: "React Hook Form with Zod validation, shadcn/ui Form components, and Server Action integration. Load when touching files with useForm, zodResolver, or z.object patterns"
+        - id: nextjs-testing
+          path: adapters/nextjs/skills/nextjs-testing/SKILL.md
+          description: "Jest + React Testing Library for Next.js — Client Components, Server Components, Server Actions, API Routes, and Zustand stores. Load when touching *.test.tsx, *.test.ts, or __tests__/** files"
+
     common:
       skills:
         - id: common-clean-code
