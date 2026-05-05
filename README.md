@@ -2,7 +2,7 @@
 
 DevFlow is a **spec-driven development pipeline** that turns a raw idea into a reviewed, tested, and merged feature. Each step maps to a skill (and optional slash command) that defines inputs, steps, outputs, and success criteria.
 
-The workflow is **technology-agnostic**: stack-specific rules live in **adapters** under [`devflow/adapters/`](devflow/adapters/). Today the **Flutter** and **Angular** adapters ship with this repo; adding more stacks means adding a new adapter folder and switching [`devflow/config.md`](devflow/config.md).
+The workflow is **technology-agnostic**: stack-specific rules live in **adapters** under [`devflow/adapters/`](devflow/adapters/). Today the **Flutter**, **Angular**, and **Next.js** adapters ship with this repo; adding more stacks means adding a new adapter folder and switching [`devflow/config.md`](devflow/config.md).
 
 ---
 
@@ -86,8 +86,12 @@ devflow/
 │   │   ├── ADAPTER.md
 │   │   ├── templates/
 │   │   └── skills/              # flutter-supabase, -supabase-migrations, -theme, -riverpod, -models, -layout, -form
+│   ├── nextjs/
+│   │   ├── ADAPTER.md
+│   │   ├── templates/
+│   │   └── skills/              # nextjs-architecture, -server, -components, -state, -ui, -forms, -testing, -metadata, -performance
 │   └── common/
-│       └── skills/              # common-clean-code
+│       └── skills/              # common-clean-code, -web-interface-guidelines, -caveman
 ├── agents/
 │   ├── code-reviewer.md         # Architecture-focused code review
 │   ├── security-auditor.md      # Security review
@@ -108,8 +112,24 @@ Feature folders use zero-padded ids (`001`, `002`, …) and `kebab-case` names c
 
 The [`devflow/`](devflow/) folder is a **dual-marketplace plugin**: same tree loads in Claude Code and Cursor.
 
-- **Claude Code:** `claude --plugin-dir ./devflow` — see [Create plugins](https://code.claude.com/docs/en/plugins). Skills are namespaced (e.g. `/devflow:task`).
-- **Cursor:** symlink `~/.cursor/plugins/local/devflow` → this `devflow` directory, reload window — see [Plugins](https://cursor.com/docs/plugins).
+### Install via Claude Code marketplace (recommended)
+
+```
+/plugin marketplace add gabrielebilello/dev_flow
+/plugin install devflow@devflow
+```
+
+Skills are namespaced — use them as `/devflow:task`, `/devflow:plan`, etc.
+
+### Install locally (Claude Code)
+
+```bash
+claude --plugin-dir ./devflow
+```
+
+### Install locally (Cursor)
+
+Symlink `~/.cursor/plugins/local/devflow` → this `devflow` directory, then reload the window — see [Plugins](https://cursor.com/docs/plugins).
 
 More detail: [`devflow/README.md`](devflow/README.md).
 
@@ -127,6 +147,7 @@ Use `code-review-graph` for blast-radius aware reviews in both Cursor and Claude
 |---------|-------------|
 | Angular | `context7`, `sequential-thinking` |
 | Flutter | `context7`, `sequential-thinking`, `dart`, `supabase` |
+| Next.js | `context7`, `sequential-thinking` |
 
 ---
 
@@ -158,9 +179,15 @@ Shared checklists and patterns in [`devflow/references/`](devflow/references/):
 
 ## Adapters
 
+### Git conventions (all adapters)
+
+- **Commit:** `[type]: [short description]` — types: `feat` · `fix` · `chore` · `docs` · `perf`
+- **Branch:** `feat/[NNN]-[feature-name]` (or `fix/`, …)
+- **PR title:** `[type]: [Feature Name]`
+
 ### Flutter (`devflow/adapters/flutter/`)
 
-Domain skills:
+Baseline: **Flutter · Riverpod · Supabase**. Commands: `flutter analyze`, `flutter test`.
 
 | Skill | Purpose |
 |-------|---------|
@@ -172,16 +199,11 @@ Domain skills:
 | `flutter-layout` | Layout, breakpoints, scrollables |
 | `flutter-form` | Form/wizard flows |
 
-Git conventions:
-- **Commit:** `[type]: [short description]` — types: `feat` · `fix` · `chore` · `docs` · `perf`
-- **Branch:** `feat/[NNN]-[feature-name]` (or `fix/`, …)
-- **PR title:** `[type]: [Feature Name]`
-
 Feature pages: use `lib/features/<feature>/pages/` with entry file named `page.dart`.
 
 ### Angular (`devflow/adapters/angular/`)
 
-Domain skills:
+Baseline: standalone + signals-first. Commands: `pnpm run lint`, `pnpm run test`, `pnpm run build`.
 
 | Skill | Purpose |
 |-------|---------|
@@ -193,10 +215,26 @@ Domain skills:
 | `angular-testing` | Testing patterns |
 | `angular-theme` | Theme & styling with Tailwind |
 
-Baseline: standalone + signals-first. Commands: `pnpm run lint`, `pnpm run test`, `pnpm run build`.
+### Next.js (`devflow/adapters/nextjs/`)
+
+Baseline: **Next.js 15+ App Router · Zustand · Tailwind CSS + shadcn/ui · Server Actions + API Routes · Jest + RTL**. Commands: `pnpm lint`, `pnpm test`, `pnpm build`.
+
+| Skill | Purpose |
+|-------|---------|
+| `nextjs-architecture` | App structure, folder layout, route segments, parallel/intercepting routes |
+| `nextjs-server` | Server Components, Server Actions, API Routes, data fetching, `'use cache'` |
+| `nextjs-components` | Client Components, React hooks, interactivity, hydration errors |
+| `nextjs-state` | Zustand stores, client state management |
+| `nextjs-ui` | shadcn/ui, Tailwind, design tokens, dark mode, responsive |
+| `nextjs-forms` | React Hook Form, Zod validation, form flows, Server Actions |
+| `nextjs-testing` | Jest + RTL, unit/integration tests, coverage |
+| `nextjs-metadata` | SEO, metadata, OG images, `generateMetadata`, sitemap, robots |
+| `nextjs-performance` | Image optimization, font loading, script strategies, bundling |
 
 ### Common (`devflow/adapters/common/`)
 
 | Skill | Purpose |
 |-------|---------|
 | `common-clean-code` | Shared clean code patterns across all stacks |
+| `common-web-interface-guidelines` | UI/UX quality rules applied during beautify on all web adapters |
+| `common-caveman` | Token-lean, filler-free response style for plans and reviews |
