@@ -115,7 +115,7 @@ The [`devflow/`](devflow/) folder is a **dual-marketplace plugin**: same tree lo
 ### Install via Claude Code marketplace (recommended)
 
 ```
-/plugin marketplace add gabrielebilello/dev_flow
+/plugin marketplace add Gabriele-bil/dev_flow
 /plugin install devflow@devflow
 ```
 
