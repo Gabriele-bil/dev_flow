@@ -57,7 +57,8 @@ Before loading templates, determine the active technology stack and update the c
 1. Scan the consumer project root to detect the stack:
    - If `pubspec.yaml` exists, adapter is `flutter`.
    - If `angular.json` exists, or `analog` / `@angular/core` are in `package.json`, adapter is `angular`.
-2. If the stack cannot be detected automatically, ask the user: "What stack are you using? (Available adapters: angular, flutter)" and wait for their choice.
+   - If `next.config.js`, `next.config.mjs`, or `next.config.ts` exists, or `next` is in `package.json`, adapter is `nextjs`.
+2. If the stack cannot be detected automatically, ask the user: "What stack are you using? (Available adapters: angular, flutter, nextjs)" and wait for their choice.
 3. Overwrite `@devflow/config.md` with the resolved adapter:
    ```markdown
    # DevFlow Configuration
@@ -104,7 +105,7 @@ Rules:
 
 After collecting questionnaire answers, scan the live repo to ground REGISTRY.md in real patterns:
 
-1. Run `Glob` on the adapter's primary feature directory (e.g. `lib/features/*/` for Flutter, `src/app/*/` for Angular) to enumerate existing feature/page folders
+1. Run `Glob` on the adapter's primary feature directory (e.g. `lib/features/*/` for Flutter, `src/app/*/` for Angular, `app/*/` or `src/app/*/` for Next.js) to enumerate existing feature/page folders
 2. Sample 2-3 existing file names from each folder to infer naming conventions in use
 3. For each observed pattern, extract: name, trigger condition (`when`), and example file path
 
