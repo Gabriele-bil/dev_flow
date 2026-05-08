@@ -74,15 +74,20 @@ Before loading templates, determine the active technology stack and update the c
 ### Step 2 - Load contract and templates
 
 1. Read adapter contract file.
-2. Resolve template directory in this order:
+2. Read `Setup dependencies` section from `@devflow/adapters/<adapter>/ADAPTER.md` and extract:
+   - JavaScript package list (runtime + dev where applicable)
+   - Flutter package list (`dependencies`, `dev_dependencies` if explicitly declared)
+   - Optional adapter notes for setup installs
+3. Resolve template directory in this order:
    - `@devflow/adapters/<adapter>/templates/` (preferred)
    - `@devflow/skills/devflow-setup/templates/` (fallback)
-3. Read all templates from chosen directory:
+4. Read all templates from chosen directory:
    - `AGENTS.template.md`
    - `REGISTRY.template.md`
    - `PRODUCT.template.md`
 
 If preferred directory missing, report fallback in final response.
+If `Setup dependencies` is missing in adapter contract, report this as a setup contract error and stop.
 
 ### Step 3 - Mandatory full questionnaire (always)
 
@@ -225,6 +230,41 @@ Ensure `.devflow-state.json` is listed in the consumer project's `.gitignore`.
   ```
 - `.gitignore` does not exist → skip (the `pre-compact` hook appends it automatically on first run)
 
+### Step 7c - Install adapter setup dependencies (required)
+
+After successful file writes, install dependencies declared in the active adapter `Setup dependencies` section.
+
+Rules:
+
+1. Execute installs from the consumer project root only.
+2. Detect runtime first:
+   - Flutter project: `pubspec.yaml` exists → use Flutter commands.
+   - JavaScript project: `package.json` exists → detect package manager in order:
+     - `pnpm-lock.yaml` → `pnpm`
+     - `yarn.lock` → `yarn`
+     - `package-lock.json` → `npm`
+     - none found → default `npm`
+3. Install only packages listed in adapter `Setup dependencies`. Do not invent package names.
+4. Command mapping:
+   - JS runtime deps:
+     - `pnpm add <packages>`
+     - `yarn add <packages>`
+     - `npm install <packages>`
+   - JS dev deps (if adapter lists them):
+     - `pnpm add -D <packages>`
+     - `yarn add -D <packages>`
+     - `npm install -D <packages>`
+   - Flutter deps:
+     - Prefer a single `flutter pub add <packages>` call per dependency bucket.
+     - If adapter requires versions, keep exact constraints from adapter contract.
+5. If install command fails:
+   - stop setup flow
+   - report exact failed command and stderr
+   - do not claim setup complete
+6. If dependency set is empty for active adapter:
+   - skip install step
+   - report `Dependency install skipped (none declared)`.
+
 ### Step 8 - Notify user
 
 Respond with:
@@ -244,6 +284,15 @@ Questionnaire fields asked: [N]
 Auto-inferred fields: [N]
 User-provided fields: [N]
 
+Dependency install:
+- adapter: [adapter]
+- manager: [pnpm|yarn|npm|flutter]
+- installed runtime deps: [N]
+- installed dev deps: [N]
+- commands:
+  - [command 1]
+  - [command 2]
+
 Next: run devflow.task
 ```
 
@@ -254,6 +303,7 @@ Before final response:
 - [ ] all three files exist in consumer root
 - [ ] managed markers are valid and paired
 - [ ] non-managed user content preserved (unless `--force`)
+- [ ] adapter setup dependencies installed (or explicit skip reason reported)
 - [ ] no verbose filler added
 - [ ] unresolved values listed as `[TODO: fill]`
 
@@ -265,11 +315,13 @@ Before final response:
 - Expanding templates with long narrative prose
 - Using adapter templates when they do not exist without fallback
 - Skipping any required questionnaire field
+- Skipping adapter `Setup dependencies` install without explicit `none declared` evidence
 
 ## I/O Reference
 
 | | |
 |---|---|
-| Reads | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md`, adapter + fallback templates |
+| Reads | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (including `Setup dependencies`), adapter + fallback templates |
 | Writes | `AGENTS.md`, `REGISTRY.md`, `docs/product.md` (consumer project root); `@devflow/config.md`; `.gitignore` (appends `.devflow-state.json` if missing) |
+| Side effects | Installs adapter setup dependencies using project package manager or Flutter pub |
 | Next step | `devflow.task` |

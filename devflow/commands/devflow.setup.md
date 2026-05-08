@@ -17,6 +17,7 @@ Use `@devflow/skills/devflow-setup/SKILL.md` and execute it exactly.
 - Run mandatory full questionnaire to collect all placeholder values before rendering.
 - Preserve `code-review-graph` skill references from templates in the generated `AGENTS.md`.
 - Write `AGENTS.md`, `REGISTRY.md`, and `docs/product.md` in the consumer project root using `devflow-managed` block markers.
+- After file writes, install adapter setup dependencies declared in `@devflow/adapters/<adapter>/ADAPTER.md` under `Setup dependencies`.
 - If `$ARGUMENTS` contains `--force`, overwrite full files; otherwise only replace `devflow-managed` sections.
 
 Optional flag:

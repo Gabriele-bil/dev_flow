@@ -68,3 +68,7 @@ node_modules/
 # devflow learnings log
 .devflow-learnings.jsonl
 .devflow-learnings.jsonl.1
+
+# devflow observe log
+.devflow-observe.jsonl
+.devflow-observe.jsonl.1

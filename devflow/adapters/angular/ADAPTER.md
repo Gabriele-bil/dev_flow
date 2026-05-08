@@ -37,6 +37,21 @@ Template intent:
 
 Output must stay token-lean, imperative, filler-free.
 
+## Setup dependencies
+
+Dependencies below are authoritative for `devflow.setup` auto-install.
+
+### js-runtime-dependencies
+
+- `@jsverse/transloco`
+- `@angular/cdk`
+- `@ngrx/operators`
+- `@ngrx/signals`
+
+### js-dev-dependencies
+
+- none
+
 ## Caveman response rules (mandatory)
 
 Apply to narrative text in plans, updates, reviews, PR notes:

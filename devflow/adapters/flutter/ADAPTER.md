@@ -40,6 +40,29 @@ Template intent:
 
 Output must stay token-lean, imperative, filler-free.
 
+## Setup dependencies
+
+Dependencies below are authoritative for `devflow.setup` auto-install.
+
+### flutter-dependencies
+
+- `easy_localization`
+- `google_fonts`
+- `flutter_riverpod`
+- `riverpod_annotation`
+- `hooks_riverpod`
+- `flutter_hooks`
+- `freezed_annotation`
+- `json_annotation`
+
+### flutter-dev-dependencies
+
+- `build_runner`
+- `riverpod_generator`
+- `freezed`
+- `json_serializable`
+- `custom_lint`
+
 ## Plan: extra sections and templates
 
 Include these in `plan.md` when applicable (after core sections from `devflow-plan`).
