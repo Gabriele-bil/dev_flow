@@ -121,6 +121,7 @@ Each file must:
 
 - Follow architecture and naming conventions from `constitution.md`
 - Reuse existing patterns from `registry.md` where applicable
+- **Shared components first:** before writing a new widget, check the project's shared folder (e.g. `lib/shared/`) and `registry.md` for an existing component that covers the use case. Extend or parameterise it rather than duplicating. If a widget being built is generic enough to be used in other features, write it inside the shared folder directly and add it to `registry.md`.
 - Use relative imports pointing to the nearest barrel file (or the import style mandated by `constitution.md`)
 - Be complete; do not leave placeholder comments such as `// TODO` or `// implement this`
 - Satisfy **all implementation rules** in the active `ADAPTER.md` (responsive UI, localization, state architecture, accessibility, layout, contracts, data boundaries — load the referenced technology skills from the adapter table when touching those areas)
@@ -151,7 +152,7 @@ Before Step 7, confirm every item in the **Implement → Pre-handoff checklist**
 
 ### Step 7 - Registry update (conditional)
 
-If new reusable patterns are identified during implementation, propose the addition before editing `registry.md`:
+If new reusable patterns **or new shared components/widgets** are identified during implementation, propose the addition before editing `registry.md`:
 
 ```text
 🔍 New pattern found: [pattern name]
@@ -159,6 +160,8 @@ If new reusable patterns are identified during implementation, propose the addit
 
 Add to registry.md? [yes / no]
 ```
+
+For **shared UI components** written to the project's shared folder during this session, always propose the registry update — do not skip even if the component seems small.
 
 Wait for explicit user confirmation before updating `registry.md`.
 

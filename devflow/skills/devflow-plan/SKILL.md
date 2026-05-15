@@ -115,6 +115,7 @@ Before writing the plan, analyze:
 - All bullets under **Plan** / **Implement** / **Test** in `ADAPTER.md` that apply to this feature (state management, UI, DB, i18n, responsive layout, etc.) — use `registry.md` and `constitution.md` to ground them
 - Edge cases and error states that must be handled
 - Any required database or external-system edits called out by the adapter
+- **Shared components:** check `registry.md` and the project's shared folder (e.g. `lib/shared/`) for existing widgets/components that cover any UI need in this feature — prefer reuse over duplication. Identify any new UI pattern introduced by this feature that is generic enough to serve other features; plan those as shared components from the start and list them under their shared path in the **File List**.
 
 ### Step 3b - Dependency pass
 
@@ -221,6 +222,8 @@ After **Implementation checkpoints**, append **every extra plan section** requir
 - [ ] All **adapter-specific sections** from `ADAPTER.md` are present or correctly omitted per adapter rules (e.g. i18n keys for UI)
 - [ ] **Implementation checkpoints** are actionable (commands per `ADAPTER.md` — analyze / tests / smoke)
 - [ ] **Open questions** are empty or resolved if **Status** is `ready`
+- [ ] Existing shared components checked; no duplication of a component already in `shared/`
+- [ ] New reusable components identified in this plan are listed under their `shared/` path in the **File List**
 ```
 
 Format rules:
