@@ -67,6 +67,22 @@ class Pet with _$Pet {
     double? initialWeight,
   }) = _Pet;
 
+  /// Skeleton loading data — passed as `mock:` to `AsyncValue.skeleton`.
+  factory Pet.mock() => Pet(
+    id: 'mock-id',
+    name: 'Mock pet name',
+    species: PetSpecies.dog,
+    birthDate: DateTime(2020, 1, 1),
+    isNeutered: false,
+    breed: 'Mock breed',
+    microchip: null,
+    photoUrl: null,
+    initialWeight: 12.5,
+  );
+
+  static List<Pet> mockList({int count = 3}) =>
+      List.generate(count, (_) => Pet.mock());
+
   int get ageInYears => DateTime.now().difference(birthDate).inDays ~/ 365;
 }
 ```
@@ -74,8 +90,35 @@ class Pet with _$Pet {
 Notes:
 
 - Keep JSON methods out of entities.
-- Add private constructor (`const Pet._()`) only when custom getters/methods are needed.
-- Add `placeholder()` only for entities actually used in skeleton UI.
+- Add private constructor (`const Pet._()`) when the entity has custom getters/methods **or** `mock()`.
+- Add `mock()` (and `mockList()` when listed in skeleton UI) only on entities actually used with `.skeleton`.
+
+## Skeleton `mock()` (domain)
+
+Lives on the entity in `domain/`. Single source of truth for loading-state data consumed by `AsyncValue.skeleton` / `AsyncSnapshot.skeleton` (`mock:` parameter).
+
+Rules:
+
+- **Name**: `factory Entity.mock()` — never `placeholder()` or widget-local fakes.
+- **Shape**: realistic field lengths and non-null values where the loaded UI expects them; skeletonizer masks content, layout must match real data.
+- **Lists**: `static List<Entity> mockList({int count = 3})` on the same entity class.
+- **Scope**: domain only — no `mock()` on DTOs.
+
+Wiring in UI (see `flutter-riverpod`):
+
+```dart
+ref.watch(petProvider).skeleton(
+  mock: Pet.mock(),
+  data: (pet) => PetDetailBody(pet: pet),
+  error: (e, st) => PetErrorView(error: e, stackTrace: st),
+);
+
+ref.watch(petsProvider).skeleton(
+  mock: Pet.mockList(),
+  data: (pets) => PetListView(pets: pets),
+  error: (e, st) => PetErrorView(error: e, stackTrace: st),
+);
+```
 
 ## DTO (Data Transfer Object)
 
@@ -226,6 +269,7 @@ data/
 - [ ] Unions/failures use `sealed` for exhaustive `switch`
 - [ ] Contracts use `abstract interface class`
 - [ ] Build runner regenerated after edits
+- [ ] Entities used in skeleton UI expose `mock()` / `mockList()` on the domain class
 
 ## Context7 References Used
 
