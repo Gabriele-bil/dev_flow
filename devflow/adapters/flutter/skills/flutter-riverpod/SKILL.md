@@ -31,6 +31,8 @@ Prefer `@riverpod` codegen + explicit invalidation.
 3. In UI, use `ref.watch` for rendering, `ref.read` for actions, `ref.listen` for side effects.
 4. Use `select`/`selectAsync` when only a sub-field should trigger rebuilds.
 5. Make invalidation strategy explicit (`invalidate`, `refresh`, `invalidateSelf`).
+6. **Loading UI must use the `skeleton` extension** on `AsyncValue` (never `when(loading: …)` spinners/shimmers for content).
+7. **Skeleton mock lives on the entity** — pass `Entity.placeholder()` (or a list of them) as `mock:`; never inline ad-hoc fake data in widgets.
 
 ## Provider Selection
 
@@ -79,7 +81,9 @@ class Todos extends _$Todos {
 }
 ```
 
-### UI consumption
+### UI consumption (skeleton loading)
+
+Use the project `skeleton` extension on `AsyncValue` — it skeletonizes the **same** `data` builder with `mock` while loading, then animates to real data.
 
 ```dart
 class TodoPage extends ConsumerWidget {
@@ -99,14 +103,45 @@ class TodoPage extends ConsumerWidget {
       );
     });
 
-    return todos.when(
-      data: (items) => ListView(children: [for (final t in items) Text(t.title)]),
-      loading: CircularProgressIndicator.new,
-      error: (e, _) => Text('Error: $e'),
+    return todos.skeleton(
+      mock: Todo.placeholderList(), // static on Todo entity — see flutter-models
+      data: (items) => ListView(
+        children: [for (final t in items) TodoTile(todo: t)],
+      ),
+      error: (e, _) => ErrorView(error: e),
     );
   }
 }
 ```
+
+Single-entity provider: `mock: Pet.placeholder()`. List provider: `mock: Todo.placeholderList()` (or fixed-length list factory on the entity).
+
+Entity placeholder contract: see `flutter-models` (`placeholder()` factory on entities used in skeleton UI).
+
+## Loading UI: `skeleton` extension (mandatory)
+
+For any `AsyncValue<T>` rendered in UI:
+
+- **Always** call `.skeleton(...)`, not `.when(loading: …)`.
+- **`data`**: build the real loaded UI once; extension reuses it for loading (with `Skeletonizer` enabled) and data (disabled, with switch animation).
+- **`mock`**: value of type `T` from the domain entity (`Entity.placeholder()` or `Entity.placeholderList()`). Keeps skeleton shape aligned with real widgets and centralized.
+- **`error`**: dedicated error UI; optional `skipError` / `skipLoadingOnReload` / `skipLoadingOnRefresh` only when UX requires it.
+
+```dart
+ref.watch(petProvider).skeleton(
+  mock: Pet.placeholder(),
+  data: (pet) => PetDetailBody(pet: pet),
+  error: (e, st) => PetErrorView(error: e, stackTrace: st),
+);
+```
+
+Do **not**:
+
+- Hand-roll `Skeletonizer` around loading branches in widgets.
+- Put fake strings/IDs/colors in the widget for loading.
+- Use `CircularProgressIndicator` / generic shimmer where the loaded layout is known.
+
+`AsyncSnapshot` has the same `skeleton` extension (e.g. `FutureBuilder`); use `sliver: true` inside sliver lists.
 
 ## `watch` vs `read` vs `listen` vs `select`
 
@@ -193,6 +228,8 @@ final container = ProviderContainer.test(
 - Mutations without invalidation/refresh of dependent providers.
 - Watching entire objects when only one field is needed.
 - Business logic in widgets instead of provider/repository layer.
+- `AsyncValue.when(loading: CircularProgressIndicator…)` or custom loading widgets instead of `.skeleton`.
+- Inline skeleton mocks in widgets instead of `Entity.placeholder()` on the domain model.
 
 ## I/O Reference
 
@@ -206,7 +243,7 @@ final container = ProviderContainer.test(
 ## Pre-Ship Checklist
 
 - [ ] Correct provider type selected.
-- [ ] Async UI handles loading/data/error explicitly.
+- [ ] Async UI uses `.skeleton` with entity `placeholder()` as `mock` (no manual loading spinners).
 - [ ] `watch/read/listen/select` used intentionally.
 - [ ] Invalidation strategy documented in code.
 - [ ] Family arguments stable/equatable.
