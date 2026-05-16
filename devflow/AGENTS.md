@@ -1,5 +1,7 @@
 # AGENTS.md
 
+> **Scope:** This file is a template bundled with the devflow plugin. It is copied into **consumer projects** by `devflow.setup`. If you are reading this inside `devflow/`, you are in the plugin source repo — use `CLAUDE.md` at the repo root for contributor context instead.
+
 Guidance for AI agents using dev-flow. Read before invoking any devflow command.
 
 ## What is dev-flow
