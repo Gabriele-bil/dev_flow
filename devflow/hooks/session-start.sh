@@ -19,6 +19,17 @@ if [ -f "$META_SKILL" ]; then
 
 $CONTENT"
 
+  # Preflight: warn if config.md has not been set up yet
+  CONFIG_WARN=""
+  CONFIG_FILE="$SCRIPT_DIR/../config.md"
+  if [ -f "$CONFIG_FILE" ] && grep -q "\[TODO" "$CONFIG_FILE"; then
+    CONFIG_WARN="
+
+---
+⚠️  devflow not configured: run /devflow.setup before any pipeline command.
+Adapter is not set — config.md still has placeholder values."
+  fi
+
   # Check for .devflow-state.json in the current working directory (consumer project)
   CONTEXT_HINT=""
   STATE_FILE="$PWD/.devflow-state.json"
@@ -55,7 +66,7 @@ Load context: $CTX"
   fi
 
   jq -cn \
-    --arg message "${BASE_MSG}${CONTEXT_HINT}" \
+    --arg message "${BASE_MSG}${CONFIG_WARN}${CONTEXT_HINT}" \
     '{priority: "IMPORTANT", message: $message}'
 else
   echo '{"priority": "INFO", "message": "dev-flow: devflow-discovery skill not found. Run devflow.setup if this is a new project."}'
