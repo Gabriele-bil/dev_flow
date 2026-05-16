@@ -65,6 +65,9 @@ node_modules/
 *.orig
 *.rej
 
+# devflow runtime state
+.devflow-state.json
+
 # devflow learnings log
 .devflow-learnings.jsonl
 .devflow-learnings.jsonl.1
