@@ -1,0 +1,48 @@
+name: Release Please
+
+# Su ogni push su main, release-please calcola il bump dai Conventional Commits
+# dall'ultimo tag devflow-v* e apre/aggiorna una release PR.
+# Al merge della release PR: crea tag annotato devflow-v* + GitHub Release.
+#
+# Conventional Commits → impatto versione:
+#   feat:             MINOR bump (1.0.0 → 1.1.0)
+#   fix:              PATCH bump (1.0.0 → 1.0.1)
+#   feat!: / BREAKING CHANGE:  MAJOR bump
+#   docs:, chore:, refactor:, test:  nessun bump
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/checkout@v4
+        if: ${{ steps.release.outputs['.--release_created'] }}
+
+      - name: Rebuild dist after release
+        if: ${{ steps.release.outputs['.--release_created'] }}
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq jq
+          bash scripts/build-plugin.sh
+          if ! git diff --quiet -- dist/; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add dist/
+            git commit -m "chore(dist): rebuild after release ${{ steps.release.outputs['.--tag_name'] }}"
+            git push origin main
+          else
+            echo "dist/ in sync — niente da committare"
+          fi

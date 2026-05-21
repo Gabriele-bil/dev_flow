@@ -2,7 +2,7 @@
 
 DevFlow is a **spec-driven development pipeline** that turns a raw idea into a reviewed, tested, and merged feature. Each step maps to a skill (and optional slash command) that defines inputs, steps, outputs, and success criteria.
 
-The workflow is **technology-agnostic**: stack-specific rules live in **adapters** under [`devflow/adapters/`](devflow/adapters/). Today the **Flutter**, **Angular**, and **Next.js** adapters ship with this repo; adding more stacks means adding a new adapter folder and switching [`devflow/config.md`](devflow/config.md).
+The workflow is **technology-agnostic**: stack-specific rules live in **adapters** under [`templates/devflow/adapters/`](templates/devflow/adapters/). Today the **Flutter**, **Angular**, and **Next.js** adapters ship with this repo; adding more stacks means adding a new adapter folder and switching [`templates/devflow/config.md`](templates/devflow/config.md).
 
 ---
 
@@ -27,16 +27,16 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 
 | Command | Skill | Input → Output |
 |--------|--------|----------------|
-| `devflow.setup` | [`devflow/skills/devflow-setup/SKILL.md`](devflow/skills/devflow-setup/SKILL.md) | Consumer repo context + adapter templates → root `AGENTS.md` + `REGISTRY.md` |
-| `devflow.task` | [`devflow/skills/devflow-task/SKILL.md`](devflow/skills/devflow-task/SKILL.md) | Idea → `devflow/features/[NNN]_[name]/task.md` |
-| `devflow.plan` | [`devflow/skills/devflow-plan/SKILL.md`](devflow/skills/devflow-plan/SKILL.md) | `task.md` → `plan.md` |
-| `devflow.implement` | [`devflow/skills/devflow-implement/SKILL.md`](devflow/skills/devflow-implement/SKILL.md) | `plan.md` → code on `feat|fix|…/[NNN]-[name]` |
-| `devflow.beautify` | [`devflow/skills/devflow-beautify/SKILL.md`](devflow/skills/devflow-beautify/SKILL.md) | Implemented files → polished code |
-| `devflow.test` | [`devflow/skills/devflow-test/SKILL.md`](devflow/skills/devflow-test/SKILL.md) | Feature → unit + integration tests |
-| `devflow.ship` | [`devflow/commands/devflow.ship.md`](devflow/commands/devflow.ship.md) | Feature → parallel review (code + security + tests) → gate before PR |
-| `devflow.pr` | [`devflow/skills/devflow-pr/SKILL.md`](devflow/skills/devflow-pr/SKILL.md) | Branch → PR to `main` |
+| `devflow.setup` | [`templates/devflow/skills/devflow-setup/SKILL.md`](templates/devflow/skills/devflow-setup/SKILL.md) | Consumer repo context + adapter templates → root `AGENTS.md` + `REGISTRY.md` |
+| `devflow.task` | [`templates/devflow/skills/devflow-task/SKILL.md`](templates/devflow/skills/devflow-task/SKILL.md) | Idea → `devflow/features/[NNN]_[name]/task.md` |
+| `devflow.plan` | [`templates/devflow/skills/devflow-plan/SKILL.md`](templates/devflow/skills/devflow-plan/SKILL.md) | `task.md` → `plan.md` |
+| `devflow.implement` | [`templates/devflow/skills/devflow-implement/SKILL.md`](templates/devflow/skills/devflow-implement/SKILL.md) | `plan.md` → code on `feat|fix|…/[NNN]-[name]` |
+| `devflow.beautify` | [`templates/devflow/skills/devflow-beautify/SKILL.md`](templates/devflow/skills/devflow-beautify/SKILL.md) | Implemented files → polished code |
+| `devflow.test` | [`templates/devflow/skills/devflow-test/SKILL.md`](templates/devflow/skills/devflow-test/SKILL.md) | Feature → unit + integration tests |
+| `devflow.ship` | [`templates/devflow/commands/devflow.ship.md`](templates/devflow/commands/devflow.ship.md) | Feature → parallel review (code + security + tests) → gate before PR |
+| `devflow.pr` | [`templates/devflow/skills/devflow-pr/SKILL.md`](templates/devflow/skills/devflow-pr/SKILL.md) | Branch → PR to `main` |
 
-Command wrappers live in [`devflow/commands/`](devflow/commands/).
+Command wrappers live in [`templates/devflow/commands/`](templates/devflow/commands/).
 
 ---
 
@@ -54,63 +54,89 @@ Command wrappers live in [`devflow/commands/`](devflow/commands/).
 
 ---
 
-## Directory layout
+## Repository layout
 
 ```
-devflow/
-├── .claude-plugin/plugin.json   # Claude Code plugin manifest
-├── .cursor-plugin/plugin.json   # Cursor plugin manifest
-├── config.md                    # Active adapter id
-├── AGENTS.md                    # Global agent rules
-├── CONTRIBUTING.md
-├── hooks/
-│   ├── hooks.json               # SessionStart hook config
-│   └── session-start.sh         # Auto-initializes project context on session start
-├── commands/                    # Slash-command entry points
-├── skills/                      # Core pipeline skills (devflow-*)
-│   ├── devflow-beautify/
-│   ├── devflow-discovery/
-│   ├── devflow-implement/
-│   ├── devflow-plan/
-│   ├── devflow-pr/
-│   ├── devflow-setup/
-│   ├── devflow-task/
-│   └── devflow-test/
-├── adapters/
-│   ├── ADAPTER.schema.md
-│   ├── angular/
-│   │   ├── ADAPTER.md
-│   │   ├── templates/
-│   │   └── skills/              # angular-architecture, -component, -forms, -http, -state, -testing, -theme
-│   ├── flutter/
-│   │   ├── ADAPTER.md
-│   │   ├── templates/
-│   │   └── skills/              # flutter-supabase, -supabase-migrations, -theme, -riverpod, -models, -layout, -form
-│   ├── nextjs/
-│   │   ├── ADAPTER.md
-│   │   ├── templates/
-│   │   └── skills/              # nextjs-architecture, -server, -components, -state, -ui, -forms, -testing, -metadata, -performance
-│   └── common/
-│       └── skills/              # common-clean-code, -web-interface-guidelines, -caveman
-├── agents/
-│   ├── code-reviewer.md         # Architecture-focused code review
-│   ├── security-auditor.md      # Security review
-│   └── test-engineer.md         # Test validation
-├── references/
-│   ├── accessibility-checklist.md
-│   ├── security-checklist.md
-│   └── testing-patterns.md
-└── features/                    # Generated task.md / plan.md per feature
-    └── [NNN]_[feature-name]/
+dev_flow/
+├── templates/
+│   └── devflow/                     # Plugin source — edit here
+│       ├── manifest.json            # Plugin metadata (name, version, author)
+│       ├── config.md                # Active adapter id
+│       ├── AGENTS.md                # Global agent rules
+│       ├── CONTRIBUTING.md
+│       ├── ETHOS.md
+│       ├── hooks/
+│       │   ├── hooks.json           # Lifecycle hook config
+│       │   └── *.sh                 # Hook scripts
+│       ├── commands/                # Slash-command entry points
+│       ├── skills/                  # Core pipeline skills (devflow-*)
+│       │   ├── devflow-beautify/
+│       │   ├── devflow-discovery/
+│       │   ├── devflow-implement/
+│       │   ├── devflow-plan/
+│       │   ├── devflow-pr/
+│       │   ├── devflow-setup/
+│       │   ├── devflow-task/
+│       │   └── devflow-test/
+│       ├── adapters/
+│       │   ├── ADAPTER.schema.md
+│       │   ├── angular/             # angular-architecture, -component, -forms, -http, -state, -testing, -theme
+│       │   ├── flutter/             # flutter-supabase, -migrations, -theme, -riverpod, -models, -layout, -form
+│       │   ├── nextjs/              # nextjs-architecture, -server, -components, -state, -ui, -forms, -testing, -metadata, -performance
+│       │   └── common/              # common-clean-code, -web-interface-guidelines, -caveman
+│       ├── agents/
+│       │   ├── code-reviewer.md
+│       │   ├── security-auditor.md
+│       │   └── test-engineer.md
+│       ├── references/
+│       │   ├── accessibility-checklist.md
+│       │   ├── security-checklist.md
+│       │   └── testing-patterns.md
+│       └── scripts/
+│           └── validate-skills.sh
+├── dist/
+│   └── devflow/                     # Build output — do not edit directly
+│       ├── .claude-plugin/          # Claude Code plugin manifest (generated)
+│       ├── .cursor-plugin/          # Cursor plugin manifest (generated)
+│       └── ...                      # Mirror of templates/devflow/ (minus dev-only files)
+├── scripts/
+│   ├── build-plugin.sh              # Orchestrator: reads manifest.json, calls builders
+│   └── builders/
+│       ├── common.sh                # Shared helpers (ok/warn/fail/step)
+│       ├── build-claude.sh          # Generates dist/ for Claude Code
+│       └── build-cursor.sh          # Adds Cursor layer on dist/
+├── .github/
+│   └── workflows/
+│       ├── build-verify.yml         # CI: verify dist/ is in sync on every PR
+│       └── release-please.yml       # CI: automated semver bump + GitHub Release on main push
+├── release-please-config.json
+├── .release-please-manifest.json
+└── CHANGELOG.md
 ```
 
-Feature folders use zero-padded ids (`001`, `002`, …) and `kebab-case` names confirmed with the user.
+Feature folders (in the consumer project) use zero-padded ids (`001`, `002`, …) and `kebab-case` names confirmed with the user.
+
+---
+
+## Build system
+
+The plugin uses a manifest-driven build: source lives in `templates/devflow/`, built output in `dist/devflow/` (committed). Run the build after any change to skills, adapters, or hooks:
+
+```bash
+# Rebuild dist/ after any source change
+bash scripts/build-plugin.sh
+
+# Validate all SKILL.md files
+bash templates/devflow/scripts/validate-skills.sh
+```
+
+The build is **idempotent** — it recreates `dist/devflow/` from scratch on every run. Requires `jq` (`brew install jq`).
 
 ---
 
 ## Plugins (Claude Code & Cursor)
 
-The [`devflow/`](devflow/) folder is a **dual-marketplace plugin**: same tree loads in Claude Code and Cursor.
+The [`dist/devflow/`](dist/devflow/) folder is a **dual-marketplace plugin**: same tree loads in Claude Code and Cursor.
 
 ### Install via Claude Code marketplace (recommended)
 
@@ -124,14 +150,14 @@ Skills are namespaced — use them as `/devflow:task`, `/devflow:plan`, etc.
 ### Install locally (Claude Code)
 
 ```bash
-claude --plugin-dir ./devflow
+claude --plugin-dir ./dist/devflow
 ```
 
 ### Install locally (Cursor)
 
-Symlink `~/.cursor/plugins/local/devflow` → this `devflow` directory, then reload the window — see [Plugins](https://cursor.com/docs/plugins).
+Symlink `~/.cursor/plugins/local/devflow` → this repo's `dist/devflow` directory, then reload the window — see [Plugins](https://cursor.com/docs/plugins).
 
-More detail: [`devflow/README.md`](devflow/README.md).
+More detail: [`templates/devflow/README.md`](templates/devflow/README.md).
 
 ### Recommended companion plugin: code-review-graph
 
@@ -153,13 +179,13 @@ Use `code-review-graph` for blast-radius aware reviews in both Cursor and Claude
 
 ## Agents
 
-Specialized agents live in [`devflow/agents/`](devflow/agents/) and are dispatched automatically by `devflow.ship`:
+Specialized agents live in [`templates/devflow/agents/`](templates/devflow/agents/) and are dispatched automatically by `devflow.ship`:
 
 | Agent | File | Role |
 |-------|------|------|
-| Code Reviewer | [`agents/code-reviewer.md`](devflow/agents/code-reviewer.md) | Architecture-focused code review |
-| Security Auditor | [`agents/security-auditor.md`](devflow/agents/security-auditor.md) | Security vulnerabilities and hardening |
-| Test Engineer | [`agents/test-engineer.md`](devflow/agents/test-engineer.md) | Test coverage and quality validation |
+| Code Reviewer | [`agents/code-reviewer.md`](templates/devflow/agents/code-reviewer.md) | Architecture-focused code review |
+| Security Auditor | [`agents/security-auditor.md`](templates/devflow/agents/security-auditor.md) | Security vulnerabilities and hardening |
+| Test Engineer | [`agents/test-engineer.md`](templates/devflow/agents/test-engineer.md) | Test coverage and quality validation |
 
 `devflow.ship` runs all three in parallel, synthesizes their reports, and routes to `devflow.pr` only if no blockers are found.
 
@@ -167,13 +193,13 @@ Specialized agents live in [`devflow/agents/`](devflow/agents/) and are dispatch
 
 ## References
 
-Shared checklists and patterns in [`devflow/references/`](devflow/references/):
+Shared checklists and patterns in [`templates/devflow/references/`](templates/devflow/references/):
 
 | File | Purpose |
 |------|---------|
-| [`accessibility-checklist.md`](devflow/references/accessibility-checklist.md) | A11y guidelines |
-| [`security-checklist.md`](devflow/references/security-checklist.md) | Security review points |
-| [`testing-patterns.md`](devflow/references/testing-patterns.md) | Testing best practices |
+| [`accessibility-checklist.md`](templates/devflow/references/accessibility-checklist.md) | A11y guidelines |
+| [`security-checklist.md`](templates/devflow/references/security-checklist.md) | Security review points |
+| [`testing-patterns.md`](templates/devflow/references/testing-patterns.md) | Testing best practices |
 
 ---
 
@@ -185,7 +211,7 @@ Shared checklists and patterns in [`devflow/references/`](devflow/references/):
 - **Branch:** `feat/[NNN]-[feature-name]` (or `fix/`, …)
 - **PR title:** `[type]: [Feature Name]`
 
-### Flutter (`devflow/adapters/flutter/`)
+### Flutter (`templates/devflow/adapters/flutter/`)
 
 Baseline: **Flutter · Riverpod · Supabase**. Commands: `flutter analyze`, `flutter test`.
 
@@ -201,7 +227,7 @@ Baseline: **Flutter · Riverpod · Supabase**. Commands: `flutter analyze`, `flu
 
 Feature pages: use `lib/features/<feature>/pages/` with entry file named `page.dart`.
 
-### Angular (`devflow/adapters/angular/`)
+### Angular (`templates/devflow/adapters/angular/`)
 
 Baseline: standalone + signals-first. Commands: `pnpm run lint`, `pnpm run test`, `pnpm run build`.
 
@@ -215,7 +241,7 @@ Baseline: standalone + signals-first. Commands: `pnpm run lint`, `pnpm run test`
 | `angular-testing` | Testing patterns |
 | `angular-theme` | Theme & styling with Tailwind |
 
-### Next.js (`devflow/adapters/nextjs/`)
+### Next.js (`templates/devflow/adapters/nextjs/`)
 
 Baseline: **Next.js 15+ App Router · Zustand · Tailwind CSS + shadcn/ui · Server Actions + API Routes · Jest + RTL**. Commands: `pnpm lint`, `pnpm test`, `pnpm build`.
 
@@ -231,7 +257,7 @@ Baseline: **Next.js 15+ App Router · Zustand · Tailwind CSS + shadcn/ui · Ser
 | `nextjs-metadata` | SEO, metadata, OG images, `generateMetadata`, sitemap, robots |
 | `nextjs-performance` | Image optimization, font loading, script strategies, bundling |
 
-### Common (`devflow/adapters/common/`)
+### Common (`templates/devflow/adapters/common/`)
 
 | Skill | Purpose |
 |-------|---------|

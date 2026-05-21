@@ -1,0 +1,38 @@
+name: Build Verify
+
+# Verifica che dist/ sia in sync con templates/ e scripts/.
+# Lancia build-plugin.sh e fallisce se il rebuild produce modifiche.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'templates/**'
+      - 'scripts/**'
+      - 'dist/**'
+      - '.claude-plugin/**'
+      - '.github/workflows/build-verify.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq jq
+
+      - name: Build plugin
+        run: bash scripts/build-plugin.sh
+
+      - name: Check dist/ is in sync
+        run: |
+          if ! git diff --quiet -- dist/ .claude-plugin/; then
+            echo "::error::dist/ o marketplace.json out of sync. Esegui 'bash scripts/build-plugin.sh' localmente e committa il risultato."
+            git --no-pager diff --stat -- dist/ .claude-plugin/
+            exit 1
+          fi
+          echo "✓ dist/ in sync con templates/"
