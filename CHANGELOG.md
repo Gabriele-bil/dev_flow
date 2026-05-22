@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.1.0...devflow-v1.2.0) (2026-05-22)
+
+
+### Features
+
+* Add flutter-architecture skill and update flutter-layout to prefer Row/Column spacing parameter over SizedBox ([6669e79](https://github.com/Gabriele-bil/dev_flow/commit/6669e79e15b4437811e61b054a5b4eb5fee4b512))
+
 ## [1.1.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.0.0...devflow-v1.1.0) (2026-05-22)
 
 
