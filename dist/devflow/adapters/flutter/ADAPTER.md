@@ -6,6 +6,7 @@ Single source of truth for Flutter behavior. Pipeline skills (`devflow-plan`, `d
 
 | When | Load |
 |------|------|
+| New feature architecture, layer ownership, feature file-tree scaffold | `@devflow/adapters/flutter/skills/flutter-architecture/SKILL.md` |
 | Database read/write/auth, schema, RLS | `@devflow/adapters/flutter/skills/flutter-supabase/SKILL.md` |
 | Schema migrations / SQL artifacts | `@devflow/adapters/flutter/skills/flutter-supabase-migrations/SKILL.md` |
 | New UI screens or visual styling | `@devflow/adapters/flutter/skills/flutter-theme/SKILL.md` |

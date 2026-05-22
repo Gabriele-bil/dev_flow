@@ -38,7 +38,8 @@ Core Flutter rule: **Constraints go down. Sizes go up. Parent sets position.**
 
 - **Linear horizontal/vertical:** `Row` / `Column`
 - **Distribute remaining space:** `Expanded` / `Flexible`
-- **Fixed gap:** `SizedBox(width/height: ...)`
+- **Uniform gap between children:** `Row(spacing: ...)` / `Column(spacing: ...)` — **preferred over `SizedBox`**
+- **One-off fixed gap (e.g. between sections):** `SizedBox(width/height: ...)` — only when `spacing` cannot apply
 - **Padding around content:** `Padding`
 - **Decorated box + optional sizing/alignment:** `Container` (only when needed)
 - **Overlay elements:** `Stack` + `Positioned`
@@ -64,7 +65,7 @@ Core Flutter rule: **Constraints go down. Sizes go up. Parent sets position.**
 ### 3) Implement outer-to-inner
 
 - Start with high-level structure (`Scaffold`, page sections).
-- Add spacing with `SizedBox`/`Padding`.
+- Add uniform spacing between siblings via `Row(spacing:)` / `Column(spacing:)`; use `SizedBox` only for isolated gaps or section separators.
 - Extract repeated or deep subtrees into private stateless widgets.
 
 ### 4) Validate with tools and edge cases
@@ -90,6 +91,8 @@ Core Flutter rule: **Constraints go down. Sizes go up. Parent sets position.**
   - If unavoidable, use `shrinkWrap: true` + `NeverScrollableScrollPhysics` for inner list (with performance awareness).
 - **Unexpected full-width/full-height children:**
   - Inspect parent constraints; remove accidental `double.infinity` sizing in unbounded context.
+- **`SizedBox` scattered between every child in a `Row`/`Column`:**
+  - Replace all sibling gaps with a single `spacing:` parameter on the parent; remove the `SizedBox` nodes.
 - **Inconsistent spacing across screen:**
   - Replace ad-hoc values with consistent spacing tokens/constants.
 
@@ -103,6 +106,39 @@ Core Flutter rule: **Constraints go down. Sizes go up. Parent sets position.**
 - [ ] Widget tree is readable (large sections extracted into subwidgets).
 
 ## Examples
+
+### Example: Sibling spacing — `spacing:` vs `SizedBox`
+
+**Anti-pattern:** `SizedBox` inserted between every child.
+
+```dart
+// BAD
+Column(
+  children: [
+    TitleWidget(),
+    SizedBox(height: 8),
+    BodyWidget(),
+    SizedBox(height: 8),
+    FooterWidget(),
+  ],
+)
+```
+
+**Fix:** Single `spacing:` parameter; no extra nodes in the tree.
+
+```dart
+// GOOD
+Column(
+  spacing: 8,
+  children: [
+    TitleWidget(),
+    BodyWidget(),
+    FooterWidget(),
+  ],
+)
+```
+
+`SizedBox` remains acceptable for one-off asymmetric gaps (e.g. a larger separator before a footer) where uniform spacing does not apply.
 
 ### Example: `ListView` inside `Column` (unbounded height)
 
