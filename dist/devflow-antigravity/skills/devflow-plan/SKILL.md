@@ -52,6 +52,7 @@ If order must deviate for a vertical slice, note the exception in **Architecture
 - **spec-first** — no code before `task.md` + `plan.md` approved
 - **traceability** — every subtask → acceptance criterion → file(s)
 - **vertical slices** — end-to-end increments, never layers
+- **reuse-first** — always check `registry.md` and shared folders before planning new components; reuse or extend over duplicate
 - **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## When NOT to Use
@@ -107,21 +108,31 @@ Then apply the **Technology skills** table in the active `ADAPTER.md`: load each
 
 Follow the **MCP** section of the active `ADAPTER.md` (tooling order and when to add optional servers).
 
-### Step 3 - Analysis
+### Step 3 - Reuse audit (mandatory before analysis)
 
-Before writing the plan, analyze:
+Before planning any file, scan for existing project elements that can be reused or extended:
+
+1. **Read `registry.md`** in full — note every shared component, widget, utility, and pattern relevant to this feature.
+2. **Scan the project's shared folder** (e.g. `lib/shared/`, `src/shared/`, `components/shared/`) — list components that partially or fully cover any UI need in this feature.
+3. **Decide for each candidate:** reuse as-is / extend / parameterise / create new. Document the decision under **Architecture decisions** in `plan.md`.
+4. **Plan new shared components:** if this feature introduces a UI pattern generic enough for reuse elsewhere, list it under its shared path in the **File List** from the start — not as an afterthought.
+
+> **Rule:** A new feature-specific component is only justified when no shared component covers ≥70% of the need. When in doubt, extend the existing one.
+
+### Step 4 - Analysis
+
+After the reuse audit, analyze:
 
 - Which subtasks in `task.md` require new files vs existing file changes
 - All bullets under **Plan** / **Implement** / **Test** in `ADAPTER.md` that apply to this feature (state management, UI, DB, i18n, responsive layout, etc.) — use `registry.md` and `constitution.md` to ground them
 - Edge cases and error states that must be handled
 - Any required database or external-system edits called out by the adapter
-- **Shared components:** check `registry.md` and the project's shared folder (e.g. `lib/shared/`) for existing widgets/components that cover any UI need in this feature — prefer reuse over duplication. Identify any new UI pattern introduced by this feature that is generic enough to serve other features; plan those as shared components from the start and list them under their shared path in the **File List**.
 
-### Step 3b - Dependency pass
+### Step 4b - Dependency pass
 
-Re-check the planned **File list** order against **Dependency ordering** above. Migrations and shared contracts must precede consumers unless an exception is documented under **Architecture decisions**.
+Re-check the planned **File list** order against **Dependency ordering** above. Migrations and shared contracts must precede consumers unless an exception is documented under **Architecture decisions**. Shared components must be listed before the feature files that consume them.
 
-### Step 4 - Write plan file
+### Step 5 - Write plan file
 
 Create `devflow/features/[NNN]_[feature-name]/plan.md` with this format:
 
@@ -235,7 +246,7 @@ Format rules:
 - Style: concise and optimized for LLM consumption (no filler)
 - Compression: caveman-compress style — drop articles/filler/hedging; fragments OK; keep technical terms, paths, commands exact.
 
-### Step 5 - Notify user
+### Step 6 - Notify user
 
 After writing the file, respond with:
 
@@ -264,6 +275,8 @@ Continue to implementation? -> devflow.implement
 | "Leave Open questions, mark Status ready" | `devflow.implement` works from what's written. Unresolved questions → silent bugs |
 | "Adapter sections don't apply here" | Omitting required `ADAPTER.md` sections → `devflow.beautify` and `devflow.test` flag missing patterns |
 | "Architecture decisions during implement" | Mid-implement decisions not in `plan.md` → silent deviations, no traceability |
+| "The shared component doesn't fit exactly — I'll create a new one" | Extend or parameterise the existing one first; duplication fragments the component inventory |
+| "I'll check shared components during implement" | Reuse audit belongs in **plan** — implement must not discover shared components mid-flight and redesign |
 
 ## Red flags
 
@@ -275,6 +288,8 @@ Continue to implementation? -> devflow.implement
 | Data/schema/security sections omitted when feature mutates backend contracts | Schema or access-control drift |
 | **Status `ready`** with unresolved **Open questions** | Implements guesses |
 | No **Implementation checkpoints** on long file lists | Hard to verify incrementally |
+| New UI component planned without **Step 3 reuse audit** | May duplicate a shared component; `devflow.beautify` will flag it |
+| Reuse decision not documented in **Architecture decisions** | Implement loses context; reviewer can't tell if duplication was intentional |
 
 ## I/O Reference
 

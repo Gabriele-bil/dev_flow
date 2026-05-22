@@ -23,6 +23,7 @@ Implement all files in `plan.md` per architecture conventions. Third DevFlow ste
 - **spec-first** — no code before `task.md` + `plan.md` approved
 - **traceability** — every subtask → acceptance criterion → file(s)
 - **vertical slices** — end-to-end increments, never layers
+- **reuse-first** — before writing any file, verify shared folder and `registry.md`; extend over duplicate, always
 - **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## When NOT to Use
@@ -64,6 +65,18 @@ Always read before starting:
 - `devflow/features/[NNN]_[feature-name]/plan.md`
 - `constitution.md`
 - `registry.md`
+
+#### Reuse pre-check (mandatory before Step 4)
+
+After reading `registry.md`, before touching any file:
+
+1. List every shared component / widget / utility relevant to files in the **File List**.
+2. For each file that creates a new UI element or service class, confirm: does an existing shared element cover ≥70% of the need?
+   - **Yes** → reuse or extend it; do **not** create a parallel implementation.
+   - **No** → proceed with the planned file; if it is generic enough, write it to the shared folder.
+3. If the plan did **not** run a reuse audit (no Architecture decisions entry about shared components) and you find a candidate in `registry.md` or the shared folder, **stop and surface it to the user** before implementing.
+
+> Skipping this check is the primary cause of component duplication. The plan's reuse decision is authoritative; the implement step enforces it.
 
 #### Context loading (implementation)
 
@@ -121,7 +134,7 @@ Each file must:
 
 - Follow architecture and naming conventions from `constitution.md`
 - Reuse existing patterns from `registry.md` where applicable
-- **Shared components first:** before writing a new widget, check the project's shared folder (e.g. `lib/shared/`) and `registry.md` for an existing component that covers the use case. Extend or parameterise it rather than duplicating. If a widget being built is generic enough to be used in other features, write it inside the shared folder directly and add it to `registry.md`.
+- **Shared components first (non-negotiable):** the reuse pre-check in Step 1 identified candidates — honour those decisions now. Before writing **any** widget, component, or service class: confirm the shared folder and `registry.md` were checked and no existing element covers the need. Extend or parameterise rather than duplicate. If the element being built is generic enough for other features, write it to the shared folder directly and propose a `registry.md` entry in Step 7.
 - Use relative imports pointing to the nearest barrel file (or the import style mandated by `constitution.md`)
 - Be complete; do not leave placeholder comments such as `// TODO` or `// implement this`
 - Satisfy **all implementation rules** in the active `ADAPTER.md` (responsive UI, localization, state architecture, accessibility, layout, contracts, data boundaries — load the referenced technology skills from the adapter table when touching those areas)
@@ -150,9 +163,26 @@ If errors are found:
 
 Before Step 7, confirm every item in the **Implement → Pre-handoff checklist** section of `ADAPTER.md` (adapter-specific quality gates).
 
-### Step 7 - Registry update (conditional)
+### Step 7 - Registry update
 
-If new reusable patterns **or new shared components/widgets** are identified during implementation, propose the addition before editing `registry.md`:
+After all files are implemented, update `registry.md` for every element written to the shared folder or identified as reusable:
+
+**Mandatory (write immediately, no confirmation needed):**
+- Any component, widget, or utility written to the project's shared folder (e.g. `lib/shared/`, `src/shared/`, `components/shared/`) during this session.
+- Any helper, hook, or service class placed in a shared/common path per `constitution.md`.
+
+**Proposed (write only after explicit user confirmation):**
+- New architectural patterns or conventions that are reusable but not yet in a shared path.
+
+For each mandatory entry, add a row to `registry.md` using the project's existing registry format:
+
+```text
+✅ Registry updated: [component/widget/utility name]
+Path: [shared path]
+[1-2 sentences on what it solves and when to use it.]
+```
+
+For proposed entries, surface them first:
 
 ```text
 🔍 New pattern found: [pattern name]
@@ -161,9 +191,7 @@ If new reusable patterns **or new shared components/widgets** are identified dur
 Add to registry.md? [yes / no]
 ```
 
-For **shared UI components** written to the project's shared folder during this session, always propose the registry update — do not skip even if the component seems small.
-
-Wait for explicit user confirmation before updating `registry.md`.
+> **Rule:** anything written to a shared folder that is missing from `registry.md` is invisible to future agents. Never leave a shared file unregistered.
 
 ### Step 7b - Write deviations to plan.md
 
@@ -220,6 +248,11 @@ Continue to beautify? -> devflow.beautify
 | "I'll wire the datasource first and add the repository type later" | Contract-first boundaries prevent leaky APIs and inconsistent errors |
 | "I'll throw `Exception` here and return `String` there" | Mixed error styles break UI handling; stick to one failure/result pattern |
 | "I'll commit a save point to avoid losing progress" | Never commit during implement. Mark `[done]` in `plan.md` instead. Commits happen in `devflow.pr` only. |
+| "The shared component is close but not perfect — faster to build a new one" | Extend or parameterise the existing one; duplication fragments the component inventory and creates future drift |
+| "I'll add it to the shared folder after the feature is done" | Generic components belong in `shared/` from the first line; retrofitting is rework and often skipped |
+| "I already know what's in shared — no need to re-check `registry.md`" | `registry.md` is updated by every feature; always re-read at session start, not from memory |
+| "I'll update the registry later / in the PR" | Shared files unregistered in `registry.md` are invisible to the next agent; update it in Step 7 before Step 7b |
+| "The shared component is small — not worth registering" | Size is irrelevant; if it lives in a shared folder it must be in the registry |
 
 ## I/O Reference
 
@@ -227,6 +260,6 @@ Continue to beautify? -> devflow.beautify
 |---|---|
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md`, `constitution.md`, `registry.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
 | Writes | all files defined in `plan.md` |
-| Writes (conditional) | `registry.md` (only after user confirmation) |
+| Writes | `registry.md` (mandatory for shared-folder elements; proposed for architectural patterns) |
 | Next step | `devflow.beautify` |
 | Related skills | Per active `ADAPTER.md` → **Technology skills** |
