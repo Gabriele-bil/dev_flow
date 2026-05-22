@@ -1,0 +1,95 @@
+---
+name: devflow-status
+description: Shows current DevFlow pipeline state — active feature, progress, next step, and adapter. Use when the user asks where they are in the pipeline or what to do next.
+argument-hint: []
+disable-model-invocation: true
+---
+
+# Skill: devflow-status
+
+Pipeline dashboard. Shows current state without advancing the pipeline.
+
+## Purpose
+
+Emit compact status dashboard. Answers "dove sono nel pipeline?" — no step execution, no code changes.
+
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
+## When NOT to Use
+
+- `devflow.setup` not yet run (no `devflow/config.md`) — inform user, stop
+- User wants to advance to next step — redirect to correct command directly
+
+## Workflow
+
+### Step 1 — Read pipeline state
+
+Priority order:
+
+1. `.devflow-state.json` in CWD — most recent state, saved by pre-compact hook
+2. `devflow/config.md` — active adapter
+3. `devflow/features/*/plan.md` — find most recent via `ls -t`; parse progress from plan if `.devflow-state.json` absent
+
+### Step 2 — List active features
+
+Scan `devflow/features/`. For each directory found:
+- Extract feature ID and name from directory name (`NNN_name` pattern)
+- Check if `plan.md` exists; if yes, read its `Status:` field
+- Collect list: `[id_name, status]`
+
+### Step 3 — Emit dashboard
+
+**Case A — `.devflow-state.json` present:**
+
+```
+DevFlow Status
+
+Adapter:     <adapter>
+Feature:     <feature>
+Plan:        <plan_path>
+Status:      <plan_status>  →  next: <next_step>
+Progress:    <done>/<total> files done (<pending> remaining)
+
+Pending files:
+  - <file1>
+  - <file2>
+  ...
+
+All features:
+  <id_name>   [<status>]
+  ...
+
+Commands:
+  <next_step>  — continue current feature
+  devflow.plan  — start planning <next_unstarted_feature>
+```
+
+**Case B — no `.devflow-state.json`, but `devflow/config.md` present:**
+
+```
+DevFlow Status
+
+Adapter: <adapter>
+No active pipeline session found.
+
+Start a feature: devflow.task
+```
+
+**Case C — no `devflow/config.md`:**
+
+```
+DevFlow not configured. Run: /devflow.setup
+```
+
+## I/O Reference
+
+| | |
+|---|---|
+| Reads | `.devflow-state.json`, `devflow/config.md`, `devflow/features/*/plan.md` |
+| Writes | nothing |
+| Related | `devflow-discovery` (full pipeline orientation) |
