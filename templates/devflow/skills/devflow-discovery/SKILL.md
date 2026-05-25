@@ -65,7 +65,7 @@ Tests passing, ready to merge?
 1. Read `@devflow/config.md` — get active adapter
 2. Read `@devflow/adapters/<adapter>/ADAPTER.md` — authoritative for stack rules
 
-Current adapters: `flutter`, `angular`. Common skills: `@devflow/adapters/common/skills/`.
+Current adapters: `flutter`, `angular`, `nextjs`. Common skills: `@devflow/adapters/common/skills/`.
 
 ## Anti-Rationalization
 

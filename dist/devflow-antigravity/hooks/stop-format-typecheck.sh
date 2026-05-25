@@ -37,14 +37,25 @@ if [[ -z "$ADAPTER" ]]; then
       break
     fi
   done
-  if [[ -z "$ADAPTER" ]]; then
-    for f in "${CHANGED_FILES[@]}"; do
-      if [[ "$f" == *.ts ]]; then
-        ADAPTER="angular"
-        break
-      fi
-    done
+fi
+
+if [[ -z "$ADAPTER" ]]; then
+  # Distinguish Next.js from Angular before falling back to .ts detection.
+  # Check for next.config.* in project root (most reliable signal).
+  if compgen -G "next.config.*" > /dev/null 2>&1; then
+    ADAPTER="nextjs"
+  elif [[ -f "package.json" ]] && grep -q '"next"' package.json 2>/dev/null; then
+    ADAPTER="nextjs"
   fi
+fi
+
+if [[ -z "$ADAPTER" ]]; then
+  for f in "${CHANGED_FILES[@]}"; do
+    if [[ "$f" == *.ts ]]; then
+      ADAPTER="angular"
+      break
+    fi
+  done
 fi
 
 # Helper: run a command, emit result on stderr
@@ -86,6 +97,31 @@ case "$ADAPTER" in
 
     run_cmd "dart format" dart format . || true
     run_cmd "dart analyze" timeout 60 dart analyze || true
+    ;;
+
+  nextjs)
+    # Filter for .ts / .tsx files
+    HAS_TS=0
+    for f in "${CHANGED_FILES[@]}"; do
+      if [[ "$f" == *.ts || "$f" == *.tsx ]]; then
+        HAS_TS=1
+        break
+      fi
+    done
+
+    if [[ $HAS_TS -eq 0 ]]; then
+      printf '%s' "$RAW"
+      exit 0
+    fi
+
+    if ! command -v pnpm &>/dev/null; then
+      printf '⚠ pnpm not found in PATH, skipping lint+typecheck\n' >&2
+      printf '%s' "$RAW"
+      exit 0
+    fi
+
+    run_cmd "pnpm lint" pnpm lint || true
+    run_cmd "pnpm exec tsc --noEmit" timeout 60 pnpm exec tsc --noEmit || true
     ;;
 
   angular)
