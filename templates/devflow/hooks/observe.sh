@@ -230,6 +230,19 @@ elif [ "$EVENT" = "post" ]; then
       fi
     fi
   fi
+elif [ "$EVENT" = "stop" ]; then
+  # ----------------------------------------------------------------
+  # Stop advisory: emit compact suggestion if counter >= threshold
+  # ----------------------------------------------------------------
+  COMPACT_THRESHOLD="${DEVFLOW_COMPACT_THRESHOLD:-50}"
+  CURRENT_COUNT=0
+  if [ -f "$STATE_FILE" ]; then
+    CURRENT_COUNT=$(jq -r '.tool_call_count // 0' "$STATE_FILE" 2>/dev/null) || CURRENT_COUNT=0
+  fi
+  if [ "$CURRENT_COUNT" -ge "$COMPACT_THRESHOLD" ] 2>/dev/null; then
+    printf '⚡ devflow: ~%s tool calls this session — consider /compact to keep context fresh.\n' \
+      "$CURRENT_COUNT" >&2
+  fi
 fi
 
 # ------------------------------------------------------------------
