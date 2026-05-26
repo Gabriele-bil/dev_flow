@@ -119,6 +119,16 @@
             "command": "bash ${cursorPluginRoot}/hooks/stop-learn-distill.sh"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${cursorPluginRoot}/hooks/observe.sh stop",
+            "async": true,
+            "timeout": 5
+          }
+        ]
       }
     ]
   }

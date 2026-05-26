@@ -119,6 +119,16 @@
             "command": "bash ${PLUGIN_ROOT}/hooks/stop-learn-distill.sh"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${PLUGIN_ROOT}/hooks/observe.sh stop",
+            "async": true,
+            "timeout": 5
+          }
+        ]
       }
     ]
   }
