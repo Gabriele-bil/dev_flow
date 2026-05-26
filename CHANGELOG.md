@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.2.0...devflow-v1.3.0) (2026-05-26)
+
+
+### Features
+
+* Add devflow.blueprint skill for multi-PR planning with dependency graph and adversarial review ([0fe759c](https://github.com/Gabriele-bil/dev_flow/commit/0fe759cc2c7eaedf9b2b2feb2499150330008256))
+* **hooks:** Register observe.sh stop as Stop lifecycle hook ([db8b460](https://github.com/Gabriele-bil/dev_flow/commit/db8b4607af178ffb0f7a352102eaa5835891bc0d))
+* Implement retry-loop detection in observe.sh to log consecutive error events and prevent duplicate entries in learnings ([04e8ca5](https://github.com/Gabriele-bil/dev_flow/commit/04e8ca5fa8499c5fca34d6a7ff76bfe2add0bb46))
+* Introduce devflow-ship skill for pre-merge gate process, enabling parallel dispatch of code-reviewer, security-auditor, and test-engineer agents ([a23a4d5](https://github.com/Gabriele-bil/dev_flow/commit/a23a4d5351fc45ee1e548f89b89dd363cd0d7f42))
+* Migrate learning system to structured instincts in YAML format ([4b5ba31](https://github.com/Gabriele-bil/dev_flow/commit/4b5ba31f824dbc93965a787364885d7dce3e67ca))
+* **observe:** Add stop event handler for compact advisory ([e0203ba](https://github.com/Gabriele-bil/dev_flow/commit/e0203ba6690b16c7fec4a8e8cb8116f836e00e55))
+* **observe:** Add tool-call counter and step-change compact advisory ([6063dc9](https://github.com/Gabriele-bil/dev_flow/commit/6063dc9ea602223ab25e812841ef223e433dd18c))
+
 ## [1.2.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.1.0...devflow-v1.2.0) (2026-05-22)
 
 
