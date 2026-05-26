@@ -1,24 +1,19 @@
 #!/bin/bash
-# stop-learn-distill.sh — Stop hook: distill learning signals from observe.jsonl.
-# Detects file churn (≥4 edits in session) and appends deduplicated entries to
-# .devflow-learnings.jsonl in the consumer project root.
+# stop-learn-distill.sh — Stop hook: distill churn signals into project instincts.
+# Detects file churn (≥4 edits in session) and upserts instinct stubs to
+# .devflow-instincts.yaml in the consumer project root.
 # Passthrough: reads stdin and writes it back to stdout unchanged.
 
 RAW=$(cat)
 
 OBSERVE_LOG=".devflow-observe.jsonl"
-LEARNINGS_LOG=".devflow-learnings.jsonl"
-STATE_FILE=".devflow-state.json"
+INSTINCTS_FILE=".devflow-instincts.yaml"
 CHURN_THRESHOLD=4
-# Analyse the most recent entries (covers a typical session without crossing into old history)
 WINDOW_LINES=200
-MAX_LEARNINGS=200
 
-# Guard: jq required
-if ! command -v jq >/dev/null 2>&1; then
-  printf '%s' "$RAW"
-  exit 0
-fi
+# Guards: jq and yq both required
+if ! command -v jq >/dev/null 2>&1; then printf '%s' "$RAW"; exit 0; fi
+if ! command -v yq >/dev/null 2>&1; then  printf '%s' "$RAW"; exit 0; fi
 
 # Guard: nothing to analyse
 if [ ! -f "$OBSERVE_LOG" ] || [ ! -s "$OBSERVE_LOG" ]; then
@@ -26,19 +21,9 @@ if [ ! -f "$OBSERVE_LOG" ] || [ ! -s "$OBSERVE_LOG" ]; then
   exit 0
 fi
 
-# ── Read current pipeline context ────────────────────────────────────────────
-FEATURE=""
-STEP=""
-if [ -f "$STATE_FILE" ]; then
-  FEATURE=$(jq -r '.feature // empty' "$STATE_FILE" 2>/dev/null) || true
-  STEP=$(jq -r '.next_step // empty' "$STATE_FILE" 2>/dev/null) || true
-fi
-
 TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ") || true
 
 # ── Detect churn: files written/edited ≥ CHURN_THRESHOLD times ───────────────
-# Count occurrences of each file path in pre-events from the session window.
-# jq produces one "file path" per matching line; sort+uniq-c finds repeats.
 CHURNED_FILES=$(
   tail -n "$WINDOW_LINES" "$OBSERVE_LOG" 2>/dev/null \
   | jq -r 'select(.event=="pre" and (.tool=="Write" or .tool=="Edit" or .tool=="MultiEdit") and (.file != null and .file != "")) | .file' 2>/dev/null \
@@ -50,52 +35,58 @@ if [ -z "$CHURNED_FILES" ]; then
   exit 0
 fi
 
-# ── Load existing learnings for dedup check ───────────────────────────────────
-EXISTING=""
-if [ -f "$LEARNINGS_LOG" ]; then
-  EXISTING=$(jq -r 'select(.type=="churn_file") | .file' "$LEARNINGS_LOG" 2>/dev/null) || true
+# ── Ensure instincts file exists ──────────────────────────────────────────────
+if [ ! -f "$INSTINCTS_FILE" ]; then
+  printf '%s\n' "# DevFlow project instincts" "instincts: []" > "$INSTINCTS_FILE"
 fi
 
-# ── Append new churn learnings (skip duplicates) ──────────────────────────────
-NEW_ENTRIES=0
+# ── Upsert instinct for each churned file ─────────────────────────────────────
 while IFS= read -r filepath; do
   [ -z "$filepath" ] && continue
 
-  # Dedup: skip if same file already recorded as churn_file
-  if echo "$EXISTING" | grep -qxF "$filepath" 2>/dev/null; then
-    continue
+  # Derive kebab-case id
+  ID_SLUG=$(printf '%s' "$filepath" | tr '[:upper:]' '[:lower:]' \
+    | sed 's/[^a-z0-9]/-/g; s/--*/-/g; s/^-//; s/-$//')
+  INSTINCT_ID="churn-${ID_SLUG}"
+
+  # Domain inference from file extension / path
+  DOMAIN="general"
+  case "$filepath" in *.dart)     DOMAIN="flutter"    ;; esac
+  case "$filepath" in *.ts|*.tsx) DOMAIN="typescript" ;; esac
+  case "$filepath" in *.py)       DOMAIN="python"     ;; esac
+  case "$filepath" in *.sh)       DOMAIN="shell"      ;; esac
+  case "$filepath" in *devflow*)  DOMAIN="devflow"    ;; esac
+
+  TRIGGER="when editing $filepath"
+  ACTION="File edited multiple times — review full flow before patching"
+
+  # Check if instinct already exists
+  EXISTING_CONF=$(yq -r \
+    ".instincts // [] | .[] | select(.id == \"$INSTINCT_ID\") | .confidence" \
+    "$INSTINCTS_FILE" 2>/dev/null | head -1) || true
+
+  if [ -n "$EXISTING_CONF" ] && [ "$EXISTING_CONF" != "null" ]; then
+    # Bump confidence by 0.05, cap at 0.95
+    NEW_CONF=$(awk "BEGIN {v=$EXISTING_CONF+0.05; if(v>0.95) v=0.95; printf \"%.2f\", v}")
+    yq -i \
+      "(.instincts[] | select(.id == \"$INSTINCT_ID\") | .confidence) = $NEW_CONF |
+       (.instincts[] | select(.id == \"$INSTINCT_ID\") | .ts) = \"$TS\"" \
+      "$INSTINCTS_FILE" 2>/dev/null || true
+  else
+    # Append new instinct stub
+    yq -i \
+      ".instincts += [{\"id\": \"$INSTINCT_ID\", \"trigger\": \"$TRIGGER\", \"confidence\": 0.5, \"domain\": \"$DOMAIN\", \"scope\": \"project\", \"action\": \"$ACTION\", \"evidence\": \"churn: 1 session\", \"ts\": \"$TS\"}]" \
+      "$INSTINCTS_FILE" 2>/dev/null || true
   fi
 
-  jq -cn \
-    --arg ts      "$TS"       \
-    --arg feature "$FEATURE"  \
-    --arg step    "$STEP"     \
-    --arg file    "$filepath" \
-    '{
-      ts:      $ts,
-      type:    "churn_file",
-      source:  "auto",
-      feature: (if $feature != "" then $feature else null end),
-      step:    (if $step    != "" then $step    else null end),
-      file:    $file,
-      note:    ("File edited \($file | split("/") | last) multiple times in session — potential plan ambiguity or complex module")
-    } | with_entries(select(.value != null))' \
-    >> "$LEARNINGS_LOG" 2>/dev/null || true
-
-  NEW_ENTRIES=$((NEW_ENTRIES + 1))
 done <<< "$CHURNED_FILES"
 
-# ── Rotate learnings log if it exceeds MAX_LEARNINGS lines ───────────────────
-if [ -f "$LEARNINGS_LOG" ]; then
-  LINE_COUNT=$(wc -l < "$LEARNINGS_LOG" 2>/dev/null | tr -d '[:space:]') || true
-  if [ -n "$LINE_COUNT" ] && [ "$LINE_COUNT" -ge "$MAX_LEARNINGS" ]; then
-    mv "$LEARNINGS_LOG" "${LEARNINGS_LOG}.1" 2>/dev/null || true
+# ── Ensure gitignore entries ──────────────────────────────────────────────────
+if [ -f ".gitignore" ]; then
+  if ! grep -qF ".devflow-instincts.yaml" .gitignore 2>/dev/null; then
+    printf '\n# devflow instincts\n.devflow-instincts.yaml\n.devflow-learnings.jsonl.migrated\n' \
+      >> .gitignore 2>/dev/null || true
   fi
-fi
-
-# ── Ensure .devflow-learnings.jsonl is gitignored ────────────────────────────
-if [ -f ".gitignore" ] && ! grep -qF ".devflow-learnings.jsonl" .gitignore 2>/dev/null; then
-  printf '\n# devflow learnings log\n.devflow-learnings.jsonl\n.devflow-learnings.jsonl.1\n' >> .gitignore 2>/dev/null || true
 fi
 
 printf '%s' "$RAW"

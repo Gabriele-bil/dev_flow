@@ -1,14 +1,14 @@
 ---
 name: devflow-learn
-description: Manage DevFlow learnings log (.devflow-learnings.jsonl). Log project quirks, search past lessons, prune stale entries. Use when the user asks to log a finding, search past learnings, or clean up the learnings log.
-argument-hint: [log, search, list, prune]
+description: Manage DevFlow project instincts (.devflow-instincts.yaml). Log new instincts, search past ones, list, prune low-confidence entries, or boost a specific instinct. Use when the user asks to log a finding, search past learnings, or clean up the instincts file.
+argument-hint: [log, search <query>, list, prune, boost <id>]
 ---
 
 # Skill: devflow.learn
 
 ## Purpose
 
-Read, write, and maintain `.devflow-learnings.jsonl` — the project's persistent lesson log. Complements the auto-detected signals written by the `stop-learn-distill` hook.
+Read, write, and maintain `.devflow-instincts.yaml` — the project's persistent instinct store. Complements the auto-detected signals written by the `stop-learn-distill` hook.
 
 ## Core Principles
 
@@ -22,6 +22,16 @@ Read, write, and maintain `.devflow-learnings.jsonl` — the project's persisten
 - Pipeline step execution — use `devflow.task`, `devflow.plan`, etc. instead
 - First-time project setup — use `devflow.setup` instead
 
+## Guards
+
+Before running any sub-command, verify:
+
+```bash
+command -v yq >/dev/null 2>&1 || echo "ERROR: yq not installed. Run: brew install yq"
+```
+
+If `yq` is missing, tell the user and stop.
+
 ## Workflow
 
 Identify the sub-command from user message or argument, then execute it.
@@ -30,101 +40,125 @@ Identify the sub-command from user message or argument, then execute it.
 
 ### Sub-command: log
 
-Record a manual learning (quirk, lesson, or warning) that should inform future sessions.
+Record a manual instinct that should inform future sessions.
 
-**Step 1 — Collect information**
+**Step 1 — Collect information (if not provided)**
 
-Ask (if not provided):
-1. What module or file does this apply to? (optional)
-2. What is the lesson in one sentence? (required)
-3. Type: `quirk` (unexpected behaviour), `lesson` (better approach found), or `warning` (known fragile area)?
+Ask:
+1. Trigger: "When should this instinct fire?" (e.g. "when choosing a state management library")
+2. Action: "What should Claude do?" (one imperative sentence)
+3. Domain: file type or area (e.g. `flutter`, `typescript`, `devflow`, `general`)
+4. Confidence: 0.0–1.0 (default `0.75` for manual entries)
 
-**Step 2 — Write entry**
-
-Run:
+**Step 2 — Derive id from trigger**
 
 ```bash
-jq -cn \
-  --arg ts      "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
-  --arg feature "$(jq -r '.feature // empty' .devflow-state.json 2>/dev/null || true)" \
-  --arg step    "$(jq -r '.next_step // empty' .devflow-state.json 2>/dev/null || true)" \
-  --arg type    "<TYPE>"   \
-  --arg file    "<FILE>"   \
-  --arg note    "<NOTE>"   \
-  '{
-    ts:      $ts,
-    type:    $type,
-    source:  "manual",
-    feature: (if $feature != "" then $feature else null end),
-    step:    (if $step    != "" then $step    else null end),
-    file:    (if $file    != "" then $file    else null end),
-    note:    $note
-  } | with_entries(select(.value != null))' \
-  >> .devflow-learnings.jsonl
+TRIGGER="<TRIGGER>"
+ID=$(printf '%s' "$TRIGGER" | tr '[:upper:]' '[:lower:]' \
+  | sed 's/[^a-z0-9]/-/g; s/--*/-/g; s/^-//; s/-$//' \
+  | cut -c1-50 | sed 's/-$//')
 ```
 
-Confirm: "Learning logged."
+**Step 3 — Ensure instincts file exists**
+
+```bash
+if [ ! -f .devflow-instincts.yaml ]; then
+  printf '%s\n' "# DevFlow project instincts" "instincts: []" > .devflow-instincts.yaml
+fi
+```
+
+**Step 4 — Write instinct**
+
+```bash
+TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+yq -i ".instincts += [{\"id\": \"$ID\", \"trigger\": \"<TRIGGER>\", \"confidence\": <CONFIDENCE>, \"domain\": \"<DOMAIN>\", \"scope\": \"project\", \"action\": \"<ACTION>\", \"evidence\": \"manual\", \"ts\": \"$TS\"}]" \
+  .devflow-instincts.yaml
+```
+
+Confirm: "Instinct `<ID>` logged (confidence <CONFIDENCE>)."
 
 ---
 
 ### Sub-command: search
 
-Find past learnings matching a keyword.
+Find instincts matching a keyword across trigger, action, and domain.
 
 **Step 1 — Run search**
 
 ```bash
-jq -r \
-  --arg q "<QUERY>" \
-  'select((.note + " " + (.file // "") + " " + (.feature // "")) | ascii_downcase | contains($q | ascii_downcase)) | "[\(.ts[0:10])] [\(.type)] \(if .file then .file + ": " else "" end)\(.note)"' \
-  .devflow-learnings.jsonl 2>/dev/null
+yq -r \
+  '.instincts[] | select((.trigger + " " + .action + " " + (.domain // "")) | test("<QUERY>"; "i")) | "• [" + (.confidence | tostring) + " " + (.domain // "general") + "] " + .trigger + " → " + .action' \
+  .devflow-instincts.yaml 2>/dev/null
 ```
 
 **Step 2 — Display results**
 
-If no output: "No learnings matching `<QUERY>`."
-Otherwise: show results, grouped by type if >5 results.
+If no output: "No instincts matching `<QUERY>`."
+Otherwise show results. If >5 results, group by domain.
 
 ---
 
 ### Sub-command: list
 
-Show all learnings, most recent first (max 20).
+Show all instincts, sorted by confidence descending.
 
 ```bash
-jq -rs 'sort_by(.ts) | reverse | .[0:20] | .[] | "[\(.ts[0:10])] [\(.type)] \(.source) — \(if .file then .file + ": " else "" end)\(.note)"' \
-  .devflow-learnings.jsonl 2>/dev/null
+yq -r \
+  '.instincts // [] | sort_by(.confidence) | reverse | .[] | "• [" + (.confidence | tostring) + " " + (.domain // "general") + "] " + .trigger + " → " + .action' \
+  .devflow-instincts.yaml 2>/dev/null
 ```
 
-If file missing or empty: "No learnings recorded yet for this project."
+If file missing or empty: "No instincts recorded yet for this project."
 
 ---
 
 ### Sub-command: prune
 
-Remove entries older than 30 days (keep all `source: manual` entries regardless of age).
+Remove instincts with `confidence < 0.3`.
 
-**Step 1 — Compute cutoff**
-
-```bash
-# macOS
-CUTOFF=$(date -v -30d +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null) \
-  || CUTOFF=$(date -d "-30 days" +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null) \
-  || CUTOFF=""
-```
-
-**Step 2 — Filter and overwrite**
+**Step 1 — Count before**
 
 ```bash
-jq -rs \
-  --arg cutoff "$CUTOFF" \
-  '[.[] | select(.source == "manual" or ($cutoff == "") or (.ts >= $cutoff))]
-   | .[]' \
-  .devflow-learnings.jsonl > .devflow-learnings.tmp \
-  && mv .devflow-learnings.tmp .devflow-learnings.jsonl
+BEFORE=$(yq '.instincts | length' .devflow-instincts.yaml 2>/dev/null || echo 0)
 ```
 
-Report: "Pruned <N> entries. <M> entries remain."
+**Step 2 — Filter in-place**
+
+```bash
+yq -i '.instincts = [.instincts[] | select(.confidence >= 0.3)]' .devflow-instincts.yaml
+```
+
+**Step 3 — Count after and report**
+
+```bash
+AFTER=$(yq '.instincts | length' .devflow-instincts.yaml 2>/dev/null || echo 0)
+REMOVED=$((BEFORE - AFTER))
+echo "Pruned $REMOVED instincts. $AFTER remain."
+```
+
+---
+
+### Sub-command: boost
+
+Manually increase an instinct's confidence by +0.1 (cap 0.95).
+
+**Step 1 — Verify id exists**
+
+```bash
+yq -r ".instincts[] | select(.id == \"<ID>\") | .id" .devflow-instincts.yaml 2>/dev/null
+```
+
+If empty: "No instinct with id `<ID>`. Use `/devflow.learn list` to see available ids."
+
+**Step 2 — Boost confidence**
+
+```bash
+CURRENT=$(yq -r ".instincts[] | select(.id == \"<ID>\") | .confidence" .devflow-instincts.yaml)
+NEW=$(awk "BEGIN {v=$CURRENT+0.1; if(v>0.95) v=0.95; printf \"%.2f\", v}")
+yq -i "(.instincts[] | select(.id == \"<ID>\") | .confidence) = $NEW" .devflow-instincts.yaml
+```
+
+Confirm: "Instinct `<ID>` confidence: `$CURRENT` → `$NEW`."
 
 ---
 
@@ -132,6 +166,6 @@ Report: "Pruned <N> entries. <M> entries remain."
 
 | | |
 |---|---|
-| Reads | `.devflow-learnings.jsonl`, `.devflow-state.json` |
-| Writes | `.devflow-learnings.jsonl` |
-| Related | `stop-learn-distill` hook (auto-signals), `session-start-learnings` hook (injection) |
+| Reads | `.devflow-instincts.yaml` |
+| Writes | `.devflow-instincts.yaml` |
+| Related | `stop-learn-distill` hook (auto-detects churn), `session-start-learnings` hook (injects instincts) |
