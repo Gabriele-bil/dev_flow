@@ -50,6 +50,7 @@ This directory is the **installable DevFlow package**: core pipeline skills, sla
 |---|---|
 | `devflow.task` | Define and scope a task |
 | `devflow.plan` | Generate `plan.md` from task |
+| `devflow.blueprint` | Multi-PR plan with dependency graph + adversarial review (3+ PRs or multi-session) |
 | `devflow.implement` | Execute plan step by step |
 | `devflow.beautify` | Apply design/style pass |
 | `devflow.ship` | Pre-handoff review |

@@ -19,6 +19,8 @@ Pipeline orientation. Use at session start or when unsure which step to run.
 
 ```
 devflow.setup → devflow.task → devflow.plan → devflow.implement → devflow.beautify → devflow.test → devflow.pr
+                             ↘ devflow.blueprint (3+ PRs / multi-session)
+                               → devflow.plan (per step) → devflow.implement → ...
 ```
 
 Each step has an input contract. Each step verifies its own preconditions. User is orchestrator — skills do not invoke each other.
@@ -30,7 +32,9 @@ Is this a new project with no context files (AGENTS.md / REGISTRY.md / docs/prod
   └─ YES → devflow.setup
 
 Raw idea or user request, no task.md yet?
-  └─ YES → devflow.task
+  ├─ Objective requires 3+ PRs or spans multiple sessions?
+  │    └─ YES → devflow.blueprint (produces plans/[slug]-blueprint.md)
+  └─ Otherwise → devflow.task
 
 task.md exists, but no plan.md?
   └─ YES → devflow.plan  (verify task.md Status not draft with unresolved questions)
@@ -53,6 +57,7 @@ Tests passing, ready to merge?
 | What user said | Entry point |
 |----------------|-------------|
 | "Build X", "Add X", "I want X" | `devflow.task` |
+| "Plan this large objective", "3+ PRs", "multi-session" | `devflow.blueprint` |
 | "Plan this", "Create plan for..." | `devflow.plan` |
 | "Implement", "Code this up" | `devflow.implement` |
 | "Review", "Clean up", "Beautify" | `devflow.beautify` |
