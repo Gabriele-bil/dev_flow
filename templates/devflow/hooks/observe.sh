@@ -22,7 +22,7 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 # Guard: event must be pre or post
-if [ "$EVENT" != "pre" ] && [ "$EVENT" != "post" ]; then
+if [ "$EVENT" != "pre" ] && [ "$EVENT" != "post" ] && [ "$EVENT" != "stop" ]; then
   exit 0
 fi
 
@@ -107,6 +107,68 @@ elif [ "$EVENT" = "post" ]; then
       is_error: (if $is_error != null then $is_error else empty end)
     } | with_entries(select(.value != null))' \
     >> "$LOG_FILE" 2>/dev/null || true
+
+  # ----------------------------------------------------------------
+  # Strategic-compact counter: track cumulative tool calls per session
+  # ----------------------------------------------------------------
+  COMPACT_THRESHOLD="${DEVFLOW_COMPACT_THRESHOLD:-50}"
+
+  # Read current counter state (defaults if absent or malformed)
+  STORED_COUNT=0
+  STORED_SESSION=""
+  STORED_LAST_STEP=""
+  if [ -f "$STATE_FILE" ]; then
+    STORED_COUNT=$(jq -r '.tool_call_count // 0'            "$STATE_FILE" 2>/dev/null) || STORED_COUNT=0
+    STORED_SESSION=$(jq -r '.last_session_id // empty'      "$STATE_FILE" 2>/dev/null) || STORED_SESSION=""
+    STORED_LAST_STEP=$(jq -r '.last_observed_step // empty' "$STATE_FILE" 2>/dev/null) || STORED_LAST_STEP=""
+  fi
+
+  # Session reset: new session_id means fresh context — reset counter
+  if [ -n "$SESSION" ] && [ "$SESSION" != "$STORED_SESSION" ]; then
+    STORED_COUNT=0
+    STORED_LAST_STEP=""
+  fi
+
+  NEW_COUNT=$(( STORED_COUNT + 1 ))
+
+  # Atomic state write: merge counter fields into existing state
+  STATE_TMP="${STATE_FILE}.tmp"
+  if [ -f "$STATE_FILE" ]; then
+    jq \
+      --argjson count "$NEW_COUNT" \
+      --arg session   "$SESSION" \
+      --arg last_step "$STORED_LAST_STEP" \
+      '. + {tool_call_count: $count, last_session_id: $session, last_observed_step: $last_step}' \
+      "$STATE_FILE" > "$STATE_TMP" 2>/dev/null \
+      && mv "$STATE_TMP" "$STATE_FILE" 2>/dev/null || true
+  else
+    jq -cn \
+      --argjson count "$NEW_COUNT" \
+      --arg session   "$SESSION" \
+      --arg last_step "$STORED_LAST_STEP" \
+      '{tool_call_count: $count, last_session_id: $session, last_observed_step: $last_step}' \
+      > "$STATE_TMP" 2>/dev/null \
+      && mv "$STATE_TMP" "$STATE_FILE" 2>/dev/null || true
+  fi
+
+  # Step-change advisory: if pipeline step changed AND above threshold → advise
+  CURRENT_STEP="$STEP"
+  if [ -n "$CURRENT_STEP" ] \
+      && [ "$CURRENT_STEP" != "$STORED_LAST_STEP" ] \
+      && [ -n "$STORED_LAST_STEP" ] \
+      && [ "$NEW_COUNT" -ge "$COMPACT_THRESHOLD" ] 2>/dev/null; then
+    printf '⚡ devflow: ~%s tool calls this session — consider /compact to keep context fresh.\n' \
+      "$NEW_COUNT" >&2
+  fi
+
+  # Update last_observed_step to current step (only if step is non-empty and changed)
+  if [ -n "$CURRENT_STEP" ] && [ "$CURRENT_STEP" != "$STORED_LAST_STEP" ]; then
+    if [ -f "$STATE_FILE" ]; then
+      jq --arg step "$CURRENT_STEP" '.last_observed_step = $step' \
+        "$STATE_FILE" > "$STATE_TMP" 2>/dev/null \
+        && mv "$STATE_TMP" "$STATE_FILE" 2>/dev/null || true
+    fi
+  fi
 
   # ----------------------------------------------------------------
   # Retry-loop detection: count consecutive trailing post events
