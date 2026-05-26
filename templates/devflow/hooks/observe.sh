@@ -10,8 +10,11 @@ set -euo pipefail
 
 EVENT="${1:-}"
 LOG_FILE=".devflow-observe.jsonl"
+LEARNINGS_FILE=".devflow-learnings.jsonl"
 STATE_FILE=".devflow-state.json"
 MAX_LINES=500
+RETRY_THRESHOLD=3
+RETRY_WINDOW=20
 
 # Guard: jq required
 if ! command -v jq >/dev/null 2>&1; then
@@ -104,6 +107,67 @@ elif [ "$EVENT" = "post" ]; then
       is_error: (if $is_error != null then $is_error else empty end)
     } | with_entries(select(.value != null))' \
     >> "$LOG_FILE" 2>/dev/null || true
+
+  # ----------------------------------------------------------------
+  # Retry-loop detection: count consecutive trailing post events
+  # where tool == $TOOL AND is_error == true.
+  # If count >= RETRY_THRESHOLD, append a retry_loop learning.
+  # ----------------------------------------------------------------
+  if [ -n "$TOOL" ] && [ "${IS_ERROR:-}" = "true" ]; then
+    CONSEC=$(
+      tail -n "$RETRY_WINDOW" "$LOG_FILE" 2>/dev/null \
+      | jq -r 'select(.event=="post") | [.tool, (.is_error | tostring)] | join(":")' 2>/dev/null \
+      | awk -v target="${TOOL}:true" '
+          { lines[NR] = $0 }
+          END {
+            count = 0
+            for (i = NR; i >= 1; i--) {
+              if (lines[i] == target) count++
+              else break
+            }
+            print count
+          }
+        '
+    ) || true
+
+    if [ -n "$CONSEC" ] && [ "$CONSEC" -ge "$RETRY_THRESHOLD" ] 2>/dev/null; then
+      # Dedup: skip if same (tool, session) already recorded as retry_loop
+      ALREADY=""
+      if [ -f "$LEARNINGS_FILE" ]; then
+        ALREADY=$(
+          jq -r --arg t "$TOOL" --arg s "$SESSION" \
+            'select(.type=="retry_loop" and .tool==$t and .session==$s) | .tool' \
+            "$LEARNINGS_FILE" 2>/dev/null | head -1
+        ) || true
+      fi
+
+      if [ -z "$ALREADY" ]; then
+        jq -cn \
+          --arg ts        "$TS"               \
+          --arg tool      "$TOOL"             \
+          --arg session   "$SESSION"          \
+          --arg feature   "$FEATURE"          \
+          --arg step      "$STEP"             \
+          --argjson thr   "$RETRY_THRESHOLD"  \
+          '{
+            ts:      $ts,
+            type:    "retry_loop",
+            source:  "auto",
+            tool:    $tool,
+            session: (if $session != "" then $session else null end),
+            feature: (if $feature != "" then $feature else null end),
+            step:    (if $step    != "" then $step    else null end),
+            note:    ("Tool \($tool) called with errors \($thr)+ times consecutively — possible retry loop or stubborn error")
+          } | with_entries(select(.value != null))' \
+          >> "$LEARNINGS_FILE" 2>/dev/null || true
+
+        # Ensure learnings file is gitignored
+        if [ -f ".gitignore" ] && ! grep -qF ".devflow-learnings.jsonl" .gitignore 2>/dev/null; then
+          printf '\n# devflow learnings log\n.devflow-learnings.jsonl\n.devflow-learnings.jsonl.1\n' >> .gitignore 2>/dev/null || true
+        fi
+      fi
+    fi
+  fi
 fi
 
 # ------------------------------------------------------------------
