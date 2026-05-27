@@ -22,11 +22,11 @@ Required sections (in order):
 5. `## Input contract` — checklist; fail-fast on any failure before touching files
 6. `## Workflow` — numbered steps, concrete actions
 7. `## Common Rationalizations` — table: excuses agents use + factual rebuttals
-8. `## I/O Reference` — reads, writes, next step
+8. `## Anti-Patterns` — table: wrong approach + problem + correct behavior; distinct from rationalizations
+9. `## I/O Reference` — reads, writes, next step
 
 Optional (add when needed):
 
-- `## Anti-patterns` — behaviors not covered by rationalizations
 - `## Completion checklist` — exit criteria before notify step
 
 ## Adding an Adapter Skill
@@ -69,6 +69,7 @@ Additional requirements:
 | "Long content can stay in SKILL.md" | Content over 100 lines → `references/<file>.md`. Link from SKILL.md |
 | "I'll describe what code should look like" | Skills are workflows agents follow, not reference docs |
 | "Rationalizations section is optional" | Rationalizations prevent most common failure modes. Always include with factual counters |
+| "Anti-patterns section is optional" | Anti-patterns document failure modes not covered by rationalizations — recurring wrong approaches that look correct |
 | "Keep verbose prose from previous version" | Caveman-compress mandatory. Rewrite filler-heavy sections on touch |
 
 ## Style Guide: Caveman-Compress

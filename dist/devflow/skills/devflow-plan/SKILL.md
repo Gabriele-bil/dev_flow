@@ -291,6 +291,17 @@ Continue to implementation? -> devflow.implement
 | New UI component planned without **Step 3 reuse audit** | May duplicate a shared component; `devflow.beautify` will flag it |
 | Reuse decision not documented in **Architecture decisions** | Implement loses context; reviewer can't tell if duplication was intentional |
 
+## Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+|---|---|---|
+| Writing `plan.md` from memory without reading `task.md` | Subtask drift; plan covers work not in task | Always read `task.md` as first step |
+| File list in layer order (all models → all services → all UI) | No vertical slice; no checkpoint; big-bang implement | Order by user-visible increment; checkpoint at each slice |
+| Open questions marked resolved without user answer | Silent assumption baked into plan | Leave open; route to user; do not guess |
+| Traceability rows with no acceptance criteria | `devflow.implement` cannot prove coverage | Every subtask row must have at least one verifiable criterion |
+| Reuse audit skipped ("implement will figure it out") | Duplicate shared components discovered mid-implement → rework | Run reuse audit in Step 3; document decision in Architecture decisions |
+| Dependencies listed without explicit ordering | Broken compile/runtime order during implement | Sort file list by dependency; document ordering rationale |
+
 ## I/O Reference
 
 | | |

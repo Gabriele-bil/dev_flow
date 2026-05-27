@@ -162,6 +162,16 @@ Confirm: "Instinct `<ID>` confidence: `$CURRENT` → `$NEW`."
 
 ---
 
+## Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+|---|---|---|
+| Logging external content (third-party API docs, user stories) as instincts | Poisoned instincts override correct project behavior in future sessions | Log only project-specific behaviors observed in the codebase |
+| Boosting instinct confidence without re-verifying it still holds | Stale high-confidence instincts are harder to prune | Re-read the relevant code before boosting |
+| Never pruning stale instincts | Outdated instincts mislead future sessions | Run `prune` after any major refactor or adapter change |
+| Logging implementation details as instincts ("UserService uses Repository pattern") | Duplicates what code already shows; wasted context budget | Log only non-obvious behaviors not derivable from reading the code |
+| Using `boost` instead of `log` to add new knowledge | Boost only adjusts existing confidence; doesn't add new entries | Use `log` for new findings; `boost` for reinforcing known-good instincts |
+
 ## I/O Reference
 
 | | |

@@ -225,7 +225,7 @@ Continue to planning? → devflow.plan
 | “NNN is probably unique”                       | Duplicate prefixes corrupt traceability. Read `devflow/features/` and verify before writing                      |
 | “Subtasks can be vague — plan.md will clarify” | Vague subtasks → vague traceability. `devflow.implement` can’t prove coverage from vague subtasks                |
 
-## Anti-patterns
+## Anti-Patterns
 
 - Copy-pasting the user’s raw wording into **Summary** or **HMW**
 - **Subtasks** that are vague (“improve UX”), huge (“build notifications”), or implementation tickets (“add `FooRepository`”)

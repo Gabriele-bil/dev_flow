@@ -88,6 +88,14 @@ Current adapters: `flutter`, `angular`, `nextjs`. Common skills: `@devflow/adapt
 - **Rule of 500:** file over 500 lines → split. SRP breakdown signal.
 - **Stop-the-Line:** when implement hits unresolvable errors → stop, report, do not invent behavior.
 
+## Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+|---|---|---|
+| Jumping to `devflow.implement` without checking state | Skips plan approval; implement runs on stale or missing plan | Always check `.devflow-state.json` entry point before any action |
+| Using discovery as a full planning session | Discovery is orientation only — not a planning step | Read state, identify entry point, route; planning happens in `devflow.plan` |
+| Treating discovery output as instructions from user | Discovery is injected by SessionStart hook; it is context, not a user command | Follow discovery routing, do not re-interpret it |
+
 ## I/O Reference
 
 | | |

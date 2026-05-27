@@ -77,3 +77,38 @@ Before writing tests:
 | No async error handling | Swallowed errors, false passes | Always `await` async tests |
 | Overly broad assertions | Misses regressions | Be specific |
 | Manual testing only | Not verifiable, not repeatable | Automate every flow that matters |
+
+## Pass@k vs Pass^k
+
+| Metric | Meaning | Use for |
+|--------|---------|---------|
+| **pass@k** | At least 1 of k attempts passes | Proving capability exists; LLM eval |
+| **pass^k** | All k attempts pass | Proving reliability; production gate |
+
+In `devflow-test`: target **pass^k ≥ 1** for all written tests. A test that passes only sometimes is a flaky test — fix or remove.
+
+## Verification Checkpoints (Multi-Step Features)
+
+Set explicit checkpoints during `devflow-implement`:
+1. Define acceptance criteria per subtask in `plan.md`
+2. Run subset of tests at each checkpoint — don't wait for full suite
+3. Fix failures before proceeding to next subtask
+4. Full suite only at `devflow-test` step
+
+```
+subtask complete → checkpoint test → pass? → next subtask
+                                    fail? → fix here, not later
+```
+
+## Coverage: What Counts
+
+Coverage % alone is misleading. These matter more:
+
+| Signal | Interpretation |
+|--------|---------------|
+| Branch coverage < 70% | Missing error path tests |
+| All happy paths, no error paths | False confidence |
+| Tests pass but coverage 0% | Test imports wrong module |
+| High coverage, no assertions | Tests exist but prove nothing |
+
+Run coverage with assertions: `if coverage > 0 but 0 assertions → fail`.

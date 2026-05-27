@@ -4,7 +4,7 @@ This directory is the **installable DevFlow package**: core pipeline skills, sla
 
 ## Quick start
 
-1. **Active stack** — edit [`config.md`](config.md); set **Adapter** to `flutter` (only bundled adapter today).
+1. **Active stack** — edit [`config.md`](config.md); set **Adapter** to `flutter`, `angular`, or `nextjs`.
 2. **Run setup once** — execute `devflow.setup` to generate root `AGENTS.md` and `REGISTRY.md` for the consumer project.
 3. **Run the pipeline** — invoke commands under [`commands/`](commands/) (e.g. `devflow.task`) or load as a plugin and use your host’s namespaced invocations.
 4. **Enable code-review-graph** — install and configure once for all detected hosts:
@@ -18,9 +18,17 @@ This directory is the **installable DevFlow package**: core pipeline skills, sla
 
 ## Adapters
 
-- [`adapters/flutter/ADAPTER.md`](adapters/flutter/ADAPTER.md) — Flutter/Dart commands, extra `plan.md` sections, MCP hints, test and PR gates.
-- [`adapters/flutter/templates/`](adapters/flutter/templates/) — adapter-specific templates used by `devflow.setup` to generate `AGENTS.md` and `REGISTRY.md`.
-- **Add a stack:** copy `adapters/flutter/` to `adapters/<name>/`, replace `ADAPTER.md` and `skills/`, then point `config.md` at `<name>`.
+Three adapters ship out of the box:
+
+| Adapter | Commands | Stack |
+|---------|----------|-------|
+| `flutter` | `flutter analyze`, `flutter test` | Flutter · Riverpod · Supabase |
+| `angular` | `pnpm run lint`, `pnpm run test`, `pnpm run build` | Angular v20+ · NgRx Signal Store · Tailwind |
+| `nextjs` | `pnpm lint`, `pnpm test`, `pnpm build` | Next.js 15+ · Zustand · Tailwind · shadcn/ui |
+
+Each adapter folder contains `ADAPTER.md` (stack rules + MCP hints), `skills/` (technology skills), and `templates/` (setup templates for `AGENTS.md`, `REGISTRY.md`, `docs/product.md`).
+
+**Add a stack:** copy `adapters/flutter/` to `adapters/<name>/`, replace `ADAPTER.md` and `skills/`, then point `config.md` at `<name>`.
 
 ## Setup command
 
@@ -48,15 +56,18 @@ This directory is the **installable DevFlow package**: core pipeline skills, sla
 
 | Command | What it does |
 |---|---|
-| `devflow.task` | Define and scope a task |
-| `devflow.plan` | Generate `plan.md` from task |
-| `devflow.blueprint` | Multi-PR plan with dependency graph + adversarial review (3+ PRs or multi-session) |
-| `devflow.implement` | Execute plan step by step |
-| `devflow.beautify` | Apply design/style pass |
-| `devflow.ship` | Pre-handoff review |
-| `devflow.setup` | Generate `AGENTS.md` + `REGISTRY.md` |
-| `devflow.status` | Show current pipeline state |
-| `devflow.learn` | Log, search, list, or prune project learnings |
+| `devflow.setup` | Generate `AGENTS.md`, `REGISTRY.md`, and `docs/product.md` from adapter templates |
+| `devflow.task` | Raw idea → structured task with HMW framing and verifiable subtasks |
+| `devflow.plan` | `task.md` → file-ordered implementation plan with traceability |
+| `devflow.blueprint` | Large idea → multi-PR blueprint with dependency graph + adversarial review |
+| `devflow.implement` | Execute `plan.md` step by step, vertical slice by slice |
+| `devflow.beautify` | 7-axis polish: correctness, readability, security, performance, architecture, UI, a11y |
+| `devflow.test` | Write and run unit + integration tests; bounded retry; standardized report |
+| `devflow.ship` | Pre-merge gate: 5 agents in parallel → Ship Gate Report → route to PR |
+| `devflow.pr` | Commit, push branch, open PR to main |
+| `devflow.status` | Show current pipeline state (active feature, next step, progress) |
+| `devflow.learn` | Manage learnings log — log / search / list / prune / boost |
+| `devflow.recovery` | Diagnose + recover a stuck or corrupted pipeline |
 
 ## Hooks
 
@@ -97,9 +108,32 @@ Three context files in `devflow/contexts/` tune Claude's behavior per pipeline p
 | `vertical slices` | End-to-end increments, never layers |
 | `token-lean` | Caveman-compress: drop articles/hedging/filler; keep precision |
 
+## References
+
+Stack-agnostic checklists and guides in `references/`:
+
+| File | Purpose |
+|------|---------|
+| `accessibility-checklist.md` | WCAG 2.1 AA — keyboard, screen readers, touch targets |
+| `model-selection.md` | Haiku / Sonnet / Opus guide per pipeline step |
+| `security-checklist.md` | OWASP Top 10, auth, input validation, secrets baseline |
+| `security-threat-model.md` | AI agent threat model — prompt injection, state corruption, supply chain |
+| `testing-patterns.md` | AAA, Beyonce Rule, Prove-It Pattern, pass@k vs pass^k, coverage signals |
+
+## Common Skills
+
+Cross-adapter skills in `adapters/common/`:
+
+| Skill | Purpose |
+|-------|---------|
+| `common-clean-code` | SOLID, DRY, design principles across all stacks |
+| `common-web-interface-guidelines` | UI/UX quality rules for all web adapters |
+| `common-caveman` | Token-lean, filler-free response style |
+| `common-state-patterns` | Riverpod / Signal Store / Zustand comparison, scope decision tree |
+
 ## Plugin Catalog
 
-`agent.yaml` at the plugin root is a machine-readable index of all pipeline components — steps, agents, skills, adapters, hooks, contexts. Use it for tooling, automation, or quick reference.
+`agent.yaml` at the plugin root is a machine-readable index of all pipeline components — steps, agents, skills, adapters, hooks, contexts, references. Use it for tooling, automation, or quick reference.
 
 ## Features output
 

@@ -84,7 +84,7 @@ for FILE in "${SKILL_FILES[@]}"; do
     fi
   else
     # Core skill: require Purpose + I/O Reference; Workflow OR any Step heading
-    for SECTION in "## Purpose" "## I/O Reference"; do
+    for SECTION in "## Purpose" "## I/O Reference" "## Anti-Patterns"; do
       if ! grep -qF "$SECTION" "$FILE"; then
         FILE_ERRORS+=("missing section \"$SECTION\"")
       fi

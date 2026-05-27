@@ -1,5 +1,29 @@
 # Changelog
 
+## [Unreleased]
+
+### Features
+
+* **skills:** Add `devflow-recovery` skill — diagnoses stuck/corrupted pipeline in 5 failure categories and proposes targeted recovery with user confirmation before any destructive action
+* **skills:** Add `common-state-patterns` skill — cross-adapter state management guide (Riverpod / NgRx Signal Store / Zustand) with scope decision tree and unified mental model
+* **references:** Add `model-selection.md` — Haiku/Sonnet/Opus recommendations per pipeline step with anti-patterns for model misuse
+* **references:** Add `security-threat-model.md` — AI agent threat model covering prompt injection, state corruption, memory poisoning, and supply chain attacks for DevFlow's architecture
+* **references:** Expand `testing-patterns.md` — add pass@k vs pass^k metrics, verification checkpoints pattern, and coverage quality signal table
+* **commands:** Add `devflow.recovery` command entry point
+* **contributing:** Make `## Anti-Patterns` a required section in all core pipeline skills (was optional)
+* **validate-skills:** Enforce `## Anti-Patterns` presence in all core skill validation
+* **build:** Add catalog integrity check to `build-plugin.sh` — prints skill/agent/reference counts and fails if skills drop below baseline
+* **agent.yaml:** Register `devflow-recovery`, `common-state-patterns`, `model-selection`, and `security-threat-model` in plugin catalog
+
+### Documentation
+
+* **README:** Add `devflow.recovery`, `devflow.blueprint`, `devflow.status`, `devflow.learn` to commands table
+* **README:** Update agents table to list all five agents (code-reviewer, security-auditor, test-engineer, accessibility-auditor, docs-reviewer)
+* **README:** Add `model-selection.md` and `security-threat-model.md` to references section
+* **README:** Add `common-state-patterns` to common adapter skills
+* **README:** Fix repository layout tree — add missing skills and references
+* **plugin README:** Update quick start (all three adapters listed); add References and Common Skills sections; fix commands table
+
 ## [1.3.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.2.0...devflow-v1.3.0) (2026-05-26)
 
 

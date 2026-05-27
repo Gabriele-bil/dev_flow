@@ -30,11 +30,15 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 | `devflow.setup` | [`templates/devflow/skills/devflow-setup/SKILL.md`](templates/devflow/skills/devflow-setup/SKILL.md) | Consumer repo context + adapter templates → root `AGENTS.md` + `REGISTRY.md` |
 | `devflow.task` | [`templates/devflow/skills/devflow-task/SKILL.md`](templates/devflow/skills/devflow-task/SKILL.md) | Idea → `devflow/features/[NNN]_[name]/task.md` |
 | `devflow.plan` | [`templates/devflow/skills/devflow-plan/SKILL.md`](templates/devflow/skills/devflow-plan/SKILL.md) | `task.md` → `plan.md` |
+| `devflow.blueprint` | [`templates/devflow/skills/devflow-blueprint/SKILL.md`](templates/devflow/skills/devflow-blueprint/SKILL.md) | Large idea → multi-PR blueprint with dependency graph + adversarial review |
 | `devflow.implement` | [`templates/devflow/skills/devflow-implement/SKILL.md`](templates/devflow/skills/devflow-implement/SKILL.md) | `plan.md` → code on `feat|fix|…/[NNN]-[name]` |
 | `devflow.beautify` | [`templates/devflow/skills/devflow-beautify/SKILL.md`](templates/devflow/skills/devflow-beautify/SKILL.md) | Implemented files → polished code |
 | `devflow.test` | [`templates/devflow/skills/devflow-test/SKILL.md`](templates/devflow/skills/devflow-test/SKILL.md) | Feature → unit + integration tests |
-| `devflow.ship` | [`templates/devflow/commands/devflow.ship.md`](templates/devflow/commands/devflow.ship.md) | Feature → parallel review (code + security + tests) → gate before PR |
+| `devflow.ship` | [`templates/devflow/commands/devflow.ship.md`](templates/devflow/commands/devflow.ship.md) | Feature → parallel review (code + security + tests + a11y + docs) → gate before PR |
 | `devflow.pr` | [`templates/devflow/skills/devflow-pr/SKILL.md`](templates/devflow/skills/devflow-pr/SKILL.md) | Branch → PR to `main` |
+| `devflow.status` | [`templates/devflow/skills/devflow-status/SKILL.md`](templates/devflow/skills/devflow-status/SKILL.md) | — → current pipeline state dashboard |
+| `devflow.learn` | [`templates/devflow/skills/devflow-learn/SKILL.md`](templates/devflow/skills/devflow-learn/SKILL.md) | — → manage learnings log (log / search / list / prune) |
+| `devflow.recovery` | [`templates/devflow/skills/devflow-recovery/SKILL.md`](templates/devflow/skills/devflow-recovery/SKILL.md) | Stuck pipeline → diagnosis + targeted recovery path |
 
 Command wrappers live in [`templates/devflow/commands/`](templates/devflow/commands/).
 
@@ -71,26 +75,35 @@ dev_flow/
 │       ├── commands/                # Slash-command entry points
 │       ├── skills/                  # Core pipeline skills (devflow-*)
 │       │   ├── devflow-beautify/
+│       │   ├── devflow-blueprint/
 │       │   ├── devflow-discovery/
 │       │   ├── devflow-implement/
+│       │   ├── devflow-learn/
 │       │   ├── devflow-plan/
 │       │   ├── devflow-pr/
+│       │   ├── devflow-recovery/
 │       │   ├── devflow-setup/
+│       │   ├── devflow-ship/
+│       │   ├── devflow-status/
 │       │   ├── devflow-task/
 │       │   └── devflow-test/
 │       ├── adapters/
 │       │   ├── ADAPTER.schema.md
 │       │   ├── angular/             # angular-architecture, -component, -forms, -http, -state, -testing, -theme
-│       │   ├── flutter/             # flutter-supabase, -migrations, -theme, -riverpod, -models, -layout, -form
+│       │   ├── flutter/             # flutter-architecture, -supabase, -migrations, -theme, -riverpod, -models, -layout, -form
 │       │   ├── nextjs/              # nextjs-architecture, -server, -components, -state, -ui, -forms, -testing, -metadata, -performance
-│       │   └── common/              # common-clean-code, -web-interface-guidelines, -caveman
+│       │   └── common/              # common-clean-code, -web-interface-guidelines, -caveman, -state-patterns
 │       ├── agents/
 │       │   ├── code-reviewer.md
 │       │   ├── security-auditor.md
-│       │   └── test-engineer.md
+│       │   ├── test-engineer.md
+│       │   ├── accessibility-auditor.md
+│       │   └── docs-reviewer.md
 │       ├── references/
 │       │   ├── accessibility-checklist.md
+│       │   ├── model-selection.md
 │       │   ├── security-checklist.md
+│       │   ├── security-threat-model.md
 │       │   └── testing-patterns.md
 │       └── scripts/
 │           └── validate-skills.sh
@@ -183,11 +196,13 @@ Specialized agents live in [`templates/devflow/agents/`](templates/devflow/agent
 
 | Agent | File | Role |
 |-------|------|------|
-| Code Reviewer | [`agents/code-reviewer.md`](templates/devflow/agents/code-reviewer.md) | Architecture-focused code review |
-| Security Auditor | [`agents/security-auditor.md`](templates/devflow/agents/security-auditor.md) | Security vulnerabilities and hardening |
-| Test Engineer | [`agents/test-engineer.md`](templates/devflow/agents/test-engineer.md) | Test coverage and quality validation |
+| Code Reviewer | [`agents/code-reviewer.md`](templates/devflow/agents/code-reviewer.md) | 5-axis code review: correctness, readability, architecture, security, performance |
+| Security Auditor | [`agents/security-auditor.md`](templates/devflow/agents/security-auditor.md) | Exploitable vulnerabilities, threat modeling, secure coding |
+| Test Engineer | [`agents/test-engineer.md`](templates/devflow/agents/test-engineer.md) | Coverage gap analysis, test strategy, test quality |
+| Accessibility Auditor | [`agents/accessibility-auditor.md`](templates/devflow/agents/accessibility-auditor.md) | WCAG 2.1 AA: keyboard/focus, screen readers, contrast, touch targets |
+| Docs Reviewer | [`agents/docs-reviewer.md`](templates/devflow/agents/docs-reviewer.md) | Public API coverage, README/CHANGELOG sync, plan traceability |
 
-`devflow.ship` runs all three in parallel, synthesizes their reports, and routes to `devflow.pr` only if no blockers are found.
+`devflow.ship` runs all five in parallel, synthesizes reports into a Ship Gate Report, and routes to `devflow.pr` only if no blockers are found.
 
 ---
 
@@ -197,9 +212,11 @@ Shared checklists and patterns in [`templates/devflow/references/`](templates/de
 
 | File | Purpose |
 |------|---------|
-| [`accessibility-checklist.md`](templates/devflow/references/accessibility-checklist.md) | A11y guidelines |
-| [`security-checklist.md`](templates/devflow/references/security-checklist.md) | Security review points |
-| [`testing-patterns.md`](templates/devflow/references/testing-patterns.md) | Testing best practices |
+| [`accessibility-checklist.md`](templates/devflow/references/accessibility-checklist.md) | WCAG 2.1 AA checklist — keyboard, screen readers, touch targets |
+| [`model-selection.md`](templates/devflow/references/model-selection.md) | Haiku / Sonnet / Opus guide per pipeline step |
+| [`security-checklist.md`](templates/devflow/references/security-checklist.md) | OWASP Top 10, auth, input validation, secrets baseline |
+| [`security-threat-model.md`](templates/devflow/references/security-threat-model.md) | AI agent threat model — prompt injection, state corruption, supply chain |
+| [`testing-patterns.md`](templates/devflow/references/testing-patterns.md) | AAA, Beyonce Rule, Prove-It Pattern, pass@k vs pass^k, coverage quality signals |
 
 ---
 
@@ -264,3 +281,4 @@ Baseline: **Next.js 15+ App Router · Zustand · Tailwind CSS + shadcn/ui · Ser
 | `common-clean-code` | Shared clean code patterns across all stacks |
 | `common-web-interface-guidelines` | UI/UX quality rules applied during beautify on all web adapters |
 | `common-caveman` | Token-lean, filler-free response style for plans and reviews |
+| `common-state-patterns` | Cross-adapter state management guide — Riverpod / Signal Store / Zustand comparison, scope decision tree, unified mental model |

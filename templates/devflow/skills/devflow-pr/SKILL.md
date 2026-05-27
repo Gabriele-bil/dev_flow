@@ -161,6 +161,17 @@ DevFlow pipeline complete for TASK-[NNN].
 | "I'll skip the registry update — it's a minor pattern" | Undocumented patterns accumulate into inconsistency; if `devflow.implement` identified a pattern, update `registry.md` |
 | "I'll push and then fix the commit message" | Commit messages are part of the project history; write them correctly the first time |
 
+## Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+|---|---|---|
+| `git add .` without reviewing what's staged | Unintended files (env files, build artifacts, debug code) enter PR | Run `git status` + `git diff --cached` before commit |
+| Using `fix` commit type for all commits | Obscures feature work; misleads changelog generation | Use `feat` for new behavior, `fix` for bug corrections, `chore` for tooling |
+| PR body without task reference | Reviewer has no context for why the change exists | Include `Closes TASK-NNN` and link to `task.md` summary |
+| Force-pushing after PR is open for review | Invalidates reviewer comments; destroys review history | Never force-push an open PR; create follow-up commit instead |
+| Skipping `devflow.ship` to save time | Ship gate exists to prevent broken code reaching main | Run `devflow.ship` before `devflow.pr`; no exceptions |
+| Branch name not matching `[type]/[NNN]-[feature-name]` convention | Breaks traceability; PR automation fails | Always follow convention from Step 2 |
+
 ## I/O Reference
 
 | | |

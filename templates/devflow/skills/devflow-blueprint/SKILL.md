@@ -304,6 +304,17 @@ Next: run devflow.plan for step [001] → [step title]
 | Blueprint status is `approved` but steps were edited after adversarial review | Bypass of review gate; re-run adversarial review or mark status `draft` |
 | Step title is a layer ("add tests", "update DB") not an increment | Layer-shaped steps → big-bang delivery; reframe as outcome increments |
 
+## Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+|---|---|---|
+| Marking all steps `parallel-safe: yes` by default | Concurrent edits to shared files → merge conflicts | Default to `no`; explicitly prove `yes` only when steps have no shared file |
+| Skipping adversarial review for "simple" blueprints | Wrong parallelization detected only during implement (too late) | Always run adversarial review; it is fast and catches ordering errors |
+| Writing context briefs that say "see step X" | Brief not self-contained; fresh agent in new session cannot proceed | Each brief must be fully self-contained (files, contracts, constraints) |
+| Using blueprint for single-PR features | Blueprint overhead without benefit; adds ceremony, delays | Use `devflow.task` → `devflow.plan` directly for single-PR scope |
+| Editing steps after adversarial review without marking `draft` | Review gate bypassed; invalid parallelization may ship | Mark `status: draft` → re-run adversarial review → re-approve |
+| Dependency graph without transitive edges | Implement proceeds in wrong order | Include all transitive dependencies; missing edge = missing ordering constraint |
+
 ## I/O Reference
 
 | | |

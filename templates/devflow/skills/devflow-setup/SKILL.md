@@ -317,6 +317,16 @@ Before final response:
 - Skipping any required questionnaire field
 - Skipping adapter `Setup dependencies` install without explicit `none declared` evidence
 
+## Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+|---|---|---|
+| Writing files inside `devflow/features/` during setup | Consumer project artefacts pollute plugin directory | Write only to consumer project root; `devflow/` is read-only during setup |
+| Skipping the questionnaire and guessing adapter | Wrong adapter → wrong templates → broken pipeline from step 1 | Always run the full questionnaire; no defaults |
+| Regenerating setup files without `--force` on existing project | User content overwritten silently | Check for managed markers; preserve non-managed content |
+| Installing setup dependencies globally instead of per-project | Global installs break other projects; not reproducible | Use project package manager (`pnpm add`, `flutter pub add`) |
+| Leaving `[TODO: fill]` placeholders in `AGENTS.md` and proceeding to `devflow.task` | First task fails input contract; agent has no project context | Fill all placeholders before routing to `devflow.task` |
+
 ## I/O Reference
 
 | | |

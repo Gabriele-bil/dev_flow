@@ -261,6 +261,17 @@ After completion, respond with:
 Continue to testing? -> devflow.test
 ```
 
+## Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+|---|---|---|
+| Expanding scope to files not in `devflow.implement` summary | Untracked changes; undefined review surface | Strictly limit to files listed in the implement summary |
+| Adding new features during beautify ("while I'm here") | Scope creep; breaks traceability back to `task.md` | Log as new subtask; implement in next pipeline cycle |
+| Skipping security axis because "it was reviewed already" | Security issues survive code review; beautify is the last gate before test | Run all 7 axes on every beautify run |
+| Running format/analyze only on new files, not modified files | Pre-existing violations surface as noise in PR diff | Run adapter commands on the full changed set |
+| Treating `Nit` findings as mandatory fixes | Over-engineering minor style issues delays delivery | Fix Critical/Required; note Nit/Optional in report; user decides |
+| Using profiler during beautify without evidence of bottleneck | Premature optimization adds complexity | Apply heuristics only; profiler only when benchmark confirms issue |
+
 ## Completion checklist
 
 Before sending Step 6:

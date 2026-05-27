@@ -136,6 +136,18 @@ Execute `@devflow/skills/devflow-pr/SKILL.md` exactly.
 
 ---
 
+## Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+|---|---|---|
+| Running only `code-reviewer`, skipping `security-auditor` | Security issues not caught at gate; reach production | Always dispatch all 5 agents; fan-out is non-negotiable |
+| Synthesizing before all agents complete | Partial findings in synthesis; Critical issues missed | Wait for all agent reports before Step 3 |
+| Downgrading severity in synthesis ("this Critical is really just a Required") | Bypasses gate logic; Critical issues slip to PR | Report severity as declared by agent; escalate to user if disputed |
+| Re-running ship after fixing only some Critical issues | Gives false confidence that gate passed | Fix all Critical issues; re-run full ship gate from Step 1 |
+| Using ship gate as a substitute for `devflow-beautify` | Ship gate audits, it does not fix; beautify is the fix step | Run beautify before ship; ship reviews the result |
+
+---
+
 ## I/O Reference
 
 | | |

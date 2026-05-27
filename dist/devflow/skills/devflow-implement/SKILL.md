@@ -254,6 +254,17 @@ Continue to beautify? -> devflow.beautify
 | "I'll update the registry later / in the PR" | Shared files unregistered in `registry.md` are invisible to the next agent; update it in Step 7 before Step 7b |
 | "The shared component is small — not worth registering" | Size is irrelevant; if it lives in a shared folder it must be in the registry |
 
+## Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+|---|---|---|
+| Committing mid-implement "as checkpoint" | Premature commits pollute git history; breaks `devflow.pr` commit discipline | Mark `[done]` in `plan.md` instead; commit only in `devflow.pr` |
+| Implementing plan steps out of dependency order | Compile/runtime failures; blocked downstream files | Follow file list order exactly; resolve deps before dependents |
+| Creating new shared components without checking registry | Duplicates existing components; fragments inventory | Read `registry.md` at session start before writing any shared file |
+| Loading full codebase "for context" | Context flood kills focus; errors on unrelated code surface | Load only files listed in `plan.md` + one exemplar pattern per task |
+| Fixing beautify/test issues discovered during implement | Scope creep into future steps; hard to track deviations | Log issue in Step 8 deviations; fix in `devflow.beautify` step |
+| Running adapter analyze only at end | Late failures require wide rework | Run after each vertical slice checkpoint |
+
 ## I/O Reference
 
 | | |

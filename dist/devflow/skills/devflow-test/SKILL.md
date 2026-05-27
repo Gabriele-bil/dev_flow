@@ -156,6 +156,17 @@ Wait for user choice before continuing.
 | "I'll skip integration tests to save time" | Integration tests cover user flows that unit tests cannot; run every integration target required by `ADAPTER.md` |
 | "3 retries failed — I'll just mark it as passing" | After 3 failures, stop and report; never mark a failing test as passing in the summary |
 
+## Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+|---|---|---|
+| Testing implementation internals (private methods, internal state) | Breaks on refactor with no behavioral change | Test inputs → outputs; mock only system boundaries |
+| 100% coverage with no assertions | Coverage metric satisfied; no behavior proven | Every test must assert at least one specific output |
+| Flaky test fixed with `retry(3)` wrapper | Hides root cause (timing, shared state, non-determinism) | Fix root cause; use deterministic test setup |
+| Snapshot-all strategy | Diffs never reviewed; all changes auto-approved | Assert specific values for meaningful properties |
+| Writing tests only for happy paths | Error paths are where bugs live | At minimum: happy path + one error path per public function |
+| Skipping `testing-patterns.md` for novel test scenarios | Reinvents patterns already documented | Read `@devflow/references/testing-patterns.md` before writing test scaffolding |
+
 ## I/O Reference
 
 | | |

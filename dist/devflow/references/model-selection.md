@@ -1,0 +1,56 @@
+# Model Selection Guide
+
+Stack-agnostic. Use alongside skill frontmatter `model:` field.
+Select model based on task complexity and cost budget — not habit.
+
+## Decision Table
+
+| Pipeline Step | Recommended | Fallback | Rationale |
+|---------------|-------------|----------|-----------|
+| `devflow-task` | Haiku | Sonnet | exploration + HMW framing; fast iteration |
+| `devflow-plan` | Sonnet | Opus | multi-file reasoning, dependency ordering |
+| `devflow-implement` | Sonnet | Opus | coding across multiple files; context budget matters |
+| `devflow-beautify` | Haiku | Sonnet | localized refactoring; single-file scope |
+| `devflow-test` | Sonnet | Opus | test generation with coverage gap analysis |
+| `devflow-ship` (agents) | Opus | Sonnet | security + correctness review; cannot miss issues |
+| `devflow-pr` | Haiku | Sonnet | mechanical git operations; no reasoning required |
+| `devflow-recovery` | Sonnet | Opus | diagnosis requires multi-file state read |
+
+## Model Profiles
+
+### Haiku
+- Use for: single-file edits, search, formatting, git commands, notifications
+- Avoid for: architecture decisions, security review, cross-file reasoning
+- Cost: lowest; fastest
+
+### Sonnet
+- Use for: multi-file implementation, planning, test generation, code review
+- Default for most pipeline steps
+- Cost: balanced; reliable
+
+### Opus
+- Use for: security audit, architecture decisions, unresolvable implement loops
+- Use when: accuracy cannot be sacrificed (devflow.ship security-auditor, code-reviewer)
+- Cost: highest; slowest — reserve for critical review steps
+
+## Anti-Patterns
+
+| Anti-Pattern | Problem |
+|---|---|
+| Opus for every step | 5–10× cost with no quality gain on mechanical tasks |
+| Haiku for devflow.ship agents | Security misses on cost optimization = false confidence |
+| No model declared in skill frontmatter | Inherits caller model — unpredictable behavior across environments |
+| Upgrading model to "fix" logic errors | Model is rarely the problem; debug prompt/context first |
+
+## Setting Model in Skill Frontmatter
+
+```yaml
+---
+name: devflow-ship
+description: Pre-merge quality gate
+model: claude-opus-4-7
+---
+```
+
+Field is optional — omit if inheriting from session default is acceptable.
+Adapter skills: inherit from pipeline step that invokes them; explicit override only if cost-sensitive.

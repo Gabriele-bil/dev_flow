@@ -51,6 +51,9 @@ pipeline:
     - command: /devflow.lint-skills
       script: scripts/validate-skills.sh
       description: "Validate all SKILL.md files for required structure (frontmatter, sections, style)"
+    - command: /devflow.recovery
+      skill: devflow-recovery
+      description: "Diagnose and recover a stuck or corrupted DevFlow pipeline — reads state, observe log, and feature files to identify failure and propose a targeted recovery"
 
 agents:
   - id: code-reviewer
@@ -103,6 +106,9 @@ skills:
     - id: devflow-learn
       path: skills/devflow-learn/SKILL.md
       description: "Manage the DevFlow learnings log. Sub-commands: log (record a quirk/lesson/warning), search (find past entries), list (show recent), prune (remove entries older than 30 days)"
+    - id: devflow-recovery
+      path: skills/devflow-recovery/SKILL.md
+      description: "Diagnoses and recovers a stuck or corrupted DevFlow pipeline. Reads state, observe log, and feature files to identify failure category and propose a targeted recovery action"
 
   adapters:
     flutter:
@@ -185,6 +191,9 @@ skills:
         - id: common-clean-code
           path: adapters/common/skills/common-clean-code/SKILL.md
           description: "Enforce Clean Code, SOLID, and design principles across all technologies. Use when writing code, refactoring, designing architecture, or reviewing code quality"
+        - id: common-state-patterns
+          path: adapters/common/skills/common-state-patterns/SKILL.md
+          description: "Cross-adapter state management guide — Riverpod (Flutter), Signal Store (Angular), Zustand (Next.js). Use when choosing a state solution, designing state architecture, or diagnosing state-related bugs"
 
 references:
   - id: security-checklist
@@ -196,6 +205,12 @@ references:
   - id: accessibility-checklist
     path: references/accessibility-checklist.md
     description: "Stack-agnostic accessibility checklist. WCAG 2.1 AA baseline covering keyboard/focus, screen readers, and touch targets. Stack-specific patterns in active ADAPTER.md"
+  - id: model-selection
+    path: references/model-selection.md
+    description: "Model selection guide — Haiku/Sonnet/Opus recommendations per DevFlow pipeline step. Use when declaring skill frontmatter model field or choosing model for a specific task"
+  - id: security-threat-model
+    path: references/security-threat-model.md
+    description: "AI agent threat model for DevFlow — attack surfaces (prompt injection, state corruption, memory poisoning, supply chain), safeguards, and incident response. Use during devflow-beautify security axis and devflow-ship review"
 
 hooks:
   - event: SessionStart

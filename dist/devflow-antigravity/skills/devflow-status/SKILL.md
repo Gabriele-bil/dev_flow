@@ -86,6 +86,14 @@ Start a feature: devflow.task
 DevFlow not configured. Run: /devflow.setup
 ```
 
+## Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+|---|---|---|
+| Modifying `.devflow-state.json` directly to "fix" the status | State corruption; pipeline steps route to wrong phase | Use `devflow-recovery` to diagnose and fix state; never hand-edit |
+| Reporting status from memory instead of reading `.devflow-state.json` | Stale report; user gets wrong next step | Always read state file at invocation time |
+| Confusing `devflow-status` with `devflow-discovery` | Status = snapshot output only; discovery = full orientation with routing | Use discovery at session start; status for quick progress check |
+
 ## I/O Reference
 
 | | |
