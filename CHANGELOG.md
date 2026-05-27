@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.3.0...devflow-v1.4.0) (2026-05-27)
+
+
+### Features
+
+* Enhance DevFlow with new skills and recovery features ([3de2eb0](https://github.com/Gabriele-bil/dev_flow/commit/3de2eb0ce9371c3433f70f69a9fd502c414a82e7))
+
 ## [Unreleased]
 
 ### Features
