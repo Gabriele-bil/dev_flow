@@ -85,6 +85,7 @@ Before loading templates, determine the active technology stack and update the c
    - `AGENTS.template.md`
    - `REGISTRY.template.md`
    - `PRODUCT.template.md`
+   - `CONSTITUTION.template.md`
 
 If preferred directory missing, report fallback in final response.
 If `Setup dependencies` is missing in adapter contract, report this as a setup contract error and stop.
@@ -104,7 +105,7 @@ Rules:
 
 - Always ask for every field listed in **Placeholder map**.
 - If user refuses or does not know, store `[TODO: fill]`.
-- Keep questions short and grouped by topic (product, conventions, patterns, commands).
+- Keep questions short and grouped by topic (product, conventions, patterns, commands, architecture).
 
 ### Step 3b - Codebase scan (optional, run after questionnaire)
 
