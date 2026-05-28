@@ -331,6 +331,7 @@ Respond with:
 AGENTS.md: [created|updated|overwritten]
 REGISTRY.md: [created|updated|overwritten]
 docs/product.md: [created|updated|overwritten]
+constitution.md: [created|updated|overwritten]
 
 Template source: [adapter|fallback]
 Manual placeholders: [N]
@@ -356,12 +357,14 @@ Next: run devflow.task
 
 Before final response:
 
-- [ ] all three files exist in consumer root
+- [ ] all four files exist in consumer root (AGENTS.md, REGISTRY.md, docs/product.md, constitution.md)
 - [ ] managed markers are valid and paired
 - [ ] non-managed user content preserved (unless `--force`)
 - [ ] adapter setup dependencies installed (or explicit skip reason reported)
 - [ ] no verbose filler added
 - [ ] unresolved values listed as `[TODO: fill]`
+- [ ] constitution.md layer table has at least one row per adapter layer
+- [ ] all constitution `{{placeholder}}` tokens are resolved or marked `[TODO: fill]`
 
 ## Red flags
 
