@@ -220,6 +220,7 @@ Budget targets:
 - `AGENTS.md`: under ~300 tokens
 - `REGISTRY.md`: under ~600 tokens
 - `docs/product.md`: under ~700 tokens
+- `constitution.md`: under ~530 tokens
 
 ### Step 6b - Token budget check (after render, before write)
 
@@ -228,6 +229,7 @@ After rendering each file, estimate token count using word count as proxy (300 w
 - `AGENTS.md`: warn if rendered content exceeds ~225 words
 - `REGISTRY.md`: warn if rendered content exceeds ~450 words
 - `docs/product.md`: warn if rendered content exceeds ~525 words
+- `constitution.md`: warn if rendered content exceeds ~400 words
 
 If over budget, trim in this order:
 1. Remove worked examples or multi-sentence explanations from bullets — replace with imperative fragment
@@ -253,6 +255,17 @@ Target location: consumer project root.
 #### docs/product.md
 
 - file missing: create from rendered template (always)
+- file exists, no `--force`: replace only managed sections by matching `<section-id>`
+- file exists + `--force`: overwrite full file
+
+When non-force mode cannot find valid managed markers in an existing file:
+
+- append rendered managed blocks to the end of the file
+- do not rewrite existing user sections
+
+#### constitution.md
+
+- file missing: create from rendered template
 - file exists, no `--force`: replace only managed sections by matching `<section-id>`
 - file exists + `--force`: overwrite full file
 
