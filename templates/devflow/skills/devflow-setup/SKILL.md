@@ -194,6 +194,13 @@ You must collect and resolve these fields before render:
 | `feature-[N]-name` | PRODUCT | Key feature label (N = 1, 2, 3…) |
 | `feature-[N]-status` | PRODUCT | `implemented`, `planned`, `in-progress`, or `deprecated` |
 | `feature-[N]-notes` | PRODUCT | Scope/status notes |
+| `layer-order` | CONSTITUTION | Layer sequence label (e.g. `domain → data → UI`) |
+| `layer-N-name` | CONSTITUTION | Layer name (N = 1…N) |
+| `layer-N-path` | CONSTITUTION | Folder path for layer N |
+| `layer-N-responsibility` | CONSTITUTION | What layer N owns |
+| `naming-conventions` | CONSTITUTION | File/class/function naming rules |
+| `import-conventions` | CONSTITUTION | Import style and barrel file rules |
+| `key-decisions` | CONSTITUTION | Architectural decisions list (state, DI, routing, DB) |
 
 Collect at least 3 features. Ask: "List your key features (name, status, notes). Add as many as needed." Add one table row per feature. `devflow.task` will maintain this table as features progress.
 
