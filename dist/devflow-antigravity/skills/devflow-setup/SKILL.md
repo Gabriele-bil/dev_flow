@@ -85,6 +85,7 @@ Before loading templates, determine the active technology stack and update the c
    - `AGENTS.template.md`
    - `REGISTRY.template.md`
    - `PRODUCT.template.md`
+   - `CONSTITUTION.template.md`
 
 If preferred directory missing, report fallback in final response.
 If `Setup dependencies` is missing in adapter contract, report this as a setup contract error and stop.
@@ -104,7 +105,7 @@ Rules:
 
 - Always ask for every field listed in **Placeholder map**.
 - If user refuses or does not know, store `[TODO: fill]`.
-- Keep questions short and grouped by topic (product, conventions, patterns, commands).
+- Keep questions short and grouped by topic (product, conventions, patterns, commands, architecture).
 
 ### Step 3b - Codebase scan (optional, run after questionnaire)
 
@@ -116,7 +117,12 @@ After collecting questionnaire answers, scan the live repo to ground REGISTRY.md
 
 Use these observations to pre-fill `pattern-1`, `pattern-2` (and optionally `pattern-3`) in the placeholder map before rendering — replacing any questionnaire `[TODO: fill]` values for patterns with real examples from the repo.
 
-If the feature directory does not exist or is empty, skip this step and use questionnaire values.
+Additionally, sample 5-10 existing source files across the project root to infer `naming-conventions`:
+- Extract file naming pattern (snake_case.dart, kebab-case.ts, PascalCase.tsx, etc.)
+- Extract class and top-level function naming from file headers
+- Pre-fill `naming-conventions` placeholder if a consistent pattern is found; otherwise leave `[TODO: fill]`
+
+If the feature directory does not exist or is empty, skip feature scan and use questionnaire values or adapter defaults for all constitution fields.
 
 ### Step 4 - Build placeholder map from answers + context
 
@@ -133,6 +139,36 @@ Build final values for template placeholders from:
 
 If a value cannot be inferred, keep a literal placeholder token:
 `[TODO: fill]`.
+
+For constitution fields, use these adapter defaults when the questionnaire answer is empty or `[TODO: fill]`:
+
+**Flutter:**
+- `layer-order`: `domain → data → riverpod → UI → i18n/codegen`
+- `import-conventions`: `Use package:{{project-name}} imports. Barrel files: index.dart per layer. No relative cross-layer imports.`
+- `key-decisions`:
+  - State: Riverpod (flutter_riverpod + riverpod_annotation)
+  - Models: Freezed + json_serializable
+  - i18n: slang
+  - Backend: Supabase
+  - Routing: [TODO: fill]
+
+**Angular:**
+- `layer-order`: `core → shared → pages`
+- `import-conventions`: `Path aliases: @core/, @shared/, @pages/. Barrel files: public-api.ts. No deep cross-module imports.`
+- `key-decisions`:
+  - State: Signal Store (no NgRx)
+  - Components: standalone (no NgModules)
+  - HTTP: HttpClient with typed responses
+  - Routing: Angular Router with lazy loading
+
+**Next.js:**
+- `layer-order`: `app → components → lib → actions`
+- `import-conventions`: `Path alias: @/ → project root. Barrel files: index.ts per directory. No server imports in Client Components.`
+- `key-decisions`:
+  - Components: Server Components by default; 'use client' only for hooks/browser API
+  - State: Zustand for global client state; URL state for filters/pagination
+  - Data: Server Actions (actions.ts) for mutations
+  - Routing: App Router (app/ directory)
 
 ### Step 5 - Placeholder map (required)
 
@@ -158,6 +194,13 @@ You must collect and resolve these fields before render:
 | `feature-[N]-name` | PRODUCT | Key feature label (N = 1, 2, 3…) |
 | `feature-[N]-status` | PRODUCT | `implemented`, `planned`, `in-progress`, or `deprecated` |
 | `feature-[N]-notes` | PRODUCT | Scope/status notes |
+| `layer-order` | CONSTITUTION | Layer sequence label (e.g. `domain → data → UI`) |
+| `layer-N-name` | CONSTITUTION | Layer name (N = 1…N) |
+| `layer-N-path` | CONSTITUTION | Folder path for layer N |
+| `layer-N-responsibility` | CONSTITUTION | What layer N owns |
+| `naming-conventions` | CONSTITUTION | File/class/function naming rules |
+| `import-conventions` | CONSTITUTION | Import style and barrel file rules |
+| `key-decisions` | CONSTITUTION | Architectural decisions list (state, DI, routing, DB) |
 
 Collect at least 3 features. Ask: "List your key features (name, status, notes). Add as many as needed." Add one table row per feature. `devflow.task` will maintain this table as features progress.
 
@@ -177,6 +220,7 @@ Budget targets:
 - `AGENTS.md`: under ~300 tokens
 - `REGISTRY.md`: under ~600 tokens
 - `docs/product.md`: under ~700 tokens
+- `constitution.md`: under ~530 tokens
 
 ### Step 6b - Token budget check (after render, before write)
 
@@ -185,6 +229,7 @@ After rendering each file, estimate token count using word count as proxy (300 w
 - `AGENTS.md`: warn if rendered content exceeds ~225 words
 - `REGISTRY.md`: warn if rendered content exceeds ~450 words
 - `docs/product.md`: warn if rendered content exceeds ~525 words
+- `constitution.md`: warn if rendered content exceeds ~400 words
 
 If over budget, trim in this order:
 1. Remove worked examples or multi-sentence explanations from bullets — replace with imperative fragment
@@ -210,6 +255,17 @@ Target location: consumer project root.
 #### docs/product.md
 
 - file missing: create from rendered template (always)
+- file exists, no `--force`: replace only managed sections by matching `<section-id>`
+- file exists + `--force`: overwrite full file
+
+When non-force mode cannot find valid managed markers in an existing file:
+
+- append rendered managed blocks to the end of the file
+- do not rewrite existing user sections
+
+#### constitution.md
+
+- file missing: create from rendered template
 - file exists, no `--force`: replace only managed sections by matching `<section-id>`
 - file exists + `--force`: overwrite full file
 
@@ -275,6 +331,7 @@ Respond with:
 AGENTS.md: [created|updated|overwritten]
 REGISTRY.md: [created|updated|overwritten]
 docs/product.md: [created|updated|overwritten]
+constitution.md: [created|updated|overwritten]
 
 Template source: [adapter|fallback]
 Manual placeholders: [N]
@@ -300,12 +357,14 @@ Next: run devflow.task
 
 Before final response:
 
-- [ ] all three files exist in consumer root
+- [ ] all four files exist in consumer root (AGENTS.md, REGISTRY.md, docs/product.md, constitution.md)
 - [ ] managed markers are valid and paired
 - [ ] non-managed user content preserved (unless `--force`)
 - [ ] adapter setup dependencies installed (or explicit skip reason reported)
 - [ ] no verbose filler added
 - [ ] unresolved values listed as `[TODO: fill]`
+- [ ] constitution.md layer table has at least one row per adapter layer
+- [ ] all constitution `{{placeholder}}` tokens are resolved or marked `[TODO: fill]`
 
 ## Red flags
 
