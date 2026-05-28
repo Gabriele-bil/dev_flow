@@ -117,7 +117,12 @@ After collecting questionnaire answers, scan the live repo to ground REGISTRY.md
 
 Use these observations to pre-fill `pattern-1`, `pattern-2` (and optionally `pattern-3`) in the placeholder map before rendering — replacing any questionnaire `[TODO: fill]` values for patterns with real examples from the repo.
 
-If the feature directory does not exist or is empty, skip this step and use questionnaire values.
+Additionally, sample 5-10 existing source files across the project root to infer `naming-conventions`:
+- Extract file naming pattern (snake_case.dart, kebab-case.ts, PascalCase.tsx, etc.)
+- Extract class and top-level function naming from file headers
+- Pre-fill `naming-conventions` placeholder if a consistent pattern is found; otherwise leave `[TODO: fill]`
+
+If the feature directory does not exist or is empty, skip feature scan and use questionnaire values or adapter defaults for all constitution fields.
 
 ### Step 4 - Build placeholder map from answers + context
 
@@ -134,6 +139,36 @@ Build final values for template placeholders from:
 
 If a value cannot be inferred, keep a literal placeholder token:
 `[TODO: fill]`.
+
+For constitution fields, use these adapter defaults when the questionnaire answer is empty or `[TODO: fill]`:
+
+**Flutter:**
+- `layer-order`: `domain → data → riverpod → UI → i18n/codegen`
+- `import-conventions`: `Use package:{{project-name}} imports. Barrel files: index.dart per layer. No relative cross-layer imports.`
+- `key-decisions`:
+  - State: Riverpod (flutter_riverpod + riverpod_annotation)
+  - Models: Freezed + json_serializable
+  - i18n: slang
+  - Backend: Supabase
+  - Routing: [TODO: fill]
+
+**Angular:**
+- `layer-order`: `core → shared → pages`
+- `import-conventions`: `Path aliases: @core/, @shared/, @pages/. Barrel files: public-api.ts. No deep cross-module imports.`
+- `key-decisions`:
+  - State: Signal Store (no NgRx)
+  - Components: standalone (no NgModules)
+  - HTTP: HttpClient with typed responses
+  - Routing: Angular Router with lazy loading
+
+**Next.js:**
+- `layer-order`: `app → components → lib → actions`
+- `import-conventions`: `Path alias: @/ → project root. Barrel files: index.ts per directory. No server imports in Client Components.`
+- `key-decisions`:
+  - Components: Server Components by default; 'use client' only for hooks/browser API
+  - State: Zustand for global client state; URL state for filters/pagination
+  - Data: Server Actions (actions.ts) for mutations
+  - Routing: App Router (app/ directory)
 
 ### Step 5 - Placeholder map (required)
 
