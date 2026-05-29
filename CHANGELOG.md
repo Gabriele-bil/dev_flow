@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.5.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.4.0...devflow-v1.5.0) (2026-05-29)
+
+
+### Features
+
+* Add Angular CONSTITUTION.template.md ([c75dc4d](https://github.com/Gabriele-bil/dev_flow/commit/c75dc4d2961b0b4d9dc56562b5d25a0e8d4623c9))
+* Add Flutter CONSTITUTION.template.md ([6147edd](https://github.com/Gabriele-bil/dev_flow/commit/6147eddd059299327f2ac2729178d0302b34f0d3))
+* Add global fallback CONSTITUTION.template.md ([7b30771](https://github.com/Gabriele-bil/dev_flow/commit/7b3077143c446bf434a4aca47a95b783f1051e7b))
+* Add Next.js CONSTITUTION.template.md ([7e3a2a5](https://github.com/Gabriele-bil/dev_flow/commit/7e3a2a5700938264b01e774d9ec2851eeb32f10d))
+* **setup:** Add constitution fields to placeholder map ([99bc29d](https://github.com/Gabriele-bil/dev_flow/commit/99bc29d2732528cb8c99d9628bfd0dc578e3ea58))
+* **setup:** Add constitution.md to setup summary and quality checklist ([eb736eb](https://github.com/Gabriele-bil/dev_flow/commit/eb736eb8b3a411cc56a0f84091439a9c4577cc63))
+* **setup:** Add constitution.md token budget and write rules ([e35682f](https://github.com/Gabriele-bil/dev_flow/commit/e35682f28aea1e2d6c5bb1017148e05ffb9662de))
+* **setup:** Extend codebase scan for naming-conventions and add constitution adapter defaults ([ca15e1b](https://github.com/Gabriele-bil/dev_flow/commit/ca15e1b3106150e992a72e1326abc9285469f19d))
+* **setup:** Load CONSTITUTION.template.md and add architecture questionnaire topic ([6a2cf06](https://github.com/Gabriele-bil/dev_flow/commit/6a2cf0694ded135e4c9b1d49b5a4be3c7cd595b2))
+
 ## [1.4.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.3.0...devflow-v1.4.0) (2026-05-27)
 
 
