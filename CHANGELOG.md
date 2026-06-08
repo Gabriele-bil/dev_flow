@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.5.0...devflow-v1.6.0) (2026-06-08)
+
+
+### Features
+
+* Add angular-animations skill and expand angular-http dependency injection patterns ([fdf5ba8](https://github.com/Gabriele-bil/dev_flow/commit/fdf5ba8473d51f178844ff77d68fc1fbc4f425e9))
+* Upgrade Angular documentation to v22 ([8c83a7a](https://github.com/Gabriele-bil/dev_flow/commit/8c83a7a0f332f7020f5d8a514a122bed8187e103))
+
 ## [1.5.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.4.0...devflow-v1.5.0) (2026-05-29)
 
 
