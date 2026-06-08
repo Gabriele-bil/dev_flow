@@ -1,6 +1,7 @@
 # Angular HTTP Patterns
 
 ## Table of Contents
+
 - [Service Layer Pattern](#service-layer-pattern)
 - [Caching Strategies](#caching-strategies)
 - [Pagination](#pagination)

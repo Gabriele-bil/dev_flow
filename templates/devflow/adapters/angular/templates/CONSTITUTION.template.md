@@ -1,5 +1,6 @@
 <!-- devflow-managed:start:architecture -->
 ## Architecture
+
 **Stack:** angular
 **Layer order:** {{layer-order}}
 
@@ -12,15 +13,18 @@
 
 <!-- devflow-managed:start:naming -->
 ## Naming conventions
+
 {{naming-conventions}}
 <!-- devflow-managed:end:naming -->
 
 <!-- devflow-managed:start:imports -->
 ## Import conventions
+
 {{import-conventions}}
 <!-- devflow-managed:end:imports -->
 
 <!-- devflow-managed:start:decisions -->
 ## Key decisions
+
 {{key-decisions}}
 <!-- devflow-managed:end:decisions -->

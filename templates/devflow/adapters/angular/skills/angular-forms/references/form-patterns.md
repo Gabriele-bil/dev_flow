@@ -3,6 +3,7 @@
 Advanced patterns for `@angular/forms/signals` only.
 
 ## Table of Contents
+
 - [Strict Rules & Common Pitfalls](#strict-rules--common-pitfalls)
 - [Multi-Step Wizard](#multi-step-wizard)
 - [Schema-Driven Dynamic Fields](#schema-driven-dynamic-fields)

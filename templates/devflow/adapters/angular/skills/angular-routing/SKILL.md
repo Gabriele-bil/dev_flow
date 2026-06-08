@@ -148,11 +148,11 @@ Use `withDebugTracing()` in `provideRouter()` only for local debugging — remov
 
 Decision matrix:
 
-| Strategy | When | Setup |
-|---|---|---|
-| CSR (default) | Internal tools, dashboards, authenticated apps | none |
-| SSG / prerender | Marketing/content pages, stable data | `ng add @angular/ssr`, `prerender: true` per route |
-| SSR + hydration | SEO-critical, fast first paint, dynamic data | `provideClientHydration(withEventReplay())` |
+| Strategy | When | Setup | |
+|---|---|---| |
+| CSR (default) | Internal tools, dashboards, authenticated apps | none | |
+| SSG / prerender | Marketing/content pages, stable data | `ng add @angular/ssr`, `prerender: true` per route | |
+| SSR + hydration | SEO-critical, fast first paint, dynamic data | `provideClientHydration(withEventReplay())` | |
 
 Use incremental hydration (`@defer (hydrate on viewport)`) for below-fold heavy components on SSR pages.
 
@@ -179,8 +179,8 @@ For advanced patterns, see [references/routing-patterns.md](references/routing-p
 
 ## I/O Reference
 
-|            |                                                                  |
-| ---------- | ---------------------------------------------------------------- |
-| Reads      | Active route/guard/resolver files, `@devflow/adapters/angular/ADAPTER.md` |
-| Writes     | New or refactored route config, guard, resolver, navigation files |
-| Invoked by | `devflow.implement`, `devflow.beautify`                          |
+|            |                                                                  | |
+| ---------- | ---------------------------------------------------------------- | |
+| Reads      | Active route/guard/resolver files, `@devflow/adapters/angular/ADAPTER.md` | |
+| Writes     | New or refactored route config, guard, resolver, navigation files | |
+| Invoked by | `devflow.implement`, `devflow.beautify`                          | |

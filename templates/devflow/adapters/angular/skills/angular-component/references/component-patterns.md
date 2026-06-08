@@ -1,6 +1,7 @@
 # Angular Component Patterns
 
 ## Table of Contents
+
 - [Model Inputs (Two-Way Binding)](#model-inputs-two-way-binding)
 - [View Queries](#view-queries)
 - [Content Queries](#content-queries)
@@ -284,6 +285,7 @@ export class Dashboard {
 ```
 
 Defer triggers:
+
 - `on viewport` - enter viewport
 - `on idle` - browser idle
 - `on interaction` - click/focus

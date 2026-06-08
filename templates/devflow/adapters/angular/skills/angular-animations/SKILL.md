@@ -107,8 +107,8 @@ Cross-route animations use the View Transitions API via `withViewTransitions()` 
 
 ## I/O Reference
 
-|            |                                                                   |
-| ---------- | ----------------------------------------------------------------- |
-| Reads      | Active component/template/style files, `package.json` (Angular version), `@devflow/adapters/angular/ADAPTER.md` |
-| Writes     | New or refactored animation triggers, CSS keyframes/transitions, animation event handlers |
-| Invoked by | `devflow.implement`, `devflow.beautify`                          |
+|            |                                                                   | |
+| ---------- | ----------------------------------------------------------------- | |
+| Reads      | Active component/template/style files, `package.json` (Angular version), `@devflow/adapters/angular/ADAPTER.md` | |
+| Writes     | New or refactored animation triggers, CSS keyframes/transitions, animation event handlers | |
+| Invoked by | `devflow.implement`, `devflow.beautify`                          | |

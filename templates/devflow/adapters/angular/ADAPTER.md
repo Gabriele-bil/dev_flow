@@ -6,17 +6,17 @@ Baseline: **standalone + signals-first**. Keep output token-lean and imperative.
 
 ## Technology skills (load by feature type)
 
-| When | Load |
-|------|------|
-| App structure, folder layout, boundaries, communication flow | `@devflow/adapters/angular/skills/angular-architecture/SKILL.md` |
-| New components, refactor existing components, template/class split | `@devflow/adapters/angular/skills/angular-component/SKILL.md` |
-| Reactive forms, validation, form UX, submit flows | `@devflow/adapters/angular/skills/angular-forms/SKILL.md` |
-| API clients, HttpClient usage, interceptors, error mapping | `@devflow/adapters/angular/skills/angular-http/SKILL.md` |
-| Global and local state management patterns | `@devflow/adapters/angular/skills/angular-state/SKILL.md` |
-| Routes, guards, resolvers, navigation, rendering strategy | `@devflow/adapters/angular/skills/angular-routing/SKILL.md` |
-| Accessible custom widgets (Accordion, Listbox, Combobox, Menu, Tabs, Tree, Grid, Toolbar) | `@devflow/adapters/angular/skills/angular-aria/SKILL.md` |
-| Enter/leave animations, state transitions, route transitions | `@devflow/adapters/angular/skills/angular-animations/SKILL.md` |
-| PR review, blast radius, architecture risk checks | `@code-review-graph/skills/code-review-graph/SKILL.md` |
+| When | Load | |
+|------|------| |
+| App structure, folder layout, boundaries, communication flow | `@devflow/adapters/angular/skills/angular-architecture/SKILL.md` | |
+| New components, refactor existing components, template/class split | `@devflow/adapters/angular/skills/angular-component/SKILL.md` | |
+| Reactive forms, validation, form UX, submit flows | `@devflow/adapters/angular/skills/angular-forms/SKILL.md` | |
+| API clients, HttpClient usage, interceptors, error mapping | `@devflow/adapters/angular/skills/angular-http/SKILL.md` | |
+| Global and local state management patterns | `@devflow/adapters/angular/skills/angular-state/SKILL.md` | |
+| Routes, guards, resolvers, navigation, rendering strategy | `@devflow/adapters/angular/skills/angular-routing/SKILL.md` | |
+| Accessible custom widgets (Accordion, Listbox, Combobox, Menu, Tabs, Tree, Grid, Toolbar) | `@devflow/adapters/angular/skills/angular-aria/SKILL.md` | |
+| Enter/leave animations, state transitions, route transitions | `@devflow/adapters/angular/skills/angular-animations/SKILL.md` | |
+| PR review, blast radius, architecture risk checks | `@code-review-graph/skills/code-review-graph/SKILL.md` | |
 
 ## MCP (when available)
 
@@ -101,15 +101,15 @@ Use the structure and constraints from:
 When implementing files, load technology skills based on file path patterns:
 
 | File path pattern | Load skill |
-|---|---|
-| `*.component.ts`, `*.component.html` | `angular-component` |
-| `*.service.ts`, `*http*.ts`, `*api*.ts`, `*client*.ts` | `angular-http` |
-| `*.form*.ts`, `*-form.component.ts`, `*validator*.ts` | `angular-forms` |
-| `*.store.ts`, `*state*.ts`, `*signal*.ts`, `*.facade.ts` | `angular-state` |
-| `*.routes.ts`, `*guard*.ts`, `*resolver*.ts`, navigation/outlet code | `angular-routing` |
-| Component files importing `@angular/aria/*` directives (`ngListbox`, `ngCombobox`, `ngMenu`, `ngTabs`, `ngTree`, `ngGrid`, etc.) | `angular-aria` |
-| `*animation*.ts`, templates using `animate.enter`/`animate.leave`/`[@trigger]` | `angular-animations` |
-| `index.ts` barrel, module boundaries, new feature folder | `angular-architecture` |
+|---|---| |
+| `*.component.ts`, `*.component.html` | `angular-component` | |
+| `*.service.ts`, `*http*.ts`, `*api*.ts`, `*client*.ts` | `angular-http` | |
+| `*.form*.ts`, `*-form.component.ts`, `*validator*.ts` | `angular-forms` | |
+| `*.store.ts`, `*state*.ts`, `*signal*.ts`, `*.facade.ts` | `angular-state` | |
+| `*.routes.ts`, `*guard*.ts`, `*resolver*.ts`, navigation/outlet code | `angular-routing` | |
+| Component files importing `@angular/aria/*` directives (`ngListbox`, `ngCombobox`, `ngMenu`, `ngTabs`, `ngTree`, `ngGrid`, etc.) | `angular-aria` | |
+| `*animation*.ts`, templates using `animate.enter`/`animate.leave`/`[@trigger]` | `angular-animations` | |
+| `index.ts` barrel, module boundaries, new feature folder | `angular-architecture` | |
 
 Load only the skills triggered by the current batch's file paths. Do not load all skills preemptively.
 
