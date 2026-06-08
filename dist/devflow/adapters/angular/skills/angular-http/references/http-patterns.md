@@ -14,7 +14,7 @@
 Keep HTTP orchestration inside services.
 
 ```typescript
-import { Injectable, inject, signal } from '@angular/core';
+import { Service, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { httpResource } from '@angular/common/http';
 
@@ -24,7 +24,7 @@ export interface User {
   email: string;
 }
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class UserService {
   private http = inject(HttpClient);
   private baseUrl = '/api/users';
@@ -66,11 +66,11 @@ export class UserService {
 ### Simple In-Memory Cache
 
 ```typescript
-import { Injectable, inject } from '@angular/core';
+import { Service, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, tap } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class CachedUserService {
   private http = inject(HttpClient);
   private cache = new Map<string, { data: User; timestamp: number }>();
@@ -97,11 +97,11 @@ export class CachedUserService {
 ### Signal Cache
 
 ```typescript
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Service, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class UserCacheService {
   private http = inject(HttpClient);
   private usersCache = signal<Map<string, User>>(new Map());

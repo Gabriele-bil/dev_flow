@@ -1,11 +1,13 @@
 ---
 name: angular-http
-description: Implement HTTP data fetching in Angular v20+ using resource(), httpResource(), and HttpClient. Use for API calls, data loading with signals, request/response handling, and interceptors. Triggers on data fetching, API integration, loading states, error handling, or converting Observable-based HTTP to signal-based patterns.
+description: Implement HTTP data fetching in Angular v22+ using resource(), httpResource(), and HttpClient. Use for API calls, data loading with signals, request/response handling, and interceptors. Triggers on data fetching, API integration, loading states, error handling, or converting Observable-based HTTP to signal-based patterns.
 ---
 
 # Angular HTTP & Data Fetching
 
 Fetch data in Angular with signal-first APIs: `httpResource()`, `resource()`, and `HttpClient`.
+`resource()` and `httpResource()` production-ready, stable as of v22 — default choice for
+signal-based data fetching.
 
 ## Core Principles
 
@@ -152,6 +154,9 @@ userResource = resource({
 ## `HttpClient` - Traditional Path
 
 Use when Observable pipelines/operators are needed.
+
+Use `@Service()` decorator for global singleton services in v22 — replaces
+`@Injectable({ providedIn: 'root' })`.
 
 ```typescript
 import { Component, inject } from "@angular/core";

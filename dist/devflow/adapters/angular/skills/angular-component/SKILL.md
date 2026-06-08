@@ -1,11 +1,11 @@
 ---
 name: angular-component
-description: Create modern Angular standalone components following v20+ best practices. Use for building UI components with signal-based inputs/outputs, OnPush change detection, host bindings, content projection, and lifecycle hooks. Triggers on component creation, refactoring class-based inputs to signals, adding host bindings, or implementing accessible interactive components.
+description: Create modern Angular standalone components following v22+ best practices. Use for building UI components with signal-based inputs/outputs, OnPush change detection, host bindings, content projection, and lifecycle hooks. Triggers on component creation, refactoring class-based inputs to signals, adding host bindings, or implementing accessible interactive components.
 ---
 
 # Angular Component
 
-Create standalone components for Angular v20+. Standalone default. Do NOT set `standalone: true`.
+Create standalone components for Angular v22+. Standalone default. Do NOT set `standalone: true`.
 
 ## Core Principles
 
@@ -19,7 +19,6 @@ Create standalone components for Angular v20+. Standalone default. Do NOT set `s
 ```typescript
 import {
   Component,
-  ChangeDetectionStrategy,
   input,
   output,
   computed,
@@ -28,7 +27,6 @@ import {
 
 @Component({
   selector: "app-user-card",
-  changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: "user-card",
     "[class.active]": "isActive()",
@@ -72,6 +70,10 @@ export class UserCard {
   }
 }
 ```
+
+`OnPush` is default change detection in v22+ — no explicit `changeDetection` needed.
+`ChangeDetectionStrategy.Default` renamed `ChangeDetectionStrategy.Eager`. Set
+`changeDetection: ChangeDetectionStrategy.Eager` only when component needs eager checks.
 
 ## Signal Inputs
 
@@ -272,9 +274,37 @@ Use native control flow. Do NOT use `*ngIf`, `*ngFor`, `*ngSwitch`.
 <p>No items found</p>
 }
 
-<!-- Switch -->
-@switch (status()) { @case ('pending') { <span>Pending</span> } @case ('active')
-{ <span>Active</span> } @default { <span>Unknown</span> } }
+<!-- Switch: multiple cases share one output -->
+@switch (status()) {
+  @case ('pending'), @case ('active') { <span>In progress</span> }
+  @case ('done') { <span>Done</span> }
+  @default { <span>Unknown</span> }
+}
+
+<!-- Switch: exhaustive check on union type — @default never errors at compile time
+     when a case is missing -->
+@switch (role()) {
+  @case ('admin') { <app-admin-panel /> }
+  @case ('member') { <app-member-panel /> }
+  @default never
+}
+```
+
+## Inline Functions and Spread (v22+)
+
+Arrow functions and spread/rest syntax are valid directly in templates.
+
+```html
+<!-- Arrow functions inline -->
+@for (item of items(); track item.id) {
+<app-item [item]="item" (click)="(() => select(item))()" />
+}
+<button (click)="((e) => handleClick(e, item))($event)">Select</button>
+
+<!-- Spread in object/array literals and calls -->
+<app-user-card [config]="{ ...baseConfig(), highlighted: isActive() }" />
+<app-tag-list [tags]="[...defaultTags(), ...customTags()]" />
+<app-form [errors]="mergeErrors(...errorSources())" />
 ```
 
 ## Class and Style Bindings

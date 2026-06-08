@@ -224,9 +224,9 @@ export class Parent {
 ### Shared Service Pattern
 
 ```typescript
-import { Injectable, computed, inject, input, signal } from '@angular/core';
+import { Service, computed, inject, input, signal } from '@angular/core';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class CartService {
   private items = signal<CartItem[]>([]);
 

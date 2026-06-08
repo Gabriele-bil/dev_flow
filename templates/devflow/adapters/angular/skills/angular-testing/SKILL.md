@@ -1,11 +1,11 @@
 ---
 name: angular-testing
-description: Write unit and integration tests for Angular v20+ applications using Vitest with TestBed and modern testing patterns. Use for testing components with signals, OnPush change detection, services with inject(), HTTP interactions, and router flows. Triggers on test creation, mocking dependencies, testing signal-based behavior, or setting up Angular test infrastructure. Don't use for E2E testing with Cypress or Playwright, or for non-Angular JavaScript/TypeScript code.
+description: Write unit and integration tests for Angular v22+ applications using Vitest with TestBed and modern testing patterns. Use for testing components with signals, OnPush change detection, services with inject(), HTTP interactions, and router flows. Triggers on test creation, mocking dependencies, testing signal-based behavior, or setting up Angular test infrastructure. Don't use for E2E testing with Cypress or Playwright, or for non-Angular JavaScript/TypeScript code.
 ---
 
 # Angular Testing
 
-Test Angular v20+ with Vitest + TestBed. Focus: signal components, services, HTTP, router, async correctness.
+Test Angular v22+ with Vitest + TestBed. Focus: signal components, services, HTTP, router, async correctness.
 
 ## Core Principles
 
@@ -15,6 +15,8 @@ Test Angular v20+ with Vitest + TestBed. Focus: signal components, services, HTT
 - **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## Testing Fundamentals (Zoneless Async-First)
+
+Zoneless is stable default since v22 — async-first patterns below are baseline, not opt-in.
 
 Default pattern: **Act -> Wait -> Assert**.
 
@@ -49,7 +51,7 @@ describe("MyComponent", () => {
 });
 ```
 
-## Vitest Setup (Angular v20+)
+## Vitest Setup (Angular v22+)
 
 Angular v20+ supports unit-test builder in `@angular/build`.
 
