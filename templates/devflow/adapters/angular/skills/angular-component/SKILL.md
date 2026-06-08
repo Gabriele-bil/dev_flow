@@ -117,6 +117,48 @@ this.clicked.emit();
 this.selected.emit(item);
 ```
 
+## Two-Way Binding — `model()`
+
+`model()` declares a writable signal input + companion output for `[(banana-in-box)]` syntax. Use for components that both receive and modify a value.
+
+```typescript
+@Component({
+  selector: "app-counter",
+  template: `<button (click)="value.set(value() + 1)">{{ value() }}</button>`,
+})
+export class Counter {
+  // Generates `value` input + `valueChange` output automatically
+  readonly value = model(0);
+  readonly label = model.required<string>();
+}
+```
+
+```html
+<!-- Parent: two-way binds via [(value)] -->
+<app-counter [(value)]="count" />
+```
+
+`model()` writes propagate to the bound parent signal — do NOT pair with a separate `output()` for the same value (redundant, fights the generated `*Change` output).
+
+## Derived State — `computed()` vs `linkedSignal()`
+
+`computed()`: pure derivation, read-only, recomputes on dependency change.
+`linkedSignal()`: derived value that resets on source change BUT stays independently writable — use when a signal should track a source yet allow local overrides (e.g., selection resets when a list changes, but user can still pick within it).
+
+```typescript
+// Simple form — resets to source value whenever source changes
+selectedTab = linkedSignal(() => this.tabs()[0]);
+
+// Advanced form — explicit source + computation, preserves prior value when valid
+selectedItem = linkedSignal<Item[], Item | undefined>({
+  source: this.items,
+  computation: (items, previous) =>
+    items.find((i) => i.id === previous?.value?.id) ?? items[0],
+});
+```
+
+Default to `computed()`. Reach for `linkedSignal()` only when the value must remain user-writable after being derived.
+
 ## Host Bindings
 
 Use `host` object in `@Component`. Do NOT use `@HostBinding` or `@HostListener`.
@@ -160,6 +202,21 @@ export class Button {
   }
 }
 ```
+
+## Reading Host Attributes — `HostAttributeToken`
+
+Use `HostAttributeToken` to read a static attribute set on the host element at injection time — type-safe replacement for `@Attribute()`.
+
+```typescript
+import { inject, HostAttributeToken } from "@angular/core";
+
+export class CustomInput {
+  // Reads `type="..."` from host element; null if absent
+  private type = inject(new HostAttributeToken("type"), { optional: true });
+}
+```
+
+Use only for static, non-reactive host attributes known at element-creation time — for dynamic values, use `input()`/host bindings instead.
 
 ## Content Projection
 
@@ -214,6 +271,48 @@ export class MyComponent implements OnInit, OnDestroy {
     // Cleanup logic
   }
 }
+```
+
+### `afterRenderEffect()` — Phased Render Effects
+
+Reactive version of `afterRender` — reruns when read signals change, runs in defined phases for safe DOM read/write ordering. SSR-safe (no-op on server).
+
+```typescript
+import { afterRenderEffect } from "@angular/core";
+
+constructor() {
+  afterRenderEffect({
+    earlyRead: () => this.measureBeforeWrite(),       // read DOM before writes
+    write: () => this.applyMeasurements(),            // write DOM
+    mixedReadWrite: () => this.legacyLayoutThrash(),  // last resort — avoid
+    read: () => this.reportFinalLayout(),             // read final layout
+  });
+}
+```
+
+Prefer splitting `earlyRead`/`write`/`read` over `mixedReadWrite` — phased separation avoids layout thrashing.
+
+## `effect()` — Use Sparingly, Never for State Sync
+
+**Never use `effect()` to sync one piece of state to another** — causes `ExpressionChangedAfterItHasBeenChecked` and creates hidden reactive chains. Use `computed()` or `linkedSignal()` instead.
+
+```typescript
+// WRONG — state-to-state sync via effect
+effect(() => {
+  this.fullName.set(`${this.first()} ${this.last()}`);
+});
+
+// RIGHT — pure derivation
+fullName = computed(() => `${this.first()} ${this.last()}`);
+```
+
+`effect()` is for side effects with no reactive consumer: logging, localStorage sync, imperative third-party DOM/library integration. Always return a cleanup function for subscriptions/timers/listeners:
+
+```typescript
+effect((onCleanup) => {
+  const id = setInterval(() => this.tick(), 1000);
+  onCleanup(() => clearInterval(id));
+});
 ```
 
 ## Accessibility Requirements

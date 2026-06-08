@@ -341,6 +341,65 @@ export class DataComponent {
 }
 ```
 
+## Advanced DI Patterns
+
+Extends `@Service`/`inject()` baseline for cases needing token-based config, multi-provider arrays, or scoped overrides.
+
+### `InjectionToken` + Factory
+
+Use for non-class dependencies (config objects, primitives, third-party instances) — type-safe, tree-shakable.
+
+```typescript
+export const API_BASE_URL = new InjectionToken<string>("API_BASE_URL", {
+  providedIn: "root",
+  factory: () => "/api",
+});
+
+// inject(API_BASE_URL) anywhere in the tree
+```
+
+### Provider Strategies
+
+```typescript
+providers: [
+  { provide: Logger, useClass: ConsoleLogger },           // swap implementation
+  { provide: API_BASE_URL, useValue: "/api/v2" },         // static value
+  { provide: UserService, useFactory: () => new UserService(inject(HttpClient)) },
+  { provide: LegacyLogger, useExisting: Logger },         // alias
+  { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }, // array registration
+]
+```
+
+`multi: true` collects all matching providers into an array — standard pattern for interceptor/validator-style extension points.
+
+### Hierarchical Injector Modifiers
+
+```typescript
+inject(ParentService, { optional: true });  // null if not found, no error
+inject(ParentService, { self: true });      // only this injector, not ancestors
+inject(ParentService, { skipSelf: true });  // skip this injector, search ancestors
+inject(ParentService, { host: true });      // stop search at host component boundary
+```
+
+Combine to express precise lookup intent (e.g. `{ optional: true, skipSelf: true }`).
+
+### `providers` vs `viewProviders`
+
+`providers`: visible to component + content-projected children. `viewProviders`: visible to component + view children only — content children can't see/override them. Use `viewProviders` to isolate internal collaborators from consumer-projected content.
+
+### Injection Context
+
+`inject()` requires an injection context (constructor, field initializer, factory function). Outside these, use:
+
+```typescript
+runInInjectionContext(injector, () => inject(MyService));
+assertInInjectionContext(myFunction); // throws if called outside injection context
+```
+
+Common need: calling `inject()`-based APIs (`takeUntilDestroyed`, signal helpers) from callbacks/timers outside constructors.
+
+For deeper examples, see [references/http-patterns.md](references/http-patterns.md#advanced-di-patterns).
+
 ## Notes from Angular HTTP Docs
 
 - Configure once with `provideHttpClient`.

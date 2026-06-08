@@ -3,11 +3,97 @@
 Advanced patterns for `@angular/forms/signals` only.
 
 ## Table of Contents
+- [Strict Rules & Common Pitfalls](#strict-rules--common-pitfalls)
 - [Multi-Step Wizard](#multi-step-wizard)
 - [Schema-Driven Dynamic Fields](#schema-driven-dynamic-fields)
 - [Async Validation with Debounce and Stale Response Guard](#async-validation-with-debounce-and-stale-response-guard)
 - [Form Performance Patterns](#form-performance-patterns)
 - [Testing Strategy](#testing-strategy)
+
+## Strict Rules & Common Pitfalls
+
+| Scenario | WRONG | RIGHT |
+| --- | --- | --- |
+| Accessing flags | `form.field.valid()` | `form.field().valid()` |
+| Accessing value | `form.field.value()` | `form.field().value()` |
+| Setting value | `form.field.set(x)` | Update model: `this.model.update(...)` |
+| Form root flags | `form.invalid()` | `form().invalid()` |
+| Double-calling | `form.field()()` | `form.field().value()` |
+| Rules context | `({ touched }) => touched()` | `({ state }) => state.touched()` |
+| Calling paths | `applyWhen(p.foo, () => p.foo() === 'x')` | `applyWhen(p.foo, ({ valueOf }) => valueOf(p.foo) === 'x')` |
+| `applyWhen` args | `applyWhen(condition, () => {...})` | `applyWhen(path, condition, schemaFn)` — 3 args |
+| `applyEach` args | `applyEach(s.items, (item, index) => ...)` | `applyEach(s.items, (item) => ...)` — 1 arg |
+| Array length | `form.items().length` | `form.items.length` (structural, no `()`) |
+| `readonly` attr | `<input readonly [formField]>` | `readonly()` rule in schema |
+| `min`/`max` attrs | `<input min="1" max="10" [formField]>` | `min()`/`max()` rules in schema |
+| `value` binding | `<input [value]="val" [formField]>` | Don't combine `[value]` with `[formField]` |
+| `when` option | `pattern(p.x, /.../, { when: ... })` | `when` works only with `required()` — use `applyWhen` for others |
+| Submit callback | `submit(form, () => {...})` | `submit(form, async () => {...})` — MUST be async |
+| Async params | `params: s.field` | `params: ({ value }) => value()` |
+| Async onError | omitted | `onError` REQUIRED in `validateAsync` |
+| `resource()` input | `request: signal` | `params: signal` |
+| Nested `@for` | `$parent.$index` | `let outerIndex = $index` |
+| `FormState` import | `import { FormState }` | doesn't exist — use `FieldState` |
+| Null in model | `signal({ name: null })` | `signal({ name: '' })`, `signal({ age: 0 })`, `signal({ items: [] })` |
+| Checkbox + array | `<input type="checkbox" [formField]="form.tags">` (string[]) | checkboxes bind ONLY to `boolean`; use `<select multiple>` for arrays |
+
+### Async Validation — `validateAsync()`
+
+`validate()` is sync-only. For async checks (uniqueness, server lookups), use `validateAsync()` backed by a `resource()`:
+
+```typescript
+import { resource } from '@angular/core';
+import { validateAsync } from '@angular/forms/signals';
+
+userForm = form(this.userModel, (s) => {
+  validateAsync(s.username, {
+    params: ({ value }) => value(),               // MUST be a function
+    factory: (username) => resource({
+      params: username,                            // 'params', not 'request'
+      loader: async ({ params: value }) => checkUsernameTaken(value),
+    }),
+    onSuccess: (isTaken) =>
+      isTaken ? { kind: 'taken', message: 'Username already taken' } : undefined,
+    onError: () => ({ kind: 'error', message: 'Validation failed' }),  // REQUIRED
+  });
+});
+```
+
+### `debounce()` — Delay Model Sync
+
+Delays writing UI input to the model — pairs naturally with `validateAsync`/search-as-you-type to cut request volume:
+
+```typescript
+import { debounce } from '@angular/forms/signals';
+
+userForm = form(this.userModel, (s) => {
+  debounce(s.username, 300);
+});
+```
+
+### `applyWhen` — Conditional Sub-Schemas
+
+Takes 3 args: `(path, condition, schemaFn)`. Inside the schema, paths are NOT signals/callable — read via `valueOf`/`stateOf`:
+
+```typescript
+applyWhen(
+  s.spouse,
+  ({ valueOf }) => valueOf(s.status) === 'joint',
+  (spousePath) => {
+    required(spousePath.name);
+  },
+);
+```
+
+### Nested `@for` — No `$parent`
+
+```html
+@for (item of form.items; track $index; let outerIndex = $index) {
+  @for (option of item.options; track $index) {
+    <button (click)="removeOption(outerIndex, $index)">Remove</button>
+  }
+}
+```
 
 ## Multi-Step Wizard
 

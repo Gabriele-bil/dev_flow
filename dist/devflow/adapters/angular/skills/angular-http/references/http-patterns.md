@@ -7,7 +7,96 @@
 - [File Upload](#file-upload)
 - [Request Cancellation](#request-cancellation)
 - [Debounced Search](#debounced-search)
+- [Advanced DI Patterns](#advanced-di-patterns)
 - [Testing HTTP](#testing-http)
+
+## Advanced DI Patterns
+
+### Config Token with Environment Override
+
+```typescript
+export const API_CONFIG = new InjectionToken<{ baseUrl: string; timeout: number }>("API_CONFIG", {
+  providedIn: "root",
+  factory: () => ({ baseUrl: "/api", timeout: 30_000 }),
+});
+
+// Override per-environment in app.config.ts
+providers: [
+  { provide: API_CONFIG, useValue: { baseUrl: "https://api.staging.example.com", timeout: 10_000 } },
+]
+```
+
+### Multi-Provider Interceptor Registration
+
+```typescript
+export const HTTP_RETRY_STRATEGIES = new InjectionToken<RetryStrategy[]>("HTTP_RETRY_STRATEGIES");
+
+providers: [
+  { provide: HTTP_RETRY_STRATEGIES, useClass: ExponentialBackoff, multi: true },
+  { provide: HTTP_RETRY_STRATEGIES, useClass: FixedDelay, multi: true },
+]
+
+// Consume as array
+private strategies = inject(HTTP_RETRY_STRATEGIES);
+```
+
+### `useFactory` with Dependencies
+
+```typescript
+export function loggerFactory(http: HttpClient, config: AppConfig) {
+  return config.remoteLogging ? new RemoteLogger(http) : new ConsoleLogger();
+}
+
+providers: [
+  { provide: Logger, useFactory: loggerFactory, deps: [HttpClient, AppConfig] },
+]
+```
+
+### `viewProviders` — Isolating Internal Collaborators
+
+```typescript
+@Component({
+  selector: "app-data-grid",
+  viewProviders: [GridStateService], // own template can inject it; projected content cannot override
+  template: `<ng-content />`,
+})
+export class DataGrid {
+  private state = inject(GridStateService);
+}
+```
+
+Use when a component's internal state service must stay opaque to consumers projecting custom templates into it.
+
+### Optional Dependency with Fallback
+
+```typescript
+export class WidgetHost {
+  private analytics = inject(AnalyticsService, { optional: true });
+
+  track(event: string) {
+    this.analytics?.track(event); // no-op if analytics not provided in this subtree
+  }
+}
+```
+
+### Running `inject()` Outside Injection Context
+
+```typescript
+export class PollingService {
+  private injector = inject(Injector);
+
+  startPolling() {
+    setInterval(() => {
+      runInInjectionContext(this.injector, () => {
+        const http = inject(HttpClient);
+        http.get("/api/status").subscribe();
+      });
+    }, 5000);
+  }
+}
+```
+
+Prefer restructuring to call `inject()` at construction time when possible — `runInInjectionContext` is an escape hatch for genuinely dynamic call sites (timers, event callbacks holding long-lived references).
 
 ## Service Layer Pattern
 

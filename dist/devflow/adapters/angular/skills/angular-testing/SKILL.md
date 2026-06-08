@@ -348,7 +348,7 @@ describe("UserComponent", () => {
 - One behavior per test.
 - Use fixture helpers for repetitive setup.
 
-For advanced patterns (harness, router, forms, directives, pipes), see [references/testing-patterns.md](references/testing-patterns.md).
+For advanced patterns — component harnesses (incl. `.with()` predicates), router testing, Cypress E2E conventions (`data-cy`, custom commands, element-wait), forms, directives, pipes — see [references/testing-patterns.md](references/testing-patterns.md).
 
 ## I/O Reference
 
