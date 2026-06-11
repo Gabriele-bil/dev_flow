@@ -1,6 +1,7 @@
 # Angular State Patterns (NgRx Signal Store)
 
 ## Table of Contents
+
 - [Feature Store Composition](#feature-store-composition)
 - [Entity Workflows](#entity-workflows)
 - [Async Orchestration with rxMethod](#async-orchestration-with-rxmethod)

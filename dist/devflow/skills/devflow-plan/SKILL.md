@@ -68,6 +68,7 @@ Before proceeding, verify:
 - [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md`
 - [ ] `task.md` has non-empty `## Summary` and `## Subtasks` sections
 - [ ] `task.md` Status is not `draft` with unresolved questions (if `draft`: all Key assumptions resolved or explicitly deferred)
+- [ ] `task.md` contains no `[NEEDS CLARIFICATION: ...]` markers (if present: stop, report locations, suggest `devflow.clarify` or manual resolution)
 
 If any item fails → stop, report which check failed, do not write `plan.md`.
 
@@ -93,6 +94,22 @@ Example:
 
 1. Read `@devflow/config.md` and note the **Adapter** id and **Adapter root**.
 2. Read `@devflow/adapters/<adapter>/ADAPTER.md` in full. Treat it as authoritative for: which technology skills to load, MCP usage, extra `plan.md` sections/templates, localization rules, and stack-specific analysis bullets.
+
+### Step 0b - Constitution Gate
+
+Before reading any other doc:
+1. Read `constitution.md` in full.
+2. Extract each `MUST` / `MUST NOT` rule as a separate item.
+3. Evaluate each rule against the planned approach for this feature.
+4. If any `MUST` or `MUST NOT` is violated → output **Constitution Violation Report**:
+
+| Rule | Violation | Required Fix |
+|------|-----------|--------------|
+| ...  | ...       | ...          |
+
+**Severity:**
+- **Critical violations** → stop before Step 1.
+- **Required violations** → document in Open questions; stop before Step 5 (Write plan file).
 
 ### Step 1 - Read docs
 
@@ -196,10 +213,13 @@ in this order to respect dependencies.
 **Batch hints (optional):** Before the first `###` of a dependency group, add one line:
 `**Batch:** S | M | L` (S ≈ 1-2 files, M ≈ 3-5, L ≈ 6+). For `L`, add `— split across `devflow.implement` sessions if needed`.
 
+**Parallelism markers (optional):** Mark parallelizable leaf files with a `[P]` prefix on the entry line. A file is `[P]`-eligible only when: (1) no other `[P]` file in the same batch touches it, and (2) it does not modify shared contracts, migrations, or state-management contracts. `[P]` coexists with `[pending]`/`[done]` — `[P]` = parallelism potential, status markers = completion state. Do not mark files that touch shared contracts, migrations, or state-management contracts.
+
 ### [NNN]. `[path/to/file.ext]` - [create | modify] [pending]
 [1-2 sentences on what this file contains and why it exists.]
 
-### [NNN]. `[path/to/file.ext]` - [create | modify] [pending]
+### [NNN]. [P] `[path/to/file.ext]` - [create | modify] [pending]
+[`[P]` present: file is eligible for parallel implementation by a separate agent or session.]
 ...
 
 ---
@@ -228,6 +248,7 @@ After **Implementation checkpoints**, append **every extra plan section** requir
 
 ## Pre-implement checklist
 
+- [ ] Constitution Gate passed (Step 0b) — no Critical violations
 - [ ] Every `task.md` subtask appears in **Traceability** with its acceptance criterion
 - [ ] **File list** order respects **Dependency ordering** (and any stated exceptions)
 - [ ] All **adapter-specific sections** from `ADAPTER.md` are present or correctly omitted per adapter rules (e.g. i18n keys for UI)
@@ -240,6 +261,7 @@ After **Implementation checkpoints**, append **every extra plan section** requir
 Format rules:
 
 - File list is the core of the plan; it must be complete and ordered
+- Mark parallelizable leaf files with `[P]` prefix on the `###` entry line. Do not mark files that touch shared contracts, migrations, or state-management contracts.
 - Traceability maps every subtask in `task.md` to at least one file
 - Adapter-specific sections: follow formatting rules in `ADAPTER.md` (for example section layout, optional/required blocks, and localization/data rules per adapter)
 - Language: English
@@ -264,6 +286,16 @@ Continue to implementation? -> devflow.implement
 - **Usually sequential:** Schema/migration changes, shared state-contract changes, wide router changes.
 - **Often parallelizable once contracts exist:** Focused leaf tests, copy/content-only updates, isolated components/modules that do not change shared contracts.
 - **Rule:** Lock shared types/contracts first; then parallelize leaf work.
+
+### Per-file `[P]` markers
+
+A file is `[P]`-eligible only when:
+1. No other `[P]` file in the same batch touches it.
+2. It does not modify shared contracts, migrations, or state-management contracts.
+
+Mark eligible files with a `[P]` prefix on the `###` entry line in the **File List** (e.g. `### 003. [P] \`path/to/file.dart\` - create [pending]`).
+
+`[P]` coexists with `[pending]`/`[done]` on the same line — `[P]` = parallelism potential, status markers = completion state. S/M/L batch labels remain for coarse grouping; `[P]` adds per-file precision for multi-agent `devflow.implement` sessions.
 
 ## Common Rationalizations
 

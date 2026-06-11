@@ -1,6 +1,7 @@
 # Angular Testing Patterns
 
 ## Table of Contents
+
 - [Vitest Advanced Patterns](#vitest-advanced-patterns)
 - [Component Harnesses](#component-harnesses)
 - [Testing Router](#testing-router)

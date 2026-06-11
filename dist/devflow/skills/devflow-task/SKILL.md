@@ -63,7 +63,7 @@ Rules:
 
 ### Step 4 - Quick stress-test
 
-Before locking Summary/scope, read **`refinement-hints.md`** and run short pass: user value, feasibility, overlap, scope honesty, riskiest assumption. Push back if scope too large.
+Before locking Summary/scope, read **`refinement-hints.md`** and run short pass across all **8 dimensions**: user value, feasibility, overlap, scope honesty, riskiest assumption, edge cases & error states, integration dependencies, terminology. Push back if scope too large.
 
 ### Step 5 - Propose feature name
 
@@ -97,6 +97,7 @@ Confirm:
 - [ ] **`NNN` prefix** matches `next_feature_number` from `.devflow-state.json` (or verified unique via directory scan if state absent)
 - [ ] **In scope / Out of scope** are honest for non-trivial ideas; **Key assumptions** filled when risks exist
 - [ ] No duplicate of an **implemented** feature unless explicitly framed as extension
+- [ ] No unresolved `[NEEDS CLARIFICATION: ...]` markers remain (or each is documented as an explicit accepted risk in Notes)
 
 If any item fails, fix the task content before writing the file.
 
@@ -187,6 +188,7 @@ Format rules:
 - **Language**: English throughout.
 - **Style**: optimized for LLM consumption, concise, no filler words.
 - **Compression**: caveman-compress style — drop articles/filler/hedging; fragments OK; keep technical terms, paths, commands exact.
+- **Unknown values**: wherever a value is unknown or assumed rather than stated by the user, write `[NEEDS CLARIFICATION: <single-sentence reason>]` inline at the point of uncertainty instead of filling in a guess. Canonical format: `[NEEDS CLARIFICATION: <single-sentence reason>]` — no variants.
 
 See **`examples.md`** in this skill directory for full worked examples.
 
@@ -233,6 +235,7 @@ Continue to planning? → devflow.plan
 - Ignoring **`docs/product.md`** implementation status and duplicating shipped work
 - Skipping the **verification checklist** or the **unique `NNN`** rule
 - Running a full **idea-refine** session inside this skill instead of routing out early
+- Filling unknown values silently instead of using `[NEEDS CLARIFICATION: <reason>]` — downstream plan inherits unvalidated guess
 
 ## Relationship to `plan.md`
 
