@@ -12,11 +12,12 @@ The workflow is **technology-agnostic**: stack-specific rules live in **adapters
 idea
   └── devflow.task
         └── devflow.plan
-              └── devflow.implement
-                    └── devflow.beautify
-                          └── devflow.test
-                                └── devflow.ship
-                                      └── devflow.pr
+              └── devflow.analyze  (recommended — cross-artifact consistency check)
+                    └── devflow.implement
+                          └── devflow.beautify
+                                └── devflow.test
+                                      └── devflow.ship
+                                            └── devflow.pr
 ```
 
 Each step produces an artifact that feeds the next. Do not skip steps.
@@ -30,6 +31,7 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 | `devflow.setup` | [`templates/devflow/skills/devflow-setup/SKILL.md`](templates/devflow/skills/devflow-setup/SKILL.md) | Consumer repo context + adapter templates → root `AGENTS.md` + `REGISTRY.md` |
 | `devflow.task` | [`templates/devflow/skills/devflow-task/SKILL.md`](templates/devflow/skills/devflow-task/SKILL.md) | Idea → `devflow/features/[NNN]_[name]/task.md` |
 | `devflow.plan` | [`templates/devflow/skills/devflow-plan/SKILL.md`](templates/devflow/skills/devflow-plan/SKILL.md) | `task.md` → `plan.md` |
+| `devflow.analyze` | [`templates/devflow/skills/devflow-analyze/SKILL.md`](templates/devflow/skills/devflow-analyze/SKILL.md) | `task.md` + `plan.md` → consistency report (traceability, AC testability, terminology, constitution alignment, coverage balance) |
 | `devflow.blueprint` | [`templates/devflow/skills/devflow-blueprint/SKILL.md`](templates/devflow/skills/devflow-blueprint/SKILL.md) | Large idea → multi-PR blueprint with dependency graph + adversarial review |
 | `devflow.implement` | [`templates/devflow/skills/devflow-implement/SKILL.md`](templates/devflow/skills/devflow-implement/SKILL.md) | `plan.md` → code on `feat|fix|…/[NNN]-[name]` |
 | `devflow.beautify` | [`templates/devflow/skills/devflow-beautify/SKILL.md`](templates/devflow/skills/devflow-beautify/SKILL.md) | Implemented files → polished code |
@@ -74,6 +76,7 @@ dev_flow/
 │       │   └── *.sh                 # Hook scripts
 │       ├── commands/                # Slash-command entry points
 │       ├── skills/                  # Core pipeline skills (devflow-*)
+│       │   ├── devflow-analyze/
 │       │   ├── devflow-beautify/
 │       │   ├── devflow-blueprint/
 │       │   ├── devflow-discovery/

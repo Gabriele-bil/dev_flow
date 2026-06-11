@@ -39,7 +39,10 @@ Raw idea or user request, no task.md yet?
 task.md exists, but no plan.md?
   └─ YES → devflow.plan  (verify task.md Status not draft with unresolved questions)
 
-plan.md exists (Status: ready), not yet implemented?
+plan.md exists (Status: ready), analyze not yet run?
+  └─ YES → devflow.analyze (recommended before devflow.implement)
+
+plan.md exists (Status: ready), analyze passed (or explicitly waived), not yet implemented?
   └─ YES → devflow.implement
 
 devflow.implement summary exists, analyze/typecheck passes, no beautify yet?
@@ -59,6 +62,7 @@ Tests passing, ready to merge?
 | "Build X", "Add X", "I want X" | `devflow.task` |
 | "Plan this large objective", "3+ PRs", "multi-session" | `devflow.blueprint` |
 | "Plan this", "Create plan for..." | `devflow.plan` |
+| "Verify consistency", "Cross-check plan", "Check artifacts" | `devflow.analyze` |
 | "Implement", "Code this up" | `devflow.implement` |
 | "Review", "Clean up", "Beautify" | `devflow.beautify` |
 | "Write tests", "Test this" | `devflow.test` |
