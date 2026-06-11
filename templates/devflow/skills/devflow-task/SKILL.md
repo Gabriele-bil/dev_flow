@@ -189,6 +189,7 @@ Format rules:
 - **Style**: optimized for LLM consumption, concise, no filler words.
 - **Compression**: caveman-compress style — drop articles/filler/hedging; fragments OK; keep technical terms, paths, commands exact.
 - **Unknown values**: wherever a value is unknown or assumed rather than stated by the user, write `[NEEDS CLARIFICATION: <single-sentence reason>]` inline at the point of uncertainty instead of filling in a guess. Canonical format: `[NEEDS CLARIFICATION: <single-sentence reason>]` — no variants.
+- **Status**: valid values are `draft` (initial write), `clarified` (ambiguities resolved via `devflow.clarify`), `done` (task fulfilled and pipeline complete). Initial write always uses `draft`.
 
 See **`examples.md`** in this skill directory for full worked examples.
 
@@ -213,6 +214,7 @@ After writing the file, respond with:
 
 docs/product.md: [updated | not found — create with devflow.setup]
 
+[[NEEDS CLARIFICATION] markers present? → devflow.clarify (recommended before devflow.plan)]
 Continue to planning? → devflow.plan
 ```
 

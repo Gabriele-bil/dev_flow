@@ -11,9 +11,10 @@ The workflow is **technology-agnostic**: stack-specific rules live in **adapters
 ```
 idea
   └── devflow.task
-        └── devflow.plan
-              └── devflow.analyze  (recommended — cross-artifact consistency check)
-                    └── devflow.implement
+        └── [devflow.clarify]  (optional — resolve [NEEDS CLARIFICATION] markers)
+              └── devflow.plan
+                    └── devflow.analyze  (recommended — cross-artifact consistency check)
+                          └── devflow.implement
                           └── devflow.beautify
                                 └── devflow.test
                                       └── devflow.ship
@@ -31,6 +32,7 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 | `devflow.setup` | [`templates/devflow/skills/devflow-setup/SKILL.md`](templates/devflow/skills/devflow-setup/SKILL.md) | Consumer repo context + adapter templates → root `AGENTS.md` + `REGISTRY.md` |
 | `devflow.task` | [`templates/devflow/skills/devflow-task/SKILL.md`](templates/devflow/skills/devflow-task/SKILL.md) | Idea → `devflow/features/[NNN]_[name]/task.md` |
 | `devflow.plan` | [`templates/devflow/skills/devflow-plan/SKILL.md`](templates/devflow/skills/devflow-plan/SKILL.md) | `task.md` → `plan.md` |
+| `devflow.clarify` | [`templates/devflow/skills/devflow-clarify/SKILL.md`](templates/devflow/skills/devflow-clarify/SKILL.md) | `task.md` (with markers) → resolved `task.md` (Status: clarified) — optional step between task and plan |
 | `devflow.analyze` | [`templates/devflow/skills/devflow-analyze/SKILL.md`](templates/devflow/skills/devflow-analyze/SKILL.md) | `task.md` + `plan.md` → consistency report (traceability, AC testability, terminology, constitution alignment, coverage balance) |
 | `devflow.blueprint` | [`templates/devflow/skills/devflow-blueprint/SKILL.md`](templates/devflow/skills/devflow-blueprint/SKILL.md) | Large idea → multi-PR blueprint with dependency graph + adversarial review |
 | `devflow.implement` | [`templates/devflow/skills/devflow-implement/SKILL.md`](templates/devflow/skills/devflow-implement/SKILL.md) | `plan.md` → code on `feat|fix|…/[NNN]-[name]` |
@@ -78,6 +80,7 @@ dev_flow/
 │       ├── skills/                  # Core pipeline skills (devflow-*)
 │       │   ├── devflow-analyze/
 │       │   ├── devflow-beautify/
+│       │   ├── devflow-clarify/
 │       │   ├── devflow-blueprint/
 │       │   ├── devflow-discovery/
 │       │   ├── devflow-implement/

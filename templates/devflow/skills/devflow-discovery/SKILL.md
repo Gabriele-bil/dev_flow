@@ -36,6 +36,9 @@ Raw idea or user request, no task.md yet?
   │    └─ YES → devflow.blueprint (produces plans/[slug]-blueprint.md)
   └─ Otherwise → devflow.task
 
+task.md exists, contains [NEEDS CLARIFICATION: ...] markers?
+  └─ YES → devflow.clarify (optional, recommended before devflow.plan)
+
 task.md exists, but no plan.md?
   └─ YES → devflow.plan  (verify task.md Status not draft with unresolved questions)
 
@@ -62,6 +65,7 @@ Tests passing, ready to merge?
 | "Build X", "Add X", "I want X" | `devflow.task` |
 | "Plan this large objective", "3+ PRs", "multi-session" | `devflow.blueprint` |
 | "Plan this", "Create plan for..." | `devflow.plan` |
+| "Clarify task", "Resolve markers", "Ambiguous task" | `devflow.clarify` |
 | "Verify consistency", "Cross-check plan", "Check artifacts" | `devflow.analyze` |
 | "Implement", "Code this up" | `devflow.implement` |
 | "Review", "Clean up", "Beautify" | `devflow.beautify` |

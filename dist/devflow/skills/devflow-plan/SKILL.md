@@ -67,7 +67,7 @@ Before proceeding, verify:
 
 - [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md`
 - [ ] `task.md` has non-empty `## Summary` and `## Subtasks` sections
-- [ ] `task.md` Status is not `draft` with unresolved questions (if `draft`: all Key assumptions resolved or explicitly deferred)
+- [ ] `task.md` Status is `draft` (Key assumptions resolved, no `[NEEDS CLARIFICATION: ...]` markers) or `clarified` — Status `draft` with unresolved markers → stop, suggest `devflow.clarify`
 - [ ] `task.md` contains no `[NEEDS CLARIFICATION: ...]` markers (if present: stop, report locations, suggest `devflow.clarify` or manual resolution)
 
 If any item fails → stop, report which check failed, do not write `plan.md`.

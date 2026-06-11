@@ -59,6 +59,7 @@ Each adapter folder contains `ADAPTER.md` (stack rules + MCP hints), `skills/` (
 | `devflow.setup` | Generate `AGENTS.md`, `REGISTRY.md`, and `docs/product.md` from adapter templates |
 | `devflow.task` | Raw idea → structured task with HMW framing and verifiable subtasks |
 | `devflow.plan` | `task.md` → file-ordered implementation plan with traceability |
+| `devflow.clarify` | `task.md` (with markers) → resolved `task.md` (Status: clarified) — optional step between task and plan |
 | `devflow.analyze` | `task.md` + `plan.md` → consistency report (traceability, AC testability, terminology, constitution alignment, coverage balance) |
 | `devflow.blueprint` | Large idea → multi-PR blueprint with dependency graph + adversarial review |
 | `devflow.implement` | Execute `plan.md` step by step, vertical slice by slice |
