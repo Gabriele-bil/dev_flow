@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.7.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.6.0...devflow-v1.7.0) (2026-06-11)
+
+
+### Features
+
+* Add Step 4c to devflow-plan for data-model.md extraction and update adapter guides to use it as the source of truth for entities. ([c3cd548](https://github.com/Gabriele-bil/dev_flow/commit/c3cd5488ff126566ad2f32c2a8a07d6b2986681e))
+* Introduce devflow.analyze skill to verify cross-artifact consistency between task.md and plan.md before implementation. ([0e0a0f7](https://github.com/Gabriele-bil/dev_flow/commit/0e0a0f73ca6e8578c78602ba7bee76891f249e3d))
+* Introduce devflow.clarify skill to resolve task ambiguity before planning and update task lifecycle statuses ([8c7e09b](https://github.com/Gabriele-bil/dev_flow/commit/8c7e09b96beaa12ea67ceba32687d3bcbb1cd48b))
+
 ## [1.6.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.5.0...devflow-v1.6.0) (2026-06-08)
 
 
