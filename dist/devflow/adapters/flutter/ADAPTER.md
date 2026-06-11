@@ -99,6 +99,10 @@ For each screen with adaptive layout, branch by breakpoint (compact / medium / e
 
 Tables, columns, RLS policies per `flutter-supabase` / `flutter-supabase-migrations`.
 
+### Data model (omit if no new persistent entities)
+
+When `devflow-plan` Step 4c generates `data-model.md`: use it as the single source of truth for entity definitions before writing any `*_entity.dart`, `*_dto.dart`, or `*_model.dart` files. Fields in `data-model.md` map to Freezed class properties — do not invent field names or types that diverge from the data model.
+
 ### Localization
 
 All user-facing copy via **slang** keys and generated accessors — no hardcoded UI strings.

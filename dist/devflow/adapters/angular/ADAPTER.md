@@ -96,6 +96,10 @@ Use the structure and constraints from:
 
 - `@devflow/adapters/angular/skills/angular-forms/SKILL.md`
 
+### Data model (omit if no new persistent entities)
+
+When `devflow-plan` Step 4c generates `data-model.md`: use it as the single source of truth for entity definitions before writing any interface, DTO, or model files. Fields in `data-model.md` map to TypeScript interfaces — do not invent property names or types that diverge from the data model.
+
 ## Implement: skill load decision matrix
 
 When implementing files, load technology skills based on file path patterns:

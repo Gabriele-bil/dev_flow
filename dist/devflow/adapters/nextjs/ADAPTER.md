@@ -140,6 +140,10 @@ Per endpoint, choose explicitly:
 
 Rule: internal mutation bound to a form or button → Server Action. External consumer, webhook, or REST endpoint → API Route.
 
+### Data model (omit if no new persistent entities)
+
+When `devflow-plan` Step 4c generates `data-model.md`: use it as the single source of truth for entity definitions before writing any Zod schema, TypeScript type, or DTO file. Fields in `data-model.md` map to Zod schemas and TypeScript types — do not invent property names or types that diverge from the data model.
+
 ## Implement: skill load decision matrix
 
 When implementing files, load technology skills based on file path patterns:

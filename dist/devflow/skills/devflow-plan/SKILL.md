@@ -149,6 +149,32 @@ After the reuse audit, analyze:
 
 Re-check the planned **File list** order against **Dependency ordering** above. Migrations and shared contracts must precede consumers unless an exception is documented under **Architecture decisions**. Shared components must be listed before the feature files that consume them.
 
+### Step 4c - Data model extraction
+
+**Trigger:** File List contains any of: migration file, DTO, domain model, schema file, new entity type.
+
+If triggered:
+1. Extract technology-agnostic entity definitions from `task.md`, architecture analysis, and any DB or schema notes accumulated in earlier steps.
+2. Write `devflow/features/[NNN]_[feature-name]/data-model.md` using this format:
+
+```markdown
+# Data Model - [Feature Name]
+
+**Feature:** PLAN-[NNN]
+**Date:** [YYYY-MM-DD]
+
+| Entity | Fields | Relationships | Lifecycle states | Validation rules |
+|--------|--------|---------------|------------------|------------------|
+| [EntityName] | [field: type, ...] | [belongs to / has many / ...] | [created / active / archived / ...] | [required, max-length N, format, ...] |
+```
+
+Rules:
+- **No implementation detail** — no class names, annotations, or framework-specific types (no `Freezed`, `@JsonSerializable`, `z.object`, TypeScript `interface`). Technology-agnostic only.
+- Each row is a single domain concept; split if two concepts are conflated.
+- Adapter skills read `data-model.md` to derive stack-specific types (Freezed → Flutter; TypeScript interfaces → Angular; Zod schemas → Next.js).
+
+If not triggered: skip this step entirely; do not create `data-model.md`.
+
 ### Step 5 - Write plan file
 
 Create `devflow/features/[NNN]_[feature-name]/plan.md` with this format:
@@ -257,6 +283,7 @@ After **Implementation checkpoints**, append **every extra plan section** requir
 - [ ] Existing shared components checked; no duplication of a component already in `shared/`
 - [ ] New reusable components identified in this plan are listed under their `shared/` path in the **File List**
 - [ ] `devflow.analyze` run (or explicitly waived) — no Critical findings
+- [ ] If feature touches persistent entities → `data-model.md` exists and is non-empty
 ```
 
 Format rules:
@@ -343,5 +370,6 @@ Mark eligible files with a `[P]` prefix on the `###` entry line in the **File Li
 | Reads | `constitution.md`, `registry.md`, `@devflow/adapters/common/skills/common-clean-code/SKILL.md` |
 | Reads (adapter) | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md`; technology skills per ADAPTER table |
 | Writes | `devflow/features/[NNN]_[feature-name]/plan.md` |
+| Writes (optional) | `devflow/features/[NNN]_[feature-name]/data-model.md` (Step 4c — triggered when feature touches persistent entities) |
 | Next step | `devflow.implement` |
 | Related skills | Per active `ADAPTER.md` → **Technology skills** |
