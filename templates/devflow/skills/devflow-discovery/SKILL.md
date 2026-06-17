@@ -33,7 +33,7 @@ Is this a new project with no context files (AGENTS.md / REGISTRY.md / docs/prod
 
 Raw idea or user request, no task.md yet?
   ├─ Objective requires 3+ PRs or spans multiple sessions?
-  │    └─ YES → devflow.blueprint (produces plans/[slug]-blueprint.md)
+  │    └─ YES → devflow.blueprint (produces devflow/plans/[slug]-blueprint.md)
   └─ Otherwise → devflow.task
 
 task.md exists, contains [NEEDS CLARIFICATION: ...] markers?

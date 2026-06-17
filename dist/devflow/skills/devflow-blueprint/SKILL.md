@@ -13,7 +13,7 @@ Run `/devflow.blueprint [objective or path to brief]`.
 - If an argument is passed and it is a file path, read it as the objective brief
 - If free text is passed, use it as the objective
 - If no argument is passed, ask the user for the objective before proceeding
-- Produce `plans/[slug]-blueprint.md` in the project root
+- Produce `devflow/plans/[slug]-blueprint.md` in the project root
 
 ## Purpose
 
@@ -141,7 +141,7 @@ Maximum two adversarial review rounds. If critical issues persist after two roun
 
 ### Step 7 — Write blueprint file
 
-Create `plans/[slug]-blueprint.md` in the project root using the template below.
+Create `devflow/plans/[slug]-blueprint.md` in the project root using the template below.
 
 `[slug]` = kebab-case summary of the objective (e.g. `auth-refactor`, `billing-v2`).
 
@@ -265,7 +265,7 @@ Each step → own `devflow.plan` → own `devflow.implement` run.
 After writing the file:
 
 ```text
-✅ Blueprint created: plans/[slug]-blueprint.md
+✅ Blueprint created: devflow/plans/[slug]-blueprint.md
 
 [Objective in 1 line]
 [N] steps · [P] parallel-safe · [B] blockers resolved in adversarial review
@@ -321,6 +321,6 @@ Next: run devflow.plan for step [001] → [step title]
 |---|---|
 | Reads | `docs/product.md`, `constitution.md`, `registry.md`, `.devflow-state.json` |
 | Spawns | Opus subagent (adversarial review, Step 6) |
-| Writes | `plans/[slug]-blueprint.md` |
+| Writes | `devflow/plans/[slug]-blueprint.md` |
 | Next step | `devflow.plan` per step, in dependency order |
 | Related skills | `devflow-plan` (per-step planning), `devflow-task` (single-feature scoping) |
