@@ -1,18 +1,11 @@
 ---
 name: nextjs-performance
-description: Image optimization (next/image), font loading (next/font), script strategies (next/script), and bundling gotchas. Load when touching img tags, font imports, script tags, or next.config.ts.
+description: next/image, next/font, next/script, bundling gotchas. Load when touching img tags, font imports, script tags, or next.config.ts.
 ---
 
 # Skill: Next.js Performance
 
 Use when optimizing images, fonts, third-party scripts, or resolving bundling issues.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## 1) Image Optimization — `next/image`
 

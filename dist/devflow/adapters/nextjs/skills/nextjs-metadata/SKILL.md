@@ -1,18 +1,11 @@
 ---
 name: nextjs-metadata
-description: Metadata API, SEO, OG images, and file-based metadata conventions. Load when touching generateMetadata, opengraph-image, or head-related files.
+description: Metadata API, SEO, OG images, file-based metadata. Load when touching generateMetadata, opengraph-image, or head files.
 ---
 
 # Skill: Next.js Metadata
 
 Use when implementing SEO metadata, Open Graph images, or file-based metadata conventions.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## 1) Static Metadata
 

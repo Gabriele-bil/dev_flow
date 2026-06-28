@@ -9,18 +9,11 @@ Stack-agnostic. Apply when writing, refactoring, or reviewing any code.
 
 ## Purpose
 
-Produce code easy to discover, understand, add, change, remove, debug, and deploy. Testable, flexible, maintainable code reduces long-term cost.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+Produce code easy to discover, understand, change, debug, and deploy. Testable, maintainable, reduces long-term cost.
 
 ## Language
 
-All identifiers, methods, properties, and comments use English. Universal readability. Translate local terms.
+English for all identifiers, methods, properties, comments. Translate local terms.
 
 ## Clean Code
 
@@ -37,12 +30,12 @@ All identifiers, methods, properties, and comments use English. Universal readab
 - Methods do one thing. Isolate bugs. Extract long methods.
 - Magic numbers move to constants. Prevent errors. Define `const`/`final`/`static`.
 - Variables reveal intent. Self-documenting code. Rename vague variables.
-- Comments explain "why". Code explains "what". Delete redundant comments.
+- Comments = "why". Code = "what". Delete redundant comments.
 - No `else` when early return works. Reduce nesting.
 - Keep entities small (< 50 lines for classes, < 10 for methods).
-- **Rule of 500:** file over 500 lines → split. Single-responsibility breakdown signal.
+- **Rule of 500:** >500 lines → split (single-responsibility signal).
 
-**Value objects:** wrap domain primitives (IDs, emails, amounts) in typed objects. Prevent misuse. Expose only valid states.
+**Value objects:** wrap domain primitives (IDs, emails, amounts). Expose only valid states.
 
 ## SOLID Principles
 

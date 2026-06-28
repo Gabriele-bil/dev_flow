@@ -11,13 +11,6 @@ Cross-adapter. Use alongside adapter-specific state skill (flutter-riverpod, ang
 
 Provide a unified mental model for state management across all DevFlow adapters. Prevent over-engineering and under-engineering state. Guide the when-to-choose decision.
 
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
-
 ## When NOT to Use
 
 - Already in implementation — consult adapter-specific state skill directly
@@ -125,13 +118,13 @@ All three solutions share the same conceptual structure:
 
 | Anti-Pattern | Problem | Fix |
 |---|---|---|
-| Global store for all state by default | Coupling; unnecessary re-renders; hard to test | Scope to smallest container that satisfies the requirement |
-| Mutating state directly outside store methods | Breaks reactivity; state diverges from UI | Always mutate through store-provided methods |
-| Deriving state in components instead of store | Duplicate derivation logic across components | Define derived state in store (`withComputed`, selectors, `.select`) |
-| One store for entire application | Merge conflicts; impossible to isolate feature state | Feature stores with clear ownership per domain |
-| Async state without loading/error/empty states | UI shows stale or broken view during transitions | Always handle all async states (`AsyncValue`, loading signal, Zustand middleware) |
-| Server state in client store (Next.js) | Stale data, cache invalidation hell | Server state → React Query/SWR; UI state only in Zustand |
-| Testing components with real store | Flaky tests; external state bleeds between tests | Inject mock store / `ProviderContainer` per test |
+| Global store for all state | Scope to smallest container that satisfies the requirement |
+| Mutating state outside store methods | Always mutate through store-provided methods |
+| Deriving state in components | Define derived state in store (`withComputed`, selectors, `.select`) |
+| One store for entire application | Feature stores with clear ownership per domain |
+| Async state without loading/error/empty | Handle all async states (`AsyncValue`, loading signal, Zustand middleware) |
+| Server state in client store (Next.js) | Server state → React Query/SWR; UI state only in Zustand |
+| Testing with real store | Inject mock store / `ProviderContainer` per test |
 
 ## I/O Reference
 

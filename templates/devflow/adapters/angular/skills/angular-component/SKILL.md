@@ -1,18 +1,11 @@
 ---
 name: angular-component
-description: Create modern Angular standalone components following v22+ best practices. Use for building UI components with signal-based inputs/outputs, OnPush change detection, host bindings, content projection, and lifecycle hooks. Triggers on component creation, refactoring class-based inputs to signals, adding host bindings, or implementing accessible interactive components.
+description: Angular v22+ standalone components — signal inputs/outputs, OnPush, host bindings, content projection, lifecycle hooks. Triggers on component creation, input→signal refactor, or host binding work.
 ---
 
 # Angular Component
 
 Create standalone components for Angular v22+. Standalone default. Do NOT set `standalone: true`.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## Component Structure
 

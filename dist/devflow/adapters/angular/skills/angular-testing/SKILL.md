@@ -1,18 +1,11 @@
 ---
 name: angular-testing
-description: Write unit and integration tests for Angular v22+ applications using Vitest with TestBed and modern testing patterns. Use for testing components with signals, OnPush change detection, services with inject(), HTTP interactions, and router flows. Triggers on test creation, mocking dependencies, testing signal-based behavior, or setting up Angular test infrastructure. Don't use for E2E testing with Cypress or Playwright, or for non-Angular JavaScript/TypeScript code.
+description: Angular v22+ unit + integration tests with Vitest. Use for component (signals, OnPush), service, HTTP, or routing tests. Triggers on test creation, mocking, or coverage tasks. Skip for E2E (Cypress/Playwright) or non-Angular code.
 ---
 
 # Angular Testing
 
 Test Angular v22+ with Vitest + TestBed. Focus: signal components, services, HTTP, router, async correctness.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## Testing Fundamentals (Zoneless Async-First)
 

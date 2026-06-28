@@ -21,16 +21,13 @@ Turn structured task into detailed implementation plan. Read required docs, outp
 
 ## Planning discipline (read-only until `plan.md` is written)
 
-Until `plan.md` is complete and saved:
+Until `plan.md` written and saved: no code/test/asset changes. Read `task.md`, `constitution.md`, `registry.md`, sources, MCP docs as needed.
 
-- **Do not** modify application code, tests, or assets except for read-only inspection.
-- **Do** read `task.md`, `constitution.md`, `registry.md`, relevant sources, and MCP docs as needed.
-
-Deliverable is **`plan.md`**, not implementation.
+Deliverable: `plan.md` only.
 
 ## Vertical slicing (mandatory for plans with > 5 files)
 
-`task.md` subtasks stay outcome-level (see `devflow-task`). When a plan has more than 5 files, define at least **2 vertical slice increments** in the **Architecture decisions** section — each slice is one end-to-end user-visible increment (not a layer). Group **File List** entries under slice headings.
+For plans >5 files: define ≥2 vertical slice increments in **Architecture decisions** — each slice is one end-to-end user-visible increment (not a layer). Group **File List** entries under slice headings.
 
 Example in Architecture decisions:
 ```
@@ -43,9 +40,7 @@ For plans with 5 or fewer files, slicing is optional — note in Overview if seq
 
 ## Dependency ordering (reflect in File List)
 
-Order the **File list** bottom-up per `constitution.md` **and** the active adapter’s `@devflow/adapters/<adapter>/ADAPTER.md` (section **Plan: extra sections → Dependency ordering** when present). If the two differ, prefer `constitution.md` for repo-specific layout and use the adapter for stack tooling (codegen, i18n, data layer).
-
-If order must deviate for a vertical slice, note the exception in **Architecture decisions**.
+Order **File list** bottom-up per `constitution.md` and `ADAPTER.md` → **Dependency ordering**. `constitution.md` wins for layout; adapter wins for stack tooling. Deviations for vertical slices → note in **Architecture decisions**.
 
 ## Core Principles
 
@@ -67,41 +62,30 @@ Before proceeding, verify:
 
 - [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md`
 - [ ] `task.md` has non-empty `## Summary` and `## Subtasks` sections
-- [ ] `task.md` Status is `draft` (Key assumptions resolved, no `[NEEDS CLARIFICATION: ...]` markers) or `clarified` — Status `draft` with unresolved markers → stop, suggest `devflow.clarify`
-- [ ] `task.md` contains no `[NEEDS CLARIFICATION: ...]` markers (if present: stop, report locations, suggest `devflow.clarify` or manual resolution)
+- [ ] `task.md` Status is `draft` (no `[NEEDS CLARIFICATION: ...]` markers) or `clarified` — if unresolved markers exist → stop, suggest `devflow.clarify`
 
 If any item fails → stop, report which check failed, do not write `plan.md`.
 
 ## Input
 
-- `devflow/features/[NNN]_[feature-name]/task.md`
-- If no path is provided, read `devflow/features/[last_feature]/task.md` from the most recent feature directory.
+Path: `devflow/features/[NNN]_[feature-name]/task.md` — if no arg, resolve latest.
 
-Feature numbering convention:
-
-- Feature IDs are strictly incremental and unique across `devflow/features/`.
-- Never create or reference a new feature directory reusing an existing `[NNN]_` prefix.
-- The correct next feature number is always the next available 3-digit value after the highest existing prefix.
-
-Example:
-
-- Existing directories: `001_login`, `002_profile`, `004_notifications`
-- Next feature number is `005`.
+Feature numbering: IDs strictly incremental; never reuse prefix. Next = highest existing + 1.
 
 ## Workflow
 
 ### Step 0 - Resolve adapter
 
-1. Read `@devflow/config.md` and note the **Adapter** id and **Adapter root**.
-2. Read `@devflow/adapters/<adapter>/ADAPTER.md` in full. Treat it as authoritative for: which technology skills to load, MCP usage, extra `plan.md` sections/templates, localization rules, and stack-specific analysis bullets.
+1. Read `@devflow/config.md` — note Adapter id and root.
+2. Read `@devflow/adapters/<adapter>/ADAPTER.md` in full (authoritative for: technology skills, MCP, extra sections, localization, stack analysis).
 
 ### Step 0b - Constitution Gate
 
-Before reading any other doc:
+Before Step 1:
 1. Read `constitution.md` in full.
-2. Extract each `MUST` / `MUST NOT` rule as a separate item.
-3. Evaluate each rule against the planned approach for this feature.
-4. If any `MUST` or `MUST NOT` is violated → output **Constitution Violation Report**:
+2. Extract each `MUST` / `MUST NOT` rule.
+3. Evaluate each against the planned approach.
+4. Violation → **Constitution Violation Report**:
 
 | Rule | Violation | Required Fix |
 |------|-----------|--------------|
@@ -127,18 +111,18 @@ Follow the **MCP** section of the active `ADAPTER.md` (tooling order and when to
 
 ### Step 3 - Reuse audit (mandatory before analysis)
 
-Before planning any file, scan for existing project elements that can be reused or extended:
+Before planning any file:
 
 1. **Read `registry.md`** in full — note every shared component, widget, utility, and pattern relevant to this feature.
 2. **Scan the project's shared folder** (e.g. `lib/shared/`, `src/shared/`, `components/shared/`) — list components that partially or fully cover any UI need in this feature.
 3. **Decide for each candidate:** reuse as-is / extend / parameterise / create new. Document the decision under **Architecture decisions** in `plan.md`.
 4. **Plan new shared components:** if this feature introduces a UI pattern generic enough for reuse elsewhere, list it under its shared path in the **File List** from the start — not as an afterthought.
 
-> **Rule:** A new feature-specific component is only justified when no shared component covers ≥70% of the need. When in doubt, extend the existing one.
+> **Rule:** New component only when no shared one covers ≥70% of the need; extend first.
 
 ### Step 4 - Analysis
 
-After the reuse audit, analyze:
+Analyze:
 
 - Which subtasks in `task.md` require new files vs existing file changes
 - All bullets under **Plan** / **Implement** / **Test** in `ADAPTER.md` that apply to this feature (state management, UI, DB, i18n, responsive layout, etc.) — use `registry.md` and `constitution.md` to ground them
@@ -147,7 +131,7 @@ After the reuse audit, analyze:
 
 ### Step 4b - Dependency pass
 
-Re-check the planned **File list** order against **Dependency ordering** above. Migrations and shared contracts must precede consumers unless an exception is documented under **Architecture decisions**. Shared components must be listed before the feature files that consume them.
+Verify **File list** order per Dependency ordering. Migrations and shared contracts before consumers; shared components before their consumers. Exceptions → **Architecture decisions**.
 
 ### Step 4c - Data model extraction
 
@@ -169,11 +153,11 @@ If triggered:
 ```
 
 Rules:
-- **No implementation detail** — no class names, annotations, or framework-specific types (no `Freezed`, `@JsonSerializable`, `z.object`, TypeScript `interface`). Technology-agnostic only.
-- Each row is a single domain concept; split if two concepts are conflated.
-- Adapter skills read `data-model.md` to derive stack-specific types (Freezed → Flutter; TypeScript interfaces → Angular; Zod schemas → Next.js).
+- No class names, annotations, or framework types — technology-agnostic only.
+- One row per domain concept; split conflated concepts.
+- Adapter skills derive stack-specific types from this file.
 
-If not triggered: skip this step entirely; do not create `data-model.md`.
+If not triggered: skip.
 
 ### Step 5 - Write plan file
 
@@ -288,17 +272,13 @@ After **Implementation checkpoints**, append **every extra plan section** requir
 
 Format rules:
 
-- File list is the core of the plan; it must be complete and ordered
-- Mark parallelizable leaf files with `[P]` prefix on the `###` entry line. Do not mark files that touch shared contracts, migrations, or state-management contracts.
-- Traceability maps every subtask in `task.md` to at least one file
-- Adapter-specific sections: follow formatting rules in `ADAPTER.md` (for example section layout, optional/required blocks, and localization/data rules per adapter)
-- Language: English
-- Style: concise and optimized for LLM consumption (no filler)
-- Compression: caveman-compress style — drop articles/filler/hedging; fragments OK; keep technical terms, paths, commands exact.
+- Adapter-specific sections: follow `ADAPTER.md` layout exactly (optional/required blocks, localization/data rules).
+- Language: English.
+- Compression: caveman-compress — drop articles/filler/hedging; keep technical terms/paths/commands exact.
 
 ### Step 6 - Notify user
 
-After writing the file, respond with:
+Respond with:
 
 ```text
 ✅ Plan created: devflow/features/[NNN]_[feature-name]/plan.md
@@ -315,52 +295,20 @@ Continue to implementation? -> devflow.implement
 - **Often parallelizable once contracts exist:** Focused leaf tests, copy/content-only updates, isolated components/modules that do not change shared contracts.
 - **Rule:** Lock shared types/contracts first; then parallelize leaf work.
 
-### Per-file `[P]` markers
-
-A file is `[P]`-eligible only when:
-1. No other `[P]` file in the same batch touches it.
-2. It does not modify shared contracts, migrations, or state-management contracts.
-
-Mark eligible files with a `[P]` prefix on the `###` entry line in the **File List** (e.g. `### 003. [P] \`path/to/file.dart\` - create [pending]`).
-
-`[P]` coexists with `[pending]`/`[done]` on the same line — `[P]` = parallelism potential, status markers = completion state. S/M/L batch labels remain for coarse grouping; `[P]` adds per-file precision for multi-agent `devflow.implement` sessions.
-
-## Common Rationalizations
-
-| Thought | Reality |
-|---------|---------|
-| "Traceability optional for small plans" | `devflow.implement` can't prove subtask coverage without it. Always include |
-| "Skip vertical slices — implement figures out order" | >5 files without slices → big-bang implement, no checkpoints, no early validation |
-| "File order doesn't matter much" | Wrong dependency order (e.g. UI before migration) → compile/runtime failures in implement |
-| "Leave Open questions, mark Status ready" | `devflow.implement` works from what's written. Unresolved questions → silent bugs |
-| "Adapter sections don't apply here" | Omitting required `ADAPTER.md` sections → `devflow.beautify` and `devflow.test` flag missing patterns |
-| "Architecture decisions during implement" | Mid-implement decisions not in `plan.md` → silent deviations, no traceability |
-| "The shared component doesn't fit exactly — I'll create a new one" | Extend or parameterise the existing one first; duplication fragments the component inventory |
-| "I'll check shared components during implement" | Reuse audit belongs in **plan** — implement must not discover shared components mid-flight and redesign |
-
-## Red flags
-
-| Symptom | Why it fails |
-|---------|----------------|
-| Missing **Traceability** row for a subtask | `devflow.implement` cannot prove coverage |
-| **File list** out of dependency order (e.g. UI before migrations) | Broken or misleading implementation order |
-| UI without planned localization keys | Violates project conventions |
-| Data/schema/security sections omitted when feature mutates backend contracts | Schema or access-control drift |
-| **Status `ready`** with unresolved **Open questions** | Implements guesses |
-| No **Implementation checkpoints** on long file lists | Hard to verify incrementally |
-| New UI component planned without **Step 3 reuse audit** | May duplicate a shared component; `devflow.beautify` will flag it |
-| Reuse decision not documented in **Architecture decisions** | Implement loses context; reviewer can't tell if duplication was intentional |
-
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|---|---|---|
-| Writing `plan.md` from memory without reading `task.md` | Subtask drift; plan covers work not in task | Always read `task.md` as first step |
-| File list in layer order (all models → all services → all UI) | No vertical slice; no checkpoint; big-bang implement | Order by user-visible increment; checkpoint at each slice |
-| Open questions marked resolved without user answer | Silent assumption baked into plan | Leave open; route to user; do not guess |
-| Traceability rows with no acceptance criteria | `devflow.implement` cannot prove coverage | Every subtask row must have at least one verifiable criterion |
-| Reuse audit skipped ("implement will figure it out") | Duplicate shared components discovered mid-implement → rework | Run reuse audit in Step 3; document decision in Architecture decisions |
-| Dependencies listed without explicit ordering | Broken compile/runtime order during implement | Sort file list by dependency; document ordering rationale |
+| Anti-Pattern | Fix |
+|---|---|
+| Writing plan without reading `task.md` | Always start with `task.md` |
+| File list in layer order (all models → services → UI) | Order by user-visible increment; checkpoint per slice |
+| No Traceability row for a subtask | Every subtask → at least one file + criterion |
+| Open questions with Status `ready` | Leave open; escalate to user; never guess |
+| Reuse audit skipped ("implement will figure it out") | Audit in Step 3; document in Architecture decisions |
+| New component without checking shared/ | ≥70% coverage rule; extend first |
+| Dependencies without explicit ordering | Sort file list; document rationale in Architecture decisions |
+| Architecture decisions made during implement | All decisions in `plan.md` before implement |
+| Adapter sections omitted | Apply every required `ADAPTER.md` section |
+| No implementation checkpoints on long plans | ≥2 checkpoints for plans >5 files |
 
 ## I/O Reference
 

@@ -13,13 +13,6 @@ Pipeline dashboard. Shows current state without advancing the pipeline.
 
 Emit compact status dashboard. Answers "dove sono nel pipeline?" — no step execution, no code changes.
 
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
-
 ## When NOT to Use
 
 - `devflow.setup` not yet run (no `devflow/config.md`) — inform user, stop
@@ -88,11 +81,11 @@ DevFlow not configured. Run: /devflow.setup
 
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|---|---|---|
-| Modifying `.devflow-state.json` directly to "fix" the status | State corruption; pipeline steps route to wrong phase | Use `devflow-recovery` to diagnose and fix state; never hand-edit |
-| Reporting status from memory instead of reading `.devflow-state.json` | Stale report; user gets wrong next step | Always read state file at invocation time |
-| Confusing `devflow-status` with `devflow-discovery` | Status = snapshot output only; discovery = full orientation with routing | Use discovery at session start; status for quick progress check |
+| Anti-Pattern | Fix |
+|---|---|
+| Editing `.devflow-state.json` directly | Use `devflow-recovery`; never hand-edit state |
+| Reporting status from memory | Always read state file at invocation time |
+| Using status instead of discovery at session start | Discovery = full orientation + routing; status = snapshot only |
 
 ## I/O Reference
 

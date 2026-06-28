@@ -1,6 +1,6 @@
 ---
 name: devflow-learn
-description: Manage DevFlow project instincts (.devflow-instincts.yaml). Log new instincts, search past ones, list, prune low-confidence entries, or boost a specific instinct. Use when the user asks to log a finding, search past learnings, or clean up the instincts file.
+description: Manage `.devflow-instincts.yaml` — log/search/list/prune/boost project instincts. Use when user asks to log a finding, search learnings, or clean up instincts.
 argument-hint: [log, search <query>, list, prune, boost <id>]
 ---
 
@@ -9,13 +9,6 @@ argument-hint: [log, search <query>, list, prune, boost <id>]
 ## Purpose
 
 Read, write, and maintain `.devflow-instincts.yaml` — the project's persistent instinct store. Complements the auto-detected signals written by the `stop-learn-distill` hook.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## When NOT to Use
 

@@ -8,13 +8,6 @@ skip-validation: true
 
 Pipeline orientation. Use at session start or when unsure which step to run.
 
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
-
 ## Pipeline Overview
 
 ```

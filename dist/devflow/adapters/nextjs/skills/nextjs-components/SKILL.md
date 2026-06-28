@@ -1,18 +1,11 @@
 ---
 name: nextjs-components
-description: Client Components with 'use client' directive, React hooks, interactivity patterns, and context providers. Load when touching files containing 'use client' directive.
+description: 'use client' components — React hooks, interactivity, context providers. Load when touching files with 'use client' directive.
 ---
 
 # Next.js Client Components
 
 Build interactive UI with `'use client'`. Keep boundary minimal. Server fetches, Client renders.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## Baseline
 

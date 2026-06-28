@@ -27,13 +27,6 @@ Core Flutter rule: **Constraints go down. Sizes go up. Parent sets position.**
 - Fixing `RenderFlex overflowed`, "unbounded constraints", clipped content, or inconsistent spacing.
 - Implementing responsive or adaptive behavior for phone/tablet/desktop.
 
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
-
 ## Quick Layout Selector
 
 - **Linear horizontal/vertical:** `Row` / `Column`

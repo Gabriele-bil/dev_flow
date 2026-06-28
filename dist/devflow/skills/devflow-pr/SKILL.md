@@ -20,13 +20,6 @@ Read `@devflow/config.md` and `@devflow/adapters/<adapter>/ADAPTER.md`. Use the 
 
 ---
 
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
-
 ## When NOT to Use
 
 - Any unit or integration test is still failing — fix or document the failure before opening the PR
@@ -152,25 +145,18 @@ DevFlow pipeline complete for TASK-[NNN].
 
 ---
 
-## Common Rationalizations
-
-| Thought | Reality |
-|---------|---------|
-| "I'll open the PR even though some tests are failing" | A PR with failing tests blocks review; fix or explicitly document failures with root cause before opening |
-| "I'll tick the checklist items without running the commands" | The checklist exists to verify evidence, not to be ticked; every item must reflect an actual command output |
-| "I'll skip the registry update — it's a minor pattern" | Undocumented patterns accumulate into inconsistency; if `devflow.implement` identified a pattern, update `registry.md` |
-| "I'll push and then fix the commit message" | Commit messages are part of the project history; write them correctly the first time |
-
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|---|---|---|
-| `git add .` without reviewing what's staged | Unintended files (env files, build artifacts, debug code) enter PR | Run `git status` + `git diff --cached` before commit |
-| Using `fix` commit type for all commits | Obscures feature work; misleads changelog generation | Use `feat` for new behavior, `fix` for bug corrections, `chore` for tooling |
-| PR body without task reference | Reviewer has no context for why the change exists | Include `Closes TASK-NNN` and link to `task.md` summary |
-| Force-pushing after PR is open for review | Invalidates reviewer comments; destroys review history | Never force-push an open PR; create follow-up commit instead |
-| Skipping `devflow.ship` to save time | Ship gate exists to prevent broken code reaching main | Run `devflow.ship` before `devflow.pr`; no exceptions |
-| Branch name not matching `[type]/[NNN]-[feature-name]` convention | Breaks traceability; PR automation fails | Always follow convention from Step 2 |
+| Anti-Pattern | Fix |
+|---|---|
+| Opening PR with failing tests | Fix or document failures with root cause first |
+| Ticking checklist without running commands | Every item must reflect actual command output |
+| Skipping `registry.md` update for new patterns | Undocumented patterns → inconsistency |
+| `git add .` without reviewing staged files | Run `git status` + `git diff --cached` first |
+| Using `fix` for all commit types | `feat` new behavior, `fix` bugs, `chore` tooling |
+| PR body without task reference | Include `Closes TASK-NNN` |
+| Force-pushing an open PR | Creates follow-up commit instead |
+| Skipping `devflow.ship` | Ship gate prevents broken code reaching main |
 
 ## I/O Reference
 

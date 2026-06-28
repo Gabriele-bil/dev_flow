@@ -11,13 +11,6 @@ disable-model-invocation: true
 
 Create or refresh global AI context files (`AGENTS.md`, `REGISTRY.md`) and product context (`docs/product.md`) in the consumer project root.
 
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
-
 ## When NOT to Use
 
 - No adapter supported by devflow is detected and user cannot identify the stack — resolve adapter choice first
@@ -366,25 +359,18 @@ Before final response:
 - [ ] constitution.md layer table has at least one row per adapter layer
 - [ ] all constitution `{{placeholder}}` tokens are resolved or marked `[TODO: fill]`
 
-## Red flags
-
-- Writing files inside `devflow/` instead of consumer root
-- Overwriting user content without `--force`
-- Generating marker-less content
-- Expanding templates with long narrative prose
-- Using adapter templates when they do not exist without fallback
-- Skipping any required questionnaire field
-- Skipping adapter `Setup dependencies` install without explicit `none declared` evidence
-
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|---|---|---|
-| Writing files inside `devflow/features/` during setup | Consumer project artefacts pollute plugin directory | Write only to consumer project root; `devflow/` is read-only during setup |
-| Skipping the questionnaire and guessing adapter | Wrong adapter → wrong templates → broken pipeline from step 1 | Always run the full questionnaire; no defaults |
-| Regenerating setup files without `--force` on existing project | User content overwritten silently | Check for managed markers; preserve non-managed content |
-| Installing setup dependencies globally instead of per-project | Global installs break other projects; not reproducible | Use project package manager (`pnpm add`, `flutter pub add`) |
-| Leaving `[TODO: fill]` placeholders in `AGENTS.md` and proceeding to `devflow.task` | First task fails input contract; agent has no project context | Fill all placeholders before routing to `devflow.task` |
+| Anti-Pattern | Fix |
+|---|---|
+| Writing files inside `devflow/features/` during setup | Write only to consumer project root; `devflow/` is read-only during setup. |
+| Skipping the questionnaire and guessing adapter | Always run the full questionnaire; no defaults. |
+| Regenerating setup files without `--force` on existing project | Check for managed markers; preserve non-managed content. |
+| Installing setup dependencies globally | Use project package manager (`pnpm add`, `flutter pub add`). |
+| Leaving `[TODO: fill]` placeholders before routing to `devflow.task` | Fill all placeholders first. |
+| Generating marker-less content | Wrap all managed content with `<!-- devflow-managed:start / :end -->`. |
+| Expanding templates with long narrative prose | Output must be token-lean, imperative, filler-free. |
+| Using adapter template that doesn't exist without fallback | Fall back to global templates if adapter template missing. |
 
 ## I/O Reference
 

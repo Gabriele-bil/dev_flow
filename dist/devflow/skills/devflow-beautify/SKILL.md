@@ -28,8 +28,8 @@ Review/improve `devflow.implement` output with **multi-axis** lens: correctness,
 ## When NOT to Use
 
 - `devflow.implement` has not run for this feature — there is nothing to beautify
-- The stack’s analyze/typecheck command (per active `ADAPTER.md`) still reports errors from the implement step — fix those before beautifying
-- The intent is to refactor pre-existing code not touched by this DevFlow run — that is out of scope; open a separate task instead
+- Active adapter analyze/typecheck still has errors from `devflow.implement` — fix before beautifying
+- Scope is pre-existing code not touched by this DevFlow run — open a separate task
 
 ## Input contract
 
@@ -43,10 +43,7 @@ If any item fails → stop, report which check failed, do not apply changes.
 
 ## Input
 
-- List of files created/modified by `devflow.implement` (from its summary)
-- `devflow/features/[NNN]_[feature-name]/plan.md`
-- If an argument is passed, use it as the `plan.md` path
-- If no argument is passed, use the current file modified in git
+Files from `devflow.implement` summary + `devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, use current git-modified file.
 
 ## Workflow
 
@@ -56,42 +53,34 @@ Read `@devflow/config.md` and `@devflow/adapters/<adapter>/ADAPTER.md`. Use its 
 
 ### Step 1 - Read docs
 
-Always read before starting:
+Read before starting:
 
 - `constitution.md`
 - `registry.md`
 
 ### Step 2 - Scope
 
-Analyze only files touched by current `devflow.implement` run.
-
-- Do not expand scope to unrelated files
-- Do not refactor pre-existing code outside the implement summary
+Scope: only files in current `devflow.implement` summary. No scope expansion; no pre-existing code refactor.
 
 ### Step 2b - Tests first (when present)
 
-If the implement summary includes test files, skim them **before** deep-diving production code:
-
-- Tests reflect intended behavior and edge cases, not brittle implementation coupling
-- Missing coverage for new behavior is an **Optional** or **Nit** finding — do not block beautify on writing new tests unless the user asks (out of scope for “no new files” unless explicitly allowed)
+If implement summary includes test files, skim them first — they reflect intended behavior. Missing test coverage for new behavior → **Optional** or **Nit** finding (not a blocker).
 
 ### Step 3 - Analysis areas (multi-axis review)
 
-The axes below are stack-agnostic defaults. For stack-specific checks, follow the active adapter `ADAPTER.md` and any technology skills it requires.
-
-Review each in-scope file against **every** axis below. Collect findings across all files before applying changes.
+Stack-agnostic defaults below. For stack-specific checks follow `ADAPTER.md` and technology skills. Review **every** in-scope file against all axes; collect all findings before applying changes.
 
 #### Correctness
 
-- Implementation matches each acceptance criterion listed in `task.md` **Acceptance criteria** section (not just plan.md behavior)
-- Edge cases and error paths are handled (null, empty, loading/error UI, async failure)
-- State updates are consistent (no obvious races or stale UI assumptions)
+- ACs from `task.md` met (not just `plan.md` behavior)
+- Edge cases and error paths handled (null, empty, loading/error UI, async failure)
+- State updates consistent (no races or stale UI assumptions)
 
 #### Readability and simplification
 
-- Naming follows project conventions and constitution rules; names carry intent (avoid vague `data`, `result`, `temp` without context)
-- Readability is clear: avoid unnecessary nesting, overly long methods, nested ternaries when an early return or small helper reads better
-- Responsibilities are separated (no domain/data logic leaking into presentation components)
+- Names follow conventions; carry intent (no `data`, `result`, `temp` without context)
+- No unnecessary nesting, long methods, or nested ternaries (prefer early return)
+- Domain/data logic not in presentation components
 - **Preserve behavior:** simplifications must not change outputs, errors, side effects, or ordering. If unsure, treat as opinionated and propose first
 - **Chesterton’s fence:** before removing or inlining code, understand why it exists (performance, platform constraint, history). If unclear, propose rather than delete
 - Duplication: repeated blocks that should share a helper per `registry.md` patterns (optional extraction if it touches public API — propose first)
@@ -157,7 +146,7 @@ Full checklist: `@devflow/references/accessibility-checklist.md`
 
 #### Severity labels
 
-Tag every finding (including in the completion summary) so the user knows what blocks progress:
+Tag all findings:
 
 | Prefix | Meaning | Action |
 |--------|---------|--------|
@@ -221,15 +210,11 @@ After edits, check **only** implement-touched files for unused imports, unreacha
 
 After all approved and certain changes are applied, run the **format**, **analyze/typecheck**, and conditional **codegen** commands from `ADAPTER.md` → **Beautify**, in the order specified there.
 
-If errors occur:
-
-- Resolve autonomously
-- Retry up to 3 attempts per command
-- If still failing after 3 attempts, stop and report full output to the user
+On error: resolve autonomously; retry 3×; if still failing → stop and report.
 
 ### Step 6 - Notify user
 
-After completion, respond with:
+Respond with:
 
 ```text
 ✅ Beautify complete: feature/[NNN]-[feature-name]
@@ -263,18 +248,16 @@ Continue to testing? -> devflow.test
 
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|---|---|---|
-| Expanding scope to files not in `devflow.implement` summary | Untracked changes; undefined review surface | Strictly limit to files listed in the implement summary |
-| Adding new features during beautify ("while I'm here") | Scope creep; breaks traceability back to `task.md` | Log as new subtask; implement in next pipeline cycle |
-| Skipping security axis because "it was reviewed already" | Security issues survive code review; beautify is the last gate before test | Run all 7 axes on every beautify run |
-| Running format/analyze only on new files, not modified files | Pre-existing violations surface as noise in PR diff | Run adapter commands on the full changed set |
-| Treating `Nit` findings as mandatory fixes | Over-engineering minor style issues delays delivery | Fix Critical/Required; note Nit/Optional in report; user decides |
-| Using profiler during beautify without evidence of bottleneck | Premature optimization adds complexity | Apply heuristics only; profiler only when benchmark confirms issue |
+| Anti-Pattern | Fix |
+|---|---|
+| Expanding scope beyond `devflow.implement` summary | Limit strictly to the implement summary |
+| Adding features during beautify ("while I'm here") | Log as new subtask; implement in next cycle |
+| Skipping security axis ("already reviewed") | Run all 8 axes every beautify run |
+| Format/analyze only on new files | Run on the full changed set |
+| Treating Nit as mandatory | Fix Critical/Required; user decides Nit/Optional |
+| Profiling without confirmed bottleneck | Apply heuristics only; profile when benchmark confirms |
 
 ## Completion checklist
-
-Before sending Step 6:
 
 - [ ] Scope stayed within `devflow.implement` touched files
 - [ ] `plan.md` behavior and acceptance criteria were checked for obvious gaps

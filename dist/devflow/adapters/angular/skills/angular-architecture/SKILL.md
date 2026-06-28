@@ -1,6 +1,6 @@
 ---
 name: angular-architecture
-description: Use when defining or refactoring Angular app architecture (folders, boundaries, dependency flow, root wiring). Enforces standalone + signals-first and Signal Store as single state standard for global and local state.
+description: Angular app architecture: folders, boundaries, dependency flow, root wiring. Standalone + signals-first; Signal Store only (no NgRx). Use for structural changes or architectural review.
 ---
 
 # Skill: Angular Architecture
@@ -14,13 +14,6 @@ Use when changing application structure, creating new page domains, or reviewing
 - Enforce Signal Store as single state model (global + local). No NgRx.
 - Keep one-way dependency flow: page -> state -> service -> http.
 - Keep reusable code in `shared`, single-instance infra in `core`, feature logic in `pages`.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## 1) Architectural baseline (mandatory)
 

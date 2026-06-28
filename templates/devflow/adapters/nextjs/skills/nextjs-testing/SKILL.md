@@ -1,18 +1,11 @@
 ---
 name: nextjs-testing
-description: Jest + React Testing Library for Next.js — Client Components, Server Components, Server Actions, API Routes, and Zustand stores. Load when touching *.test.tsx, *.test.ts, or __tests__/** files.
+description: Jest + React Testing Library for Next.js — Client/Server Components, Server Actions, API Routes, Zustand stores. Load when touching *.test.tsx, *.test.ts, or __tests__/**.
 ---
 
 # Next.js Testing
 
 Test Next.js with Jest + React Testing Library. Focus: Client Components, Server Components, Server Actions, API Routes, Zustand stores.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## Baseline
 

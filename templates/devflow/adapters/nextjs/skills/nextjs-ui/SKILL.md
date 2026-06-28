@@ -1,6 +1,6 @@
 ---
 name: nextjs-ui
-description: shadcn/ui components, Tailwind CSS styling via @apply, design tokens, dark mode, responsive layout. Caveman-lean. Load when touching components/ui/** or files importing from @/components/ui.
+description: shadcn/ui, Tailwind @apply, design tokens, dark mode, responsive layout. Load when touching components/ui/** or @/components/ui imports.
 ---
 
 # Skill: nextjs-ui

@@ -1,6 +1,6 @@
 ---
 name: nextjs-server
-description: Server Components, Server Actions, API Routes, and data fetching with Next.js cache extensions. Load when touching files with 'use server' directive, app/api/** routes, or **/actions.ts files.
+description: Server Components, Server Actions, API Routes, data fetching with Next.js cache. Load when touching 'use server' files, app/api/**, or **/actions.ts.
 ---
 
 # Skill: Next.js Server
@@ -14,13 +14,6 @@ Use when implementing Server Components with data fetching, Server Actions for m
 - Enforce correct cache strategy per data freshness requirement.
 - Keep secrets and sensitive logic server-side only.
 - Enforce API Routes only for external-facing endpoints; use Server Actions for internal mutations.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## 1) Server Components (default)
 

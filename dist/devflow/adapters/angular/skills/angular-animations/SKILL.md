@@ -1,18 +1,11 @@
 ---
 name: angular-animations
-description: Animate elements entering/leaving the DOM and toggle state-based transitions in Angular v22+. Use native CSS animate.enter/animate.leave by default; fall back to legacy @angular/animations DSL only for pre-v20.2 projects or heavy existing usage. Triggers on enter/leave animation requests, state-toggle transitions, or animation-library integration (GSAP etc.).
+description: Angular v22+ DOM animations. Native CSS animate.enter/leave by default; @angular/animations DSL for pre-v20.2 only. Triggers on enter/leave, state transitions, or animation-library (GSAP) integration.
 ---
 
 # Angular Animations
 
 Animate DOM enter/leave + state transitions. Check `package.json` Angular version first — drives which approach applies.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## Native CSS — `animate.enter` / `animate.leave` (v20.2+, Default)
 

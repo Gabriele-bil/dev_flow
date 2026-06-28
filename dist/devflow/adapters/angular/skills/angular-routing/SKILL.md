@@ -1,18 +1,11 @@
 ---
 name: angular-routing
-description: Define and manage Angular routes, guards, resolvers, navigation, and rendering strategy for v22+. Use for route config, lazy loading, route protection, data prefetch, programmatic/declarative navigation, and SSR/hydration decisions. Triggers on route file creation, guard/resolver implementation, navigation flows, or rendering-strategy choices.
+description: Angular v22+ routing — routes, guards, resolvers, navigation, SSR/hydration. Use for route config, lazy loading, protection, prefetch, or rendering decisions. Triggers on route file creation, guard/resolver work, or navigation flows.
 ---
 
 # Angular Routing
 
 Configure routes, protect/prefetch with guards and resolvers, navigate, pick rendering strategy. Functional style only — no class-based guards/resolvers.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## Route Definition
 

@@ -1,18 +1,11 @@
 ---
 name: nextjs-state
-description: Zustand client state management — stores, middleware, selectors, and decision matrix for choosing state location. Load when touching store.ts, *Store.ts, or use*Store.ts files.
+description: Zustand — stores, middleware, selectors, state-location decision matrix. Load when touching store.ts, *Store.ts, or use*Store.ts files.
 ---
 
 # Next.js State with Zustand
 
 Manage client-only global state with Zustand. Next.js cache handles server state — never duplicate in store.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## Fundamental Rule
 

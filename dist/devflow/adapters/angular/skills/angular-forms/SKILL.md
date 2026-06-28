@@ -1,6 +1,6 @@
 ---
 name: angular-forms
-description: Build signal-based forms in Angular v22 using stable Signal Forms API. Use for form creation with automatic two-way binding, schema-based validation, field state management, and dynamic forms. Triggers on form implementation, adding validation, creating multi-step forms, or building forms with conditional fields. Signal Forms is production-ready, default choice for new Angular forms. Don't use for template-driven forms without signals or third-party form libraries like Formly or ngx-formly.
+description: Angular v22 Signal Forms — two-way binding, schema validation, field state, dynamic forms. Production-ready default. Triggers on form creation, validation, multi-step, or conditional fields. Skip for template-driven forms or Formly/ngx-formly.
 ---
 
 # Angular Signal Forms
@@ -8,13 +8,6 @@ description: Build signal-based forms in Angular v22 using stable Signal Forms A
 Build type-safe, reactive forms with Signal Forms API. One model signal = source of truth.
 
 Signal Forms stable, production-ready in Angular v22.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## Strict Rules
 

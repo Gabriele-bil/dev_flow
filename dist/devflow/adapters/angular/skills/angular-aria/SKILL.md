@@ -1,18 +1,11 @@
 ---
 name: angular-aria
-description: Build accessible custom widgets (Accordion, Listbox, Combobox, Select, Menu, Tabs, Toolbar, Tree, Grid) with Angular Aria headless directives for v22+. Use when implementing keyboard-navigable, ARIA-compliant interactive components instead of native form controls. Triggers on custom-widget creation, accessibility requirements, or `ng*` Aria directive imports (`ngListbox`, `ngCombobox`, `ngMenu`, `ngTabs`, `ngTree`, `ngGrid`, etc.).
+description: Angular v22+ accessible widgets (Accordion, Listbox, Combobox, Menu, Tabs, Tree, Grid) via `@angular/aria` headless directives. Use for keyboard-navigable ARIA components. Triggers on `ngListbox`, `ngCombobox`, `ngMenu`, `ngTabs`, `ngTree`, `ngGrid` imports.
 ---
 
 # Angular Aria
 
 Build accessible interactive widgets with `@angular/aria` headless directives. They handle keyboard interaction, ARIA attributes, focus management, screen-reader support — you provide HTML structure + CSS.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## Setup
 

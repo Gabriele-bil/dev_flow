@@ -1,6 +1,6 @@
 ---
 name: devflow-clarify
-description: Optional interactive session between devflow-task and devflow-plan. Runs the 8-dimension ambiguity scan on task.md, generates up to 5 prioritized questions, collects answers one at a time, updates task.md incrementally, removes resolved [NEEDS CLARIFICATION: ...] markers, and sets Status clarified. Use when task.md has open markers or high-risk assumptions that should be validated before planning begins.
+description: Resolves [NEEDS CLARIFICATION: ...] markers in task.md via incremental Q&A. 8D scan → up to 5 questions → updates task.md → sets Status clarified. Use when task.md has open markers or high-risk assumptions before planning.
 model: haiku
 effort: low
 ---
@@ -10,13 +10,6 @@ effort: low
 ## Purpose
 
 Optional interactive session between `devflow.task` and `devflow.plan`. Validate and resolve ambiguities in `task.md` through structured Q&A, update the artifact incrementally, and set `Status: clarified` to signal readiness for planning.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## When NOT to Use
 
@@ -127,25 +120,18 @@ After the Q&A loop completes:
 
 This section is an audit trail only. Do not reformat, compress, or omit it after writing.
 
-## Common Rationalizations
-
-| Thought | Reality |
-|---------|---------|
-| "Markers are minor — skip to devflow.plan" | `devflow.plan` stops on unresolved markers. Resolve or explicitly waive them first |
-| "I'll answer all questions at once, then update" | One-at-a-time ensures each answer shapes the next question correctly; batch answers break incremental consistency |
-| "Rewrite Summary to incorporate the answer" | Summary preserves original wording for traceability. Answers belong in the target section and in `## Clarifications` |
-| "devflow.clarify is mandatory on every task" | Optional. If no markers and assumptions are low-risk, go directly to `devflow.plan` |
-| "Skip clarify — plan can absorb the ambiguity" | Ambiguity absorbed into `plan.md` becomes silent assumptions; they surface as bugs in `devflow.test` |
-
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|---|---|---|
-| Updating `task.md` after the full Q&A without intermediate saves | Later answers may conflict with earlier ones | Update `task.md` after each accepted answer, before presenting the next question |
-| Rewriting `## Summary` to incorporate clarification answers | Destroys original wording; breaks traceability | Update the target section; record answer in `## Clarifications` |
-| Running clarify after `devflow.plan` is already written | Plan was built on unresolved assumptions; mid-plan clarification causes plan drift | Run clarify only between task and plan; patch `plan.md` directly for post-plan adjustments |
-| Skipping all questions without recording them | Plan inherits the unresolved risk silently | Record every skip in `## Clarifications` with its reason |
-| Generating more than 5 questions | Too many questions means no prioritization | Cap at 5; surface only the highest-risk ambiguities |
+| Anti-Pattern | Fix |
+|---|---|
+| Skipping unresolved markers | `devflow.plan` stops on them; resolve or explicitly waive first |
+| Batch Q&A then update | One question at a time — each answer shapes the next |
+| Rewriting `## Summary` to absorb answers | Update target section + `## Clarifications`; preserve original wording |
+| Treating clarify as mandatory | Optional; skip if no markers and assumptions are low-risk |
+| Absorbing ambiguity into plan instead | Unresolved → silent assumptions → bugs in `devflow.test` |
+| Batch-updating `task.md` at Q&A end | Update after each accepted answer |
+| Skipping questions without recording them | Record every skip in `## Clarifications` with reason |
+| Asking >5 questions | Cap at 5; surface only highest-risk ambiguities |
 
 ## I/O Reference
 

@@ -17,13 +17,6 @@ Do not edit remote schema manually in Studio for production workflows.
 - Fixing migration drift between local and remote.
 - Deploying DB changes before updating Flutter data layer.
 
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
-
 ## Required CLI Workflow
 
 ```bash

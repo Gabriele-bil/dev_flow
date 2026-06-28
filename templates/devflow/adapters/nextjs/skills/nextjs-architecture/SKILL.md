@@ -1,6 +1,6 @@
 ---
 name: nextjs-architecture
-description: App Router folder structure, route segments, layout nesting, server/client boundary discipline. Load when creating new routes, layouts, or reorganizing feature folders.
+description: App Router folders, route segments, layout nesting, server/client boundary. Load when creating routes, layouts, or reorganizing feature folders.
 ---
 
 # Skill: Next.js Architecture
@@ -14,13 +14,6 @@ Use when creating new routes, layouts, reorganizing feature folders, or reviewin
 - Enforce colocation: route-specific code lives inside its route folder.
 - Keep server/client boundary as deep in the tree as possible.
 - Enforce one-way dependency flow: page → components → actions/services → external.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## 1) Baseline (mandatory)
 

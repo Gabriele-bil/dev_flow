@@ -64,15 +64,9 @@ Dependencies below are authoritative for `devflow.setup` auto-install.
 
 Apply to narrative text in plans, updates, reviews, PR notes:
 
-- Drop: articles (`a/an/the`), filler (`just/really/basically/actually/simply`), pleasantries, hedging.
-- Keep: technical terms exact, errors quoted exact, code blocks unchanged.
-- Prefer: short synonyms (`fix`, `use`, `build`, `test`).
-- Pattern: `[thing] [action] [reason]. [next step].`
-
-Example:
-
-- Bad: `Sure! I'd be happy to help. The issue is likely in auth middleware...`
-- Good: `Auth middleware bug. Token expiry check use < not <=. Fix guard, add test.`
+- Drop: articles, filler (`just/really/basically/actually/simply`), pleasantries, hedging.
+- Keep: technical terms exact, code blocks unchanged.
+- Prefer: `fix`, `use`, `build`, `test`. Pattern: `[thing] [action] [reason]. [next step].`
 
 ## Plan: extra sections and templates
 
@@ -162,16 +156,6 @@ Local API proxying — `proxy.conf.json` + `angular.json` `serve.options.proxyCo
 // angular.json — architect.serve.options
 { "proxyConfig": "proxy.conf.json" }
 ```
-
-### Angular implementation rules (summary)
-
-Adapter does orchestration only. Domain rules live in skills:
-
-- Architecture and boundaries: `@devflow/adapters/angular/skills/angular-architecture/SKILL.md`
-- Components: `@devflow/adapters/angular/skills/angular-component/SKILL.md`
-- Forms: `@devflow/adapters/angular/skills/angular-forms/SKILL.md`
-- HTTP: `@devflow/adapters/angular/skills/angular-http/SKILL.md`
-- State: `@devflow/adapters/angular/skills/angular-state/SKILL.md`
 
 ### Pre-handoff checklist (implement)
 

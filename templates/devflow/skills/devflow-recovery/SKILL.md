@@ -12,13 +12,6 @@ Pipeline rescue. Diagnoses state, identifies failure point, proposes recovery pa
 
 Recover a blocked or corrupted pipeline by reading `.devflow-state.json`, inspecting relevant files, and routing to the correct recovery action.
 
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
-
 ## When NOT to Use
 
 - Pipeline is not stuck — use `devflow-status` for normal progress check
@@ -153,24 +146,14 @@ New state: [next_step now set to X]
 Next command: [exact command to continue]
 ```
 
-## Common Rationalizations
-
-| Thought | Reality |
-|---------|---------|
-| "I'll auto-fix state without asking" | State modification without diagnosis causes further corruption |
-| "The nuclear reset is fastest" | Nuclear destroys traceability; try targeted recovery first |
-| "I'll re-run the entire pipeline from step 1" | Completed steps had side effects (files written, deps installed); re-running duplicates work |
-| "I'll infer the failure without reading observe log" | Observe log shows exactly which tool calls preceded the failure; always check it |
-
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|---|---|---|
-| Editing `.devflow-state.json` directly without diagnosis | Overwrites correct data; deeper corruption | Always read state before writing; use Step 3 diagnosis first |
-| Re-running from step 1 when only one step failed | Duplicates completed work; may overwrite correct files | Find last `[done]` marker in `plan.md`; resume from next pending |
-| Auto-executing nuclear reset without user confirmation | Irreversible data loss if user didn't intend it | Always present options; wait for explicit user choice |
-| Using recovery for normal pipeline progression | Recovery is for failures; status + correct command is for normal progression | Use `devflow-status` first; recovery only when status shows corruption |
-| Ignoring `.devflow-observe.jsonl` during diagnosis | Missing root cause; recovery addresses symptom not cause | Always check last 20 observe entries before proposing recovery |
+| Anti-Pattern | Fix |
+|---|---|
+| Auto-fix state without diagnosis / re-run from step 1 | Read `.devflow-state.json` + last 20 observe entries first; resume from last `[done]` marker. |
+| Auto-execute nuclear reset without user confirmation | Present all options; wait for explicit choice. Nuclear destroys traceability. |
+| Use recovery for normal pipeline progression | `devflow-status` first; recovery only when status shows corruption. |
+| Ignore `.devflow-observe.jsonl` during diagnosis | Observe log shows exact tool calls before failure — always check it. |
 
 ## I/O Reference
 

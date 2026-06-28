@@ -17,13 +17,6 @@ Prefer `@riverpod` codegen + explicit invalidation.
 - Designing async fetch + mutation flows.
 - Testing providers/widgets with overrides.
 
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
-
 ## Core Rules
 
 1. Prefer `@riverpod` code generation for type-safe providers.

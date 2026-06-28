@@ -14,13 +14,6 @@ Pre-merge fan-out gate. Dispatch three specialist agents in parallel → synthes
 
 ---
 
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
-
 ---
 
 ## When NOT to Use
@@ -125,26 +118,18 @@ Execute `@devflow/skills/devflow-pr/SKILL.md` exactly.
 
 ---
 
-## Common Rationalizations
-
-| Thought | Reality |
-|---------|---------|
-| "Skip ship gate — tests already passed" | Tests prove behavior; ship gate proves merge readiness across code quality, security, and coverage |
-| "Run reviewers sequentially to save context" | Fan-out is the design. Sequential loses the benefit of independent perspectives |
-| "One Critical issue is minor — proceed anyway" | Critical means block. Fix it or explicitly escalate to user; never auto-proceed |
-| "Merge reports mentally without writing synthesis" | Written synthesis is the audit trail; skip it and findings get lost before devflow.pr |
-
----
-
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|---|---|---|
-| Running only `code-reviewer`, skipping `security-auditor` | Security issues not caught at gate; reach production | Always dispatch all 5 agents; fan-out is non-negotiable |
-| Synthesizing before all agents complete | Partial findings in synthesis; Critical issues missed | Wait for all agent reports before Step 3 |
-| Downgrading severity in synthesis ("this Critical is really just a Required") | Bypasses gate logic; Critical issues slip to PR | Report severity as declared by agent; escalate to user if disputed |
-| Re-running ship after fixing only some Critical issues | Gives false confidence that gate passed | Fix all Critical issues; re-run full ship gate from Step 1 |
-| Using ship gate as a substitute for `devflow-beautify` | Ship gate audits, it does not fix; beautify is the fix step | Run beautify before ship; ship reviews the result |
+| Anti-Pattern | Fix |
+|---|---|
+| Skipping ship gate ("tests passed") | Tests prove behavior; ship gate proves merge readiness across quality, security, coverage |
+| Running reviewers sequentially | Fan-out is the design; sequential loses independent perspectives |
+| Auto-proceeding on Critical issue | Critical = block; fix or escalate; never auto-proceed |
+| Merging reports mentally without synthesis | Written synthesis is the audit trail |
+| Dispatching only `code-reviewer` | Always dispatch all 3 agents |
+| Synthesizing before all agents complete | Wait for all reports before Step 3 |
+| Downgrading severity in synthesis | Report as declared; escalate if disputed |
+| Re-running after fixing only some Critical issues | Fix all Critical; re-run full gate from Step 1 |
 
 ---
 

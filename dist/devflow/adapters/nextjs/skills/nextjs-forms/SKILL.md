@@ -1,18 +1,11 @@
 ---
 name: nextjs-forms
-description: React Hook Form with Zod validation, shadcn/ui Form components, and Server Action integration. Load when touching files with useForm, zodResolver, or z.object patterns.
+description: React Hook Form + Zod + shadcn/ui Form + Server Actions. Load when touching useForm, zodResolver, or z.object patterns.
 ---
 
 # Next.js Forms
 
 react-hook-form + @hookform/resolvers/zod + zod + shadcn/ui Form components. Zod schema = source of truth for client and server.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## Baseline
 

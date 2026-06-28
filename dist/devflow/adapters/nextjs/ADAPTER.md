@@ -68,15 +68,9 @@ Dependencies below are authoritative for `devflow.setup` auto-install.
 
 Apply to narrative text in plans, updates, reviews, PR notes:
 
-- Drop: articles (`a/an/the`), filler (`just/really/basically/actually/simply`), pleasantries, hedging.
-- Keep: technical terms exact, errors quoted exact, code blocks unchanged.
-- Prefer: short synonyms (`fix`, `use`, `build`, `test`).
-- Pattern: `[thing] [action] [reason]. [next step].`
-
-Example:
-
-- Bad: `Sure! I'd be happy to help. The issue is likely in the server action...`
-- Good: `Server Action bug. Missing revalidatePath call after mutation. Add call, add test.`
+- Drop: articles, filler (`just/really/basically/actually/simply`), pleasantries, hedging.
+- Keep: technical terms exact, code blocks unchanged.
+- Prefer: `fix`, `use`, `build`, `test`. Pattern: `[thing] [action] [reason]. [next step].`
 
 ## Plan: extra sections and templates
 
@@ -177,20 +171,6 @@ pnpm build
 ```
 
 Retry failed steps up to **3** attempts each; then stop and report full output.
-
-### Next.js implementation rules (summary)
-
-Adapter does orchestration only. Domain rules live in skills:
-
-- Architecture and boundaries: `@devflow/adapters/nextjs/skills/nextjs-architecture/SKILL.md`
-- Server Components, Actions, API Routes, `'use cache'`: `@devflow/adapters/nextjs/skills/nextjs-server/SKILL.md`
-- Client Components, hooks, hydration errors: `@devflow/adapters/nextjs/skills/nextjs-components/SKILL.md`
-- State (Zustand): `@devflow/adapters/nextjs/skills/nextjs-state/SKILL.md`
-- UI (shadcn/ui, Tailwind): `@devflow/adapters/nextjs/skills/nextjs-ui/SKILL.md`
-- Forms (RHF + Zod): `@devflow/adapters/nextjs/skills/nextjs-forms/SKILL.md`
-- Testing (Jest + RTL): `@devflow/adapters/nextjs/skills/nextjs-testing/SKILL.md`
-- SEO, metadata, OG images: `@devflow/adapters/nextjs/skills/nextjs-metadata/SKILL.md`
-- Image, font, script, bundling: `@devflow/adapters/nextjs/skills/nextjs-performance/SKILL.md`
 
 ### Pre-handoff checklist (implement)
 

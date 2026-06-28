@@ -1,18 +1,11 @@
 ---
 name: angular-state
-description: Build Angular state with NgRx Signal Store using withState, withProps, withComputed, withMethods, rxMethod, and withEntities. Use for global/local feature stores, async state handling, derived state, HTTP orchestration, and entity CRUD. Triggers on store creation, refactoring service-heavy components into stores, adding async loading/error/value state, or implementing entity collections.
+description: Angular NgRx Signal Store — withState, withComputed, withMethods, rxMethod, withEntities. Use for feature stores, async state, derived state, entity CRUD. Triggers on store creation, component→store refactor, or async/entity work.
 ---
 
 # Angular State with NgRx Signal Store
 
 Build state with `signalStore`. Keep store explicit, typed, feature-focused.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## Store Rules
 

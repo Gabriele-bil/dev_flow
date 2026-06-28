@@ -5,13 +5,6 @@ description: Use when creating or refactoring Flutter domain entities, DTOs, enu
 
 # Skill: Flutter Models
 
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
-
 ## Core Rules
 
 - Keep all models immutable (`final` fields, no setters, update with `copyWith`).

@@ -1,6 +1,6 @@
 ---
 name: angular-theme
-description: Build and refactor Angular app theme with Tailwind and shared CSS layers. Use when defining global styles, component theme classes, design tokens, dark mode, or style architecture cleanup.
+description: Angular theme with Tailwind + CSS layers. Use for global styles, design tokens, dark mode, or style architecture.
 ---
 
 # Skill: Angular Theme
@@ -13,13 +13,6 @@ Use when creating or refactoring app theme rules. Keep style system predictable.
 - Keep Tailwind as single styling system.
 - Keep component styles consistent across pages.
 - Keep templates clean. Utility noise down.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## 1) Theme baseline (mandatory)
 

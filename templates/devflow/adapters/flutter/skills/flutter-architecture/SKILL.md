@@ -7,13 +7,6 @@ description: Use when designing a new Flutter feature, reviewing cross-layer dep
 
 Define layer ownership and dependency direction for new features; used in `devflow-plan` to produce correct file trees and in `devflow-implement` before scaffolding.
 
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
-
 ## When NOT to Use
 
 - File does not match trigger pattern in `ADAPTER.md`
@@ -66,16 +59,16 @@ Implement bottom-up (per `ADAPTER.md` dependency ordering):
 6. **Localization** — slang keys for all user-visible strings; no hardcoded copy
 7. **Codegen** — `dart run build_runner build --delete-conflicting-outputs` after `@freezed` / `@riverpod` annotations
 
-## Common Rationalizations
+## Anti-Patterns
 
-| Thought | Reality |
-|---------|---------|
-| "Entity can hold `fromJson` — simpler" | JSON is data-layer concern; domain must stay pure |
-| "Skip layers for simple CRUD" | All layers mandatory; thin layers are fast to write, not skippable |
-| "Use `ChangeNotifier` ViewModel like the official Flutter docs" | DevFlow uses Riverpod notifiers; no ViewModels |
-| "Skip barrel for small folder" | Barrel mandatory regardless of size per `ADAPTER.md` |
-| "Business logic in widget is faster" | Logic in UI breaks testability and violates layer contract |
-| "Use Case class between provider and repository" | Use cases only for complex cross-repository logic; default to notifier |
+| Anti-Pattern | Fix |
+|---|---|
+| Entity holds `fromJson` | JSON = data layer; domain stays pure |
+| Skip layers for simple CRUD | All layers mandatory; thin = fast, not skippable |
+| `ChangeNotifier` ViewModel | DevFlow uses Riverpod notifiers only |
+| Skip barrel for small folder | Barrel mandatory regardless of size |
+| Business logic in widget | Logic in UI breaks testability + layer contract |
+| Use Case class for simple logic | Use cases only for complex cross-repository work |
 
 ## I/O Reference
 

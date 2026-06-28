@@ -43,10 +43,7 @@ If any item fails → stop, report which check failed, do not write test files.
 
 ## Input
 
-- List of files created/modified by `devflow.implement` and `devflow.beautify`
-- `devflow/features/[NNN]_[feature-name]/plan.md`
-- If an argument is passed, use it as the `plan.md` path
-- If no argument is passed, resolve the latest `devflow/features/*/plan.md`
+Files from `devflow.implement` + `devflow.beautify` + `devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, resolve latest `devflow/features/*/plan.md`.
 
 ## Workflow
 
@@ -99,7 +96,7 @@ Failure handling:
 
 ### Step 7 - Notify user
 
-After execution, include actual command output. Do NOT report "all tests passed" without raw evidence.
+Include actual command output. Do NOT report "all tests passed" without raw evidence.
 
 ```text
 ✅ Tests complete: [type]/[NNN]-[feature-name]
@@ -146,26 +143,20 @@ All tests passing? Choose how to continue:
 
 Wait for user choice before continuing.
 
-## Common Rationalizations
-
-| Thought | Reality |
-|---------|---------|
-| "I'll write tests after the PR is open" | Tests are a pre-condition for `devflow.pr`; the PR checklist cannot be completed without passing tests |
-| "I tested manually — that's enough" | Manual testing is not verifiable; automated tests are required for the PR checklist |
-| "This file is too simple to need tests" | Simple files break too; a trivial test is better than no test; if truly untestable, document why in the Step 7 report |
-| "I'll skip integration tests to save time" | Integration tests cover user flows that unit tests cannot; run every integration target required by `ADAPTER.md` |
-| "3 retries failed — I'll just mark it as passing" | After 3 failures, stop and report; never mark a failing test as passing in the summary |
-
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|---|---|---|
-| Testing implementation internals (private methods, internal state) | Breaks on refactor with no behavioral change | Test inputs → outputs; mock only system boundaries |
-| 100% coverage with no assertions | Coverage metric satisfied; no behavior proven | Every test must assert at least one specific output |
-| Flaky test fixed with `retry(3)` wrapper | Hides root cause (timing, shared state, non-determinism) | Fix root cause; use deterministic test setup |
-| Snapshot-all strategy | Diffs never reviewed; all changes auto-approved | Assert specific values for meaningful properties |
-| Writing tests only for happy paths | Error paths are where bugs live | At minimum: happy path + one error path per public function |
-| Skipping `testing-patterns.md` for novel test scenarios | Reinvents patterns already documented | Read `@devflow/references/testing-patterns.md` before writing test scaffolding |
+| Anti-Pattern | Fix |
+|---|---|
+| Writing tests after PR is open | Tests are a pre-condition for `devflow.pr` |
+| Manual-only testing | Automated tests required for PR checklist |
+| Skipping trivial files | A trivial test beats no test; untestable → document why |
+| Skipping integration tests | They cover user flows unit tests can't |
+| Marking failing tests as passing after 3 retries | Stop and report; never falsify the summary |
+| Testing implementation internals | Test inputs → outputs; mock only system boundaries |
+| 100% coverage with no assertions | Every test must assert at least one specific output |
+| Flaky test fixed with `retry(3)` | Fix root cause; use deterministic setup |
+| Happy-path-only tests | ≥1 error path per public function |
+| Skipping `testing-patterns.md` for novel scenarios | Read `@devflow/references/testing-patterns.md` first |
 
 ## I/O Reference
 

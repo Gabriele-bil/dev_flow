@@ -1,6 +1,6 @@
 ---
 name: devflow-analyze
-description: Read-only cross-artifact consistency check across task.md, plan.md, and constitution.md. Detects traceability gaps, untestable acceptance criteria, terminology drift, constitution layer violations, and coverage imbalances. Use between devflow.plan (Status ready) and devflow.implement to verify pipeline artifacts before coding begins.
+description: Read-only consistency check: task.md + plan.md + constitution.md. Detects traceability gaps, untestable ACs, terminology drift, layer violations. Run after devflow.plan (Status ready), before devflow.implement.
 model: haiku
 effort: low
 ---
@@ -10,13 +10,6 @@ effort: low
 ## Purpose
 
 Read-only cross-artifact consistency check. Verify `task.md` and `plan.md` are internally consistent and constitution-compliant before implementation begins. Run between `devflow.plan` (Status: ready) and `devflow.implement`.
-
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## When NOT to Use
 
@@ -173,23 +166,16 @@ Produce the Analyze Report directly in the response. **Do not write any files.**
 
 Blockers = Critical + Required findings.
 
-## Common Rationalizations
-
-| Thought | Reality |
-|---------|---------|
-| "Traceability is close enough — implement will figure it out" | Untraceable subtasks are invisible to `devflow.implement`; gaps surface as bugs in `devflow.test` |
-| "AC language is informal but the intent is clear" | `devflow.test` writes assertions from ACs; vague ACs produce vague tests that pass even when broken |
-| "Constitution alignment is obvious from context" | Layer violations caught here are free to fix; caught in `devflow.beautify` require refactor |
-| "Skip analyze — the plan looks fine" | 5-pass structural check, not a subjective review. Cost: one read. Benefit: silent gaps caught before coding starts |
-
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|---|---|---|
-| Running `devflow.analyze` mid-implementation | Findings may reflect intentional divergence already resolved | Run before `devflow.implement`; post-implement use `devflow.beautify` |
-| Waiving Critical findings without documentation | Undocumented waivers cause reviewer confusion and pipeline drift | Document waived Critical findings in `plan.md` Open questions |
-| Using analyze output as a substitute for `devflow.plan` | Analyze reads artifacts — it does not generate plans | Fix plan first; run analyze to verify |
-| Fixing findings by editing only `plan.md` | Some findings (untestable ACs, missing subtasks) require `task.md` to be updated | Check whether the root is in `task.md` or `plan.md` before editing |
+| Anti-Pattern | Fix |
+|---|---|
+| "Traceability close enough" | Untraceable subtasks → silent bugs in `devflow.test` |
+| Vague acceptance criteria | `devflow.test` writes from ACs; vague ACs → untestable |
+| Skipping analyze ("plan looks fine") | 5-pass structural check; one read catches silent gaps |
+| Running analyze mid-implementation | Run before `devflow.implement`; post-impl use `devflow.beautify` |
+| Waiving Critical findings without documentation | Document in `plan.md` Open questions |
+| Fixing findings in `plan.md` only | Check if root is in `task.md` first |
 
 ## I/O Reference
 

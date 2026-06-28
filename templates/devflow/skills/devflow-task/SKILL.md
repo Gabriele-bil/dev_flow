@@ -1,6 +1,6 @@
 ---
 name: devflow-task
-description: Transforms a raw idea into a structured DevFlow task by reading product and architecture context, optionally stress-testing scope, and generating a user story with HMW framing, scope boundaries, key assumptions, and verifiable subtasks. Use when the user asks to create a task, start the DevFlow pipeline, run devflow.task, or provides a feature idea in text/file form.
+description: Transforms raw idea into DevFlow task.md with HMW framing, scope, assumptions, subtasks. Use when user asks to create a task, start the pipeline, run devflow.task, or provides a feature idea.
 ---
 
 # Skill: devflow.task
@@ -31,7 +31,7 @@ Turn raw idea into structured task. Read product context, output user story + su
 
 ### Step 1 - Read context
 
-Read sources in this order and use each for its role:
+Read in order:
 
 | Source                            | Role                                                                             |
 | --------------------------------- | -------------------------------------------------------------------------------- |
@@ -43,7 +43,7 @@ Optional: use `Glob`, `Grep`, and `Read` on the codebase to ground the task in e
 
 ### Step 2 - Classify input
 
-- **Clear enough** — proceed to clarification (Step 3) only if something material is still unknown; otherwise skip to Step 4.
+- **Clear enough** — skip to Step 4 unless material unknowns remain.
 - **Ambiguous or multi-directional** — before subtasks: produce **one** crisp **How Might We** line and use Step 3 to nail actor, success, and boundaries (no full ideation pass).
 - **Brainstorm-scale** (no concrete problem or user) — stop and point the user to **`ce-brainstorm`** or **`idea-refine`**; resume `devflow-task` when they have a single direction.
 
@@ -58,38 +58,35 @@ Stop and ask before writing the task if:
 Rules:
 
 - Max 5 questions, numbered, concise
-- Prefer the **`AskQuestion`** tool when the environment provides it (e.g. multiple-choice); otherwise ask in chat and wait for answers
+- Use **`AskQuestion`** tool if available; otherwise ask in chat
 - Skip entirely if the idea is already clear enough
 
 ### Step 4 - Quick stress-test
 
-Before locking Summary/scope, read **`refinement-hints.md`** and run short pass across all **8 dimensions**: user value, feasibility, overlap, scope honesty, riskiest assumption, edge cases & error states, integration dependencies, terminology. Push back if scope too large.
+Read **`refinement-hints.md`**, run 8D pass (user value, feasibility, overlap, scope honesty, riskiest assumption, edge cases, integration, terminology); push back if scope too large.
 
 ### Step 5 - Propose feature name
 
-Propose 3 `kebab-case` name options derived from the idea. Names must be:
+Propose 3 `kebab-case` names:
 
-- Short (1-3 words)
-- Feature-oriented, not implementation-oriented
-- Consistent with existing names in `devflow/features/` (if any)
+- 1-3 words, feature-oriented
+- Consistent with `devflow/features/` names
 
-Prefer **`AskQuestion`** with the three names as options (plus “Other — specify in chat” if the tool allows). Otherwise list the three names and wait for confirmation before continuing.
+Use **`AskQuestion`** with three options if available; otherwise list names and wait.
 
 ### Step 6 - Determine incremental number
 
-**Fast path (zero directory scan):** Read `.devflow-state.json` in the project root.
-If the field `next_feature_number` is present, use it directly — no further lookup needed.
+**Fast path:** Read `.devflow-state.json` in project root.
+If `next_feature_number` present, use it — no further lookup.
 
-**Fallback (first run or state missing):** Read the `devflow/features/` directory, find the highest existing prefix (`001_`, `002_`, ...), and use the next 3-digit number. Start from `001` if the directory is empty or absent.
+**Fallback:** Read `devflow/features/`, find highest prefix, use next 3-digit number. Start `001` if empty or absent.
 
 Critical rule:
 
-- Never reuse an existing prefix, even if a similarly named feature already exists.
-- The `next_feature_number` field in `.devflow-state.json` is updated automatically by a hook each time a `task.md` is written, so it is always current.
+- Never reuse an existing prefix.
+- `.devflow-state.json` updated by hook on each `task.md` write — always current.
 
 ### Step 7 - Verification checklist (before write)
-
-Confirm:
 
 - [ ] **How Might We** line is present and neither too broad nor solution-embedded
 - [ ] Target **user** matches product actors; **user story** matches Summary
@@ -177,35 +174,31 @@ Leave empty if none.]
 
 Format rules:
 
-- **Summary**: rewritten from scratch, clear, unambiguous, enriched with product context, never copied from raw input.
-- **Problem framing (HMW)**: one line; narrow enough to plan, broad enough for real design choices.
-- **Scope boundaries**: **In scope** / **Out of scope** reduce plan creep; out-of-scope items are explicit trade-offs, not TODOs.
-- **Key assumptions**: omit only for trivial, low-risk tasks; otherwise include the riskiest beliefs and validation hints.
-- **User story**: always `As a / I want to / So that`.
-- **Subtasks**: atomic and verifiable, no implementation details (no class names, methods, file paths).
-- **Acceptance criteria**: observable and falsifiable; one criterion per verifiable outcome; no solution detail.
-- **Notes**: analysis decisions only, not TODOs.
-- **Language**: English throughout.
-- **Style**: optimized for LLM consumption, concise, no filler words.
-- **Compression**: caveman-compress style — drop articles/filler/hedging; fragments OK; keep technical terms, paths, commands exact.
-- **Unknown values**: wherever a value is unknown or assumed rather than stated by the user, write `[NEEDS CLARIFICATION: <single-sentence reason>]` inline at the point of uncertainty instead of filling in a guess. Canonical format: `[NEEDS CLARIFICATION: <single-sentence reason>]` — no variants.
-- **Status**: valid values are `draft` (initial write), `clarified` (ambiguities resolved via `devflow.clarify`), `done` (task fulfilled and pipeline complete). Initial write always uses `draft`.
+- **HMW**: one line, actionable, user-centered, not solution-disguised.
+- **Scope**: Out-of-scope explicit — trade-offs, not TODOs.
+- **Assumptions**: omit only for truly trivial tasks.
+- **Subtasks**: atomic, verifiable; no class names, methods, or file paths.
+- **Acceptance criteria**: observable, falsifiable, one per outcome, no solution detail.
+- **Language**: English.
+- **Compression**: caveman-compress — drop articles/filler/hedging; fragments OK; keep technical terms/paths/commands exact.
+- **Unknown values**: use `[NEEDS CLARIFICATION: <reason>]` inline; never guess. No variants of this format.
+- **Status**: `draft` (initial), `clarified` (post `devflow.clarify`), `done` (pipeline complete).
 
 See **`examples.md`** in this skill directory for full worked examples.
 
 ### Step 9 - Update docs/product.md feature status
 
-After writing `task.md`, update the **Feature status** table in `docs/product.md`:
+After writing `task.md`, update `docs/product.md` **Feature status** table:
 
-- If the feature is new: add a row with status `in-progress` and a short note
-- If the feature already exists with status `planned`: update to `in-progress`
-- Do not modify other rows or sections outside the `devflow-managed:feature-status` block
+- New feature: add row, status `in-progress`, short note
+- Existing `planned`: update to `in-progress`
+- Do not touch rows/sections outside `devflow-managed:feature-status` block
 
-If `docs/product.md` does not exist, skip this step and note it in the notify response.
+If `docs/product.md` absent, skip and note in notify.
 
 ### Step 10 - Notify user
 
-After writing the file, respond with:
+Respond with:
 
 ```text
 ✅ Task created: devflow/features/[NNN]_[feature-name]/task.md
@@ -218,30 +211,22 @@ docs/product.md: [updated | not found — create with devflow.setup]
 Continue to planning? → devflow.plan
 ```
 
-## Common Rationalizations
-
-| Thought                                        | Reality                                                                                                          |
-| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| “Idea clear — skip to devflow.plan”            | `task.md` HMW + scope + assumptions ground `plan.md`. Skipping → undocumented scope, missing acceptance criteria |
-| “Small task — skip clarification”              | Unvalidated scope → plan rework. Ask before writing when material unknowns exist                                 |
-| “I’ll use user’s wording for Summary”          | Raw input in Summary useless for planning. Rewrite and enrich with product context                               |
-| “Quick feature — skip stress-test”             | Scope creep starts small. Run stress-test (Step 4) even on trivial ideas                                         |
-| “NNN is probably unique”                       | Duplicate prefixes corrupt traceability. Read `devflow/features/` and verify before writing                      |
-| “Subtasks can be vague — plan.md will clarify” | Vague subtasks → vague traceability. `devflow.implement` can’t prove coverage from vague subtasks                |
-
 ## Anti-Patterns
 
-- Copy-pasting the user’s raw wording into **Summary** or **HMW**
-- **Subtasks** that are vague (“improve UX”), huge (“build notifications”), or implementation tickets (“add `FooRepository`”)
-- **Out of scope** that is empty on a large or ambiguous idea
-- Ignoring **`docs/product.md`** implementation status and duplicating shipped work
-- Skipping the **verification checklist** or the **unique `NNN`** rule
-- Running a full **idea-refine** session inside this skill instead of routing out early
-- Filling unknown values silently instead of using `[NEEDS CLARIFICATION: <reason>]` — downstream plan inherits unvalidated guess
+| Anti-Pattern | Fix |
+|---|---|
+| Copying raw user wording into Summary or HMW | Rewrite and enrich from `product.md` |
+| Vague subtasks (“improve UX”) or implementation tickets (“add `FooRepository`”) | Atomic, outcome-level; no file/class names |
+| Empty Out-of-scope on large/ambiguous idea | Explicit trade-offs — reduces plan creep |
+| Skipping clarification because task “seems clear” | Ask when material unknowns exist |
+| Skipping stress-test (Step 4) on small features | 8D pass; scope creep starts small |
+| Assuming NNN prefix is unique without reading state | Read `.devflow-state.json`; never reuse prefix |
+| Running idea-refine work inside this skill | Route to `ce-brainstorm` / `idea-refine` early |
+| Filling unknown values with guesses | Use `[NEEDS CLARIFICATION: ...]` inline |
 
 ## Relationship to `plan.md`
 
-`devflow.plan` turns this task into `plan.md`: file-ordered plan with traceability, decisions, risks, checkpoints, pre-implement checklist. Keep **Subtasks** outcome-level; put paths/provider names in `plan.md`, not here.
+`devflow.plan` → `plan.md`: file-ordered plan with traceability, decisions, risks, checkpoints. Keep Subtasks outcome-level; paths/names go in `plan.md`.
 
 ## I/O Reference
 

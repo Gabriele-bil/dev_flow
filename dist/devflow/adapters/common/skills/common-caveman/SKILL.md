@@ -1,6 +1,6 @@
 ---
 name: common-caveman
-description: Rewrite current response in caveman-speak — drop articles, filler, hedging; keep full technical accuracy. ~75% fewer output tokens. Use when user says "caveman mode", "talk like caveman", "less tokens", "be brief", or needs tighter output. Single invocation — does not persist across session.
+description: Rewrite current response in caveman-speak — drop articles, filler, hedging; keep full technical accuracy. ~75% fewer output tokens. Use when user says caveman mode, talk like caveman, less tokens, or be brief. Single invocation — does not persist.
 ---
 
 # Skill: common-caveman
@@ -9,19 +9,11 @@ description: Rewrite current response in caveman-speak — drop articles, filler
 
 Compress response into caveman-speak. Drop fluff. Keep substance. ~75% token reduction, 100% technical accuracy.
 
-## Core Principles
-
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
-
 ## When NOT to Use
 
 - Security warning — write full sentences
 - Irreversible destructive op (DROP TABLE, rm -rf, force push, branch delete) — confirm in normal prose
-- Multi-step sequence where missing conjunction creates ordering ambiguity
-- Compression produces technical ambiguity (e.g. "migrate table drop column backup first" — order unclear)
+- Multi-step sequence where compression creates ordering ambiguity
 - User asks clarification or repeats question
 
 ## Rules
@@ -40,10 +32,7 @@ Compress response into caveman-speak. Drop fluff. Keep substance. ~75% token red
 - Error messages quoted exact
 - All negations, conditions, verbs
 
-**Patterns:**
-- Fragments OK. Short synonyms: fix not "implement a solution for", big not "extensive", use not "make use of"
-- Structure: `[thing] [action] [reason]. [next step].`
-- Arrows for causality: `X → Y`
+**Patterns:** fragments OK. Short synonyms: fix/"big"/"use" over "implement a solution for"/"extensive"/"make use of". Structure: `[thing] [action] [reason]. [next step].` Arrows: `X → Y`
 
 **Never abbreviate:**
 - API names, function names, method names, class names, error strings
@@ -54,13 +43,13 @@ Compress response into caveman-speak. Drop fluff. Keep substance. ~75% token red
 | Thought | Reality |
 |---------|---------|
 | "Answer complex — needs full sentence" | Complexity ≠ verbosity. Technical substance survives compression. |
-| "Ambiguous without articles" | Add precision where needed; removing "the" ≠ removing clarity |
-| "User won't understand fragments" | Fragments with exact technical terms = faster parse, not harder |
-| "Security topic — skip caveman" | Security topic ≠ security warning. Warning about destructive/irreversible action → normal prose. Explaining a concept → caveman ok |
+| "Ambiguous without articles" | Add precision; removing "the" ≠ removing clarity. |
+| "User won't understand fragments" | Exact technical terms + fragments = faster parse. |
+| "Security topic — skip caveman" | Security topic ≠ warning. Destructive action → prose. Concept → caveman. |
 
 ## Examples
 
-| Normal | Caveman |
+| Before | After |
 |--------|---------|
 | "The issue is that your component creates a new object reference on each render cycle." | "New object ref each render." |
 | "I'd recommend wrapping it in `useMemo` to prevent unnecessary re-renders." | "Wrap in `useMemo`." |
@@ -70,12 +59,7 @@ Compress response into caveman-speak. Drop fluff. Keep substance. ~75% token red
 
 ## Auto-Clarity Exceptions
 
-Revert to normal prose for:
-1. Security warnings
-2. Irreversible action confirmations
-3. Ordering-sensitive multi-step sequences where compression risks misread
-
-Resume caveman immediately after exception block.
+Normal prose for: security warnings, irreversible action confirmations, ordering-sensitive sequences. Resume caveman immediately after.
 
 ## I/O Reference
 

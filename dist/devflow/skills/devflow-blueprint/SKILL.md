@@ -1,6 +1,6 @@
 ---
 name: devflow-blueprint
-description: Transforms a large objective into a multi-PR blueprint with dependency graph, parallel-step detection, and adversarial review gate. Use when a feature requires 3+ PRs, spans multiple sessions, or involves parallel workstreams that cannot fit in a single devflow.plan.
+description: Transforms large objective into multi-PR blueprint with dependency graph and parallel-step detection. Use when feature requires 3+ PRs, spans sessions, or needs parallel workstreams.
 argument-hint: [objective or path-to-brief]
 ---
 
@@ -273,47 +273,19 @@ After writing the file:
 Next: run devflow.plan for step [001] → [step title]
 ```
 
-## Adversarial review: what to do with output
-
-| Subagent verdict | Action |
-|-----------------|--------|
-| LGTM | Write file immediately |
-| Minor issues | Fix inline; add to Review notes; write file |
-| Major issues | Fix steps/briefs/deps; re-run adversarial review (max 1 more round) |
-| Critical issues (after 2 rounds) | Surface to user; do not write file |
-
-## Common Rationalizations
-
-| Thought | Reality |
-|---------|---------|
-| "Steps are obvious — skip dependency graph" | Implicit deps → merge conflicts. Always make them explicit |
-| "Context briefs are redundant — agents can read prior steps" | Prior steps may be in a different session or agent. Briefs must be self-contained |
-| "Adversarial review is slow — skip it for small blueprints" | Small blueprints with wrong parallelization waste agent time. Run the gate |
-| "I'll mark steps parallel-safe unless I'm sure they conflict" | Incorrect parallel-safe marking → concurrent edits to same file. Default to `no`; prove `yes` |
-| "Blueprint can evolve during implement" | Changes mid-implement invalidate context briefs of downstream steps. Approve before coding |
-| "One big step is fine — fewer PRs = less overhead" | Large steps → long reviews, big-bang merges, hard rollbacks. Keep steps PR-sized |
-
-## Red flags
-
-| Symptom | Why it fails |
-|---------|-------------|
-| Step has no acceptance criteria | `devflow.implement` cannot prove completion |
-| Context brief says "see step [NNN] for details" | Brief is not self-contained; fresh agent cannot proceed |
-| Two parallel-safe steps touch the same file | Guaranteed merge conflict |
-| Dependency graph is a straight line with no parallelism | Likely over-sequenced; review for independent workstreams |
-| Blueprint status is `approved` but steps were edited after adversarial review | Bypass of review gate; re-run adversarial review or mark status `draft` |
-| Step title is a layer ("add tests", "update DB") not an increment | Layer-shaped steps → big-bang delivery; reframe as outcome increments |
-
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|---|---|---|
-| Marking all steps `parallel-safe: yes` by default | Concurrent edits to shared files → merge conflicts | Default to `no`; explicitly prove `yes` only when steps have no shared file |
-| Skipping adversarial review for "simple" blueprints | Wrong parallelization detected only during implement (too late) | Always run adversarial review; it is fast and catches ordering errors |
-| Writing context briefs that say "see step X" | Brief not self-contained; fresh agent in new session cannot proceed | Each brief must be fully self-contained (files, contracts, constraints) |
-| Using blueprint for single-PR features | Blueprint overhead without benefit; adds ceremony, delays | Use `devflow.task` → `devflow.plan` directly for single-PR scope |
-| Editing steps after adversarial review without marking `draft` | Review gate bypassed; invalid parallelization may ship | Mark `status: draft` → re-run adversarial review → re-approve |
-| Dependency graph without transitive edges | Implement proceeds in wrong order | Include all transitive dependencies; missing edge = missing ordering constraint |
+| Anti-Pattern | Fix |
+|---|---|
+| Skip dependency graph — "deps obvious" | Implicit deps → merge conflicts. Always make explicit. |
+| Context brief not self-contained ("see step [NNN]") | Fresh agent in new session cannot proceed. Brief = files, contracts, constraints, full context. |
+| Skip/rush adversarial review | Wrong parallelization caught only during implement. Always run the gate. |
+| Mark all steps `parallel-safe: yes` by default | Concurrent edits → conflicts. Default `no`; prove `yes` only when no shared files. |
+| Edit steps after adversarial review without re-marking `draft` | Review gate bypassed. Mark `draft` → re-run adversarial → re-approve. |
+| Use blueprint for single-PR scope | Use `devflow.task` → `devflow.plan` directly. |
+| Step has no acceptance criteria | `devflow.implement` cannot prove completion. |
+| Step title is a layer ("add tests") not outcome increment | Layer-shaped → big-bang delivery. Reframe as increments. |
+| Two parallel-safe steps touch the same file / graph is straight line / missing transitive edges | Concurrent edits, wrong ordering, missed parallelism. Default `parallel-safe: no`; include all transitive deps; review straight-line graphs for parallel workstreams. |
 
 ## I/O Reference
 
