@@ -1,0 +1,14 @@
+{
+  "name": "devflow",
+  "owner": {
+    "name": "Gabriele Bilello"
+  },
+  "plugins": [
+    {
+      "name": "devflow",
+      "description": "Spec-driven development pipeline: idea → task → plan → implement → beautify → test → PR. Adapter-based architecture — supports Angular, Flutter and Next.js.",
+      "source": "./dist/devflow",
+      "version": "1.7.0"
+    }
+  ]
+}

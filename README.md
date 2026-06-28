@@ -117,13 +117,17 @@ dev_flow/
 │   └── devflow/                     # Build output — do not edit directly
 │       ├── .claude-plugin/          # Claude Code plugin manifest (generated)
 │       ├── .cursor-plugin/          # Cursor plugin manifest (generated)
+│       ├── .antigravity-plugin/     # Antigravity CLI plugin manifest (generated)
+│       ├── plugin.json              # Antigravity plugin manifest at root (generated)
+│       ├── hooks.json               # Antigravity hooks manifest at root (generated)
 │       └── ...                      # Mirror of templates/devflow/ (minus dev-only files)
 ├── scripts/
 │   ├── build-plugin.sh              # Orchestrator: reads manifest.json, calls builders
 │   └── builders/
 │       ├── common.sh                # Shared helpers (ok/warn/fail/step)
 │       ├── build-claude.sh          # Generates dist/ for Claude Code
-│       └── build-cursor.sh          # Adds Cursor layer on dist/
+│       ├── build-cursor.sh          # Adds Cursor layer on dist/
+│       └── build-antigravity.sh     # Adds Antigravity CLI layer on dist/
 ├── .github/
 │   └── workflows/
 │       ├── build-verify.yml         # CI: verify dist/ is in sync on every PR
@@ -153,9 +157,9 @@ The build is **idempotent** — it recreates `dist/devflow/` from scratch on eve
 
 ---
 
-## Plugins (Claude Code & Cursor)
+## Plugins (Claude Code, Cursor & Antigravity CLI)
 
-The [`dist/devflow/`](dist/devflow/) folder is a **dual-marketplace plugin**: same tree loads in Claude Code and Cursor.
+The [`dist/devflow/`](dist/devflow/) folder is a **multi-platform plugin**: same tree loads in Claude Code, Cursor, and Antigravity CLI (`agy`).
 
 ### Install via Claude Code marketplace (recommended)
 
@@ -175,6 +179,16 @@ claude --plugin-dir ./dist/devflow
 ### Install locally (Cursor)
 
 Symlink `~/.cursor/plugins/local/devflow` → this repo's `dist/devflow` directory, then reload the window — see [Plugins](https://cursor.com/docs/plugins).
+
+### Install locally (Antigravity CLI / agy)
+
+```bash
+# Validate the plugin files first
+agy plugin validate ./dist/devflow
+
+# Install the plugin locally
+agy plugin install ./dist/devflow
+```
 
 More detail: [`templates/devflow/README.md`](templates/devflow/README.md).
 

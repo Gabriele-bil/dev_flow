@@ -52,6 +52,12 @@ Each adapter folder contains `ADAPTER.md` (stack rules + MCP hints), `skills/` (
 - Local install: `ln -s /path/to/devflow ~/.cursor/plugins/local/devflow` then reload the window.
 - Docs: [Plugins](https://cursor.com/docs/plugins)
 
+## Antigravity CLI (agy)
+
+- Manifests: [`plugin.json`](plugin.json) (root) and [`.antigravity-plugin/plugin.json`](.antigravity-plugin/plugin.json)
+- Local install: `agy plugin install /path/to/devflow`
+- Validate: `agy plugin validate /path/to/devflow`
+
 ## Commands
 
 | Command | What it does |
