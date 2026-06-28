@@ -14,6 +14,7 @@ Review widget and component code only. Skip business logic, data layers, state m
 ## Context to Read First
 
 Before auditing:
+
 - `devflow/features/[NNN]_[feature-name]/task.md` — acceptance criteria and affected UI surfaces
 - `devflow/features/[NNN]_[feature-name]/plan.md` — component structure and interaction flows
 - Active `ADAPTER.md` → **Beautify: accessibility** — stack-specific patterns (Flutter `Semantics`, Angular `aria-*`)
@@ -70,7 +71,7 @@ Before auditing:
 Use dev-flow taxonomy throughout the report:
 
 | Label | Meaning |
-|-------|---------|
+| ------- | --------- |
 | **Critical:** | Completely inaccessible to a user group (e.g., keyboard-only, screen reader) — block merge |
 | *(no prefix)* | Required — fix before merge |
 | **Nit:** | Minor improvement — optional |

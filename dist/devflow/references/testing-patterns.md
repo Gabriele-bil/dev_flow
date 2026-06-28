@@ -5,7 +5,7 @@ Framework-specific patterns in active `ADAPTER.md` → **Technology skills → t
 
 ## Test Structure: Arrange-Act-Assert (AAA)
 
-```
+```text
 // Arrange: set up data and preconditions
 // Act: perform action under test
 // Assert: verify outcome
@@ -17,7 +17,7 @@ Every test follows AAA. Name describes behavior under test, not implementation.
 
 Pattern: `[unit] [expected behavior] [condition]`
 
-```
+```text
 describe('TaskService.createTask')
   it('returns task with pending status')
   it('throws ValidationError when title empty')
@@ -28,7 +28,7 @@ describe('TaskService.createTask')
 
 Mock only at system boundaries. Never mock internals.
 
-```
+```text
 Mock:                          Do not mock:
 ├── Database calls             ├── Internal utility functions
 ├── HTTP / network requests    ├── Business logic
@@ -40,7 +40,7 @@ Mock:                          Do not mock:
 ## Test Types and Pyramid
 
 | Type | Coverage target | What it tests |
-|------|----------------|---------------|
+| ------ | ---------------- | --------------- |
 | Unit (80%) | Domain logic, models, state methods | Inputs → outputs, error paths |
 | Integration (15%) | User flows end-to-end, service boundaries | Wired behavior across layers |
 | E2E (5%) | Critical user journeys only | Full stack from UI to data |
@@ -61,6 +61,7 @@ If behavior matters enough to keep, put a test on it. No "too simple to test" ex
 ## Coverage Gap Inventory
 
 Before writing tests:
+
 1. List all public functions/classes/state methods in scope
 2. For each: happy path + at least one error/edge case
 3. Explicitly flag surfaces with no coverage — never skip silently
@@ -68,7 +69,7 @@ Before writing tests:
 ## Test Anti-Patterns
 
 | Anti-Pattern | Problem | Fix |
-|---|---|---|
+| --- | --- | --- |
 | Testing implementation details | Breaks on refactor | Test inputs/outputs, not internals |
 | Snapshot everything | Diffs never reviewed | Assert specific values |
 | Shared mutable state between tests | Tests pollute each other | Setup/teardown per test |
@@ -81,7 +82,7 @@ Before writing tests:
 ## Pass@k vs Pass^k
 
 | Metric | Meaning | Use for |
-|--------|---------|---------|
+| --- | --- | --- |
 | **pass@k** | At least 1 of k attempts passes | Proving capability exists; LLM eval |
 | **pass^k** | All k attempts pass | Proving reliability; production gate |
 
@@ -90,12 +91,13 @@ In `devflow-test`: target **pass^k ≥ 1** for all written tests. A test that pa
 ## Verification Checkpoints (Multi-Step Features)
 
 Set explicit checkpoints during `devflow-implement`:
+
 1. Define acceptance criteria per subtask in `plan.md`
 2. Run subset of tests at each checkpoint — don't wait for full suite
 3. Fix failures before proceeding to next subtask
 4. Full suite only at `devflow-test` step
 
-```
+```text
 subtask complete → checkpoint test → pass? → next subtask
                                     fail? → fix here, not later
 ```
@@ -105,7 +107,7 @@ subtask complete → checkpoint test → pass? → next subtask
 Coverage % alone is misleading. These matter more:
 
 | Signal | Interpretation |
-|--------|---------------|
+| -------- | --------------- |
 | Branch coverage < 70% | Missing error path tests |
 | All happy paths, no error paths | False confidence |
 | Tests pass but coverage 0% | Test imports wrong module |

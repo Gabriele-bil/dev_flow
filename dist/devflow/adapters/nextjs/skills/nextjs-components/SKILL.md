@@ -14,6 +14,7 @@ Next.js 14+, React 18+, TypeScript strict.
 ## When to Use `'use client'`
 
 Add directive ONLY if component uses:
+
 - `useState`, `useEffect`, `useRef`, `useCallback`, `useMemo`
 - Event handlers: `onClick`, `onChange`, `onSubmit`, etc.
 - Browser-only APIs: `window`, `document`, `localStorage`
@@ -108,7 +109,7 @@ All from `next/navigation` — NOT `next/router` (legacy Pages Router):
 ### Suspense boundary — quale hook lo richiede
 
 | Hook | Suspense richiesto |
-|---|---|
+| --- | --- |
 | `useSearchParams()` | Sempre |
 | `usePathname()` | Solo in route dinamiche (`[slug]`, `[id]`) |
 | `useParams()` | No |
@@ -206,7 +207,7 @@ export function UserProfile({ user }: { user: User }) {
 Props che attraversano il confine Server→Client devono essere JSON-serializzabili:
 
 | Tipo | Passa? | Fix |
-|---|---|---|
+| --- | --- | --- |
 | `string`, `number`, `boolean` | ✅ | — |
 | Oggetto/array plain | ✅ | — |
 | Server Action (`'use server'`) | ✅ | — |
@@ -252,7 +253,7 @@ export function ClientButton() {
 Causati da mismatch HTML server vs client. Cause comuni e fix:
 
 | Causa | Fix |
-|---|---|
+| --- | --- |
 | `Date.now()` / `Math.random()` nel render | Sposta in `useEffect` o usa stato inizializzato client-side |
 | `window` / `localStorage` nel render | `if (typeof window !== 'undefined')` oppure `useEffect` |
 | HTML non valido: `<div>` dentro `<p>`, `<p>` annidati | Correggi struttura HTML |

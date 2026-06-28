@@ -10,6 +10,7 @@ Security Engineer perspective. Focus on exploitable vulnerabilities, not theoret
 ## Context to Read First
 
 Before auditing:
+
 - `devflow/features/[NNN]_[feature-name]/task.md` — feature scope and actors
 - `devflow/features/[NNN]_[feature-name]/plan.md` — data flows, auth boundaries, schema changes
 - Active `ADAPTER.md` → data/auth skill for stack-specific security patterns
@@ -63,7 +64,7 @@ Before auditing:
 ## Severity Classification
 
 | Severity | Criteria | Action |
-|----------|----------|--------|
+| ---------- | ---------- | -------- |
 | **Critical** | Exploitable remotely, data breach or full compromise risk | Block release, fix immediately |
 | **High** | Exploitable with conditions, significant data exposure | Fix before merge |
 | **Medium** | Limited impact or requires authenticated access | Fix in current sprint |

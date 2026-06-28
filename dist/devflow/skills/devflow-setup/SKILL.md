@@ -53,6 +53,7 @@ Before loading templates, determine the active technology stack and update the c
    - If `next.config.js`, `next.config.mjs`, or `next.config.ts` exists, or `next` is in `package.json`, adapter is `nextjs`.
 2. If the stack cannot be detected automatically, ask the user: "What stack are you using? (Available adapters: angular, flutter, nextjs)" and wait for their choice.
 3. Overwrite `@devflow/config.md` with the resolved adapter:
+
    ```markdown
    # DevFlow Configuration
 
@@ -61,6 +62,7 @@ Before loading templates, determine the active technology stack and update the c
 
    Pipeline skills read this file first, then load `@devflow/adapters/<adapter>/ADAPTER.md` for technology-specific commands, plan sections, checklists, and skill references.
    ```
+
 4. Build adapter contract path:
    `@devflow/adapters/<adapter>/ADAPTER.md`
 
@@ -111,6 +113,7 @@ After collecting questionnaire answers, scan the live repo to ground REGISTRY.md
 Use these observations to pre-fill `pattern-1`, `pattern-2` (and optionally `pattern-3`) in the placeholder map before rendering — replacing any questionnaire `[TODO: fill]` values for patterns with real examples from the repo.
 
 Additionally, sample 5-10 existing source files across the project root to infer `naming-conventions`:
+
 - Extract file naming pattern (snake_case.dart, kebab-case.ts, PascalCase.tsx, etc.)
 - Extract class and top-level function naming from file headers
 - Pre-fill `naming-conventions` placeholder if a consistent pattern is found; otherwise leave `[TODO: fill]`
@@ -122,7 +125,7 @@ If the feature directory does not exist or is empty, skip feature scan and use q
 Build final values for template placeholders from:
 
 | Source | Extract | Required |
-|---|---|:---:|
+| --- | --- | :---: |
 | `constitution.md` | architecture/layering, naming, default commands | no |
 | existing `docs/product.md` | product/app hints for continuity | no |
 | Adapter-defined project manifests (for example language/package manifests) | package/project name | no |
@@ -136,6 +139,7 @@ If a value cannot be inferred, keep a literal placeholder token:
 For constitution fields, use these adapter defaults when the questionnaire answer is empty or `[TODO: fill]`:
 
 **Flutter:**
+
 - `layer-order`: `domain → data → riverpod → UI → i18n/codegen`
 - `import-conventions`: `Use package:{{project-name}} imports. Barrel files: index.dart per layer. No relative cross-layer imports.`
 - `key-decisions`:
@@ -146,6 +150,7 @@ For constitution fields, use these adapter defaults when the questionnaire answe
   - Routing: [TODO: fill]
 
 **Angular:**
+
 - `layer-order`: `core → shared → pages`
 - `import-conventions`: `Path aliases: @core/, @shared/, @pages/. Barrel files: public-api.ts. No deep cross-module imports.`
 - `key-decisions`:
@@ -155,6 +160,7 @@ For constitution fields, use these adapter defaults when the questionnaire answe
   - Routing: Angular Router with lazy loading
 
 **Next.js:**
+
 - `layer-order`: `app → components → lib → actions`
 - `import-conventions`: `Path alias: @/ → project root. Barrel files: index.ts per directory. No server imports in Client Components.`
 - `key-decisions`:
@@ -168,7 +174,7 @@ For constitution fields, use these adapter defaults when the questionnaire answe
 You must collect and resolve these fields before render:
 
 | Placeholder | Target file | Prompt intent |
-|---|---|---|
+| --- | --- | --- |
 | `project-name` | AGENTS, PRODUCT | Product/app name shown to humans |
 | `adapter` | AGENTS | Active stack adapter id |
 | `format-cmd` | AGENTS, REGISTRY | Formatting command |
@@ -225,6 +231,7 @@ After rendering each file, estimate token count using word count as proxy (300 w
 - `constitution.md`: warn if rendered content exceeds ~400 words
 
 If over budget, trim in this order:
+
 1. Remove worked examples or multi-sentence explanations from bullets — replace with imperative fragment
 2. Remove any sentence starting with "This section..." or "Note that..."
 3. Shorten skill reference paths only if duplicated elsewhere in the file
@@ -273,10 +280,12 @@ Ensure `.devflow-state.json` is listed in the consumer project's `.gitignore`.
 
 - `.gitignore` exists and already contains `.devflow-state.json` → skip
 - `.gitignore` exists and does not contain it → append:
-  ```
+
+  ```gitignore
   # devflow runtime state
   .devflow-state.json
   ```
+
 - `.gitignore` does not exist → skip (the `pre-compact` hook appends it automatically on first run)
 
 ### Step 7c - Install adapter setup dependencies (required)
@@ -362,7 +371,7 @@ Before final response:
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
-|---|---|
+| --- | --- |
 | Writing files inside `devflow/features/` during setup | Write only to consumer project root; `devflow/` is read-only during setup. |
 | Skipping the questionnaire and guessing adapter | Always run the full questionnaire; no defaults. |
 | Regenerating setup files without `--force` on existing project | Check for managed markers; preserve non-managed content. |
@@ -375,7 +384,7 @@ Before final response:
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Reads | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (including `Setup dependencies`), adapter + fallback templates |
 | Writes | `AGENTS.md`, `REGISTRY.md`, `docs/product.md` (consumer project root); `@devflow/config.md`; `.gitignore` (appends `.devflow-state.json` if missing) |
 | Side effects | Installs adapter setup dependencies using project package manager or Flutter pub |

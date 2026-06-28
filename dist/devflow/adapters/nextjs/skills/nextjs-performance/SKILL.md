@@ -161,6 +161,7 @@ const myFont = localFont({
 ```
 
 **Rules:**
+
 - Always use `variable` mode to integrate with Tailwind/CSS variables.
 - Specify `subsets` to preload only needed character sets — reduces font file size.
 - Declare fonts in `layout.tsx` — not in individual components.
@@ -176,7 +177,7 @@ import Script from 'next/script'
 ### Loading strategies
 
 | Strategy | When JS loads | Use for |
-|---|---|---|
+| --- | --- | --- |
 | `beforeInteractive` | Before page hydration | Critical polyfills (rare) |
 | `afterInteractive` (default) | After page hydration | Tag managers, analytics |
 | `lazyOnload` | Browser idle | Low-priority third-party widgets |
@@ -296,6 +297,6 @@ ANALYZE=true npm run build
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Invoked by | `devflow-implement` when touching `<img>`, font imports, `<script>` tags, `next.config.ts` images/font/script config |
 | Related | `nextjs-architecture`, `nextjs-ui`, `nextjs-metadata` |

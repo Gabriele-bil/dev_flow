@@ -40,7 +40,7 @@ Read `@devflow/config.md` and `@devflow/adapters/<adapter>/ADAPTER.md`. Use the 
 Select type by feature nature:
 
 | Type | When to use |
-|---|---|
+| --- | --- |
 | `feat` | New feature or capability |
 | `fix` | Bug fix |
 | `chore` | Tooling, dependencies, configuration |
@@ -148,7 +148,7 @@ DevFlow pipeline complete for TASK-[NNN].
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
-|---|---|
+| --- | --- |
 | Opening PR with failing tests | Fix or document failures with root cause first |
 | Ticking checklist without running commands | Every item must reflect actual command output |
 | Skipping `registry.md` update for new patterns | Undocumented patterns → inconsistency |
@@ -161,7 +161,7 @@ DevFlow pipeline complete for TASK-[NNN].
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
 | Runs | `git add .` · `git commit` · `git push` · `gh pr create` |
 | Next step | - (end of pipeline) |

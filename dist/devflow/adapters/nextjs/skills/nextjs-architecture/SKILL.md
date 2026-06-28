@@ -28,7 +28,7 @@ Use when creating new routes, layouts, reorganizing feature folders, or reviewin
 Each route folder can contain these reserved filenames:
 
 | File | Purpose |
-|---|---|
+| --- | --- |
 | `page.tsx` | Route leaf — makes URL publicly accessible |
 | `layout.tsx` | Persistent wrapper — wraps page and children, does NOT re-mount on navigation |
 | `loading.tsx` | Automatic Suspense boundary — shows while page/children stream |
@@ -42,6 +42,7 @@ Each route folder can contain these reserved filenames:
 | `twitter-image.tsx` | Auto-generated Twitter card image — runs on Edge runtime |
 
 Rules:
+
 - `layout.tsx` receives `children: React.ReactNode` — never fetch data that changes per-page inside root layout.
 - `error.tsx` MUST be a Client Component (`'use client'`). Receives `error` and `reset` props.
 - `global-error.tsx` MUST be a Client Component AND include `<html><body>` tags — replaces root layout on error.
@@ -51,17 +52,19 @@ Rules:
 ## 3) Route Groups and Private Folders
 
 **Route groups** — parentheses: `(group-name)/`
+
 - Organize routes without adding URL segment.
 - Each group can have its own `layout.tsx`.
 - Use to split authenticated vs public layout.
 
 **Private folders** — underscore: `_folder-name/`
+
 - Excluded from routing system entirely.
 - Use for components, hooks, lib co-located with a route but not routes themselves.
 
 ## 4) Recommended App Structure
 
-```
+```text
 app/
 ├── (marketing)/               # public pages, no auth required
 │   ├── layout.tsx             # marketing layout (nav, footer)
@@ -112,6 +115,7 @@ middleware.ts                  # At project root — NOT inside app/
 **Server Component = default.** Absence of directive = server.
 
 Promote to Client Component ONLY when file requires:
+
 - `useState`, `useReducer`, `useContext`
 - `useEffect`, `useRef`, `useLayoutEffect`
 - Event handlers attached to DOM elements (`onClick`, `onChange`, etc.)
@@ -119,6 +123,7 @@ Promote to Client Component ONLY when file requires:
 - Third-party libraries that rely on the above
 
 Rules:
+
 - Put `'use client'` as deep in the tree as possible — not on parent wrappers.
 - Never put `'use client'` on root `layout.tsx` — renders entire app client-side.
 - Context providers MUST be in a separate `providers.tsx` with `'use client'`. Import in root layout.
@@ -156,7 +161,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ## 6) Dependency Flow
 
-```
+```text
 page.tsx
   └── _components/*.tsx
         └── actions.ts / lib/[domain]/service.ts
@@ -177,7 +182,7 @@ File at **project root** (sibling to `app/`, `lib/`, `components/`). Never insid
 Next.js 16+ renamed `middleware.ts` → `proxy.ts` (codemod: `npx @next/codemod@latest upgrade`):
 
 | Version | File | Export | Matcher config |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 14–15 | `middleware.ts` | `middleware()` | `config` |
 | 16+ | `proxy.ts` | `proxy()` | `proxyConfig` |
 
@@ -220,7 +225,7 @@ export const proxyConfig = {
 ## 8) Naming Conventions
 
 | Target | Convention | Example |
-|---|---|---|
+| --- | --- | --- |
 | Folders / files | kebab-case | `user-profile/`, `user-card.tsx` |
 | React components | PascalCase (function name) | `export function UserCard()` |
 | Utility functions | camelCase | `formatDate()`, `parseSlug()` |
@@ -237,7 +242,7 @@ export const proxyConfig = {
 
 Rendono più pagine nello stesso layout simultaneamente (es. modale su sfondo):
 
-```
+```text
 app/
   @modal/                    # slot parallelo
     (.)product/[id]/         # intercepting route — cattura /product/[id]
@@ -295,6 +300,7 @@ export default async function ProductModal({ params }: { params: Promise<{ id: s
 ```
 
 **Regole:**
+
 - `default.tsx` obbligatorio in ogni slot parallelo — evita 404 al refresh diretto.
 - Chiudi il modale con `router.back()`, non `router.push('/')`.
 - Notazione intercepting: `(.)` = stesso livello, `(..)` = un livello su, `(...)` = root.
@@ -315,7 +321,7 @@ Before merge, confirm:
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Invoked by | `devflow-implement` when file path matches `app/**/page.tsx`, `app/**/layout.tsx`, `app/**/template.tsx`, `app/**/loading.tsx`, `app/**/error.tsx`, `app/**/not-found.tsx` |
 | Reads | `@devflow/adapters/nextjs/ADAPTER.md` |
 | Related | `nextjs-server`, `nextjs-components` |

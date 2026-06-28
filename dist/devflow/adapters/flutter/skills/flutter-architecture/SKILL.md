@@ -23,7 +23,7 @@ Define layer ownership and dependency direction for new features; used in `devfl
 Dependency direction: **UI → Providers → Domain ← Data**
 
 | Layer | Folder | Owns |
-|-------|--------|------|
+| ------- | -------- | ------ |
 | Domain | `lib/features/<name>/domain/` | Entities, sealed failures, repository contracts |
 | Data | `lib/features/<name>/data/` | DTOs, mappers, datasources, repository impls |
 | Providers | `lib/features/<name>/providers/` | `@riverpod` notifiers; calls repository contracts |
@@ -32,6 +32,7 @@ Dependency direction: **UI → Providers → Domain ← Data**
 Shared: `lib/core/` — theme, routing, layout helpers, shared widgets.
 
 Dependency rules:
+
 - Domain: no imports from data, providers, or UI.
 - Providers: depend on domain contracts, not data implementations.
 - UI: watches providers only; no direct repository or datasource calls.
@@ -42,6 +43,7 @@ Dependency rules:
 Full tree for single-page and multi-page features: see [`references/feature-tree.md`](references/feature-tree.md).
 
 Summary:
+
 - **Single page** — `pages/<name>_page.dart` flat inside the feature.
 - **Multiple pages** — each page becomes `pages/<page>/` subfolder with its own `providers/`, `widgets/`, `<page>_page.dart`, and `_<page>.dart` barrel.
 - Feature-level `providers/` and `widgets/` hold elements shared across pages; page-level subfolders hold page-scoped elements only.
@@ -62,7 +64,7 @@ Implement bottom-up (per `ADAPTER.md` dependency ordering):
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
-|---|---|
+| --- | --- |
 | Entity holds `fromJson` | JSON = data layer; domain stays pure |
 | Skip layers for simple CRUD | All layers mandatory; thin = fast, not skippable |
 | `ChangeNotifier` ViewModel | DevFlow uses Riverpod notifiers only |
@@ -73,7 +75,7 @@ Implement bottom-up (per `ADAPTER.md` dependency ordering):
 ## I/O Reference
 
 | | |
-|-|-|
+| - | - |
 | Trigger | New feature architecture, layer ownership decisions, feature file-tree scaffold |
 | Reads | `constitution.md` (stack + naming), `plan.md` (file list section) |
 | Writes | Informs file list + dependency ordering in `plan.md` |

@@ -42,6 +42,7 @@ Before dispatching, verify all of the following. Stop and report which check fai
 Dispatch all three agents **simultaneously**. Do not wait for one before dispatching the next.
 
 Each agent receives:
+
 - Path to `task.md` and `plan.md`
 - List of files created/modified by `devflow.implement` and `devflow.beautify`
 - Active adapter name (from `@devflow/config.md`)
@@ -98,7 +99,7 @@ Reviewed by: code-reviewer · security-auditor · test-engineer
 ## Step 4 - Gate decision
 
 | Finding state | Action |
-|---|---|
+| --- | --- |
 | Any **Critical** issue | Stop. Present report. Wait for user to fix before re-running |
 | Any **Required** issue | Present report. Ask: "Fix before PR or proceed with documented exceptions?" |
 | Only **Nit / Optional / FYI** | Proceed automatically to Step 5 |
@@ -121,7 +122,7 @@ Execute `@devflow/skills/devflow-pr/SKILL.md` exactly.
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
-|---|---|
+| --- | --- |
 | Skipping ship gate ("tests passed") | Tests prove behavior; ship gate proves merge readiness across quality, security, coverage |
 | Running reviewers sequentially | Fan-out is the design; sequential loses independent perspectives |
 | Auto-proceeding on Critical issue | Critical = block; fix or escalate; never auto-proceed |
@@ -136,7 +137,7 @@ Execute `@devflow/skills/devflow-pr/SKILL.md` exactly.
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
 | Reads | Files from `devflow.implement` / `devflow.beautify` summary |
 | Dispatches | `code-reviewer`, `security-auditor`, `test-engineer` (parallel) |

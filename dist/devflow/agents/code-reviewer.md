@@ -10,6 +10,7 @@ Staff Engineer perspective. Evaluate changes for merge readiness.
 ## Context to Read First
 
 Before reviewing:
+
 - `devflow/features/[NNN]_[feature-name]/task.md` — acceptance criteria and scope
 - `devflow/features/[NNN]_[feature-name]/plan.md` — architecture decisions and traceability
 - `constitution.md` — naming, layering, file conventions
@@ -67,7 +68,7 @@ Read tests first — they reveal intent and coverage.
 Use dev-flow taxonomy throughout the report:
 
 | Label | Meaning |
-|-------|---------|
+| ------- | --------- |
 | **Critical:** | Security risk, wrong behavior vs plan, data loss risk — block merge |
 | *(no prefix)* | Required — fix before merge |
 | **Nit:** | Minor style — optional |

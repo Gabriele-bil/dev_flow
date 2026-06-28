@@ -162,7 +162,7 @@ Do not store cross-step aggregate payload in widget-local mutable state.
 ## Anti-patterns
 
 | Avoid | Prefer |
-|---|---|
+| --- | --- |
 | Reading `.value` before validation | `saveAndValidate()` then read `.value` |
 | Enum instances as raw field values | serializable value + mapping on submit |
 | Business submit logic inside widget callback | notifier/use-case orchestrates submit |
@@ -178,7 +178,7 @@ Do not store cross-step aggregate payload in widget-local mutable state.
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Trigger | Any feature that introduces or modifies a form (login, signup, wizard steps, edit screens) |
 | Reads | `constitution.md` (architecture conventions), `registry.md` (existing form patterns) |
 | Invoked by | `devflow.implement` (form screens), `devflow.plan` (when wizard or multi-field form is planned) |

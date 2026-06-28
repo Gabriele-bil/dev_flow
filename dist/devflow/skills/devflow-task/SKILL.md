@@ -214,7 +214,7 @@ Continue to planning? → devflow.plan
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
-|---|---|
+| --- | --- |
 | Copying raw user wording into Summary or HMW | Rewrite and enrich from `product.md` |
 | Vague subtasks (“improve UX”) or implementation tickets (“add `FooRepository`”) | Atomic, outcome-level; no file/class names |
 | Empty Out-of-scope on large/ambiguous idea | Explicit trade-offs — reduces plan creep |

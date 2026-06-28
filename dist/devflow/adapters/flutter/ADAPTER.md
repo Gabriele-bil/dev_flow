@@ -5,7 +5,7 @@ Single source of truth for Flutter behavior. Pipeline skills (`devflow-plan`, `d
 ## Technology skills (load by feature type)
 
 | When | Load |
-|------|------|
+| ------ | ------ |
 | New feature architecture, layer ownership, feature file-tree scaffold | `@devflow/adapters/flutter/skills/flutter-architecture/SKILL.md` |
 | Database read/write/auth, schema, RLS | `@devflow/adapters/flutter/skills/flutter-supabase/SKILL.md` |
 | Schema migrations / SQL artifacts | `@devflow/adapters/flutter/skills/flutter-supabase-migrations/SKILL.md` |
@@ -20,7 +20,7 @@ Single source of truth for Flutter behavior. Pipeline skills (`devflow-plan`, `d
 
 - Required baseline for this adapter:
   - `context7`
-  - `sequential-thinking` (MCP server: https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking)
+  - `sequential-thinking` (MCP server: <https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking>)
   - `dart` (required on Flutter projects)
 - **Dart MCP** — package APIs, Flutter/Dart signatures (use in plan, implement, beautify).
 - **Context7** — third-party docs when Dart MCP is insufficient.
@@ -112,7 +112,7 @@ All user-facing copy via **slang** keys and generated accessors — no hardcoded
 When implementing files, load technology skills based on file path patterns:
 
 | File path pattern | Load skill |
-|---|---|
+| --- | --- |
 | `*/domain/*.dart`, `*_entity.dart`, `*_model.dart` | `flutter-models` |
 | `*/providers/*.dart`, `*_provider.dart`, `*_notifier.dart` | `flutter-riverpod` |
 | `*/datasource*.dart`, `*_datasource.dart`, `*_repository*.dart` | `flutter-supabase` |
@@ -158,7 +158,7 @@ Every directory containing Dart source files **must** have a barrel file that re
 Examples:
 
 | Folder | Barrel file |
-|--------|-------------|
+| -------- | ------------- |
 | `domain/` | `domain/_domain.dart` |
 | `data/` | `data/_data.dart` |
 | `providers/` | `providers/_providers.dart` |
@@ -169,6 +169,7 @@ Examples:
 **Import rules:**
 
 1. **Cross-folder imports** — always import from the nearest barrel, never from individual files in another folder:
+
    ```dart
    // ✅ Good — import the barrel of the target folder
    import '../domain/_domain.dart';
@@ -176,7 +177,9 @@ Examples:
    // ❌ Bad — direct import of a file in another folder
    import '../domain/pet.dart';
    ```
+
 2. **Same-folder imports** — import the file directly (no barrel indirection):
+
    ```dart
    // ✅ Good — same folder: import the file directly
    import 'pet_mapper.dart';
@@ -184,7 +187,9 @@ Examples:
    // ❌ Bad — do not import the barrel from within the same folder
    import '_data.dart';
    ```
+
 3. **Barrel content** — export every public `.dart` file in the folder; do not filter unless a file is intentionally package-private:
+
    ```dart
    // data/_data.dart
    export 'pet_dto.dart';

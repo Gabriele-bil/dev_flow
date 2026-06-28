@@ -66,7 +66,7 @@ Rules:
 
 Define component defaults once in `MaterialTheme.theme(ColorScheme)` in [`theme.dart`](lib/core/theme/theme.dart). That single method backs `light()`, `dark()`, and contrast variants, so **one** update applies to every brightness.
 
-**Already defined**
+### Already defined
 
 - **`InputDecorationTheme`**: `filled: true`; `fillColor: colorScheme.surfaceContainerHighest`; `OutlineInputBorder` with `BorderRadius.circular(AppLayout.inputBorderRadius)` for all states; `outline` when enabled; `primary` width 2 when focused; `error` (width 2 when focused error); `disabledBorder` uses `onSurface` at 12% alpha.
 

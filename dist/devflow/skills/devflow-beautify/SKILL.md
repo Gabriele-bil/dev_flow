@@ -149,7 +149,7 @@ Full checklist: `@devflow/references/accessibility-checklist.md`
 Tag all findings:
 
 | Prefix | Meaning | Action |
-|--------|---------|--------|
+| -------- | --------- | -------- |
 | **Critical:** | Security risk, wrong behavior vs plan, data loss risk | Must fix before treating beautify as done |
 | *(none)* | Required | Fix before merge / next pipeline step |
 | **Nit:** | Minor style preference | Optional |
@@ -249,7 +249,7 @@ Continue to testing? -> devflow.test
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
-|---|---|
+| --- | --- |
 | Expanding scope beyond `devflow.implement` summary | Limit strictly to the implement summary |
 | Adding features during beautify ("while I'm here") | Log as new subtask; implement in next cycle |
 | Skipping security axis ("already reviewed") | Run all 8 axes every beautify run |
@@ -271,7 +271,7 @@ Continue to testing? -> devflow.test
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Reads | files from `devflow.implement` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md`, `registry.md` |

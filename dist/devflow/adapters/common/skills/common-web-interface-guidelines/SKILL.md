@@ -160,7 +160,7 @@ Group by file. `file:line` format (VS Code clickable). Terse.
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Reads | UI source files passed by the user |
 | Writes | Nothing — audit output only |
 | Next step | Apply fixes, then re-run if needed |

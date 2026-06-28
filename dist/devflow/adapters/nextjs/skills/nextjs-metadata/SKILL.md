@@ -170,7 +170,7 @@ export const metadata: Metadata = {
 Place these files in `app/` (or route folders) — no code needed:
 
 | File | Output |
-|---|---|
+| --- | --- |
 | `favicon.ico` | `<link rel="icon">` |
 | `icon.png` / `icon.svg` | `<link rel="icon">` |
 | `apple-icon.png` | `<link rel="apple-touch-icon">` |
@@ -299,6 +299,6 @@ export default async function Image({ params, id }: { params: Promise<{ id: stri
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Invoked by | `devflow-implement` when touching `generateMetadata`, `generateViewport`, `generateSitemaps`, `generateImageMetadata`, `opengraph-image`, `robots.ts`, `sitemap.ts`, or metadata-related config |
 | Related | `nextjs-server`, `nextjs-architecture` |
