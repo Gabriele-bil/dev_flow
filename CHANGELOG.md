@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.8.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.7.0...devflow-v1.8.0) (2026-06-28)
+
+
+### Features
+
+* Add Antigravity CLI plugin support via build-antigravity script and manifest generation ([4931fd8](https://github.com/Gabriele-bil/dev_flow/commit/4931fd843b253a7cfd01b7a5b7e8d0784a74a294))
+* Initialize tokensave ([97c4a74](https://github.com/Gabriele-bil/dev_flow/commit/97c4a74774bf7a2bed1d889a9dbd5632d10c4459))
+
+
+### Bug Fixes
+
+* Blueprint destination directory ([d23e0af](https://github.com/Gabriele-bil/dev_flow/commit/d23e0af2661ae8c799e61d4684b0a4e0f239330d))
+
 ## [1.7.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.6.0...devflow-v1.7.0) (2026-06-11)
 
 
