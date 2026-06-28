@@ -21,7 +21,7 @@ This directory is the **installable DevFlow package**: core pipeline skills, sla
 Three adapters ship out of the box:
 
 | Adapter | Commands | Stack |
-|---------|----------|-------|
+| --------- | ---------- | ------- |
 | `flutter` | `flutter analyze`, `flutter test` | Flutter · Riverpod · Supabase |
 | `angular` | `pnpm run lint`, `pnpm run test`, `pnpm run build` | Angular v20+ · NgRx Signal Store · Tailwind |
 | `nextjs` | `pnpm lint`, `pnpm test`, `pnpm build` | Next.js 15+ · Zustand · Tailwind · shadcn/ui |
@@ -61,7 +61,7 @@ Each adapter folder contains `ADAPTER.md` (stack rules + MCP hints), `skills/` (
 ## Commands
 
 | Command | What it does |
-|---|---|
+| --- | --- |
 | `devflow.setup` | Generate `AGENTS.md`, `REGISTRY.md`, and `docs/product.md` from adapter templates |
 | `devflow.task` | Raw idea → structured task with HMW framing and verifiable subtasks |
 | `devflow.plan` | `task.md` → file-ordered implementation plan with traceability |
@@ -82,7 +82,7 @@ Each adapter folder contains `ADAPTER.md` (stack rules + MCP hints), `skills/` (
 Ten hooks activate automatically — no user invocation required.
 
 | Event | Script | What it does |
-|---|---|---|
+| --- | --- | --- |
 | SessionStart | `session-start.sh` | Injects discovery skill + suggests context file based on active pipeline step |
 | SessionStart | `session-start-learnings.sh` | Injects past learnings from `.devflow-learnings.jsonl` into session context |
 | PreToolUse | `pre-config-protect.sh` | Blocks edits to linter/analyzer config files |
@@ -100,7 +100,7 @@ Ten hooks activate automatically — no user invocation required.
 Three context files in `devflow/contexts/` tune Claude's behavior per pipeline phase. The SessionStart hook suggests which one to load based on the active step.
 
 | Context | Suggested for | Focus |
-|---|---|---|
+| --- | --- | --- |
 | `contexts/implement.md` | devflow.implement, devflow.beautify | Code-first, follow plan.md order, mark [done] |
 | `contexts/review.md` | devflow.ship | 7-axis review, severity-ordered findings |
 | `contexts/research.md` | devflow.task, devflow.plan | Explore before acting, no application code |
@@ -110,7 +110,7 @@ Three context files in `devflow/contexts/` tune Claude's behavior per pipeline p
 `ETHOS.md` defines the four non-negotiable principles injected into every skill:
 
 | Principle | Rule |
-|---|---|
+| --- | --- |
 | `spec-first` | No code before `task.md` + `plan.md` approved |
 | `traceability` | Every subtask → acceptance criterion → file(s) |
 | `vertical slices` | End-to-end increments, never layers |
@@ -121,7 +121,7 @@ Three context files in `devflow/contexts/` tune Claude's behavior per pipeline p
 Stack-agnostic checklists and guides in `references/`:
 
 | File | Purpose |
-|------|---------|
+| ------ | --------- |
 | `accessibility-checklist.md` | WCAG 2.1 AA — keyboard, screen readers, touch targets |
 | `model-selection.md` | Haiku / Sonnet / Opus guide per pipeline step |
 | `security-checklist.md` | OWASP Top 10, auth, input validation, secrets baseline |
@@ -133,7 +133,7 @@ Stack-agnostic checklists and guides in `references/`:
 Cross-adapter skills in `adapters/common/`:
 
 | Skill | Purpose |
-|-------|---------|
+| ------- | --------- |
 | `common-clean-code` | SOLID, DRY, design principles across all stacks |
 | `common-web-interface-guidelines` | UI/UX quality rules for all web adapters |
 | `common-caveman` | Token-lean, filler-free response style |

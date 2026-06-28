@@ -10,7 +10,7 @@ Canonical section checklist for all DevFlow adapters. Use when creating a new ad
 ## Required sections
 
 | Section | Key | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Technology skills table | `## Technology skills` | `[R]` — maps feature type → skill path |
 | MCP baseline | `## MCP` | `[R]` — required baseline + optional servers |
 | Setup templates | `## Setup: templates` | `[R]` — template resolution paths |
@@ -31,7 +31,7 @@ Canonical section checklist for all DevFlow adapters. Use when creating a new ad
 ## Optional sections
 
 | Section | Key | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Caveman response rules | `## Caveman response rules` | `[O]` — stack teams may add style reminders |
 | Codegen triggers | within `## Implement` | `[O]` — only for stacks with code generation |
 | Responsive tests | within `## Test` | `[O]` — for UI-heavy stacks |

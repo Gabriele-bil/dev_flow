@@ -33,6 +33,7 @@ cat .devflow-state.json 2>/dev/null || echo "STATE_MISSING"
 ```
 
 Extract:
+
 - `active_feature` — feature directory name
 - `next_step` — last recorded step
 - `next_feature_number` — NNN counter
@@ -44,7 +45,7 @@ If `STATE_MISSING`: proceed to **Recovery path C**.
 Determine failure category based on state + file existence:
 
 | Category | Condition | Recovery |
-|----------|-----------|----------|
+| ---------- | ----------- | ---------- |
 | **A — Step failure** | State valid; last step threw error or loop | Re-run step from last checkpoint |
 | **B — State drift** | State says step X; feature files indicate step Y | Resync state to match files |
 | **C — State missing** | `.devflow-state.json` absent | Infer state from feature files; reconstruct |
@@ -74,7 +75,7 @@ grep -i "error\|fail\|stuck\|issue" .devflow-learnings.jsonl 2>/dev/null | tail 
 
 For **Category C (state missing)**: infer step from feature files:
 
-```
+```text
 task.md exists, plan.md absent     → next_step: devflow.plan
 plan.md exists, no [done] markers  → next_step: devflow.implement
 plan.md has [done] markers         → next_step: devflow.beautify or later
@@ -84,7 +85,7 @@ plan.md has [done] markers         → next_step: devflow.beautify or later
 
 Present diagnosis and ONE recommended action. Do not auto-execute destructive operations.
 
-```
+```text
 DevFlow Recovery Diagnosis
 ==========================
 Active feature: [feature or "unknown"]
@@ -112,11 +113,13 @@ Wait for user confirmation before executing any recovery action.
 Execute only the user-chosen option.
 
 **Re-run step** (Option 1 typical):
+
 - Read `plan.md` to find last `[done]` marker
 - Continue `devflow.implement` from next pending subtask
 - Do not re-run completed subtasks
 
 **Resync state** (Option 2 typical):
+
 ```bash
 # Reconstruct .devflow-state.json from files
 jq -n \
@@ -128,17 +131,19 @@ jq -n \
 ```
 
 **Nuclear reset** (Option 3):
+
 ```bash
 rm .devflow-state.json
 # Do NOT delete feature files unless user explicitly confirms
 ```
+
 Confirm before proceeding: "This will reset pipeline state. Feature files preserved. Continue? (yes/no)"
 
 ### Step 6 — Confirm recovery
 
 After execution:
 
-```
+```text
 Recovery complete.
 
 Action taken: [what was done]
@@ -149,7 +154,7 @@ Next command: [exact command to continue]
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
-|---|---|
+| --- | --- |
 | Auto-fix state without diagnosis / re-run from step 1 | Read `.devflow-state.json` + last 20 observe entries first; resume from last `[done]` marker. |
 | Auto-execute nuclear reset without user confirmation | Present all options; wait for explicit choice. Nuclear destroys traceability. |
 | Use recovery for normal pipeline progression | `devflow-status` first; recovery only when status shows corruption. |
@@ -158,7 +163,7 @@ Next command: [exact command to continue]
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Reads | `.devflow-state.json`, `.devflow-observe.jsonl`, `.devflow-learnings.jsonl` |
 | Reads | `devflow/features/*/task.md`, `devflow/features/*/plan.md` |
 | Reads | `devflow/config.md` |

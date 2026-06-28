@@ -67,6 +67,7 @@ Always read before starting:
 #### Reuse pre-check (mandatory before Step 4)
 
 Plan's reuse decisions (Architecture decisions section) are authoritative. Before touching any file:
+
 - Honour every reuse/extend decision from the plan.
 - If the plan has **no** Architecture decisions entry about shared components but `registry.md` or the shared folder has a candidate covering ≥70% of the need → **stop and surface it** before implementing.
 - Never create a parallel implementation of an existing shared element.
@@ -156,10 +157,12 @@ Before Step 7, confirm every item in the **Implement → Pre-handoff checklist**
 After all files are implemented, update `registry.md` for every element written to the shared folder or identified as reusable:
 
 **Mandatory (write immediately, no confirmation needed):**
+
 - Any component, widget, or utility written to the project's shared folder (e.g. `lib/shared/`, `src/shared/`, `components/shared/`) during this session.
 - Any helper, hook, or service class placed in a shared/common path per `constitution.md`.
 
 **Proposed (write only after explicit user confirmation):**
+
 - New architectural patterns or conventions that are reusable but not yet in a shared path.
 
 For each mandatory entry, add a row to `registry.md` using the project's existing registry format:
@@ -223,7 +226,7 @@ Continue to beautify? -> devflow.beautify
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
-|---|---|
+| --- | --- |
 | Committing mid-implement ("save point") | Mark `[done]` in `plan.md`; commits in `devflow.pr` only |
 | Implementing files out of dependency order | Follow **File List** order; deps before dependents |
 | Creating shared components without checking registry | Read `registry.md` before writing any shared file |
@@ -234,10 +237,11 @@ Continue to beautify? -> devflow.beautify
 | Guessing unspecified behavior | Find repo precedent; if none → ask |
 | Skipping registry update for shared folder element | Anything in shared/ must be in `registry.md` before Step 7b |
 | Fixing beautify/test issues during implement | Log in Step 8 deviations; fix in `devflow.beautify` |
+
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md`, `constitution.md`, `registry.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
 | Writes | all files defined in `plan.md` |
 | Writes | `registry.md` (mandatory for shared-folder elements; proposed for architectural patterns) |

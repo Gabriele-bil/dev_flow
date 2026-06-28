@@ -30,7 +30,8 @@ Deliverable: `plan.md` only.
 For plans >5 files: define ≥2 vertical slice increments in **Architecture decisions** — each slice is one end-to-end user-visible increment (not a layer). Group **File List** entries under slice headings.
 
 Example in Architecture decisions:
-```
+
+```text
 - **Slice 1 — data contract + shell**: DB migration + domain model + empty UI scaffold; compiles and renders blank screen
 - **Slice 2 — state + data flow**: provider + repository impl + loading/error states wired to UI
 - **Slice 3 — full UI + i18n**: complete widget tree + localization keys + responsive layout
@@ -82,6 +83,7 @@ Feature numbering: IDs strictly incremental; never reuse prefix. Next = highest 
 ### Step 0b - Constitution Gate
 
 Before Step 1:
+
 1. Read `constitution.md` in full.
 2. Extract each `MUST` / `MUST NOT` rule.
 3. Evaluate each against the planned approach.
@@ -92,6 +94,7 @@ Before Step 1:
 | ...  | ...       | ...          |
 
 **Severity:**
+
 - **Critical violations** → stop before Step 1.
 - **Required violations** → document in Open questions; stop before Step 5 (Write plan file).
 
@@ -138,6 +141,7 @@ Verify **File list** order per Dependency ordering. Migrations and shared contra
 **Trigger:** File List contains any of: migration file, DTO, domain model, schema file, new entity type.
 
 If triggered:
+
 1. Extract technology-agnostic entity definitions from `task.md`, architecture analysis, and any DB or schema notes accumulated in earlier steps.
 2. Write `devflow/features/[NNN]_[feature-name]/data-model.md` using this format:
 
@@ -153,6 +157,7 @@ If triggered:
 ```
 
 Rules:
+
 - No class names, annotations, or framework types — technology-agnostic only.
 - One row per domain concept; split conflated concepts.
 - Adapter skills derive stack-specific types from this file.
@@ -298,7 +303,7 @@ Continue to implementation? -> devflow.implement
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
-|---|---|
+| --- | --- |
 | Writing plan without reading `task.md` | Always start with `task.md` |
 | File list in layer order (all models → services → UI) | Order by user-visible increment; checkpoint per slice |
 | No Traceability row for a subtask | Every subtask → at least one file + criterion |
@@ -313,7 +318,7 @@ Continue to implementation? -> devflow.implement
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md` |
 | Reads | `constitution.md`, `registry.md`, `@devflow/adapters/common/skills/common-clean-code/SKILL.md` |
 | Reads (adapter) | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md`; technology skills per ADAPTER table |

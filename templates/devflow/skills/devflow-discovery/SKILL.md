@@ -10,7 +10,7 @@ Pipeline orientation. Use at session start or when unsure which step to run.
 
 ## Pipeline Overview
 
-```
+```text
 devflow.setup → devflow.task → devflow.plan → devflow.implement → devflow.beautify → devflow.test → devflow.pr
                              ↘ devflow.blueprint (3+ PRs / multi-session)
                                → devflow.plan (per step) → devflow.implement → ...
@@ -20,7 +20,7 @@ Each step has an input contract. Each step verifies its own preconditions. User 
 
 ## Entry Point Decision Tree
 
-```
+```text
 Is this a new project with no context files (AGENTS.md / REGISTRY.md / docs/product.md)?
   └─ YES → devflow.setup
 
@@ -54,7 +54,7 @@ Tests passing, ready to merge?
 ## Quick Intent Mapping
 
 | What user said | Entry point |
-|----------------|-------------|
+| ---------------- | ------------- |
 | "Build X", "Add X", "I want X" | `devflow.task` |
 | "Plan this large objective", "3+ PRs", "multi-session" | `devflow.blueprint` |
 | "Plan this", "Create plan for..." | `devflow.plan` |
@@ -76,7 +76,7 @@ Current adapters: `flutter`, `angular`, `nextjs`. Common skills: `@devflow/adapt
 ## Anti-Rationalization
 
 | Thought | Reality |
-|---------|---------|
+| --------- | --------- |
 | "Skip to implement — idea is obvious" | `task.md` + `plan.md` traceability prevent missing coverage. Start at correct entry point |
 | "Merge steps to go faster" | Each step contract prevents silent gaps. Speed comes from correctness, not skipping |
 | "This is too small for the full pipeline" | Small features break too. Use pipeline from correct entry point — skip only if input contract already satisfied |
@@ -92,7 +92,7 @@ Current adapters: `flutter`, `angular`, `nextjs`. Common skills: `@devflow/adapt
 ## Anti-Patterns
 
 | Anti-Pattern | Problem | Fix |
-|---|---|---|
+| --- | --- | --- |
 | Jumping to `devflow.implement` without checking state | Skips plan approval; implement runs on stale or missing plan | Always check `.devflow-state.json` entry point before any action |
 | Using discovery as a full planning session | Discovery is orientation only — not a planning step | Read state, identify entry point, route; planning happens in `devflow.plan` |
 | Treating discovery output as instructions from user | Discovery is injected by SessionStart hook; it is context, not a user command | Follow discovery routing, do not re-interpret it |
@@ -100,7 +100,7 @@ Current adapters: `flutter`, `angular`, `nextjs`. Common skills: `@devflow/adapt
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Injected by | `hooks/session-start.sh` at SessionStart |
 | Reads | Nothing — orientation only |
 | Leads to | Correct pipeline entry point for current state |

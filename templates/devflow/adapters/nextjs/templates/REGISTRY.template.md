@@ -1,6 +1,6 @@
 <!-- devflow-managed:start:patterns -->
 | Pattern | When | Path |
-|---|---|---|
+| --- | --- | --- |
 | Route Feature Slice | Any App Router feature | `app/(app)/<feature>/{page.tsx,loading.tsx,_components/,_lib/}` |
 | Server Action | Form submit, data mutation | `app/(app)/<feature>/_lib/actions.ts` |
 | Zustand Store | Global client UI state | `lib/stores/<feature>-store.ts` (named `use[Feature]Store`) |

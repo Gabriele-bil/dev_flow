@@ -21,6 +21,7 @@ Optional interactive session between `devflow.task` and `devflow.plan`. Validate
 ## Recommended triggers
 
 Run when either condition is true:
+
 1. `task.md` contains at least one `[NEEDS CLARIFICATION: ...]` marker
 2. `task.md` Status is `draft` and Key assumptions section contains high-risk or unvalidated beliefs
 
@@ -65,7 +66,7 @@ For each question in the prioritized queue, one at a time:
 ### Section update rules
 
 | Ambiguity source | Target section |
-|------------------|----------------|
+| ------------------ | ---------------- |
 | Undefined actor or user type | `## User Story` — update actor; `## Summary` only if actor is missing there |
 | Missing or vague acceptance criterion | `## Acceptance criteria` — add or sharpen the criterion |
 | High-risk Key assumption | `## Key assumptions` — mark validated or replace with concrete statement |
@@ -86,7 +87,7 @@ After the Q&A loop completes:
 2. Update `task.md` header: set `**Status:** clarified`.
 3. Output a **Clarification Summary** in the response:
 
-```
+```text
 ## Clarification Summary
 **Feature:** [NNN]_[feature-name]
 **Session:** [YYYY-MM-DD]
@@ -123,7 +124,7 @@ This section is an audit trail only. Do not reformat, compress, or omit it after
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
-|---|---|
+| --- | --- |
 | Skipping unresolved markers | `devflow.plan` stops on them; resolve or explicitly waive first |
 | Batch Q&A then update | One question at a time — each answer shapes the next |
 | Rewriting `## Summary` to absorb answers | Update target section + `## Clarifications`; preserve original wording |
@@ -136,7 +137,7 @@ This section is an audit trail only. Do not reformat, compress, or omit it after
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md` |
 | Reads | `@devflow/skills/devflow-task/refinement-hints.md` (8D scan framework) |
 | Writes | `devflow/features/[NNN]_[feature-name]/task.md` — inline marker removal, targeted section updates, `## Clarifications` section appended, `Status` → `clarified` |

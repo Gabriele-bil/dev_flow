@@ -1,6 +1,6 @@
 <!-- devflow-managed:start:patterns -->
 | Pattern | When | Path |
-|---|---|---|
+| --- | --- | --- |
 | Riverpod AsyncNotifier | Async feature state | `lib/features/<feature>/providers/...` |
 | Responsive LayoutBuilder | Multi-breakpoint UI | `lib/features/<feature>/pages/page.dart` |
 | Repository Contract | Data/domain boundary | `lib/features/<feature>/domain/...` |

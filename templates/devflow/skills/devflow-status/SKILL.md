@@ -31,6 +31,7 @@ Priority order:
 ### Step 2 — List active features
 
 Scan `devflow/features/`. For each directory found:
+
 - Extract feature ID and name from directory name (`NNN_name` pattern)
 - Check if `plan.md` exists; if yes, read its `Status:` field
 - Collect list: `[id_name, status]`
@@ -39,7 +40,7 @@ Scan `devflow/features/`. For each directory found:
 
 **Case A — `.devflow-state.json` present:**
 
-```
+```text
 DevFlow Status
 
 Adapter:     <adapter>
@@ -64,7 +65,7 @@ Commands:
 
 **Case B — no `.devflow-state.json`, but `devflow/config.md` present:**
 
-```
+```text
 DevFlow Status
 
 Adapter: <adapter>
@@ -75,14 +76,14 @@ Start a feature: devflow.task
 
 **Case C — no `devflow/config.md`:**
 
-```
+```text
 DevFlow not configured. Run: /devflow.setup
 ```
 
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
-|---|---|
+| --- | --- |
 | Editing `.devflow-state.json` directly | Use `devflow-recovery`; never hand-edit state |
 | Reporting status from memory | Always read state file at invocation time |
 | Using status instead of discovery at session start | Discovery = full orientation + routing; status = snapshot only |
@@ -90,7 +91,7 @@ DevFlow not configured. Run: /devflow.setup
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Reads | `.devflow-state.json`, `devflow/config.md`, `devflow/features/*/plan.md` |
 | Writes | nothing |
 | Related | `devflow-discovery` (full pipeline orientation) |

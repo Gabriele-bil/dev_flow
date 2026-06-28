@@ -11,7 +11,7 @@ Six-step sequential pipeline: task → plan → implement → beautify → test 
 ## Intent → Command Mapping
 
 | Intent | Entry point | Condition |
-|--------|-------------|-----------|
+| -------- | ------------- | ----------- |
 | Raw feature idea | `devflow.task` | No `task.md` for this feature |
 | `task.md` ready, no `plan.md` | `devflow.plan` | `task.md` Status not `draft` with unresolved questions |
 | `plan.md` ready, not implemented | `devflow.implement` | `plan.md` Status == `ready` |
@@ -33,7 +33,7 @@ Never start mid-pipeline without verifying entry-point skill's input contract.
 ## Anti-Rationalization
 
 | Thought | Reality |
-|---------|---------|
+| --------- | --------- |
 | "Feature is small — skip task.md, plan directly" | `task.md` HMW + scope + assumptions prevent plan rework. Start at correct entry point |
 | "I know what to build — skip plan.md" | `plan.md` traceability table is only guarantee `devflow.implement` covers all subtasks |
 | "Merge beautify and test to save time" | Each step has strict contracts. Merging → silent gaps and untraceable deviations |

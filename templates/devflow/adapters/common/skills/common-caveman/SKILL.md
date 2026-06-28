@@ -19,12 +19,14 @@ Compress response into caveman-speak. Drop fluff. Keep substance. ~75% token red
 ## Rules
 
 **Drop:**
+
 - Articles: a, an, the
 - Filler: just, really, basically, actually, simply, note that
 - Pleasantries: sure, certainly, of course, happy to
 - Hedging: should, might, consider, try, it seems, I'd recommend
 
 **Keep:**
+
 - Technical terms exact
 - File paths exact
 - Commands exact
@@ -35,13 +37,14 @@ Compress response into caveman-speak. Drop fluff. Keep substance. ~75% token red
 **Patterns:** fragments OK. Short synonyms: fix/"big"/"use" over "implement a solution for"/"extensive"/"make use of". Structure: `[thing] [action] [reason]. [next step].` Arrows: `X → Y`
 
 **Never abbreviate:**
+
 - API names, function names, method names, class names, error strings
 - Content inside code blocks
 
 ## Common Rationalizations
 
 | Thought | Reality |
-|---------|---------|
+| --------- | --------- |
 | "Answer complex — needs full sentence" | Complexity ≠ verbosity. Technical substance survives compression. |
 | "Ambiguous without articles" | Add precision; removing "the" ≠ removing clarity. |
 | "User won't understand fragments" | Exact technical terms + fragments = faster parse. |
@@ -50,7 +53,7 @@ Compress response into caveman-speak. Drop fluff. Keep substance. ~75% token red
 ## Examples
 
 | Before | After |
-|--------|---------|
+| -------- | --------- |
 | "The issue is that your component creates a new object reference on each render cycle." | "New object ref each render." |
 | "I'd recommend wrapping it in `useMemo` to prevent unnecessary re-renders." | "Wrap in `useMemo`." |
 | "You should consider adding a null check before accessing that property." | "Add null check before property access." |
@@ -64,7 +67,7 @@ Normal prose for: security warnings, irreversible action confirmations, ordering
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Reads | Current response / pending output |
 | Writes | Compressed rewrite — same content, ~75% fewer tokens |
 | Next step | None — single invocation |

@@ -16,6 +16,7 @@ Skip: private/internal functions, test files, generated code.
 ## Context to Read First
 
 Before reviewing:
+
 - `devflow/features/[NNN]_[feature-name]/task.md` — acceptance criteria and feature scope
 - `devflow/features/[NNN]_[feature-name]/plan.md` — traceability table and public surfaces introduced
 - `constitution.md` — naming conventions and documentation standards for the project
@@ -66,7 +67,7 @@ Before reviewing:
 Use dev-flow taxonomy throughout the report:
 
 | Label | Meaning |
-|-------|---------|
+| ------- | --------- |
 | **Critical:** | Missing docs on a public API that consumers depend on — block merge |
 | *(no prefix)* | Required — fix before merge |
 | **Nit:** | Minor wording — optional |

@@ -10,6 +10,7 @@ QA Engineer perspective. Analyze coverage gaps, assess test quality, verify beha
 ## Context to Read First
 
 Before analysis:
+
 - `devflow/features/[NNN]_[feature-name]/task.md` — acceptance criteria (each needs ≥1 test)
 - `devflow/features/[NNN]_[feature-name]/plan.md` — traceability table (all subtasks must map to tests)
 - Active `ADAPTER.md` → **Test** section — frameworks, placement, coverage threshold
@@ -31,13 +32,14 @@ Every criterion in `task.md` must have ≥1 automated test. Flag any uncovered c
 ### 2. Coverage Gap Inventory
 
 List all public functions, classes, and state methods. For each:
+
 - Happy path covered?
 - At least one error/edge case covered?
 - Explicitly name uncovered surfaces — never skip silently
 
 ### 3. Test Level Assessment
 
-```
+```text
 Pure logic, no I/O            → Unit test
 Crosses a boundary            → Integration test
 Critical end-to-end user flow → E2E test
@@ -52,6 +54,7 @@ Behavior that matters enough to keep deserves a test. No "too simple to test" ex
 ### 5. Prove-It Pattern (Bug Fixes)
 
 When reviewing bug fix tests:
+
 - Test must fail with pre-fix code
 - Test must pass with fix applied
 - Verify this is documented — a test that can't fail is not proof

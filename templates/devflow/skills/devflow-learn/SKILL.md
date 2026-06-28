@@ -35,15 +35,16 @@ Identify the sub-command from user message or argument, then execute it.
 
 Record a manual instinct that should inform future sessions.
 
-**Step 1 — Collect information (if not provided)**
+#### Step 1 — Collect information (if not provided)
 
 Ask:
+
 1. Trigger: "When should this instinct fire?" (e.g. "when choosing a state management library")
 2. Action: "What should Claude do?" (one imperative sentence)
 3. Domain: file type or area (e.g. `flutter`, `typescript`, `devflow`, `general`)
 4. Confidence: 0.0–1.0 (default `0.75` for manual entries)
 
-**Step 2 — Derive id from trigger**
+#### Step 2 — Derive id from trigger
 
 ```bash
 TRIGGER="<TRIGGER>"
@@ -52,7 +53,7 @@ ID=$(printf '%s' "$TRIGGER" | tr '[:upper:]' '[:lower:]' \
   | cut -c1-50 | sed 's/-$//')
 ```
 
-**Step 3 — Ensure instincts file exists**
+#### Step 3 — Ensure instincts file exists
 
 ```bash
 if [ ! -f .devflow-instincts.yaml ]; then
@@ -60,7 +61,7 @@ if [ ! -f .devflow-instincts.yaml ]; then
 fi
 ```
 
-**Step 4 — Write instinct**
+#### Step 4 — Write instinct
 
 ```bash
 TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -68,7 +69,7 @@ yq -i ".instincts += [{\"id\": \"$ID\", \"trigger\": \"<TRIGGER>\", \"confidence
   .devflow-instincts.yaml
 ```
 
-Confirm: "Instinct `<ID>` logged (confidence <CONFIDENCE>)."
+Confirm: "Instinct `<ID>` logged (confidence `<CONFIDENCE>`)."
 
 ---
 
@@ -76,7 +77,7 @@ Confirm: "Instinct `<ID>` logged (confidence <CONFIDENCE>)."
 
 Find instincts matching a keyword across trigger, action, and domain.
 
-**Step 1 — Run search**
+#### Step 1 — Run search
 
 ```bash
 yq -r \
@@ -84,7 +85,7 @@ yq -r \
   .devflow-instincts.yaml 2>/dev/null
 ```
 
-**Step 2 — Display results**
+#### Step 2 — Display results
 
 If no output: "No instincts matching `<QUERY>`."
 Otherwise show results. If >5 results, group by domain.
@@ -109,19 +110,19 @@ If file missing or empty: "No instincts recorded yet for this project."
 
 Remove instincts with `confidence < 0.3`.
 
-**Step 1 — Count before**
+#### Step 1 — Count before
 
 ```bash
 BEFORE=$(yq '.instincts | length' .devflow-instincts.yaml 2>/dev/null || echo 0)
 ```
 
-**Step 2 — Filter in-place**
+#### Step 2 — Filter in-place
 
 ```bash
 yq -i '.instincts = [.instincts[] | select(.confidence >= 0.3)]' .devflow-instincts.yaml
 ```
 
-**Step 3 — Count after and report**
+#### Step 3 — Count after and report
 
 ```bash
 AFTER=$(yq '.instincts | length' .devflow-instincts.yaml 2>/dev/null || echo 0)
@@ -135,7 +136,7 @@ echo "Pruned $REMOVED instincts. $AFTER remain."
 
 Manually increase an instinct's confidence by +0.1 (cap 0.95).
 
-**Step 1 — Verify id exists**
+#### Step 1 — Verify id exists
 
 ```bash
 yq -r ".instincts[] | select(.id == \"<ID>\") | .id" .devflow-instincts.yaml 2>/dev/null
@@ -143,7 +144,7 @@ yq -r ".instincts[] | select(.id == \"<ID>\") | .id" .devflow-instincts.yaml 2>/
 
 If empty: "No instinct with id `<ID>`. Use `/devflow.learn list` to see available ids."
 
-**Step 2 — Boost confidence**
+#### Step 2 — Boost confidence
 
 ```bash
 CURRENT=$(yq -r ".instincts[] | select(.id == \"<ID>\") | .confidence" .devflow-instincts.yaml)
@@ -158,7 +159,7 @@ Confirm: "Instinct `<ID>` confidence: `$CURRENT` → `$NEW`."
 ## Anti-Patterns
 
 | Anti-Pattern | Problem | Fix |
-|---|---|---|
+| --- | --- | --- |
 | Logging external content (third-party API docs, user stories) as instincts | Poisoned instincts override correct project behavior in future sessions | Log only project-specific behaviors observed in the codebase |
 | Boosting instinct confidence without re-verifying it still holds | Stale high-confidence instincts are harder to prune | Re-read the relevant code before boosting |
 | Never pruning stale instincts | Outdated instincts mislead future sessions | Run `prune` after any major refactor or adapter change |
@@ -168,7 +169,7 @@ Confirm: "Instinct `<ID>` confidence: `$CURRENT` → `$NEW`."
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Reads | `.devflow-instincts.yaml` |
 | Writes | `.devflow-instincts.yaml` |
 | Related | `stop-learn-distill` hook (auto-detects churn), `session-start-learnings` hook (injects instincts) |

@@ -52,7 +52,7 @@ Additional requirements:
 ## Naming Conventions
 
 | Type | Convention | Example |
-|------|-----------|---------|
+| ------ | ----------- | --------- |
 | Pipeline skill dir | `devflow-<name>` | `devflow-task` |
 | Adapter skill dir | `<adapter>-<domain>` | `angular-forms` |
 | Common skill dir | `common-<domain>` | `common-clean-code` |
@@ -64,7 +64,7 @@ Additional requirements:
 ## Common Rationalizations (when writing skills)
 
 | Thought | Reality |
-|---------|---------|
+| --------- | --------- |
 | "This skill doesn't need an input contract" | Skills fail-fast on bad input. No contract → silent partial execution |
 | "Long content can stay in SKILL.md" | Content over 100 lines → `references/<file>.md`. Link from SKILL.md |
 | "I'll describe what code should look like" | Skills are workflows agents follow, not reference docs |
@@ -95,13 +95,14 @@ Keep: technical terms exact, file paths exact, commands exact, all verbs, negati
 ## Adding Hooks
 
 **Hook vs skill:**
+
 - Hook: automated, runs on every tool call/session event, no user invocation needed
 - Skill: invoked explicitly by user or another skill, contains workflow guidance for Claude
 
 **Available events:**
 
 | Event | Notes |
-|---|---|
+| --- | --- |
 | `SessionStart` | Fires once at session start; use for context injection |
 | `PreToolUse` | Fires before a tool call; block with `{"decision":"block","reason":"..."}` on stdout |
 | `PostToolUse` | Fires after a tool call; async OK; do not emit stdout (no passthrough) |
@@ -110,6 +111,7 @@ Keep: technical terms exact, file paths exact, commands exact, all verbs, negati
 | `SessionEnd` | Fires when session closes; async OK |
 
 **Script conventions:**
+
 - No `set -e` — hooks must never crash the Claude session
 - Always consume stdin: `RAW=$(cat)` — do not leave stdin open
 - Stop hooks: always `printf '%s' "$RAW"` at the end (passthrough)

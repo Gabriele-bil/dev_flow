@@ -30,12 +30,14 @@ Build UI with shadcn/ui + Tailwind v4. No utility vomit in HTML. Extract styles 
 ## Rules
 
 **Drop:**
+
 - Utility class lists in `className`
 - Inline styles (`style={{...}}`)
 - Hex/RGB values
 - Articles (a, an, the), filler, hedging
 
 **Keep:**
+
 - Descriptive, semantic class names
 - Design tokens (`--primary`, `--border`)
 - `@apply` directive in CSS
@@ -43,6 +45,7 @@ Build UI with shadcn/ui + Tailwind v4. No utility vomit in HTML. Extract styles 
 - Responsive breakpoints
 
 **Patterns:**
+
 - HTML: `<tag className="descriptive-name">`
 - CSS: `.descriptive-name { @apply utility-1 utility-2 ...; }`
 - Mobile-first: base styles first → media queries or responsive `@apply`
@@ -59,6 +62,7 @@ Build UI with shadcn/ui + Tailwind v4. No utility vomit in HTML. Extract styles 
 ## shadcn/ui — Refactor Model
 
 shadcn/ui adds utilities to `components/ui/` by default. **Refactor immediately:**
+
 1. Run `npx shadcn@latest add [component]`
 2. Open `components/ui/[component].tsx`
 3. Identify utility strings

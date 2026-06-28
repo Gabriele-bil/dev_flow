@@ -50,6 +50,7 @@ Run all passes independently and collect findings. Do not stop after the first f
 **Goal:** every `task.md` subtask has at least one row in the Traceability table with a non-empty file path.
 
 For each subtask in `task.md`:
+
 - Find corresponding rows in `plan.md` Traceability table (match by subtask description).
 - No row found → **Critical**: subtask not covered in Traceability.
 - Row found but file path is empty or `—` → **Critical**: subtask row has no file mapping.
@@ -61,6 +62,7 @@ For each subtask in `task.md`:
 **Goal:** every AC is observable and falsifiable.
 
 For each acceptance criterion in `task.md`:
+
 - Flag if it uses untestable language: "works correctly", "looks good", "behaves as expected", "is user-friendly", "performs well", "is fast", "is clean", "is easy to use".
 - Flag if it describes internal implementation state rather than externally observable behavior (e.g. "the class exposes a method…", "the provider is initialized…").
 - Severity: **Required** — untestable AC blocks `devflow.test` from writing meaningful assertions.
@@ -74,6 +76,7 @@ For each acceptance criterion in `task.md`:
 Build a term inventory from both documents. For each conceptual entity (feature name, actor, module, entity, field name), check whether multiple synonyms appear across the two documents.
 
 Flag pairs such as "user profile" / "profile page" / "account page" when they appear to refer to the same thing.
+
 - Severity: **Nit** for minor style divergence; **Required** when divergence crosses a domain boundary (e.g. the same database entity is named differently in Summary vs Architecture decisions).
 
 ---
@@ -83,6 +86,7 @@ Flag pairs such as "user profile" / "profile page" / "account page" when they ap
 **Goal:** each file path in the File List follows the layer rules in `constitution.md`.
 
 For each entry in `plan.md` File List:
+
 - Extract the directory segment of the path.
 - Check it against the layer hierarchy and naming conventions declared in `constitution.md`.
 - Flag paths that place a file in a layer that violates declared ordering or naming conventions.
@@ -103,7 +107,7 @@ For each entry in `plan.md` File List:
 
 Produce the Analyze Report directly in the response. **Do not write any files.**
 
-```
+```text
 ## DevFlow Analyze Report
 **Feature:** [NNN]_[feature-name]
 **Date:** [YYYY-MM-DD]
@@ -159,7 +163,7 @@ Produce the Analyze Report directly in the response. **Do not write any files.**
 ## Severity taxonomy
 
 | Severity | Meaning | Action required |
-|----------|---------|-----------------|
+| ---------- | --------- | ----------------- |
 | **Critical** | Implementation will fail or produce unverifiable results | Must resolve before `devflow.implement` |
 | **Required** | Coverage or quality gap exists; plan is otherwise valid | Resolve before `devflow.implement`; document waiver in `plan.md` Open questions if explicitly skipped |
 | **Nit** | Minor consistency or clarity issue | Optional; fix during `devflow.beautify` or ignore |
@@ -169,7 +173,7 @@ Blockers = Critical + Required findings.
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
-|---|---|
+| --- | --- |
 | "Traceability close enough" | Untraceable subtasks → silent bugs in `devflow.test` |
 | Vague acceptance criteria | `devflow.test` writes from ACs; vague ACs → untestable |
 | Skipping analyze ("plan looks fine") | 5-pass structural check; one read catches silent gaps |
@@ -180,7 +184,7 @@ Blockers = Critical + Required findings.
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md` |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md` |

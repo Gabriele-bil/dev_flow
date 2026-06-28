@@ -21,7 +21,7 @@ Provide a unified mental model for state management across all DevFlow adapters.
 
 Apply this decision tree before writing any state code:
 
-```
+```text
 Is the state used by only one component?
   Yes → component-local state (useState, StatefulWidget, local signal)
   No  → Is it shared across sibling components only?
@@ -105,7 +105,7 @@ const name = useUserStore((state) => state.name); // slice selector
 All three solutions share the same conceptual structure:
 
 | Concept | Riverpod | Signal Store | Zustand |
-|---------|----------|--------------|---------|
+| --------- | ---------- | -------------- | --------- |
 | State container | `StateNotifier` | `signalStore` | `create` |
 | Read state | `ref.watch` | `store.field` (signal) | `useStore(sel)` |
 | Mutate state | notifier method | store method | set / action |
@@ -116,8 +116,8 @@ All three solutions share the same conceptual structure:
 
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|---|---|---|
+| Anti-Pattern | Fix |
+| --- | --- |
 | Global store for all state | Scope to smallest container that satisfies the requirement |
 | Mutating state outside store methods | Always mutate through store-provided methods |
 | Deriving state in components | Define derived state in store (`withComputed`, selectors, `.select`) |
@@ -129,7 +129,7 @@ All three solutions share the same conceptual structure:
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Reads | Adapter-specific state skill (`flutter-riverpod`, `angular-state`, `nextjs-state`) |
 | Reads | Active `ADAPTER.md` → **Technology skills → state** |
 | Related | `common-clean-code` (SOLID principles applied to state design) |

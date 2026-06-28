@@ -106,24 +106,30 @@ Include actual command output. Do NOT report "all tests passed" without raw evid
 
 Output:
 ```
+
 [paste actual unit test command output here]
-```
+
+```text
 
 ### Integration - Target 1
 [N] passed · [N] failed
 
 Output:
 ```
+
 [paste actual integration test output here]
-```
+
+```text
 
 ### Integration - Target 2
 [N] passed · [N] failed
 
 Output:
 ```
+
 [paste actual integration test output here]
-```
+
+```text
 
 [-- Failures --]
 (shown only if any test failed after 3 attempts)
@@ -146,7 +152,7 @@ Wait for user choice before continuing.
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
-|---|---|
+| --- | --- |
 | Writing tests after PR is open | Tests are a pre-condition for `devflow.pr` |
 | Manual-only testing | Automated tests required for PR checklist |
 | Skipping trivial files | A trivial test beats no test; untestable → document why |
@@ -161,7 +167,7 @@ Wait for user choice before continuing.
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Reads | files from `devflow.implement` / `devflow.beautify` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md`, `registry.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |

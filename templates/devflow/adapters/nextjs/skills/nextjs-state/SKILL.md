@@ -14,7 +14,7 @@ Zustand = client state only. Server data (user profile, posts, products) lives i
 ## Decision Matrix
 
 | State type | Where |
-|---|---|
+| --- | --- |
 | Server data (user profile, posts, products) | Server Component fetch + Next.js cache |
 | UI transient (modal open, accordion expanded) | `useState` local to component |
 | UI global (sidebar collapsed, selected tab) | Zustand store |
@@ -148,7 +148,7 @@ beforeEach(() => {
 
 ## I/O Reference
 
-|            |                                                                  |
-| ---------- | ---------------------------------------------------------------- |
+| | |
+| --- | --- |
 | Invoked by | `devflow-implement` for `**/store.ts`, `**/*Store.ts`, `**/use*Store.ts` |
-| Related    | `nextjs-components`, `nextjs-server`                             |
+| Related | `nextjs-components`, `nextjs-server` |

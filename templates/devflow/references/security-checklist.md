@@ -42,7 +42,7 @@ Stack-specific checks in active `ADAPTER.md` → **Technology skills**.
 
 ## Error Handling
 
-```
+```json
 // Production: generic error, no internals
 { "error": { "code": "INTERNAL_ERROR", "message": "Something went wrong" } }
 
@@ -66,7 +66,7 @@ npm audit --audit-level=high
 ## OWASP Top 10 Quick Reference
 
 | # | Vulnerability | Prevention |
-|---|---------------|------------|
+| --- | --------------- | ------------ |
 | 1 | Broken Access Control | Auth + ownership check on every operation |
 | 2 | Cryptographic Failures | HTTPS, strong hashing, no secrets in code |
 | 3 | Injection | Parameterized queries, input validation at boundaries |

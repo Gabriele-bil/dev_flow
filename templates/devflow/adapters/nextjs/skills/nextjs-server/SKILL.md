@@ -20,6 +20,7 @@ Use when implementing Server Components with data fetching, Server Actions for m
 No directive needed — absence of `'use client'` = Server Component.
 
 Capabilities:
+
 - `async/await` directly in component body — no `useEffect` needed for data fetching
 - Access to filesystem, database, environment secrets — never exposed to client bundle
 - Import server-only libraries (Node.js APIs, ORMs, SDKs with secrets)
@@ -338,7 +339,7 @@ export async function GET(
 ### API Routes vs Server Actions — decision rule
 
 | Use API Route when | Use Server Action when |
-|---|---|
+| --- | --- |
 | External consumer (mobile app, third-party) | Mutation from within Next.js app |
 | Webhook receiver | Form submission |
 | OAuth callback | Button click mutation |
@@ -490,7 +491,7 @@ export const runtime = 'edge'
 ```
 
 | Use Node.js (default) when | Use Edge when |
-|---|---|
+| --- | --- |
 | DB access (Prisma, Drizzle, pg) | Middleware (globally distributed) |
 | File system access | Request geolocation / A-B testing |
 | Node.js-only packages | Ultra-low latency, no Node.js APIs needed |
@@ -528,7 +529,7 @@ curl -X POST http://localhost:<PORT>/_next/mcp \
 Tool disponibili via MCP:
 
 | Tool | Cosa ritorna |
-|---|---|
+| --- | --- |
 | `get_errors` | Errori correnti (build + runtime con source maps) |
 | `get_routes` | Tutte le route scansionando il filesystem |
 | `get_project_metadata` | Path del progetto e URL del dev server |
@@ -544,7 +545,7 @@ next build --debug-build-paths "/dashboard,/product/[id]"
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Invoked by | `devflow-implement` when `app/api/**`, `**/actions.ts`, `**/action.ts`, or files containing `'use server'` |
 | Reads | `@devflow/adapters/nextjs/ADAPTER.md` |
 | Related | `nextjs-architecture`, `nextjs-components`, `nextjs-forms` |

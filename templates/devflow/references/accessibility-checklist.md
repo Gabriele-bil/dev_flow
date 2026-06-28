@@ -46,7 +46,7 @@ Stack-specific patterns in active `ADAPTER.md` → **Beautify: accessibility**.
 ## Common Anti-Patterns
 
 | Anti-Pattern | Problem | Fix |
-|---|---|---|
+| --- | --- | --- |
 | `div`/container as button | Not focusable, no keyboard | Use semantic `<button>` or `Semantics` |
 | Missing `alt` / semantics | Invisible to assistive tech | Add descriptive text |
 | Color-only state | Invisible to color-blind users | Add icon, text, or pattern |

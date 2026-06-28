@@ -52,7 +52,7 @@ If objective is too vague → stop, ask one clarifying question, wait for answer
 Read in order:
 
 | Source | Role |
-|--------|------|
+| -------- | ------ |
 | `docs/product.md` | Domain, actors, implemented vs planned features |
 | `constitution.md` | Stack, layering rules, conventions |
 | `registry.md` | Shared patterns, existing modules |
@@ -78,6 +78,7 @@ Rules:
 For each step, list its **blockers** (steps that must be merged first). Use step IDs (`[NNN]`).
 
 Derive the graph from:
+
 - Shared files that would conflict if edited concurrently
 - Logical output dependencies (e.g. step creates a type consumed by another)
 - Migration / schema changes that must precede application code
@@ -99,7 +100,7 @@ Mark such steps with `[parallel-safe]` in the step list. Add a **Parallel workst
 For **each step**, produce a self-contained context brief with:
 
 | Field | Content |
-|-------|---------|
+| ------- | --------- |
 | **Objective** | One sentence: what this step achieves |
 | **Why now** | Why this step comes before/after its neighbors |
 | **State of codebase at start** | What already exists (from prior steps + current baseline); enough for a fresh agent |
@@ -114,7 +115,7 @@ The brief must be self-contained: a new agent handed only this section and the p
 
 Before writing the final file, spawn an Opus subagent with the **full draft blueprint** and this prompt:
 
-```
+```text
 You are a senior architect reviewing a multi-PR blueprint.
 Your job: find problems BEFORE implementation begins.
 
@@ -173,12 +174,14 @@ Create `devflow/plans/[slug]-blueprint.md` in the project root using the templat
 ## Dependency graph
 
 ```
+
 [001] Foundation
   └── [002] Data layer
         ├── [003] API layer (parallel-safe with [004])
         └── [004] Worker jobs (parallel-safe with [003])
               └── [005] UI
-```
+
+```text
 
 | Step | Blockers |
 |------|----------|
@@ -276,7 +279,7 @@ Next: run devflow.plan for step [001] → [step title]
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
-|---|---|
+| --- | --- |
 | Skip dependency graph — "deps obvious" | Implicit deps → merge conflicts. Always make explicit. |
 | Context brief not self-contained ("see step [NNN]") | Fresh agent in new session cannot proceed. Brief = files, contracts, constraints, full context. |
 | Skip/rush adversarial review | Wrong parallelization caught only during implement. Always run the gate. |
@@ -290,7 +293,7 @@ Next: run devflow.plan for step [001] → [step title]
 ## I/O Reference
 
 | | |
-|---|---|
+| --- | --- |
 | Reads | `docs/product.md`, `constitution.md`, `registry.md`, `.devflow-state.json` |
 | Spawns | Opus subagent (adversarial review, Step 6) |
 | Writes | `devflow/plans/[slug]-blueprint.md` |

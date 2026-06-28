@@ -1,6 +1,6 @@
 <!-- devflow-managed:start:patterns -->
 | Pattern | When | Path |
-|---|---|---|
+| --- | --- | --- |
 | {{pattern-1-name}} | {{pattern-1-when}} | `{{pattern-1-path}}` |
 | {{pattern-2-name}} | {{pattern-2-when}} | `{{pattern-2-path}}` |
 <!-- devflow-managed:end:patterns -->
