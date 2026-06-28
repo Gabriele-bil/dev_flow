@@ -75,3 +75,4 @@ node_modules/
 # devflow observe log
 .devflow-observe.jsonl
 .devflow-observe.jsonl.1
+.tokensave
