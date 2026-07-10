@@ -1,6 +1,6 @@
 ---
 name: devflow-test
-description: Writes and executes unit and integration tests for the current DevFlow feature using the active adapter targets, with bounded retry handling and standardized reporting. Use when the user asks to run devflow.test, validate a DevFlow feature after beautify, or execute the fifth step of the DevFlow pipeline.
+description: Writes/runs unit+integration tests via adapter targets, bounded retries. Use when user runs devflow.test, validates feature after beautify, or fifth pipeline step.
 argument-hint: [optional-plan-path]
 disable-model-invocation: true
 ---

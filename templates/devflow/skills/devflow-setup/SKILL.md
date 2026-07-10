@@ -1,6 +1,6 @@
 ---
 name: devflow-setup
-description: Generates or updates AGENTS.md, REGISTRY.md, and docs/product.md in the consumer project root from adapter templates using token-lean managed sections and a mandatory questionnaire. Use when running devflow.setup after plugin install or when adapter/stack/product context changes.
+description: Generates AGENTS.md, REGISTRY.md, docs/product.md via adapter templates + questionnaire. Use when running devflow.setup post-install, or adapter/stack/product context changes.
 argument-hint: [--force]
 disable-model-invocation: true
 ---

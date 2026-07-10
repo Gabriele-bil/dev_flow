@@ -7,6 +7,8 @@ description: App Router folders, route segments, layout nesting, server/client b
 
 Use when creating new routes, layouts, reorganizing feature folders, or reviewing architectural consistency.
 
+Full code examples: `references/architecture-patterns.md`.
+
 ## Objectives
 
 - Keep App Router structure deterministic and reviewable.
@@ -64,51 +66,7 @@ Rules:
 
 ## 4) Recommended App Structure
 
-```text
-app/
-├── (marketing)/               # public pages, no auth required
-│   ├── layout.tsx             # marketing layout (nav, footer)
-│   ├── page.tsx               # home page "/"
-│   ├── about/
-│   │   └── page.tsx
-│   └── blog/
-│       ├── page.tsx           # blog index
-│       └── [slug]/
-│           └── page.tsx       # blog post
-├── (app)/                     # authenticated area
-│   ├── layout.tsx             # app layout (sidebar, header) — auth check here
-│   ├── dashboard/
-│   │   ├── page.tsx
-│   │   ├── loading.tsx        # shown while dashboard data streams
-│   │   ├── error.tsx          # catches dashboard errors
-│   │   └── _components/       # dashboard-only components (not routable)
-│   ├── settings/
-│   │   ├── page.tsx
-│   │   └── _components/
-│   └── [feature]/
-│       ├── page.tsx
-│       ├── loading.tsx
-│       ├── error.tsx
-│       ├── _components/
-│       └── actions.ts         # Server Actions for this route
-├── api/                       # API Routes
-│   └── [resource]/
-│       └── route.ts
-├── globals.css
-└── layout.tsx                 # Root layout — html, body, global providers ONLY
-
-lib/                           # Shared utilities — no UI, no React
-├── utils.ts
-├── validations.ts
-└── [domain]/
-    └── *.ts
-
-components/                    # Shared UI components
-├── ui/                        # shadcn/ui primitives (Button, Input, etc.)
-└── [feature]/                 # Feature-specific shared components
-
-middleware.ts                  # At project root — NOT inside app/
-```
+Standard layout: route groups `(marketing)` / `(app)` split public vs authenticated areas, feature routes carry their own `_components/` and `actions.ts`, shared `lib/` and `components/` at root, `middleware.ts` at project root (not inside `app/`). Full tree → `references/architecture-patterns.md`.
 
 ## 5) Server/Client Boundary Rules
 
@@ -129,35 +87,7 @@ Rules:
 - Context providers MUST be in a separate `providers.tsx` with `'use client'`. Import in root layout.
 - Pass server data down as props to client components — do not re-fetch in client.
 
-```tsx
-// providers.tsx — wrap all context providers here
-'use client'
-import { ThemeProvider } from 'next-themes'
-import { SessionProvider } from 'next-auth/react'
-
-export function Providers({ children }: { children: React.ReactNode }) {
-  return (
-    <SessionProvider>
-      <ThemeProvider attribute="class" defaultTheme="system">
-        {children}
-      </ThemeProvider>
-    </SessionProvider>
-  )
-}
-
-// app/layout.tsx — stays Server Component
-import { Providers } from './_components/providers'
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <body>
-        <Providers>{children}</Providers>
-      </body>
-    </html>
-  )
-}
-```
+Full code (`providers.tsx` pattern) → `references/architecture-patterns.md`.
 
 ## 6) Dependency Flow
 
@@ -186,41 +116,7 @@ Next.js 16+ renamed `middleware.ts` → `proxy.ts` (codemod: `npx @next/codemod@
 | 14–15 | `middleware.ts` | `middleware()` | `config` |
 | 16+ | `proxy.ts` | `proxy()` | `proxyConfig` |
 
-```ts
-// middleware.ts (Next.js 14-15)
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-
-export function middleware(request: NextRequest) {
-  const token = request.cookies.get('session')?.value
-  if (!token) {
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
-  return NextResponse.next()
-}
-
-export const config = {
-  matcher: ['/app/:path*', '/dashboard/:path*'],
-}
-```
-
-```ts
-// proxy.ts (Next.js 16+)
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-
-export function proxy(request: NextRequest) {
-  const token = request.cookies.get('session')?.value
-  if (!token) {
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
-  return NextResponse.next()
-}
-
-export const proxyConfig = {
-  matcher: ['/app/:path*', '/dashboard/:path*'],
-}
-```
+Full code for both versions → `references/architecture-patterns.md`.
 
 ## 8) Naming Conventions
 
@@ -236,74 +132,9 @@ export const proxyConfig = {
 | Dynamic segments | `[]` wrapping | `[slug]/`, `[id]/` |
 | Catch-all segments | `[...]` wrapping | `[...slug]/` |
 
-## 9) Parallel Routes e Intercepting Routes
+## 9) Parallel Routes and Intercepting Routes
 
-### Parallel Routes — slot `@name`
-
-Rendono più pagine nello stesso layout simultaneamente (es. modale su sfondo):
-
-```text
-app/
-  @modal/                    # slot parallelo
-    (.)product/[id]/         # intercepting route — cattura /product/[id]
-      page.tsx               # contenuto modale
-  product/
-    [id]/
-      page.tsx               # pagina completa (navigazione diretta / refresh)
-  layout.tsx                 # riceve { children, modal }
-  default.tsx                # ritorna null — slot fallback quando @modal inattivo
-```
-
-```tsx
-// app/layout.tsx
-export default function RootLayout({
-  children,
-  modal,
-}: {
-  children: React.ReactNode
-  modal: React.ReactNode
-}) {
-  return (
-    <html lang="en">
-      <body>
-        {children}
-        {modal}
-      </body>
-    </html>
-  )
-}
-```
-
-```tsx
-// app/default.tsx — obbligatorio per evitare 404 al refresh
-export default function Default() {
-  return null
-}
-```
-
-```tsx
-// app/@modal/(.)product/[id]/page.tsx — modale
-'use client'
-import { useRouter } from 'next/navigation'
-
-export default async function ProductModal({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  const product = await getProduct(id)
-
-  return (
-    <dialog open>
-      <button onClick={() => useRouter().back()}>Chiudi</button>
-      <ProductDetail product={product} />
-    </dialog>
-  )
-}
-```
-
-**Regole:**
-
-- `default.tsx` obbligatorio in ogni slot parallelo — evita 404 al refresh diretto.
-- Chiudi il modale con `router.back()`, non `router.push('/')`.
-- Notazione intercepting: `(.)` = stesso livello, `(..)` = un livello su, `(...)` = root.
+Parallel routes use `@name` slots to render multiple pages in the same layout simultaneously (e.g. a modal over a background page). Intercepting routes (`(.)`, `(..)`, `(...)` notation) capture navigation to show it in a slot instead of the full route. Every parallel slot needs a `default.tsx` returning `null` to avoid 404 on direct refresh; close modals with `router.back()`, not `router.push()`. Full code → `references/architecture-patterns.md`.
 
 ## 10) Architecture Review Checklist
 

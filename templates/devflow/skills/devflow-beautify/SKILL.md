@@ -1,6 +1,6 @@
 ---
 name: devflow-beautify
-description: Reviews and improves devflow.implement output across correctness, readability, security, performance, architecture compliance, and UI consistency. Use when the user asks to run devflow.beautify, review implementation output, or execute the fourth step of the DevFlow pipeline.
+description: Reviews devflow.implement output: correctness, readability, security, performance, architecture, UI. Use when user runs devflow.beautify, reviews implementation output, or fourth pipeline step.
 argument-hint: [optional-plan-path]
 disable-model-invocation: true
 ---

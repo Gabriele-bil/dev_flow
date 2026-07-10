@@ -1,11 +1,13 @@
 ---
 name: flutter-supabase
-description: Use when implementing or refactoring Flutter data/auth/storage/realtime code with Supabase. Covers provider-based client access, datasource boundaries, Postgrest query patterns, storage paths, realtime streams, RPC/functions, and repository error mapping.
+description: Use for Flutter data/auth/storage/realtime code with Supabase — provider-based client access, datasource boundaries, Postgrest queries, storage paths, realtime streams, RPC/functions, repository error mapping.
 ---
 
 # Skill: Flutter + Supabase
 
 Use for data-layer work on `supabase_flutter` in Flutter + Riverpod architecture.
+
+Full code examples: `references/supabase-patterns.md`.
 
 ## Objectives
 
@@ -16,237 +18,42 @@ Use for data-layer work on `supabase_flutter` in Flutter + Riverpod architecture
 
 ## 1) Client access pattern (mandatory)
 
-Always access the client via provider injection.
-
-```dart
-// core/env/supabase_client_provider.dart
-@riverpod
-SupabaseClient supabaseClient(SupabaseClientRef ref) =>
-    Supabase.instance.client;
-```
-
-```dart
-// feature provider
-@riverpod
-PetRepository petRepository(PetRepositoryRef ref) {
-  final client = ref.watch(supabaseClientProvider);
-  return PetRepositoryImpl(PetDatasource(client));
-}
-```
-
-Never call `Supabase.instance.client` directly inside repositories, use cases, or UI widgets.
+Always access the client via provider injection (`supabaseClientProvider`). Never call `Supabase.instance.client` directly inside repositories, use cases, or UI widgets. Full code → `references/supabase-patterns.md`.
 
 ## 2) Datasource boundary rules
 
 - One datasource class per feature aggregate
-- Datasource returns raw JSON only:
-  - `Map<String, dynamic>`
-  - `List<Map<String, dynamic>>`
+- Datasource returns raw JSON only (`Map<String, dynamic>` / `List<Map<String, dynamic>>`)
 - Datasource throws; it does not map errors
 - No domain mapping and no business logic in datasource
 
-```dart
-class PetDatasource {
-  final SupabaseClient _client;
-  const PetDatasource(this._client);
-}
-```
-
 ## 3) Database query patterns
 
-### Read lists
-
-```dart
-Future<List<Map<String, dynamic>>> fetchAll(String ownerId) =>
-    _client
-        .from('pets')
-        .select()
-        .eq('owner_id', ownerId)
-        .order('created_at', ascending: false);
-```
-
-### Read exactly one row
-
-Use `.single()` when the row must exist and be unique.
-
-```dart
-Future<Map<String, dynamic>> fetchById(String id) =>
-    _client.from('pets').select().eq('id', id).single();
-```
-
-### Read optional single row
-
-Use `.maybeSingle()` when "not found" is valid.
-
-```dart
-Future<Map<String, dynamic>?> fetchByMicrochip(String code) =>
-    _client.from('pets').select().eq('microchip_code', code).maybeSingle();
-```
-
-### Pagination
-
-Use `.range(start, end)` with stable ordering.
-
-```dart
-Future<List<Map<String, dynamic>>> fetchPage({
-  required String petId,
-  required int page,
-  required int pageSize,
-}) =>
-    _client
-        .from('log_entries')
-        .select()
-        .eq('pet_id', petId)
-        .order('created_at', ascending: false)
-        .range(page * pageSize, (page + 1) * pageSize - 1);
-```
-
-### Join style
-
-```dart
-Future<List<Map<String, dynamic>>> fetchWithMembers(String ownerId) =>
-    _client
-        .from('pets')
-        .select('*, pet_members(user_id, joined_at)')
-        .eq('owner_id', ownerId);
-```
+Use `.single()` when the row must exist and be unique, `.maybeSingle()` when "not found" is valid, `.range(start, end)` with stable ordering for pagination, and `.select('*, related(...)')` for joins. Full read patterns → `references/supabase-patterns.md`.
 
 ## 4) Mutations (write patterns)
 
-After `insert`/`update`/`upsert`, chain `.select()` (and usually `.single()`) when the caller needs returned rows.
-
-```dart
-Future<Map<String, dynamic>> insert(Map<String, dynamic> row) =>
-    _client.from('pets').insert(row).select().single();
-```
-
-```dart
-Future<Map<String, dynamic>> update(String id, Map<String, dynamic> patch) =>
-    _client.from('pets').update(patch).eq('id', id).select().single();
-```
-
-```dart
-Future<Map<String, dynamic>> upsert(Map<String, dynamic> row) =>
-    _client.from('pets').upsert(row).select().single();
-```
-
-```dart
-Future<void> deleteById(String id) =>
-    _client.from('pets').delete().eq('id', id);
-```
-
-Use `onConflict` for natural-key upserts when needed:
-
-```dart
-await _client.from('pets').upsert(row, onConflict: 'owner_id,microchip_code');
-```
+After `insert`/`update`/`upsert`, chain `.select()` (and usually `.single()`) when the caller needs returned rows. Use `onConflict` for natural-key upserts. Full code → `references/supabase-patterns.md`.
 
 ## 5) Repository error mapping (mandatory)
 
-Repositories convert datasource exceptions into typed failures.
-
-```dart
-PetFailure mapPostgrest(PostgrestException e) => switch (e.code) {
-  'PGRST116' => const PetFailure.notFound(),
-  '23505' => const PetFailure.alreadyExists(),
-  '23503' => const PetFailure.invalidReference(),
-  '42501' => const PetFailure.permissionDenied(),
-  _ => PetFailure.unexpected(e.message),
-};
-```
+Repositories convert datasource exceptions into typed failures by switching on `PostgrestException.code` (e.g. `PGRST116` → not found, `23505` → already exists, `42501` → permission denied). Full code → `references/supabase-patterns.md`.
 
 ## 6) Auth patterns
 
-```dart
-final user = _client.auth.currentUser;
-final session = _client.auth.currentSession;
-```
-
-```dart
-await _client.auth.signInWithPassword(email: email, password: password);
-await _client.auth.signInWithOAuth(
-  OAuthProvider.google,
-  redirectTo: kIsWeb ? null : 'io.supabase.flutter://callback',
-);
-await _client.auth.signOut();
-```
-
-Expose auth events via provider:
-
-```dart
-@riverpod
-Stream<AuthState> authState(AuthStateRef ref) =>
-    ref.watch(supabaseClientProvider).auth.onAuthStateChange;
-```
+Use `_client.auth.currentUser` / `currentSession`, `signInWithPassword`, `signInWithOAuth`, `signOut`. Expose auth events via a provider wrapping `auth.onAuthStateChange`. Full code → `references/supabase-patterns.md`.
 
 ## 7) Storage patterns
 
-```dart
-Future<String> uploadFile({
-  required String bucket,
-  required String path,
-  required Uint8List bytes,
-  required String contentType,
-}) async {
-  await _client.storage.from(bucket).uploadBinary(
-        path,
-        bytes,
-        fileOptions: FileOptions(contentType: contentType),
-      );
-  return _client.storage.from(bucket).getPublicUrl(path);
-}
-```
-
-```dart
-Future<void> deleteFile(String bucket, String path) =>
-    _client.storage.from(bucket).remove([path]);
-```
-
-Storage path convention:
-
-```text
-[bucket]/[user_id]/[pet_id]/[filename]
-pet-photos/abc123/xyz789/profile.jpg
-pet-documents/abc123/xyz789/vaccine_card.pdf
-```
+Upload with `storage.from(bucket).uploadBinary(...)`, delete with `.remove([path])`. Path convention: `[bucket]/[user_id]/[pet_id]/[filename]`. Full code → `references/supabase-patterns.md`.
 
 ## 8) Realtime patterns
 
-Use realtime only for collaborative or multi-device live views.
-
-```dart
-@riverpod
-Stream<List<LogEntry>> logEntries(LogEntriesRef ref, String petId) =>
-    ref
-        .watch(supabaseClientProvider)
-        .from('log_entries')
-        .stream(primaryKey: ['id'])
-        .eq('pet_id', petId)
-        .order('created_at', ascending: false)
-        .map((rows) => rows.map(LogEntryMapper.fromJson).toList());
-```
-
-Prefer `AsyncNotifier` + manual refresh for non-live screens.
+Use realtime only for collaborative or multi-device live views, via `.stream(primaryKey: [...])`. Prefer `AsyncNotifier` + manual refresh for non-live screens. Full code → `references/supabase-patterns.md`.
 
 ## 9) RPC and Edge Functions
 
-Use RPC for database-side logic:
-
-```dart
-final result = await _client.rpc(
-  'search_cities',
-  params: {'search_term': 'San', 'country_id': 1},
-);
-```
-
-Use Edge Functions for server code that needs secrets or external integrations:
-
-```dart
-final res = await _client.functions.invoke(
-  'process-order',
-  body: {'order_id': '12345'},
-);
-```
+Use RPC (`_client.rpc(...)`) for database-side logic. Use Edge Functions (`_client.functions.invoke(...)`) for server code that needs secrets or external integrations. Full code → `references/supabase-patterns.md`.
 
 ## 10) Anti-patterns
 
@@ -271,7 +78,7 @@ final res = await _client.functions.invoke(
 ## I/O Reference
 
 |                |                                                                                                                                                  |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Trigger        | Any feature involving Supabase data read/write, auth, storage, realtime, or RPC calls                                                            |
 | Reads          | `constitution.md` (data layer conventions), `registry.md` (existing datasource/repository patterns)                                              |
 | Invoked by     | `devflow.plan` (when feature involves DB), `devflow.implement` (datasource and repository files)                                                 |

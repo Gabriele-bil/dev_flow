@@ -1,6 +1,6 @@
 ---
 name: devflow-implement
-description: Implements all files defined in a DevFlow plan using project architecture conventions, MCP-assisted API validation, and verification steps. Use when the user asks to run devflow.implement, execute plan.md, or perform the third step of the DevFlow pipeline.
+description: Implements DevFlow plan files per architecture conventions, MCP-assisted validation. Use when user runs devflow.implement, executes plan.md, or third pipeline step.
 argument-hint: [optional-plan-path]
 disable-model-invocation: true
 ---
@@ -154,35 +154,7 @@ Before Step 7, confirm every item in the **Implement → Pre-handoff checklist**
 
 ### Step 7 - Registry update
 
-After all files are implemented, update `registry.md` for every element written to the shared folder or identified as reusable:
-
-**Mandatory (write immediately, no confirmation needed):**
-
-- Any component, widget, or utility written to the project's shared folder (e.g. `lib/shared/`, `src/shared/`, `components/shared/`) during this session.
-- Any helper, hook, or service class placed in a shared/common path per `constitution.md`.
-
-**Proposed (write only after explicit user confirmation):**
-
-- New architectural patterns or conventions that are reusable but not yet in a shared path.
-
-For each mandatory entry, add a row to `registry.md` using the project's existing registry format:
-
-```text
-✅ Registry updated: [component/widget/utility name]
-Path: [shared path]
-[1-2 sentences on what it solves and when to use it.]
-```
-
-For proposed entries, surface them first:
-
-```text
-🔍 New pattern found: [pattern name]
-[1-2 sentences describing what it solves and how it works.]
-
-Add to registry.md? [yes / no]
-```
-
-> **Rule:** anything written to a shared folder that is missing from `registry.md` is invisible to future agents. Never leave a shared file unregistered.
+After all files implemented, update `registry.md` for every element written to shared folder or identified as reusable. Mandatory entries (shared components/helpers) written immediately; proposed entries (new patterns) only after user confirmation. Templates and rule: `references/registry-update-template.md`.
 
 ### Step 7b - Write deviations to plan.md
 
@@ -198,30 +170,7 @@ Read by `devflow.beautify` and `devflow.pr`. Omit if fully aligned.
 
 ### Step 8 - Notify user
 
-Respond with:
-
-```text
-✅ Implementation complete: feature/[NNN]-[feature-name]
-
-### Files created
-- `path/to/file.ext`
-- ...
-
-### Files modified
-- `path/to/file.ext`
-- ...
-
-### Deviations from plan
-- [file or section]: [reason for deviation]  ← also written to plan.md
-  (none if fully aligned)
-
-### Commands run
-- codegen (per adapter): [yes | no]
-- format (per adapter): ✅ / ❌ (resolved after [N] attempts)
-- analyze/typecheck (per adapter): ✅ / ❌ (resolved after [N] attempts)
-
-Continue to beautify? -> devflow.beautify
-```
+Respond using template in `references/notify-template.md`.
 
 ## Anti-Patterns
 
@@ -242,7 +191,7 @@ Continue to beautify? -> devflow.beautify
 
 | | |
 | --- | --- |
-| Reads | `devflow/features/[NNN]_[feature-name]/plan.md`, `constitution.md`, `registry.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
+| Reads | `devflow/features/[NNN]_[feature-name]/plan.md`, `constitution.md`, `registry.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md`, `references/registry-update-template.md`, `references/notify-template.md` |
 | Writes | all files defined in `plan.md` |
 | Writes | `registry.md` (mandatory for shared-folder elements; proposed for architectural patterns) |
 | Next step | `devflow.beautify` |

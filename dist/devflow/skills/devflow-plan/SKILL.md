@@ -1,6 +1,6 @@
 ---
 name: devflow-plan
-description: Transforms a structured DevFlow task into a detailed, file-oriented implementation plan for devflow.implement. Use when the user asks to run devflow.plan, create a planning artifact from devflow task output, or produce plan.md for a DevFlow feature.
+description: Transforms DevFlow task into file-oriented implementation plan. Use when user runs devflow.plan, creates planning artifact from task, or plan.md for feature.
 argument-hint: [optional-task-path]
 disable-model-invocation: true
 ---

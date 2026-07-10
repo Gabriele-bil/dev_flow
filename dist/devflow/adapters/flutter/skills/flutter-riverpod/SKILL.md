@@ -10,6 +10,8 @@ description: Use when implementing, refactoring, or debugging Flutter state mana
 Use Riverpod v3 patterns for predictable, testable, performant state.
 Prefer `@riverpod` codegen + explicit invalidation.
 
+Full code: `references/riverpod-patterns.md`.
+
 ## When to Use
 
 - Building features with Riverpod in Flutter.
@@ -36,124 +38,22 @@ Prefer `@riverpod` codegen + explicit invalidation.
 - **`StreamProvider`**: true real-time streams.
 - **Families**: parameterized providers; arguments must be stable/equatable.
 
-## Minimal Patterns
-
-### Sync state with Notifier
-
-```dart
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-part 'counter.g.dart';
-
-@riverpod
-class Counter extends _$Counter {
-  @override
-  int build() => 0;
-
-  void increment() => state++;
-}
-```
-
-### Async fetch + mutation
-
-```dart
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-part 'todos.g.dart';
-
-@riverpod
-class Todos extends _$Todos {
-  @override
-  Future<List<Todo>> build() async {
-    return ref.watch(todoRepositoryProvider).fetchTodos();
-  }
-
-  Future<void> addTodo(String title) async {
-    final repo = ref.read(todoRepositoryProvider);
-    await repo.createTodo(title);
-    ref.invalidateSelf();
-  }
-}
-```
-
-### UI consumption (skeleton loading)
-
-Use the project `skeleton` extension on `AsyncValue` — it skeletonizes the **same** `data` builder with `mock` while loading, then animates to real data.
-
-```dart
-class TodoPage extends ConsumerWidget {
-  const TodoPage({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final todos = ref.watch(todosProvider);
-
-    ref.listen(todosProvider, (prev, next) {
-      next.whenOrNull(
-        error: (err, _) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(err.toString())),
-          );
-        },
-      );
-    });
-
-    return todos.skeleton(
-      mock: Todo.mockList(), // on Todo entity — see flutter-models
-      data: (items) => ListView(
-        children: [for (final t in items) TodoTile(todo: t)],
-      ),
-      error: (e, _) => ErrorView(error: e),
-    );
-  }
-}
-```
-
-Single-entity provider: `mock: Pet.mock()`. List provider: `mock: Todo.mockList()`.
-
-Entity mock contract: see `flutter-models` (`mock()` / `mockList()` on domain entities).
-
 ## Loading UI: `skeleton` extension (mandatory)
 
 For any `AsyncValue<T>` rendered in UI:
 
 - **Always** call `.skeleton(...)`, not `.when(loading: …)`.
 - **`data`**: build the real loaded UI once; extension reuses it for loading (with `Skeletonizer` enabled) and data (disabled, with switch animation).
-- **`mock`**: value of type `T` from the domain entity (`Entity.mock()` or `Entity.mockList()`). Keeps skeleton shape aligned with real widgets and centralized.
-- **`error`**: dedicated error UI; optional `skipError` / `skipLoadingOnReload` / `skipLoadingOnRefresh` only when UX requires it.
+- **`mock`**: `Entity.mock()` / `Entity.mockList()` from the domain entity — never inline fakes.
 
-```dart
-ref.watch(petProvider).skeleton(
-  mock: Pet.mock(),
-  data: (pet) => PetDetailBody(pet: pet),
-  error: (e, st) => PetErrorView(error: e, stackTrace: st),
-);
-```
-
-Do **not**:
-
-- Hand-roll `Skeletonizer` around loading branches in widgets.
-- Put fake strings/IDs/colors in the widget for loading.
-- Use `CircularProgressIndicator` / generic shimmer where the loaded layout is known.
-
-`AsyncSnapshot` has the same `skeleton` extension (e.g. `FutureBuilder`); use `sliver: true` inside sliver lists.
-
-## `watch` vs `read` vs `listen` vs `select`
+## `watch` / `read` / `listen` / `select`
 
 - **`watch`**: reactive read for rendering/derived logic.
 - **`read`**: one-shot read for callbacks/commands.
 - **`listen`**: side effects on transitions (snackbar, navigation).
 - **`select`**: rebuild only on selected field changes.
 
-Bad:
-
-```dart
-final value = ref.read(userProvider); // in build: UI won't react to updates
-```
-
-Good:
-
-```dart
-final userName = ref.watch(userProvider.select((u) => u.name));
-```
+`ref.read` inside `build` is an anti-pattern — UI won't react to updates. Use `ref.watch(provider.select(...))` instead.
 
 ## Invalidation Semantics
 
@@ -173,46 +73,11 @@ Use:
 - Use keep-alive only for expensive/UX-critical caches.
 - Manage resources with `onDispose` and related lifecycle hooks.
 
-```dart
-@riverpod
-Future<String> cachedValue(Ref ref) async {
-  final value = await fetchValue();
-  final link = ref.keepAlive();
-  Timer(const Duration(minutes: 5), link.close);
-  return value;
-}
-```
-
 ## Testing
 
-### Provider tests
-
-```dart
-test('counter increments', () {
-  final container = ProviderContainer.test();
-  addTearDown(container.dispose);
-
-  expect(container.read(counterProvider), 0);
-  container.read(counterProvider.notifier).increment();
-  expect(container.read(counterProvider), 1);
-});
-```
-
-### Overrides
-
-```dart
-final container = ProviderContainer.test(
-  overrides: [
-    todoRepositoryProvider.overrideWithValue(FakeTodoRepository()),
-  ],
-);
-```
-
-### Widget tests
-
-- Wrap with `ProviderScope`.
-- Inject fakes with overrides.
-- Use `tester.container()` when direct container access is needed.
+- Provider tests: `ProviderContainer.test()`, `addTearDown(container.dispose)`.
+- Overrides: `provider.overrideWithValue(fake)`.
+- Widget tests: wrap with `ProviderScope`, inject fakes via overrides, use `tester.container()` when direct access is needed.
 
 ## Common Anti-Patterns
 

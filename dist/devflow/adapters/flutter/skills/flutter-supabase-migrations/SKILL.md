@@ -10,21 +10,14 @@ description: Use when creating, reviewing, or applying Supabase database migrati
 Use migration files as single source of truth for schema changes.
 Do not edit remote schema manually in Studio for production workflows.
 
+Full commands and SQL: `references/migrations-patterns.md`.
+
 ## When to Use
 
 - Adding/changing tables, columns, constraints, indexes, enums, or RLS policies.
 - Syncing local and remote schema history.
 - Fixing migration drift between local and remote.
 - Deploying DB changes before updating Flutter data layer.
-
-## Required CLI Workflow
-
-```bash
-supabase login
-supabase link --project-ref <project-ref>
-```
-
-> `supabase db push` requires a linked project.
 
 ## Golden Rules
 
@@ -36,104 +29,23 @@ supabase link --project-ref <project-ref>
 
 ## Standard Migration Flow (Remote)
 
-### 1) Create migration
-
-```bash
-supabase migration new <snake_case_name>
-```
-
-Examples:
-
-- `create_pets_table`
-- `add_weight_to_pets`
-- `create_pet_events_table`
-
-### 2) Write SQL in `supabase/migrations/<timestamp>_<name>.sql`
-
-Recommended order:
-
-1. types/extensions (if needed)
-2. tables/columns/constraints
-3. indexes
-4. triggers/functions
-5. RLS + policies
-
-### 3) Review pending history
-
-```bash
-supabase migration list
-```
-
-### 4) Push to remote
-
-```bash
-supabase db push
-```
-
-Optional preflight:
-
-```bash
-supabase db push --dry-run
-```
+1. `supabase migration new <snake_case_name>` — new migration file.
+2. Write SQL in `supabase/migrations/<timestamp>_<name>.sql`; order: types/extensions → tables/columns/constraints → indexes → triggers/functions → RLS + policies.
+3. `supabase migration list` — review pending history.
+4. `supabase db push` (optionally `--dry-run` first) — push to remote (requires `supabase link`).
 
 ## Drift Recovery Workflow
 
-Use when local/remote migration history diverges.
+Use when local/remote migration history diverges: `supabase migration list` to inspect mismatch, `supabase db pull` to pull remote schema into a migration file (requires Docker; `auth`/`storage` schemas excluded by default).
 
-### Inspect mismatch
-
-```bash
-supabase migration list
-```
-
-### Pull remote schema into a migration file
-
-```bash
-supabase db pull
-```
-
-Notes:
-
-- `db pull` creates a migration file under `supabase/migrations`.
-- It requires Docker for schema diffing.
-- `auth` and `storage` schemas are excluded by default (use `--schema` if needed).
-
-### Repair migration history (only when necessary)
-
-```bash
-supabase migration repair <version> --status applied
-supabase migration repair <version> --status reverted
-```
-
-Use `repair` only to realign migration history, not to hide failed SQL.
+`supabase migration repair <version> --status applied|reverted` only to realign migration history, not to hide failed SQL.
 
 ## SQL Conventions
 
-### Table basics
-
-- Use `public` schema unless intentionally different.
-- Use `snake_case`; plural table names.
-- Use UUID PK by default:
-
-```sql
-id uuid primary key default gen_random_uuid()
-```
-
-### Timestamps
-
-- Add both:
-  - `created_at timestamptz not null default now()`
-  - `updated_at timestamptz not null default now()`
-- Maintain `updated_at` with trigger/function.
-
-### Foreign keys
-
-- Name columns `<entity>_id`.
-- Use `references public.<table>(id)` with explicit delete behavior.
-
-### Indexes
-
-- Add indexes for lookup/join columns introduced by the migration.
+- `public` schema unless intentionally different; `snake_case`, plural table names; UUID PK by default.
+- Timestamps: both `created_at` and `updated_at` (`timestamptz not null default now()`), `updated_at` maintained via trigger/function.
+- Foreign keys: `<entity>_id` columns, `references public.<table>(id)` with explicit delete behavior.
+- Indexes: add for lookup/join columns introduced by the migration.
 
 ## RLS Conventions
 
@@ -142,35 +54,13 @@ id uuid primary key default gen_random_uuid()
 3. Keep policy names predictable (`<table>_<action>`).
 4. Keep policy logic tied to ownership/membership rules.
 
-Minimal pattern:
-
-```sql
-alter table public.pets enable row level security;
-
-create policy "pets_select" on public.pets
-for select using (auth.uid() = owner_id);
-```
-
 ## Destructive Change Policy
 
-For risky operations (`drop column`, type rewrite, non-null without backfill):
-
-- Split into multiple migrations:
-  1. additive/backfill-safe phase
-  2. app rollout
-  3. cleanup phase
-- Ensure backward compatibility during rollout window.
-- Define rollback plan before `db push`.
+For risky operations (`drop column`, type rewrite, non-null without backfill): split into multiple migrations (additive/backfill-safe phase → app rollout → cleanup phase), ensure backward compatibility during rollout window, define rollback plan before `db push`.
 
 ## Flutter Integration Order
 
-After successful `supabase db push`:
-
-1. Update entities/models and serializers.
-2. Update datasource queries and DTO mapping.
-3. Update repositories/use cases.
-4. Update Riverpod notifiers/providers.
-5. Update tests and seed fixtures.
+After successful `supabase db push`: 1) entities/models and serializers, 2) datasource queries and DTO mapping, 3) repositories/use cases, 4) Riverpod notifiers/providers, 5) tests and seed fixtures.
 
 Do not merge app-layer changes that depend on columns/tables not yet pushed remotely.
 

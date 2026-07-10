@@ -1,6 +1,6 @@
 ---
 name: devflow-ship
-description: Pre-merge fan-out gate. Dispatches code-reviewer, security-auditor, and test-engineer in parallel, synthesizes a Ship Gate Report, and routes to devflow.pr if no blockers. Use when the user asks to run devflow.ship, wants a pre-merge review gate, or asks if the feature is ready to ship — the pipeline step after devflow.test and before devflow.pr.
+description: Pre-merge fan-out gate: code-reviewer, security-auditor, test-engineer parallel, routes devflow.pr if clean. Use when user runs devflow.ship, wants pre-merge gate, or asks "ready to ship?" — after devflow.test, before devflow.pr.
 disable-model-invocation: true
 model: sonnet
 effort: high

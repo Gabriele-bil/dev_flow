@@ -1,6 +1,6 @@
 ---
 name: devflow-analyze
-description: Read-only consistency check: task.md + plan.md + constitution.md. Detects traceability gaps, untestable ACs, terminology drift, layer violations. Use when the user asks to run devflow.analyze, check plan/task consistency, or perform the pipeline step after devflow.plan (Status ready) and before devflow.implement.
+description: Read-only check: task.md+plan.md+constitution.md consistency. Flags traceability gaps, untestable ACs, terminology drift, layer violations. Use when user runs devflow.analyze — after devflow.plan (ready), before devflow.implement.
 model: haiku
 effort: low
 ---
@@ -105,60 +105,7 @@ For each entry in `plan.md` File List:
 
 ### Step 3 — Output report
 
-Produce the Analyze Report directly in the response. **Do not write any files.**
-
-```text
-## DevFlow Analyze Report
-**Feature:** [NNN]_[feature-name]
-**Date:** [YYYY-MM-DD]
-**Artifacts:** task.md (Status: [value]) · plan.md (Status: ready)
-
----
-
-### Pass A — Traceability completeness
-[PASS — all subtasks have Traceability rows with file mappings]
-— or —
-- **[SEVERITY]** A: [description]
-  → Suggested fix: [one-line resolution]
-
-### Pass B — AC testability
-[PASS — all ACs are observable and falsifiable]
-— or —
-- **[SEVERITY]** B: [description]
-  → Suggested fix: [one-line resolution]
-
-### Pass C — Terminology consistency
-[PASS — consistent terminology across both documents]
-— or —
-- **[SEVERITY]** C: [description]
-  → Suggested fix: [one-line resolution]
-
-### Pass D — Constitution alignment
-[PASS — all file paths respect constitution.md layer rules]
-— or —
-- **[SEVERITY]** D: [description]
-  → Suggested fix: [one-line resolution]
-
-### Pass E — Coverage balance
-[PASS — no orphaned ACs or files]
-— or —
-- **[SEVERITY]** E: [description]
-  → Suggested fix: [one-line resolution]
-
----
-
-### Summary
-
-| Severity | Count |
-|----------|-------|
-| Critical | N     |
-| Required | N     |
-| Nit      | N     |
-
-[N blocker(s) (Critical + Required) — resolve before devflow.implement]
-— or —
-[No blockers — proceed to devflow.implement]
-```
+Produce the Analyze Report directly in the response. **Do not write any files.** Format: `references/analyze-report-template.md`.
 
 ## Severity taxonomy
 
@@ -188,6 +135,7 @@ Blockers = Critical + Required findings.
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md` |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md` |
+| Reads | `references/analyze-report-template.md` |
 | Writes | **Nothing** — strictly read-only |
 | Precedes | `devflow.implement` |
 | Follows | `devflow.plan` (Status: ready) |

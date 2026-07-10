@@ -14,138 +14,36 @@ Default stack for this repository:
 
 Prefer package primitives over custom controllers/ad-hoc validation.
 
-## Standard form skeleton
+Full code: `references/form-patterns.md`.
 
-```dart
-final formKey = GlobalKey<FormBuilderState>();
-
-FormBuilder(
-  key: formKey,
-  autovalidateMode: AutovalidateMode.onUserInteraction,
-  child: Column(
-    children: [
-      FormBuilderTextField(
-        name: 'name',
-        decoration: const InputDecoration(labelText: 'Name'),
-        validator: FormBuilderValidators.compose([
-          FormBuilderValidators.required(),
-          FormBuilderValidators.minLength(2),
-        ]),
-      ),
-      ElevatedButton(
-        onPressed: () => onSubmit(formKey),
-        child: const Text('Save'),
-      ),
-    ],
-  ),
-)
-```
-
-Rules:
+## Form skeleton rules
 
 - Use `GlobalKey<FormBuilderState>` for `FormBuilder`.
 - Keep field names unique and `snake_case`.
 - Use `AutovalidateMode.onUserInteraction` as default UX baseline.
-
-## Submit and read values safely
-
-```dart
-void onSubmit(GlobalKey<FormBuilderState> formKey) {
-  final isValid = formKey.currentState?.saveAndValidate() ?? false;
-  if (!isValid) return;
-
-  final values = formKey.currentState!.value;
-  // map values -> notifier/repository input
-}
-```
-
-Guidance:
-
-- Call `saveAndValidate()` before reading `.value`.
-- Use `validate()` + `instantValue` only when you need current values without save side effects.
+- Call `saveAndValidate()` before reading `.value`. Use `validate()` + `instantValue` only when current values are needed without save side effects.
 - Keep business mapping/submit side effects in notifier/use-case layer, not inline in widgets.
 
 ## Field patterns
 
-### Text
-
-```dart
-FormBuilderTextField(
-  name: 'name',
-  textCapitalization: TextCapitalization.words,
-  decoration: const InputDecoration(labelText: 'Name'),
-  validator: FormBuilderValidators.compose([
-    FormBuilderValidators.required(),
-    FormBuilderValidators.maxLength(50),
-  ]),
-)
-```
-
-### Numeric input
-
-```dart
-FormBuilderTextField(
-  name: 'weight',
-  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-  decoration: const InputDecoration(labelText: 'Weight', suffixText: 'kg'),
-  valueTransformer: (value) => value == null ? null : double.tryParse(value),
-  validator: FormBuilderValidators.compose([
-    FormBuilderValidators.required(),
-    FormBuilderValidators.numeric(),
-    FormBuilderValidators.min(0.1),
-  ]),
-)
-```
-
-Always normalize string input with `valueTransformer` when domain type is numeric/date-like.
-
-### Select fields (dropdown/radio/chips)
-
-Use serializable primitives (`String`, `int`) as UI values, then map to domain enum/value objects in submit mapping.
-
-### Date fields
-
-Constrain with `firstDate`/`lastDate` and validate domain constraints (for example "not in future") via composed validators.
+- **Text**: standard `FormBuilderTextField` with composed validators.
+- **Numeric**: normalize with `valueTransformer` (e.g. `double.tryParse`) — domain type is numeric, not string.
+- **Select (dropdown/radio/chips)**: serializable primitives (`String`, `int`) as UI values, map to domain enum/value objects on submit.
+- **Date**: constrain with `firstDate`/`lastDate`, validate domain constraints (e.g. "not in future") via composed validators.
 
 ## Validator conventions
 
-Use `FormBuilderValidators.compose([...])` and keep order intentional:
-
-1. presence (`required`)
-2. shape (`email`, `numeric`, `match`)
-3. range/domain (`min`, `max`, custom validator)
-
-Example:
-
-```dart
-validator: FormBuilderValidators.compose([
-  FormBuilderValidators.required(),
-  FormBuilderValidators.email(),
-  (value) {
-    if (value == null) return null;
-    return value.endsWith('@example.com')
-        ? null
-        : 'Use a company email';
-  },
-]),
-```
+`FormBuilderValidators.compose([...])`, order intentional: 1) presence (`required`) 2) shape (`email`, `numeric`, `match`) 3) range/domain (`min`, `max`, custom validator).
 
 ## Edit mode and programmatic updates
 
 - Use `initialValue` for first render prefill.
-- For async-loaded edit data, update form state programmatically (for example with `patchValue`) once data is available.
-- Keep the source of truth in provider/notifier state; form is an editing surface.
+- For async-loaded edit data, update form state programmatically (e.g. `patchValue`) once data is available.
+- Keep source of truth in provider/notifier state; form is an editing surface.
 
 ## Multi-step (wizard) forms
 
-Pattern:
-
-1. one `FormBuilder` key per step
-2. validate/save step
-3. merge into notifier-held aggregate payload
-4. final step triggers repository submit
-
-Do not store cross-step aggregate payload in widget-local mutable state.
+Pattern: 1) one `FormBuilder` key per step 2) validate/save step 3) merge into notifier-held aggregate payload 4) final step triggers repository submit. Do not store cross-step aggregate payload in widget-local mutable state.
 
 ## Loading, disable, and feedback
 
