@@ -1,0 +1,14 @@
+{
+  "skill_name": "devflow-recovery",
+  "trigger": {
+    "positive": [
+      { "prompt": "The pipeline step keeps failing, help me recover", "top_k": 3 },
+      { "prompt": "devflow state looks inconsistent or corrupted, fix it", "top_k": 3 },
+      { "prompt": "I'm not sure which step to run next, something is broken", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "Just tell me what state the pipeline is in", "owner": "devflow-status" },
+      { "prompt": "Log this finding as a project instinct", "owner": "devflow-learn" }
+    ]
+  }
+}

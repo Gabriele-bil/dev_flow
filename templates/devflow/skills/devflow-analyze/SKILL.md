@@ -1,6 +1,6 @@
 ---
 name: devflow-analyze
-description: Read-only consistency check: task.md + plan.md + constitution.md. Detects traceability gaps, untestable ACs, terminology drift, layer violations. Run after devflow.plan (Status ready), before devflow.implement.
+description: Read-only consistency check: task.md + plan.md + constitution.md. Detects traceability gaps, untestable ACs, terminology drift, layer violations. Use when the user asks to run devflow.analyze, check plan/task consistency, or perform the pipeline step after devflow.plan (Status ready) and before devflow.implement.
 model: haiku
 effort: low
 ---

@@ -1,0 +1,14 @@
+{
+  "skill_name": "devflow-learn",
+  "trigger": {
+    "positive": [
+      { "prompt": "Log this finding as a project instinct for next time", "top_k": 3 },
+      { "prompt": "Search past learnings before we start this feature", "top_k": 3 },
+      { "prompt": "Prune outdated instincts from devflow-instincts.yaml", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "Diagnose why the pipeline state is corrupted", "owner": "devflow-recovery" },
+      { "prompt": "Split this large objective into a multi-PR blueprint", "owner": "devflow-blueprint" }
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "skill_name": "devflow-discovery",
+  "trigger": {
+    "positive": [
+      { "prompt": "Where do I begin with devflow on a brand new project?", "top_k": 3 },
+      { "prompt": "Orient me to the pipeline at the start of this session", "top_k": 3 },
+      { "prompt": "What's the correct entry point given the current project state?", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "Show me the current progress of an already-started feature", "owner": "devflow-status" },
+      { "prompt": "Run devflow setup after installing the plugin", "owner": "devflow-setup" }
+    ]
+  }
+}

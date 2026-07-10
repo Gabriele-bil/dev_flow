@@ -1,0 +1,14 @@
+{
+  "skill_name": "devflow-implement",
+  "trigger": {
+    "positive": [
+      { "prompt": "Implement everything described in plan.md", "top_k": 3 },
+      { "prompt": "Write the code for this devflow plan step by step", "top_k": 3 },
+      { "prompt": "Execute the implementation step of the pipeline now", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "Review the implementation output for readability and architecture", "owner": "devflow-beautify" },
+      { "prompt": "Write and run tests for this feature", "owner": "devflow-test" }
+    ]
+  }
+}

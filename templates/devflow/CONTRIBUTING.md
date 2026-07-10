@@ -25,6 +25,11 @@ Required sections (in order):
 8. `## Anti-Patterns` — table: wrong approach + problem + correct behavior; distinct from rationalizations
 9. `## I/O Reference` — reads, writes, next step
 
+Also add `evals/cases/<skill-name>.json` — at least 3 positive trigger
+prompts and 2 negative trigger prompts (paraphrased user asks, not copied
+from `description:`). Skip if the skill sets `disable-model-invocation:
+true` — see `evals/README.md`.
+
 Optional (add when needed):
 
 - `## Completion checklist` — exit criteria before notify step

@@ -1,6 +1,6 @@
 ---
 name: angular-theme
-description: Angular theme with Tailwind + CSS layers. Use for global styles, design tokens, dark mode, or style architecture.
+description: Angular theme with Tailwind + CSS layers. Use when the user asks for global styles, design tokens, dark mode, or style architecture changes.
 ---
 
 # Skill: Angular Theme

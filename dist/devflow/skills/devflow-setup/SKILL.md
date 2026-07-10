@@ -136,72 +136,11 @@ Build final values for template placeholders from:
 If a value cannot be inferred, keep a literal placeholder token:
 `[TODO: fill]`.
 
-For constitution fields, use these adapter defaults when the questionnaire answer is empty or `[TODO: fill]`:
-
-**Flutter:**
-
-- `layer-order`: `domain → data → riverpod → UI → i18n/codegen`
-- `import-conventions`: `Use package:{{project-name}} imports. Barrel files: index.dart per layer. No relative cross-layer imports.`
-- `key-decisions`:
-  - State: Riverpod (flutter_riverpod + riverpod_annotation)
-  - Models: Freezed + json_serializable
-  - i18n: slang
-  - Backend: Supabase
-  - Routing: [TODO: fill]
-
-**Angular:**
-
-- `layer-order`: `core → shared → pages`
-- `import-conventions`: `Path aliases: @core/, @shared/, @pages/. Barrel files: public-api.ts. No deep cross-module imports.`
-- `key-decisions`:
-  - State: Signal Store (no NgRx)
-  - Components: standalone (no NgModules)
-  - HTTP: HttpClient with typed responses
-  - Routing: Angular Router with lazy loading
-
-**Next.js:**
-
-- `layer-order`: `app → components → lib → actions`
-- `import-conventions`: `Path alias: @/ → project root. Barrel files: index.ts per directory. No server imports in Client Components.`
-- `key-decisions`:
-  - Components: Server Components by default; 'use client' only for hooks/browser API
-  - State: Zustand for global client state; URL state for filters/pagination
-  - Data: Server Actions (actions.ts) for mutations
-  - Routing: App Router (app/ directory)
+For constitution fields and the full required placeholder table, see `references/placeholder-map.md`.
 
 ### Step 5 - Placeholder map (required)
 
-You must collect and resolve these fields before render:
-
-| Placeholder | Target file | Prompt intent |
-| --- | --- | --- |
-| `project-name` | AGENTS, PRODUCT | Product/app name shown to humans |
-| `adapter` | AGENTS | Active stack adapter id |
-| `format-cmd` | AGENTS, REGISTRY | Formatting command |
-| `analyze-cmd` | AGENTS, REGISTRY | Static analysis command |
-| `test-cmd` | REGISTRY | Test command |
-| `naming-rule` | REGISTRY | Naming conventions summary |
-| `pattern-1-name` | REGISTRY | Pattern title |
-| `pattern-1-when` | REGISTRY | When to apply pattern 1 |
-| `pattern-1-path` | REGISTRY | Path for pattern 1 |
-| `pattern-2-name` | REGISTRY | Pattern title |
-| `pattern-2-when` | REGISTRY | When to apply pattern 2 |
-| `pattern-2-path` | REGISTRY | Path for pattern 2 |
-| `product-domain` | PRODUCT | Problem space/domain |
-| `target-users` | PRODUCT | Primary actors/users |
-| `primary-outcome` | PRODUCT | Main user value |
-| `feature-[N]-name` | PRODUCT | Key feature label (N = 1, 2, 3…) |
-| `feature-[N]-status` | PRODUCT | `implemented`, `planned`, `in-progress`, or `deprecated` |
-| `feature-[N]-notes` | PRODUCT | Scope/status notes |
-| `layer-order` | CONSTITUTION | Layer sequence label (e.g. `domain → data → UI`) |
-| `layer-N-name` | CONSTITUTION | Layer name (N = 1…N) |
-| `layer-N-path` | CONSTITUTION | Folder path for layer N |
-| `layer-N-responsibility` | CONSTITUTION | What layer N owns |
-| `naming-conventions` | CONSTITUTION | File/class/function naming rules |
-| `import-conventions` | CONSTITUTION | Import style and barrel file rules |
-| `key-decisions` | CONSTITUTION | Architectural decisions list (state, DI, routing, DB) |
-
-Collect at least 3 features. Ask: "List your key features (name, status, notes). Add as many as needed." Add one table row per feature. `devflow.task` will maintain this table as features progress.
+Collect and resolve every field in `references/placeholder-map.md` before render. Collect at least 3 features. Ask: "List your key features (name, status, notes). Add as many as needed." Add one table row per feature. `devflow.task` will maintain this table as features progress.
 
 ### Step 6 - Render token-lean content
 
@@ -240,36 +179,13 @@ Log the final word count per file in the Step 8 summary.
 
 ### Step 7 - Write files
 
-Target location: consumer project root.
+Target location: consumer project root. Same rules for all four files (`AGENTS.md`, `REGISTRY.md`, `docs/product.md`, `constitution.md`):
 
-#### AGENTS.md
-
-- file missing: create from rendered template
+- file missing: create from rendered template (`docs/product.md` and `constitution.md`: always create if missing)
 - file exists, no `--force`: replace only managed sections by matching `<section-id>`
 - file exists + `--force`: overwrite full file
 
-#### REGISTRY.md
-
-- same rules as `AGENTS.md`
-
-#### docs/product.md
-
-- file missing: create from rendered template (always)
-- file exists, no `--force`: replace only managed sections by matching `<section-id>`
-- file exists + `--force`: overwrite full file
-
-When non-force mode cannot find valid managed markers in an existing file:
-
-- append rendered managed blocks to the end of the file
-- do not rewrite existing user sections
-
-#### constitution.md
-
-- file missing: create from rendered template
-- file exists, no `--force`: replace only managed sections by matching `<section-id>`
-- file exists + `--force`: overwrite full file
-
-When non-force mode cannot find valid managed markers in an existing file:
+When non-force mode cannot find valid managed markers in an existing file (`docs/product.md`, `constitution.md`):
 
 - append rendered managed blocks to the end of the file
 - do not rewrite existing user sections
@@ -290,70 +206,11 @@ Ensure `.devflow-state.json` is listed in the consumer project's `.gitignore`.
 
 ### Step 7c - Install adapter setup dependencies (required)
 
-After successful file writes, install dependencies declared in the active adapter `Setup dependencies` section.
-
-Rules:
-
-1. Execute installs from the consumer project root only.
-2. Detect runtime first:
-   - Flutter project: `pubspec.yaml` exists → use Flutter commands.
-   - JavaScript project: `package.json` exists → detect package manager in order:
-     - `pnpm-lock.yaml` → `pnpm`
-     - `yarn.lock` → `yarn`
-     - `package-lock.json` → `npm`
-     - none found → default `npm`
-3. Install only packages listed in adapter `Setup dependencies`. Do not invent package names.
-4. Command mapping:
-   - JS runtime deps:
-     - `pnpm add <packages>`
-     - `yarn add <packages>`
-     - `npm install <packages>`
-   - JS dev deps (if adapter lists them):
-     - `pnpm add -D <packages>`
-     - `yarn add -D <packages>`
-     - `npm install -D <packages>`
-   - Flutter deps:
-     - Prefer a single `flutter pub add <packages>` call per dependency bucket.
-     - If adapter requires versions, keep exact constraints from adapter contract.
-5. If install command fails:
-   - stop setup flow
-   - report exact failed command and stderr
-   - do not claim setup complete
-6. If dependency set is empty for active adapter:
-   - skip install step
-   - report `Dependency install skipped (none declared)`.
+After successful file writes, install dependencies declared in the active adapter `Setup dependencies` section. Full rules: `references/dependency-install.md`.
 
 ### Step 8 - Notify user
 
-Respond with:
-
-```text
-✅ Setup complete
-
-AGENTS.md: [created|updated|overwritten]
-REGISTRY.md: [created|updated|overwritten]
-docs/product.md: [created|updated|overwritten]
-constitution.md: [created|updated|overwritten]
-
-Template source: [adapter|fallback]
-Manual placeholders: [N]
-- [file]: [placeholder]
-
-Questionnaire fields asked: [N]
-Auto-inferred fields: [N]
-User-provided fields: [N]
-
-Dependency install:
-- adapter: [adapter]
-- manager: [pnpm|yarn|npm|flutter]
-- installed runtime deps: [N]
-- installed dev deps: [N]
-- commands:
-  - [command 1]
-  - [command 2]
-
-Next: run devflow.task
-```
+Respond using the template in `references/notify-template.md`.
 
 ## Output quality checklist
 

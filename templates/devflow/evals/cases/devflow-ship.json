@@ -1,0 +1,14 @@
+{
+  "skill_name": "devflow-ship",
+  "trigger": {
+    "positive": [
+      { "prompt": "Run the pre-merge gate with reviewers before I merge this feature", "top_k": 3 },
+      { "prompt": "Fan out code review, security and test checks before the PR", "top_k": 3 },
+      { "prompt": "Is this feature ready to ship?", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "Commit everything and open the pull request", "owner": "devflow-pr" },
+      { "prompt": "Write and run tests for this feature", "owner": "devflow-test" }
+    ]
+  }
+}

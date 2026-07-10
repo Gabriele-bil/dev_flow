@@ -1,0 +1,14 @@
+{
+  "skill_name": "devflow-test",
+  "trigger": {
+    "positive": [
+      { "prompt": "Write and run tests for this feature", "top_k": 3 },
+      { "prompt": "Validate the feature after beautify with unit and integration tests", "top_k": 3 },
+      { "prompt": "Run the test step of the devflow pipeline", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "Dispatch reviewers before merging this feature", "owner": "devflow-ship" },
+      { "prompt": "Review the implementation output for readability", "owner": "devflow-beautify" }
+    ]
+  }
+}

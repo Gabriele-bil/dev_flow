@@ -1,0 +1,14 @@
+{
+  "skill_name": "devflow-plan",
+  "trigger": {
+    "positive": [
+      { "prompt": "Turn this task into a detailed implementation plan", "top_k": 3 },
+      { "prompt": "Generate plan.md for this feature with file-by-file changes", "top_k": 3 },
+      { "prompt": "Produce the build sequence before we start implementing", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "Resolve the clarification markers in task.md", "owner": "devflow-clarify" },
+      { "prompt": "Implement everything described in the plan", "owner": "devflow-implement" }
+    ]
+  }
+}

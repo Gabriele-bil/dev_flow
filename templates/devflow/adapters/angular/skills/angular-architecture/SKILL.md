@@ -1,6 +1,6 @@
 ---
 name: angular-architecture
-description: Angular app architecture: folders, boundaries, dependency flow, root wiring. Standalone + signals-first; Signal Store only (no NgRx). Use for structural changes or architectural review.
+description: Angular app architecture: folders, boundaries, dependency flow, root wiring. Standalone + signals-first; Signal Store only (no NgRx). Use when the user asks for structural changes or an architectural review.
 ---
 
 # Skill: Angular Architecture

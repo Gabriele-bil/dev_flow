@@ -119,7 +119,7 @@ After the Q&A loop completes:
 **Updated:** none
 ```
 
-This section is an audit trail only. Do not reformat, compress, or omit it after writing.
+Audit trail only — do not reformat, compress, or omit after writing.
 
 ## Anti-Patterns
 

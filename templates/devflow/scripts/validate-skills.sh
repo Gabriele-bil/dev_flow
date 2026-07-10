@@ -68,6 +68,14 @@ for FILE in "${SKILL_FILES[@]}"; do
       DESC_VALUE=$(echo "$DESC_LINE" | sed 's/^description:[[:space:]]*//')
       if [[ -z "$DESC_VALUE" ]]; then
         FILE_ERRORS+=("frontmatter field 'description' is empty")
+      elif [[ "$STRICT" == true ]]; then
+        DESC_LEN=${#DESC_VALUE}
+        if [[ $DESC_LEN -lt 40 ]]; then
+          FILE_WARNINGS+=("style: description is $DESC_LEN chars (<40) — likely too generic to trigger reliably")
+        fi
+        if ! echo "$DESC_VALUE" | grep -qiE 'use when|when the user|when [a-z]+ing|when a |when this|triggers? (on|when|for)'; then
+          FILE_WARNINGS+=("style: description missing explicit trigger condition (expected phrasing like 'Use when ...')")
+        fi
       fi
     fi
 
@@ -108,7 +116,7 @@ for FILE in "${SKILL_FILES[@]}"; do
     fi
 
     # Empty sections: a ## heading followed immediately by another ## heading or EOF
-    LINES=$(wc -l < "$FILE")
+    LINES=$(wc -l < "$FILE" | tr -d ' ')
     while IFS= read -r LINE_NUM_CONTENT; do
       LINE_NUM=$(echo "$LINE_NUM_CONTENT" | cut -d: -f1)
       HEADING=$(echo "$LINE_NUM_CONTENT" | cut -d: -f2-)
@@ -122,11 +130,16 @@ for FILE in "${SKILL_FILES[@]}"; do
           NEXT_LINE_NUM=$((LINE_NUM + 2))
           NEXT_CONTENT=$(sed -n "${NEXT_LINE_NUM}p" "$FILE")
         fi
-        if echo "$NEXT_CONTENT" | grep -qE '^##'; then
+        if echo "$NEXT_CONTENT" | grep -qE '^## '; then
           FILE_WARNINGS+=("style: empty section: $HEADING")
         fi
       fi
     done < <(grep -nE '^## ' "$FILE")
+
+    # Line-count check: core skills over budget should extract to references/
+    if ! echo "$REL" | grep -q "^adapters/" && [[ $LINES -gt 250 ]]; then
+      FILE_WARNINGS+=("style: SKILL.md is $LINES lines (>250) — extract detail to references/<file>.md")
+    fi
   fi
 
   # ── Output for this file ─────────────────────────────────────────────────────

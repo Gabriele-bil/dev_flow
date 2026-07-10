@@ -1,0 +1,14 @@
+{
+  "skill_name": "devflow-setup",
+  "trigger": {
+    "positive": [
+      { "prompt": "Run devflow setup after installing the plugin", "top_k": 3 },
+      { "prompt": "Generate AGENTS.md and REGISTRY.md for this project", "top_k": 3 },
+      { "prompt": "The adapter or product context changed, regenerate the setup docs", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "Start a new feature idea for the pipeline", "owner": "devflow-task" },
+      { "prompt": "Where do I begin with devflow on a brand new project?", "owner": "devflow-discovery" }
+    ]
+  }
+}

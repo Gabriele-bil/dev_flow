@@ -1,0 +1,14 @@
+{
+  "skill_name": "devflow-blueprint",
+  "trigger": {
+    "positive": [
+      { "prompt": "This feature needs multiple PRs across several sessions, break it down", "top_k": 3 },
+      { "prompt": "Create a dependency graph for parallel workstreams on this big objective", "top_k": 3 },
+      { "prompt": "Split this large objective into a multi-PR blueprint", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "Write scope and assumptions for a single small feature idea", "owner": "devflow-task" },
+      { "prompt": "Log this finding as a project instinct", "owner": "devflow-learn" }
+    ]
+  }
+}

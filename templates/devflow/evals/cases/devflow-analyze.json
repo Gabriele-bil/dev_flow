@@ -1,0 +1,14 @@
+{
+  "skill_name": "devflow-analyze",
+  "trigger": {
+    "positive": [
+      { "prompt": "Check consistency between task, plan and constitution before implementing", "top_k": 3 },
+      { "prompt": "Are there traceability gaps between spec and plan?", "top_k": 3 },
+      { "prompt": "Run a read-only cross-check before I start implementing", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "Implement everything described in plan.md", "owner": "devflow-implement" },
+      { "prompt": "Where am I in the devflow pipeline right now?", "owner": "devflow-status" }
+    ]
+  }
+}
