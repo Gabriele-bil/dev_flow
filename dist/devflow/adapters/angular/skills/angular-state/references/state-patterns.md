@@ -2,12 +2,204 @@
 
 ## Table of Contents
 
+- [Base Store Structure](#base-store-structure)
+- [Global vs Local Store](#global-vs-local-store)
+- [Async Methods with rxMethod + tapResponse](#async-methods-with-rxmethod--tapresponse)
+- [Entity CRUD with withEntities](#entity-crud-with-withentities)
+- [Pure Helpers in utils](#pure-helpers-in-utils)
 - [Feature Store Composition](#feature-store-composition)
 - [Entity Workflows](#entity-workflows)
 - [Async Orchestration with rxMethod](#async-orchestration-with-rxmethod)
 - [Error Normalization](#error-normalization)
 - [Local Store Pattern](#local-store-pattern)
 - [Testing Signal Store](#testing-signal-store)
+
+## Base Store Structure
+
+```typescript
+import { computed, inject } from "@angular/core";
+import {
+  patchState,
+  signalStore,
+  withComputed,
+  withMethods,
+  withProps,
+  withState,
+} from "@ngrx/signals";
+
+interface UsersState {
+  users: User[];
+  loading: boolean;
+  error: string | null;
+  selectedId: string | null;
+}
+
+const initialState: UsersState = {
+  users: [],
+  loading: false,
+  error: null,
+  selectedId: null,
+};
+
+export const UsersStore = signalStore(
+  { providedIn: "root" },
+  withState(initialState),
+  withProps(() => ({
+    usersService: inject(UsersService),
+  })),
+  withComputed((store) => ({
+    selectedUser: computed(
+      () => store.users().find((u) => u.id === store.selectedId()) ?? null,
+    ),
+    hasError: computed(() => !!store.error()),
+  })),
+  withMethods((store) => ({
+    selectUser(id: string) {
+      patchState(store, { selectedId: id });
+    },
+    clearError() {
+      patchState(store, { error: null });
+    },
+  })),
+);
+```
+
+## Global vs Local Store
+
+```typescript
+// Global store
+export const AuthStore = signalStore(
+  { providedIn: "root" },
+  withState(initialState),
+);
+
+// Local store (per component instance)
+export const WizardStore = signalStore(withState(wizardInitialState));
+
+@Component({
+  template: `...`,
+  providers: [WizardStore],
+})
+export class WizardPage {
+  store = inject(WizardStore);
+}
+```
+
+## Async Methods with `rxMethod` + `tapResponse`
+
+Use `rxMethod` for service HTTP pipelines. Always set `loading/error/value`.
+
+```typescript
+import { inject } from "@angular/core";
+import {
+  patchState,
+  signalStore,
+  withMethods,
+  withProps,
+  withState,
+} from "@ngrx/signals";
+import { rxMethod } from "@ngrx/signals/rxjs-interop";
+import { tapResponse } from "@ngrx/operators";
+import { debounceTime, distinctUntilChanged, pipe, switchMap, tap } from "rxjs";
+
+interface SearchState {
+  value: Book[];
+  loading: boolean;
+  error: string | null;
+}
+
+const searchInitialState: SearchState = {
+  value: [],
+  loading: false,
+  error: null,
+};
+
+export const BookSearchStore = signalStore(
+  withState(searchInitialState),
+  withProps(() => ({
+    booksService: inject(BooksService),
+  })),
+  withMethods((store) => ({
+    loadByQuery: rxMethod<string>(
+      pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        tap(() => patchState(store, { loading: true, error: null })),
+        switchMap((query) =>
+          store.booksService.getByQuery(query).pipe(
+            tapResponse({
+              next: (value) => patchState(store, { value, loading: false }),
+              error: (err: unknown) =>
+                patchState(store, {
+                  loading: false,
+                  error: err instanceof Error ? err.message : "Request failed",
+                }),
+            }),
+          ),
+        ),
+      ),
+    ),
+  })),
+);
+```
+
+## Entity CRUD with `withEntities`
+
+Use for normalized entity collections.
+
+```typescript
+import { patchState, signalStore, withMethods } from "@ngrx/signals";
+import {
+  addEntity,
+  removeEntities,
+  setAllEntities,
+  updateAllEntities,
+  withEntities,
+} from "@ngrx/signals/entities";
+
+type Todo = { id: number; text: string; completed: boolean };
+
+export const TodosStore = signalStore(
+  withEntities<Todo>(),
+  withMethods((store) => ({
+    setTodos(todos: Todo[]) {
+      patchState(store, setAllEntities(todos));
+    },
+    addTodo(todo: Todo) {
+      patchState(store, addEntity(todo));
+    },
+    completeAll() {
+      patchState(store, updateAllEntities({ completed: true }));
+    },
+    removeEmpty() {
+      patchState(
+        store,
+        removeEntities(({ text }) => !text.trim()),
+      );
+    },
+  })),
+);
+```
+
+## Pure Helpers in `utils`
+
+If `withMethods` gets noisy, move pure transformations to `utils`.
+
+```typescript
+// utils/users-state.utils.ts
+export function mergeUsers(existing: User[], incoming: User[]): User[] {
+  const map = new Map(existing.map((u) => [u.id, u]));
+  for (const user of incoming) map.set(user.id, user);
+  return Array.from(map.values());
+}
+```
+
+```typescript
+// store file
+patchState(store, (state) => ({
+  users: mergeUsers(state.users, users),
+}));
+```
 
 ## Feature Store Composition
 
