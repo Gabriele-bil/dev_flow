@@ -74,7 +74,12 @@ tail -20 .devflow-observe.jsonl 2>/dev/null | jq -r '.tool_name, .file_path // e
 
 # 5. Check learnings for known issues
 grep -i "error\|fail\|stuck\|issue" .devflow-learnings.jsonl 2>/dev/null | tail -5
+
+# 6. Check per-feature checkpoint — decisions + errors already tried
+cat devflow/features/${ACTIVE_FEATURE}/.checkpoint.json 2>/dev/null
 ```
+
+Checkpoint present → include `errors_tried` in the diagnosis; never re-propose a fix already listed there. Schema: `@devflow/references/state-machine.md` → **Checkpoint file**.
 
 For **Category C (state missing)**: infer step from feature files:
 
@@ -168,7 +173,7 @@ Next command: [exact command to continue]
 
 | | |
 | --- | --- |
-| Reads | `.devflow-state.json`, `.devflow-observe.jsonl`, `.devflow-learnings.jsonl` |
+| Reads | `.devflow-state.json`, `.devflow-observe.jsonl`, `.devflow-learnings.jsonl`, `devflow/features/*/.checkpoint.json` |
 | Reads | `devflow/features/*/task.md`, `devflow/features/*/plan.md` |
 | Reads | `devflow/config.md`, `@devflow/references/state-machine.md` |
 | Writes | `.devflow-state.json` (only on user-confirmed resync) |

@@ -1,6 +1,6 @@
 ---
 name: devflow-ship
-description: Pre-merge fan-out gate: code-reviewer, security-auditor, test-engineer parallel, routes devflow.pr if clean. Use when user runs devflow.ship, wants pre-merge gate, or asks "ready to ship?" — after devflow.test, before devflow.pr.
+description: Pre-merge fan-out gate: dispatches 1–5 review agents (code-reviewer, security-auditor, test-engineer, +2) per complexity profile, routes devflow.pr if clean. Use when user runs devflow.ship, wants pre-merge gate, or asks "ready to ship?" — after devflow.test, before devflow.pr.
 disable-model-invocation: true
 model: sonnet
 effort: high
@@ -10,9 +10,14 @@ effort: high
 
 ## Purpose
 
-Pre-merge fan-out gate. Dispatch three specialist agents in parallel → synthesize reports → gate on findings → route to `devflow.pr`.
+Pre-merge fan-out gate. Dispatch specialist agents in parallel — count scaled by depth profile (`quick` = 1, `standard` = 3, `thorough` = 5) → synthesize reports → gate on findings → route to `devflow.pr`.
 
----
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ---
 
@@ -35,12 +40,13 @@ Before dispatching, verify all of the following. Stop and report which check fai
 - [ ] Active adapter analyze/typecheck clean
 - [ ] `plan.md` exists at `devflow/features/[NNN]_[feature-name]/plan.md`
 - [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md`
+- [ ] Depth profile resolved from `plan.md` `**Complexity:**` per `@devflow/references/complexity-scoring.md` (missing → `standard`)
 
 ---
 
 ## Step 1 - Fan-out (parallel)
 
-Dispatch all three agents **simultaneously**. Do not wait for one before dispatching the next.
+Dispatch all profile-required agents **simultaneously**. Do not wait for one before dispatching the next.
 
 Each agent receives:
 
@@ -49,23 +55,33 @@ Each agent receives:
 - Active adapter name (from `@devflow/config.md`)
 - Optional reviewer notes from `$ARGUMENTS`
 
-**Agents to dispatch:**
+**Agents per depth profile:**
+
+| Profile | Agents |
+| --- | --- |
+| `quick` | `code-reviewer` |
+| `standard` | `code-reviewer` · `security-auditor` · `test-engineer` |
+| `thorough` | `standard` set + `accessibility-auditor` · `docs-reviewer` |
+
+Agent definitions:
 
 1. `@devflow/agents/code-reviewer.md` — six-axis code review (correctness, readability, architecture, security, performance, scope fidelity)
 2. `@devflow/agents/security-auditor.md` — security audit
 3. `@devflow/agents/test-engineer.md` — coverage gap analysis
+4. `@devflow/agents/accessibility-auditor.md` — WCAG 2.1 AA audit (thorough only)
+5. `@devflow/agents/docs-reviewer.md` — doc coverage and drift (thorough only)
 
 ---
 
 ## Step 2 - Collect reports
 
-Wait for all three reports. Do not proceed until all complete.
+Wait for **all dispatched** reports. Do not proceed until all complete.
 
 ---
 
 ## Step 3 - Synthesize
 
-Merge findings across all three reports. Deduplicate overlapping findings (same file:line from multiple reviewers → one merged entry, noting which reviewers flagged it).
+Merge findings across all dispatched reports. Deduplicate overlapping findings (same file:line from multiple reviewers → one merged entry, noting which reviewers flagged it).
 
 Produce a unified report:
 
@@ -92,7 +108,7 @@ Produce a unified report:
 - [positive observations from all agents]
 
 ---
-Reviewed by: code-reviewer · security-auditor · test-engineer
+Profile: [quick | standard | thorough] · Reviewed by: [agents actually dispatched]
 ```
 
 ---
@@ -128,8 +144,9 @@ Execute `@devflow/skills/devflow-pr/SKILL.md` exactly.
 | Running reviewers sequentially | Fan-out is the design; sequential loses independent perspectives |
 | Auto-proceeding on Critical issue | Critical = block; fix or escalate; never auto-proceed |
 | Merging reports mentally without synthesis | Written synthesis is the audit trail |
-| Dispatching only `code-reviewer` | Always dispatch all 3 agents |
-| Synthesizing before all agents complete | Wait for all reports before Step 3 |
+| Dispatching fewer agents than profile requires | Fan-out per depth profile table: `quick` = 1, `standard` = 3, `thorough` = 5 |
+| Downgrading profile at ship to shrink fan-out | Profile fixed at plan; change requires plan.md edit + user confirmation |
+| Synthesizing before all agents complete | Wait for all dispatched reports before Step 3 |
 | Downgrading severity in synthesis | Report as declared; escalate if disputed |
 | Re-running after fixing only some Critical issues | Fix all Critical; re-run full gate from Step 1 |
 
@@ -141,7 +158,8 @@ Execute `@devflow/skills/devflow-pr/SKILL.md` exactly.
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
 | Reads | Files from `devflow.implement` / `devflow.beautify` summary |
+| Reads | `@devflow/references/complexity-scoring.md` (depth profile → fan-out) |
 | Writes | `plan.md` — `**Status:** shipped` on gate pass |
-| Dispatches | `code-reviewer`, `security-auditor`, `test-engineer` (parallel) |
+| Dispatches | review agents per depth profile — `quick`: `code-reviewer`; `standard`: + `security-auditor`, `test-engineer`; `thorough`: + `accessibility-auditor`, `docs-reviewer` (parallel) |
 | Routes to | `devflow-pr` skill on gate pass |
 | Replaces | Running `devflow.pr` directly when multi-perspective review is needed |

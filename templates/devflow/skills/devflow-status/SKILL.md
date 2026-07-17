@@ -1,13 +1,13 @@
 ---
 name: devflow-status
-description: Shows current DevFlow pipeline state — active feature, progress, next step, and adapter. Use when the user asks where they are in the pipeline or what to do next.
-argument-hint: []
+description: Shows current DevFlow pipeline state — active feature, progress, next step, and adapter. Supports --json for machine-readable output with stable exit codes. Use when the user asks where they are in the pipeline or what to do next.
+argument-hint: [--json]
 disable-model-invocation: true
 ---
 
 # Skill: devflow-status
 
-Pipeline dashboard. Shows current state without advancing the pipeline.
+Pipeline dashboard. Shows current state without advancing the pipeline. `--json` → machine-readable output for CI/scripts.
 
 ## Purpose
 
@@ -20,6 +20,10 @@ Emit compact status dashboard. Answers "dove sono nel pipeline?" — no step exe
 - User wants to continue interrupted work — `devflow.resume` (status is snapshot only)
 
 ## Workflow
+
+### Step 0 — Mode
+
+`$ARGUMENTS` contains `--json` → skip Steps 1–3, run the emitter snippet from `@devflow/references/status-schema.md` verbatim, output only the resulting JSON object (no prose, no dashboard), report its exit code (0 = healthy, 1 = no pipeline, 2 = inconsistent state). Otherwise continue below.
 
 ### Step 1 — Read pipeline state
 
@@ -88,6 +92,7 @@ DevFlow not configured. Run: /devflow.setup
 | Anti-Pattern | Fix |
 | --- | --- |
 | Editing `.devflow-state.json` directly | Use `devflow-recovery`; never hand-edit state |
+| Prose or dashboard around `--json` output | Single JSON object on stdout — consumers parse it (see `status-schema.md`) |
 | Reporting status from memory | Always read state file at invocation time |
 | Using status instead of discovery at session start | Discovery = full orientation + routing; status = snapshot only |
 
@@ -95,6 +100,6 @@ DevFlow not configured. Run: /devflow.setup
 
 | | |
 | --- | --- |
-| Reads | `.devflow-state.json`, `devflow/config.md`, `devflow/features/*/plan.md`, `@devflow/references/state-machine.md` |
+| Reads | `.devflow-state.json`, `devflow/config.md`, `devflow/features/*/plan.md`, `@devflow/references/state-machine.md`, `@devflow/references/status-schema.md` (`--json` mode) |
 | Writes | nothing |
 | Related | `devflow-discovery` (full pipeline orientation), `devflow-resume` (session re-entry), `devflow-recovery` (corrupted state) |

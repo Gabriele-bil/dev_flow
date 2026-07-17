@@ -36,6 +36,18 @@ Select model based on task complexity and cost budget — not habit.
 - Use when: accuracy cannot be sacrificed (devflow.ship security-auditor, code-reviewer)
 - Cost: highest; slowest — reserve for critical review steps
 
+## Depth Profile Hints
+
+Depth profile from `plan.md` `**Complexity:**` tag (see `references/complexity-scoring.md`) shifts the Decision Table:
+
+| Profile | implement | beautify | test | ship agents |
+| --------- | ----------- | ---------- | ------ | ------------- |
+| `quick` | Haiku/Sonnet | Haiku | Haiku | Sonnet (`code-reviewer` only) |
+| `standard` | Decision Table above | — | — | — |
+| `thorough` | Sonnet/Opus | Sonnet | Sonnet | Opus (all 5 agents) |
+
+Never downgrade ship security review below the Decision Table for cost — profile floor in `complexity-scoring.md` keeps security-touching features at `standard`+.
+
 ## Anti-Patterns
 
 | Anti-Pattern | Problem |

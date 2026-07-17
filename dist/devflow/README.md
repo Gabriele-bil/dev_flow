@@ -110,7 +110,7 @@ Each adapter folder contains `ADAPTER.md` (stack rules + MCP hints), `skills/` (
 
 ## Hooks
 
-Eleven hooks activate automatically — no user invocation required.
+Fourteen hook registrations activate automatically — no user invocation required. Behavioral tests: `hooks/tests/`, run via `scripts/run-hook-tests.sh`.
 
 | Event | Script | What it does |
 | --- | --- | --- |
@@ -119,12 +119,15 @@ Eleven hooks activate automatically — no user invocation required.
 | PreToolUse | `pre-config-protect.sh` | Blocks edits to linter/analyzer config files |
 | PreToolUse | `observe.sh pre` | Logs tool calls to `.devflow-observe.jsonl` |
 | PostToolUse | `observe.sh post` | Logs tool results to `.devflow-observe.jsonl` |
+| PostToolUse | `post-bash-output-filter.sh` | Compresses verbose adapter command output (flutter/dart/pnpm/ng/git diff) past 2k chars: head + error/warning lines + tail |
 | PostToolUse | `post-edit-accumulate.sh` | Tracks modified files for batch format check |
+| PostToolUse | `post-task-create.sh` | Updates `next_feature_number` in `.devflow-state.json` after task.md writes |
 | PreCompact | `pre-compact.sh` | Snapshots `plan.md` progress to `.devflow-state.json` |
 | Stop | `stop-format-typecheck.sh` | Runs adapter format+analyze after each response |
 | Stop | `stop-notify.sh` | Sends macOS desktop notification on response complete |
 | Stop | `stop-debug-check.sh` | Warns about `print()` / `console.log` in modified files |
 | Stop | `stop-learn-distill.sh` | Detects file churn (≥4 edits) in `.devflow-observe.jsonl`; appends to `.devflow-learnings.jsonl` |
+| Stop | `observe.sh stop` | Logs response-boundary events to `.devflow-observe.jsonl` |
 
 ## Contexts
 
@@ -154,11 +157,13 @@ Stack-agnostic checklists and guides in `references/`:
 | File | Purpose |
 | ------ | --------- |
 | `accessibility-checklist.md` | WCAG 2.1 AA — keyboard, screen readers, touch targets |
+| `complexity-scoring.md` | Feature complexity score (0–20) → quick/standard/thorough depth profiles scaling beautify/test/ship rigor |
 | `escalation-ladder.md` | Bounded failure handling: retry → debug mode → re-approach → decompose → block |
 | `model-selection.md` | Haiku / Sonnet / Opus guide per pipeline step |
 | `security-checklist.md` | OWASP Top 10, auth, input validation, secrets baseline |
 | `security-threat-model.md` | AI agent threat model — prompt injection, state corruption, supply chain |
 | `state-machine.md` | Canonical pipeline statuses + legal transitions — SSOT for status/resume/recovery/hooks |
+| `status-schema.md` | `devflow.status --json` output schema + stable exit codes for CI/scripts |
 | `testing-patterns.md` | AAA, Beyonce Rule, Prove-It Pattern, pass@k vs pass^k, coverage signals |
 | `verification-levels.md` | Goal-backward per-AC verification: existence → substantive → wired → runtime |
 

@@ -9,6 +9,7 @@ Single source of truth for DevFlow statuses and transitions. Cited by `devflow-d
 | `task.md` | `**Status:**` | `devflow.task`, `devflow.clarify`, `devflow.pr` |
 | `plan.md` | `**Status:**` + `[done]`/`[pending]` markers | pipeline skills at step boundaries |
 | `.devflow-state.json` | snapshot (feature, plan_status, next_step, progress) | `hooks/pre-compact.sh`, `hooks/post-task-create.sh`, skills via State update snippet |
+| `devflow/features/[NNN]_[name]/.checkpoint.json` | working context (step, slice, decisions, errors_tried) | `devflow.implement` (slice boundaries), `devflow.test` (retry loops); deleted by `devflow.pr` |
 
 `plan.md` is authoritative; `.devflow-state.json` is a derived cache. On conflict → trust `plan.md`, resync via `devflow.recovery`.
 
@@ -57,6 +58,43 @@ command -v jq >/dev/null 2>&1 && { [ -f .devflow-state.json ] || echo '{}' > .de
 
 Replace `<status>` and `<next_step>` per the table above. Full snapshot (file lists, counts) still refreshed by `hooks/pre-compact.sh` at compaction.
 
+## Checkpoint file (per feature)
+
+`devflow/features/[NNN]_[name]/.checkpoint.json` — working context `[done]` markers cannot hold: mid-implement decisions, constraints discovered, errors already tried. Surviving file = interrupted-work signal.
+
+Schema (6 fields max — no engine-oriented extras):
+
+```json
+{
+  "step": "devflow.implement",
+  "slice": "Slice 2 — state + data flow",
+  "decisions": ["repository pattern over direct client — matches registry precedent"],
+  "constraints": ["API rate limit 10 req/s — batch calls"],
+  "errors_tried": ["mock returned null: fixed provider override, not the model"],
+  "updated_at": "2026-07-17T10:00:00Z"
+}
+```
+
+Lifecycle:
+
+- Written by `devflow.implement` at each slice boundary (Step 4) and by `devflow.test` after each failed retry cycle
+- Read by `devflow.resume` (Step 1) and `devflow.recovery` (Step 3 diagnosis)
+- Deleted by `devflow.pr` before staging (Step 2) — never committed
+- Atomic rewrite: write `.checkpoint.json.tmp` → `mv`
+
+Checkpoint update snippet (skips silently when `jq` missing):
+
+```bash
+command -v jq >/dev/null 2>&1 && jq -n \
+  --arg step "<step>" --arg slice "<current slice>" \
+  --argjson dec '["<decision>"]' --argjson con '["<constraint>"]' --argjson err '["<error tried>"]' \
+  '{step: $step, slice: $slice, decisions: $dec, constraints: $con, errors_tried: $err, updated_at: (now | todate)}' \
+  > "devflow/features/<NNN>_<name>/.checkpoint.json.tmp" && \
+  mv "devflow/features/<NNN>_<name>/.checkpoint.json.tmp" "devflow/features/<NNN>_<name>/.checkpoint.json"
+```
+
+Append to existing arrays instead of overwriting: read current file with `jq '.decisions'` first, extend, rewrite.
+
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
@@ -65,3 +103,5 @@ Replace `<status>` and `<next_step>` per the table above. Full snapshot (file li
 | Skipping a status ("implement + beautify in one go") | Each boundary writes its status — resume and hooks depend on it |
 | Editing `.devflow-state.json` to change pipeline position | Edit `plan.md` Status; state file is derived cache |
 | Setting `tested` with FAIL verdicts in `verification.md` | FAIL = not tested; fix or backprop first |
+| Committing `.checkpoint.json` | `devflow.pr` deletes it before `git add .`; checkpoint is session context, not project history |
+| Rewriting checkpoint wholesale each slice (losing prior decisions) | Append to `decisions`/`errors_tried` arrays; only `step`/`slice`/`updated_at` are replaced |

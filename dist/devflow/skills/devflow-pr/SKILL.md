@@ -51,9 +51,10 @@ Select type by feature nature:
 
 ## Step 2 - Commit
 
-Stage and commit all changes in a single commit:
+Delete the feature checkpoint first — pipeline complete, session context never committed (`@devflow/references/state-machine.md` → **Checkpoint file**). Then stage and commit all changes in a single commit:
 
 ```bash
+rm -f devflow/features/[NNN]_[feature-name]/.checkpoint.json
 git add .
 git commit -m "[type]: [short description of the feature]"
 ```
@@ -166,5 +167,6 @@ DevFlow pipeline complete for TASK-[NNN].
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
 | Runs | `git add .` · `git commit` · `git push` · `gh pr create` |
+| Deletes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json` (before staging) |
 | Writes | `plan.md` `**Status:** pr-opened`, `task.md` `**Status:** done` |
 | Next step | - (end of pipeline) |

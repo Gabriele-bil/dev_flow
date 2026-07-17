@@ -9,6 +9,7 @@ Used by `devflow.plan` Step 5 — write `devflow/features/[NNN]_[feature-name]/p
 **Task:** [link to task.md]
 **Date:** [YYYY-MM-DD]
 **Status:** ready
+**Complexity:** [N] ([quick | standard | thorough])
 
 ---
 
@@ -108,6 +109,7 @@ After **Implementation checkpoints**, append **every extra plan section** requir
 - [ ] New reusable components identified in this plan are listed under their `shared/` path in the **File List**
 - [ ] `devflow.analyze` run (or explicitly waived) — no Critical findings
 - [ ] If feature touches persistent entities → `data-model.md` exists and is non-empty
+- [ ] `**Complexity:**` recorded per `references/complexity-scoring.md` — profile floor applied (auth/migrations/input → minimum `standard`)
 ```
 
 Format rules:

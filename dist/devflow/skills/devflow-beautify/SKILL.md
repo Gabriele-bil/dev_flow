@@ -72,6 +72,8 @@ Stack-agnostic defaults below. For stack-specific checks follow `ADAPTER.md` and
 
 Axes: correctness · readability/simplification · architecture compliance · security · performance · UI consistency · responsiveness/layout · accessibility.
 
+**Depth profile:** read `**Complexity:**` from `plan.md` (per `@devflow/references/complexity-scoring.md`; missing → `standard`). `quick` → review only correctness + readability/simplification axes. `standard` / `thorough` → all 8 axes.
+
 Full per-axis checklist: `references/analysis-axes.md`.
 
 ### Step 4 - Apply changes
@@ -158,6 +160,7 @@ Respond with:
 - ...
 
 ### Improvements by area
+[`quick` profile: mark unreviewed axes as "skipped (quick profile)"]
 - **Correctness**: [brief summary, or "no changes"]
 - **Readability / simplification**: [brief summary, or "no changes"]
 - **Security**: [brief summary, or "no changes"]
@@ -186,7 +189,7 @@ Continue to testing? -> devflow.test
 | --- | --- |
 | Expanding scope beyond `devflow.implement` summary | Limit strictly to the implement summary |
 | Adding features during beautify ("while I'm here") | Log as new subtask; implement in next cycle |
-| Skipping security axis ("already reviewed") | Run all 8 axes every beautify run |
+| Skipping security axis ("already reviewed") | Run all axes the depth profile requires; `quick` never applies to security-touching features (profile floor) |
 | Format/analyze only on new files | Run on the full changed set |
 | Treating Nit as mandatory | Fix Critical/Required; user decides Nit/Optional |
 | Profiling without confirmed bottleneck | Apply heuristics only; profile when benchmark confirms |
@@ -209,7 +212,7 @@ Continue to testing? -> devflow.test
 | Reads | files from `devflow.implement` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md`, `registry.md` |
-| Reads | `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status) |
+| Reads | `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status), `@devflow/references/complexity-scoring.md` (depth profile) |
 | Writes | improvements to existing files only (no new files) |
 | Writes | `plan.md` — `**Status:** beautified` |
 | Next step | `devflow.test` |

@@ -60,6 +60,8 @@ Always read before starting:
 
 ### Step 2 - Scope
 
+**Depth profile:** read `**Complexity:**` from `plan.md` (per `@devflow/references/complexity-scoring.md`; missing → `standard`). `quick` → happy path + 1 regression case per AC; skip exhaustive error-path matrix. `standard` → happy path + ≥1 error path per public surface. `thorough` → standard + edge cases per `@devflow/references/testing-patterns.md`.
+
 Test only files belonging to the current feature.
 
 - Do not write tests for shared/core files or pre-existing code unless they were modified in this DevFlow run
@@ -92,6 +94,7 @@ Failure handling:
 - Attempt 1: analyze failure output and fix the test or implementation
 - Attempt 2: verify mocks and dependencies are correctly set up
 - Attempt 3: isolate and fix root cause
+- After each failed attempt: append error + what was tried to `.checkpoint.json` `errors_tried` per `@devflow/references/state-machine.md` → **Checkpoint file** — resume/recovery skip already-tried fixes
 - After 3 attempts: escalate per `@devflow/references/escalation-ladder.md` — Level 2 debug mode (one hypothesis, minimal probe), Level 3 re-approach (question the plan step), Level 5 block with stuck-report. Never mark a failing test as passing
 
 ### Step 6b - Goal-backward verification
@@ -99,7 +102,7 @@ Failure handling:
 After all tests pass, verify **backwards from the spec** per `@devflow/references/verification-levels.md`:
 
 1. For each acceptance criterion in `task.md`: locate implementing file(s) via `plan.md` → **Traceability** table.
-2. Run the four levels — existence, substantive (no stubs), wired (reachable, not dead code), runtime (adapter integration targets when defined, else `N/A`).
+2. Run the four levels — existence, substantive (no stubs), wired (reachable, not dead code), runtime (adapter integration targets when defined, else `N/A`). Depth per profile: `quick` → levels 1–3; `standard` → levels 1–3 + level 4 when adapter defines targets; `thorough` → level 4 mandatory (no adapter target → verdict PARTIAL with note).
 3. Write `devflow/features/[NNN]_[feature-name]/verification.md` using the report template in the reference.
 4. Any **FAIL** verdict → do NOT set status `tested`. Implementation gap → fix (re-enter escalation ladder at Level 1) or report. Spec gap (AC missing/too weak) → suggest `devflow.backprop`.
 
@@ -180,7 +183,7 @@ Wait for user choice before continuing.
 | Testing implementation internals | Test inputs → outputs; mock only system boundaries |
 | 100% coverage with no assertions | Every test must assert at least one specific output |
 | Flaky test fixed with `retry(3)` | Fix root cause; use deterministic setup |
-| Happy-path-only tests | ≥1 error path per public function |
+| Happy-path-only tests | ≥1 error path per public function (`standard`+ profiles; `quick` = happy + regression per AC) |
 | Skipping `testing-patterns.md` for novel scenarios | Read `@devflow/references/testing-patterns.md` first |
 | Skipping verification because tests pass | Tests are forward-looking; Step 6b proves each AC exists, is real, is wired |
 | Setting `tested` with FAIL verdicts in verification.md | FAIL = not tested; fix or route to `devflow.backprop` |
@@ -192,9 +195,10 @@ Wait for user choice before continuing.
 | Reads | files from `devflow.implement` / `devflow.beautify` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md`, `registry.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
-| Reads | `@devflow/references/verification-levels.md` (Step 6b), `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status) |
+| Reads | `@devflow/references/verification-levels.md` (Step 6b), `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status), `@devflow/references/complexity-scoring.md` (depth profile) |
 | Reads (optional) | `@devflow/references/testing-patterns.md` — stack-agnostic patterns reference |
 | Writes | Test output paths per active `ADAPTER.md` → **Test** |
 | Writes | `devflow/features/[NNN]_[feature-name]/verification.md` — per-AC verdict table |
+| Writes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json` — `errors_tried` on retry loops (state-machine.md → Checkpoint file) |
 | Writes | `plan.md` — `**Status:** tested` (only when tests pass + verification has no FAIL) |
 | Next step | `devflow.ship` (or `devflow.pr` directly for solo quick changes) |

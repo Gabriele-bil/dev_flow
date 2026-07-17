@@ -45,6 +45,12 @@ Extract `feature`, `plan_status`, `next_step`, `pending_files`.
 
 If `STATE_MISSING`: derive from files — latest `devflow/features/*/plan.md` (highest `NNN_` prefix), read its `**Status:**`, map to `next_step` via `@devflow/references/state-machine.md` status table. Continue with derived values.
 
+Also read the feature checkpoint when present — restores working context lost at compaction (`slice`, `decisions`, `constraints`, `errors_tried`; schema: `state-machine.md` → **Checkpoint file**):
+
+```bash
+cat devflow/features/[NNN]_[feature-name]/.checkpoint.json 2>/dev/null
+```
+
 ### Step 2 — Cross-check state against files
 
 Trust order: `plan.md` > `.devflow-state.json` (state file is derived cache — see `@devflow/references/state-machine.md`).
@@ -73,6 +79,7 @@ Feature:     [NNN]_[feature-name]
 Plan status: [status]  →  next: [next_step]
 Progress:    [done]/[total] files done
 First pending: [file path, if mid-implement]
+Checkpoint:  [slice + last decision + last error tried, if .checkpoint.json present]
 [Drift note, if state file disagreed with plan.md]
 
 Continue with [next_step]? (yes / no / different step)
@@ -106,7 +113,7 @@ On confirmation, execute the skill for `next_step` honoring its input contract:
 
 | | |
 | --- | --- |
-| Reads | `.devflow-state.json`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md` (existence), `devflow/config.md` |
+| Reads | `.devflow-state.json`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md` (existence), `devflow/features/[NNN]_[feature-name]/.checkpoint.json` (working context), `devflow/config.md` |
 | Reads | `@devflow/references/state-machine.md` — status/transition source of truth |
 | Writes | nothing (routing only) |
 | Routes to | pipeline skill matching `next_step` |

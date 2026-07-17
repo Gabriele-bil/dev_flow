@@ -110,7 +110,7 @@ Keep: technical terms exact, file paths exact, commands exact, all verbs, negati
 | --- | --- |
 | `SessionStart` | Fires once at session start; use for context injection |
 | `PreToolUse` | Fires before a tool call; block with `{"decision":"block","reason":"..."}` on stdout |
-| `PostToolUse` | Fires after a tool call; async OK; do not emit stdout (no passthrough) |
+| `PostToolUse` | Fires after a tool call; async hooks emit no stdout; sync hooks may emit control JSON — `hookSpecificOutput.updatedToolOutput` rewrites tool output in context (cap 10k chars) |
 | `PreCompact` | Fires before context compaction; output becomes part of compacted context |
 | `Stop` | Fires after each Claude response; reads full response on stdin, must write it back on stdout (passthrough); async hooks skip passthrough requirement |
 | `SessionEnd` | Fires when session closes; async OK |
@@ -126,6 +126,8 @@ Keep: technical terms exact, file paths exact, commands exact, all verbs, negati
 - Runtime artifacts (`.tmp`, `.jsonl`, `.json`): append to `.gitignore` if `.gitignore` exists
 
 **Naming convention:** `<event>-<purpose>.sh` — e.g. `pre-config-protect.sh`, `stop-format-typecheck.sh`
+
+**Behavioral tests (required):** every hook manipulating consumer state gets a suite in `hooks/tests/test-<purpose>.sh` (plain bash asserts, temp-dir fixtures — copy structure from `test-pre-compact.sh`). Run all suites: `bash scripts/run-hook-tests.sh`. `bash -n` alone is not coverage.
 
 ## What Not to Do
 

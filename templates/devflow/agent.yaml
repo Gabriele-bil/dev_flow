@@ -232,6 +232,12 @@ references:
   - id: verification-levels
     path: references/verification-levels.md
     description: "Goal-backward verification for devflow-test Step 6b — four levels (existence, substantive, wired, runtime) checked per acceptance criterion, with verification.md report template"
+  - id: complexity-scoring
+    path: references/complexity-scoring.md
+    description: "Feature complexity score (0–20, five signals) mapped to quick/standard/thorough depth profiles. Written by devflow-plan Step 4d; read by beautify/test/ship to scale review axes, test scope, verification depth, and agent fan-out"
+  - id: status-schema
+    path: references/status-schema.md
+    description: "Machine-readable status schema for devflow.status --json — output fields, emitter snippet, stable exit codes (0 healthy, 1 no-pipeline, 2 inconsistent) for CI and scripts"
 
 hooks:
   - event: SessionStart
@@ -253,6 +259,10 @@ hooks:
     args: post
     async: true
     description: "Log post-tool-call events to .devflow-observe.jsonl for pattern analysis"
+  - event: PostToolUse
+    matcher: "Bash"
+    script: hooks/post-bash-output-filter.sh
+    description: "Compress verbose adapter command output (flutter/dart test-analyze, pnpm/npm/yarn/ng lint-test-build, git diff/log) past 2k chars — keeps head, error/warning lines, tail via updatedToolOutput"
   - event: PreCompact
     script: hooks/pre-compact.sh
     description: "Snapshot plan.md [done]/[pending] progress before context compaction. Saves .devflow-state.json and injects resume reminder"
@@ -279,6 +289,11 @@ hooks:
   - event: Stop
     script: hooks/stop-learn-distill.sh
     description: "Distill learning signals from .devflow-observe.jsonl — detect file churn (≥4 edits), write deduplicated entries to .devflow-learnings.jsonl"
+  - event: Stop
+    script: hooks/observe.sh
+    args: stop
+    async: true
+    description: "Log response-boundary events to .devflow-observe.jsonl; emits strategic-compact advisory when tool-call count exceeds threshold"
   - event: SessionStart
     script: hooks/session-start-learnings.sh
     description: "Inject past learnings from .devflow-learnings.jsonl into session context, filtered by active feature"

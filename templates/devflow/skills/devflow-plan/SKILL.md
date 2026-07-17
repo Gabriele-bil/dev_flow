@@ -166,6 +166,10 @@ Rules:
 
 If not triggered: skip.
 
+### Step 4d - Complexity score
+
+Score feature per `@devflow/references/complexity-scoring.md`: 5 signals (files touched, task type, judgment, cross-component surface, novelty), each 0–4, sum 0–20 → profile (`0–6 quick`, `7–13 standard`, `14–20 thorough`). Apply profile floor: auth/payments/security boundaries/migrations/user-input handling → minimum `standard`. Record in `plan.md` frontmatter: `**Complexity:** N (profile)`. Read by `devflow.beautify`, `devflow.test`, `devflow.ship` to scale rigor.
+
 ### Step 5 - Write plan file
 
 Create `devflow/features/[NNN]_[feature-name]/plan.md` using the template in `references/plan-template.md`. Sections in order: Overview, Architecture decisions, Risks and mitigations, Open questions, Traceability, File List, Implementation checkpoints, Adapter-specific sections, Edge Cases & Error Handling, Pre-implement checklist.
@@ -210,6 +214,7 @@ Continue to implementation? -> devflow.implement
 | Architecture decisions made during implement | All decisions in `plan.md` before implement |
 | Adapter sections omitted | Apply every required `ADAPTER.md` section |
 | No implementation checkpoints on long plans | ≥2 checkpoints for plans >5 files |
+| Complexity score skipped or guessed | Score per `complexity-scoring.md` signals in Step 4d; downstream steps default to `standard` without it |
 
 ## I/O Reference
 
@@ -218,6 +223,7 @@ Continue to implementation? -> devflow.implement
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md` |
 | Reads | `constitution.md`, `registry.md`, `@devflow/adapters/common/skills/common-clean-code/SKILL.md` |
 | Reads (adapter) | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md`; technology skills per ADAPTER table |
+| Reads | `@devflow/references/complexity-scoring.md` (Step 4d — score + profile) |
 | Writes | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Writes (optional) | `devflow/features/[NNN]_[feature-name]/data-model.md` (Step 4c — triggered when feature touches persistent entities) |
 | Next step | `devflow.implement` |

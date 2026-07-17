@@ -133,6 +133,10 @@ Each file must:
 - **Trace to plan (scope fidelity):** every file and function traces to a **File List** or **Traceability** entry — build only what the acceptance criteria require. Urge to add a "while I'm here" improvement → log it via `devflow.learn`; do not write it
 - Satisfy **all implementation rules** in the active `ADAPTER.md` (responsive UI, localization, state architecture, accessibility, layout, contracts, data boundaries — load the referenced technology skills from the adapter table when touching those areas)
 
+### Checkpoint at slice boundaries
+
+After completing each vertical slice (or every 5 files on unsliced plans), write `devflow/features/[NNN]_[feature-name]/.checkpoint.json` per `@devflow/references/state-machine.md` → **Checkpoint file**: current step, active slice, decisions made, constraints discovered, errors tried. Context `[done]` markers cannot hold — read by `devflow.resume` / `devflow.recovery` after crash or compaction. Append to arrays; do not overwrite prior entries.
+
 ### Save point (for large plans)
 
 **No commits during implement.** Mark progress with `[done]` in `plan.md`; commits happen only in `devflow.pr`.
@@ -200,6 +204,7 @@ Respond using template in `references/notify-template.md`.
 | Reads | `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status transitions) |
 | Writes | all files defined in `plan.md` |
 | Writes | `plan.md` — `[done]` markers, `**Status:** implementing → implemented`, `## Implementation deviations` |
+| Writes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json` — slice-boundary working context (state-machine.md → Checkpoint file) |
 | Writes | `registry.md` (mandatory for shared-folder elements; proposed for architectural patterns) |
 | Next step | `devflow.beautify` |
 | Related skills | Per active `ADAPTER.md` → **Technology skills** |
