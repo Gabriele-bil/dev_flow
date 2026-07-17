@@ -51,7 +51,7 @@ echo ""
 echo "  Catalog: ${SKILLS_COUNT} skill(s)  ${AGENTS_COUNT} agent(s)  ${REFS_COUNT} reference(s)"
 
 # Fail if skills drop below baseline (updated after adding new skills)
-SKILLS_MIN=41
+SKILLS_MIN=43
 if [ "$SKILLS_COUNT" -lt "$SKILLS_MIN" ]; then
   echo "  ERROR: skill count ($SKILLS_COUNT) below minimum ($SKILLS_MIN) — possible build regression"
   exit 1

@@ -92,9 +92,22 @@ Failure handling:
 - Attempt 1: analyze failure output and fix the test or implementation
 - Attempt 2: verify mocks and dependencies are correctly set up
 - Attempt 3: isolate and fix root cause
-- If still failing after 3 attempts: stop retries and report using failure format
+- After 3 attempts: escalate per `@devflow/references/escalation-ladder.md` — Level 2 debug mode (one hypothesis, minimal probe), Level 3 re-approach (question the plan step), Level 5 block with stuck-report. Never mark a failing test as passing
+
+### Step 6b - Goal-backward verification
+
+After all tests pass, verify **backwards from the spec** per `@devflow/references/verification-levels.md`:
+
+1. For each acceptance criterion in `task.md`: locate implementing file(s) via `plan.md` → **Traceability** table.
+2. Run the four levels — existence, substantive (no stubs), wired (reachable, not dead code), runtime (adapter integration targets when defined, else `N/A`).
+3. Write `devflow/features/[NNN]_[feature-name]/verification.md` using the report template in the reference.
+4. Any **FAIL** verdict → do NOT set status `tested`. Implementation gap → fix (re-enter escalation ladder at Level 1) or report. Spec gap (AC missing/too weak) → suggest `devflow.backprop`.
+
+Passing tests do not skip this step — tests prove behavior forward; verification proves every AC satisfied, wired, reachable.
 
 ### Step 7 - Notify user
+
+If tests pass AND `verification.md` **Result** is not FAIL: set `plan.md` `**Status:** tested`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
 
 Include actual command output. Do NOT report "all tests passed" without raw evidence.
 
@@ -131,6 +144,11 @@ Output:
 
 ```text
 
+### Verification (goal-backward)
+Result: [PASS | FAIL | PARTIAL] — [N]/[N] ACs verified
+Report: devflow/features/[NNN]_[feature-name]/verification.md
+[FAIL verdicts listed here with level + evidence]
+
 [-- Failures --]
 (shown only if any test failed after 3 attempts)
 
@@ -142,9 +160,10 @@ Output:
 
 ---
 
-All tests passing? Choose how to continue:
-1. Run full project test suite before opening PR -> devflow.pr
-2. Skip full suite and open PR directly -> devflow.pr
+All tests passing and verification clean? Choose how to continue:
+1. Run ship gate (multi-agent review) -> devflow.ship
+2. Run full project test suite before opening PR -> devflow.pr
+3. Skip full suite and open PR directly -> devflow.pr
 ```
 
 Wait for user choice before continuing.
@@ -163,6 +182,8 @@ Wait for user choice before continuing.
 | Flaky test fixed with `retry(3)` | Fix root cause; use deterministic setup |
 | Happy-path-only tests | ≥1 error path per public function |
 | Skipping `testing-patterns.md` for novel scenarios | Read `@devflow/references/testing-patterns.md` first |
+| Skipping verification because tests pass | Tests are forward-looking; Step 6b proves each AC exists, is real, is wired |
+| Setting `tested` with FAIL verdicts in verification.md | FAIL = not tested; fix or route to `devflow.backprop` |
 
 ## I/O Reference
 
@@ -171,6 +192,9 @@ Wait for user choice before continuing.
 | Reads | files from `devflow.implement` / `devflow.beautify` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md`, `registry.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
+| Reads | `@devflow/references/verification-levels.md` (Step 6b), `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status) |
 | Reads (optional) | `@devflow/references/testing-patterns.md` — stack-agnostic patterns reference |
 | Writes | Test output paths per active `ADAPTER.md` → **Test** |
-| Next step | `devflow.pr` |
+| Writes | `devflow/features/[NNN]_[feature-name]/verification.md` — per-AC verdict table |
+| Writes | `plan.md` — `**Status:** tested` (only when tests pass + verification has no FAIL) |
+| Next step | `devflow.ship` (or `devflow.pr` directly for solo quick changes) |

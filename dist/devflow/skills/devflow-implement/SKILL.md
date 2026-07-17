@@ -84,7 +84,7 @@ Load only: plan (**File List** + decisions), `constitution.md`, `registry.md`, a
 
 **Large File Lists (>5 files):** emit a 3–5 bullet inline plan aligned with **File List** order before editing.
 
-**Long sessions / session resume:** after writing each file, mark it `[done]` in `plan.md`'s **File List** entry (replace `[pending]` with `[done]`). When resuming an interrupted session: re-read `plan.md`, find the first `[pending]` entry, confirm resume position to the user before continuing. Never re-implement a `[done]` file unless explicitly asked.
+**Long sessions / session resume:** after writing each file, mark it `[done]` in `plan.md`'s **File List** entry (replace `[pending]` with `[done]`). When resuming an interrupted session: run `devflow.resume` (first-class entry point — reads state, cross-checks markers, confirms position). Fallback without state: re-read `plan.md`, find the first `[pending]` entry, confirm resume position to the user before continuing. Never re-implement a `[done]` file unless explicitly asked.
 
 ### Step 2 - MCP usage
 
@@ -119,6 +119,8 @@ In fallback mode, explicitly notify the user that the branch was created from cu
 
 ### Step 4 - Implement files
 
+Before the first file: set `plan.md` `**Status:** implementing`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
+
 Implement all files from the plan in the exact order defined in the **File List**.
 
 Each file must:
@@ -128,6 +130,7 @@ Each file must:
 - **Shared components first (non-negotiable):** the reuse pre-check in Step 1 identified candidates — honour those decisions now. Before writing **any** widget, component, or service class: confirm the shared folder and `registry.md` were checked and no existing element covers the need. Extend or parameterise rather than duplicate. If the element being built is generic enough for other features, write it to the shared folder directly and propose a `registry.md` entry in Step 7.
 - Use relative imports pointing to the nearest barrel file (or the import style mandated by `constitution.md`)
 - Be complete; do not leave placeholder comments such as `// TODO` or `// implement this`
+- **Trace to plan (scope fidelity):** every file and function traces to a **File List** or **Traceability** entry — build only what the acceptance criteria require. Urge to add a "while I'm here" improvement → log it via `devflow.learn`; do not write it
 - Satisfy **all implementation rules** in the active `ADAPTER.md` (responsive UI, localization, state architecture, accessibility, layout, contracts, data boundaries — load the referenced technology skills from the adapter table when touching those areas)
 
 ### Save point (for large plans)
@@ -136,7 +139,7 @@ Each file must:
 
 ### Step 5 - Codegen (conditional)
 
-If the active `ADAPTER.md` defines a **codegen** step and implemented files match its triggers (annotations, schema definitions, generated clients, localization catalogs, etc.), run the adapter codegen command. Retry up to **3** attempts; then stop and report full output.
+If the active `ADAPTER.md` defines a **codegen** step and implemented files match its triggers (annotations, schema definitions, generated clients, localization catalogs, etc.), run the adapter codegen command. On failure follow `@devflow/references/escalation-ladder.md` from Level 1 (max 3 bounded attempts, then debug mode → re-approach → block).
 
 ### Step 6 - Format and analyze
 
@@ -144,9 +147,8 @@ Run the **format** and **analyze/typecheck** commands from `ADAPTER.md` **Implem
 
 If errors are found:
 
-- Resolve autonomously
-- Retry up to 3 attempts per command
-- If still failing after 3 attempts, stop and report full output to the user
+- Resolve autonomously; max 3 attempts per command, each attempt materially different
+- After 3 failed attempts: escalate per `@devflow/references/escalation-ladder.md` (Level 2 debug mode → Level 3 re-approach → Level 5 block with stuck-report)
 
 #### Pre-handoff checklist (adapter)
 
@@ -170,6 +172,8 @@ Read by `devflow.beautify` and `devflow.pr`. Omit if fully aligned.
 
 ### Step 8 - Notify user
 
+Set `plan.md` `**Status:** implemented`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
+
 Respond using template in `references/notify-template.md`.
 
 ## Anti-Patterns
@@ -184,6 +188,7 @@ Respond using template in `references/notify-template.md`.
 | Deviating from plan without logging it | Report deviations in Step 7b summary |
 | Running analyze only at the end | Run after each vertical slice checkpoint |
 | Guessing unspecified behavior | Find repo precedent; if none → ask |
+| Writing code no AC requires (gold-plating, speculative options) | Every line traces to plan/AC; log the idea via `devflow.learn` instead |
 | Skipping registry update for shared folder element | Anything in shared/ must be in `registry.md` before Step 7b |
 | Fixing beautify/test issues during implement | Log in Step 8 deviations; fix in `devflow.beautify` |
 
@@ -192,7 +197,9 @@ Respond using template in `references/notify-template.md`.
 | | |
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md`, `constitution.md`, `registry.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md`, `references/registry-update-template.md`, `references/notify-template.md` |
+| Reads | `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status transitions) |
 | Writes | all files defined in `plan.md` |
+| Writes | `plan.md` — `[done]` markers, `**Status:** implementing → implemented`, `## Implementation deviations` |
 | Writes | `registry.md` (mandatory for shared-folder elements; proposed for architectural patterns) |
 | Next step | `devflow.beautify` |
 | Related skills | Per active `ADAPTER.md` → **Technology skills** |

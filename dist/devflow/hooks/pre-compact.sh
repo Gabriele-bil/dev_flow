@@ -67,13 +67,17 @@ if [ -d "devflow/features" ]; then
   fi
 fi
 
-# Map plan status to the next devflow pipeline step
+# Map plan status to the next devflow pipeline step.
+# Source of truth: references/state-machine.md — keep this case in sync.
 case "$PLAN_STATUS" in
   "ready")        NEXT_STEP="devflow.implement" ;;
   "implementing") NEXT_STEP="devflow.implement" ;;
   "implemented")  NEXT_STEP="devflow.beautify"  ;;
   "beautified")   NEXT_STEP="devflow.test"      ;;
-  "tested")       NEXT_STEP="devflow.pr"        ;;
+  "tested")       NEXT_STEP="devflow.ship"      ;;
+  "shipped")      NEXT_STEP="devflow.pr"        ;;
+  "pr-opened")    NEXT_STEP="devflow.task"      ;;
+  "blocked")      NEXT_STEP="devflow.recovery"  ;;
   *)              NEXT_STEP="devflow.implement" ;;
 esac
 
@@ -136,6 +140,6 @@ jq -cn \
       + "Status:     " + $status + "  →  next: " + $next_step + "\n"
       + "Progress:   " + ($done|tostring) + "/" + ($total|tostring) + " files done, " + ($pending|tostring) + " remaining\n\n"
       + "Remaining files:\n" + $pending_lines + "\n\n"
-      + "On resume: re-read plan.md → find first [pending] entry → confirm position with user before continuing."
+      + "On resume: run devflow.resume (reads state, cross-checks plan.md, confirms position) — or re-read plan.md → first [pending] entry → confirm position with user."
     )
   }'

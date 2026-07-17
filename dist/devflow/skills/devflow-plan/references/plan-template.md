@@ -99,6 +99,7 @@ After **Implementation checkpoints**, append **every extra plan section** requir
 
 - [ ] Constitution Gate passed (Step 0b) — no Critical violations
 - [ ] Every `task.md` subtask appears in **Traceability** with its acceptance criterion
+- [ ] Every **File List** entry maps to ≥1 **Traceability** row — no orphan/gold-plated files
 - [ ] **File list** order respects **Dependency ordering** (and any stated exceptions)
 - [ ] All **adapter-specific sections** from `ADAPTER.md` are present or correctly omitted per adapter rules (e.g. i18n keys for UI)
 - [ ] **Implementation checkpoints** are actionable (commands per `ADAPTER.md` — analyze / tests / smoke)

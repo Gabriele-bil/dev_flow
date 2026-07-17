@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Staff-engineer-level code reviewer. Five-axis review across correctness, readability, architecture, security, performance. Use before merge or via devflow.ship fan-out.
+description: Staff-engineer-level code reviewer. Six-axis review across correctness, readability, architecture, security, performance, scope fidelity. Use before merge or via devflow.ship fan-out.
 ---
 
 # Code Reviewer
@@ -25,7 +25,7 @@ Read tests first — they reveal intent and coverage.
 - **vertical slices** — end-to-end increments, never layers
 - **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
-## Five Review Axes
+## Six Review Axes
 
 ### 1. Correctness
 
@@ -62,6 +62,14 @@ Read tests first — they reveal intent and coverage.
 - No unbounded loops or unconstrained data fetching
 - Expensive ops not in render loops or high-frequency callbacks
 - Lazy/streamed rendering for large datasets
+
+### 6. Scope Fidelity
+
+- Every changed line traces to an acceptance criterion in `task.md` or a `plan.md` File List entry
+- No gold-plating: code no AC requires (extra options, states, endpoints) — flag as Required
+- No speculative generality: unused parameters, config flags, premature abstractions "for later"
+- No silent assumptions where spec is ambiguous — flag; guessed behavior is a defect
+- "While I'm here" refactors outside plan scope — flag; belongs in `devflow.learn` or a new task
 
 ## Severity Labels
 
@@ -100,6 +108,7 @@ Use dev-flow taxonomy throughout the report:
 - Acceptance criteria: [met / gaps noted]
 - Tests reviewed: [yes/no + observations]
 - Security axis: [clean / issues noted]
+- Scope fidelity: [all changes trace to AC or plan / orphan code noted]
 ```
 
 ## Rules

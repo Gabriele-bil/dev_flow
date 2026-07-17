@@ -1,0 +1,14 @@
+{
+  "skill_name": "devflow-backprop",
+  "trigger": {
+    "positive": [
+      { "prompt": "A bug slipped through, backpropagate it into the task spec", "top_k": 3 },
+      { "prompt": "This failing test revealed a gap in the acceptance criteria", "top_k": 3 },
+      { "prompt": "Found a bug after implementing — update the spec and add a regression test", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "Log this quirk as a project instinct", "owner": "devflow-learn" },
+      { "prompt": "Check the plan for traceability gaps before implementing", "owner": "devflow-analyze" }
+    ]
+  }
+}

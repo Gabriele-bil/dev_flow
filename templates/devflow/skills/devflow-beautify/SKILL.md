@@ -142,9 +142,11 @@ After edits, check **only** implement-touched files for unused imports, unreacha
 
 After all approved and certain changes are applied, run the **format**, **analyze/typecheck**, and conditional **codegen** commands from `ADAPTER.md` → **Beautify**, in the order specified there.
 
-On error: resolve autonomously; retry 3×; if still failing → stop and report.
+On error: resolve autonomously; max 3 attempts; then escalate per `@devflow/references/escalation-ladder.md` (debug mode → re-approach → block).
 
 ### Step 6 - Notify user
+
+Set `plan.md` `**Status:** beautified`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
 
 Respond with:
 
@@ -207,7 +209,9 @@ Continue to testing? -> devflow.test
 | Reads | files from `devflow.implement` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md`, `registry.md` |
+| Reads | `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status) |
 | Writes | improvements to existing files only (no new files) |
+| Writes | `plan.md` — `**Status:** beautified` |
 | Next step | `devflow.test` |
 | Reads (adapter) | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
 | Related skills | Per active `ADAPTER.md` → **Technology skills** |

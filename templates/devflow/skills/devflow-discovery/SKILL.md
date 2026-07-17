@@ -11,16 +11,19 @@ Pipeline orientation. Use at session start or when unsure which step to run.
 ## Pipeline Overview
 
 ```text
-devflow.setup → devflow.task → devflow.plan → devflow.implement → devflow.beautify → devflow.test → devflow.pr
+devflow.setup → devflow.task → devflow.plan → devflow.implement → devflow.beautify → devflow.test → devflow.ship → devflow.pr
                              ↘ devflow.blueprint (3+ PRs / multi-session)
                                → devflow.plan (per step) → devflow.implement → ...
 ```
 
-Each step has an input contract. Each step verifies its own preconditions. User is orchestrator — skills do not invoke each other.
+Each step has an input contract. Each step verifies its own preconditions. User is orchestrator — skills do not invoke each other. Statuses and transitions: `@devflow/references/state-machine.md`.
 
 ## Entry Point Decision Tree
 
 ```text
+Returning to an interrupted session (state or plan.md with work in progress exists)?
+  └─ YES → devflow.resume  (devflow.recovery if state looks corrupted)
+
 Is this a new project with no context files (AGENTS.md / REGISTRY.md / docs/product.md)?
   └─ YES → devflow.setup
 
@@ -64,6 +67,8 @@ Tests passing, ready to merge?
 | "Review", "Clean up", "Beautify" | `devflow.beautify` |
 | "Write tests", "Test this" | `devflow.test` |
 | "Open PR", "Commit", "Ship" | `devflow.pr` |
+| "Resume", "Continue where we left off", "Pick up the session" | `devflow.resume` |
+| "Bug slipped through", "Failing test exposed spec gap" | `devflow.backprop` |
 | "Set up project", "Initialize" | `devflow.setup` |
 
 ## Adapter Resolution (every step except task and setup)

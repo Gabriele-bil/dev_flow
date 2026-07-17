@@ -54,11 +54,17 @@ pipeline:
     - command: /devflow.recovery
       skill: devflow-recovery
       description: "Diagnose and recover a stuck or corrupted DevFlow pipeline — reads state, observe log, and feature files to identify failure and propose a targeted recovery"
+    - command: /devflow.resume
+      skill: devflow-resume
+      description: "Resume an interrupted DevFlow session — read saved state, cross-check plan.md markers, confirm position, re-enter the correct pipeline step"
+    - command: /devflow.backprop
+      skill: devflow-backprop
+      description: "Backpropagate a bug or failing test into the spec — trace to acceptance criterion, classify the gap, tighten task.md, add regression test"
 
 agents:
   - id: code-reviewer
     path: agents/code-reviewer.md
-    description: "Staff-engineer-level code reviewer. Five-axis review across correctness, readability, architecture, security, performance. Use before merge or via devflow.ship fan-out"
+    description: "Staff-engineer-level code reviewer. Six-axis review across correctness, readability, architecture, security, performance, scope fidelity. Use before merge or via devflow.ship fan-out"
     invoked_by: devflow.ship
   - id: security-auditor
     path: agents/security-auditor.md
@@ -109,6 +115,12 @@ skills:
     - id: devflow-recovery
       path: skills/devflow-recovery/SKILL.md
       description: "Diagnoses and recovers a stuck or corrupted DevFlow pipeline. Reads state, observe log, and feature files to identify failure category and propose a targeted recovery action"
+    - id: devflow-resume
+      path: skills/devflow-resume/SKILL.md
+      description: "Resumes an interrupted DevFlow session — reads saved state, cross-checks plan.md markers, confirms resume position, re-enters correct pipeline skill"
+    - id: devflow-backprop
+      path: skills/devflow-backprop/SKILL.md
+      description: "Backpropagates a bug or failing test into the spec — traces failure to its acceptance criterion, classifies the gap, tightens task.md, adds regression test"
 
   adapters:
     flutter:
@@ -211,6 +223,15 @@ references:
   - id: security-threat-model
     path: references/security-threat-model.md
     description: "AI agent threat model for DevFlow — attack surfaces (prompt injection, state corruption, memory poisoning, supply chain), safeguards, and incident response. Use during devflow-beautify security axis and devflow-ship review"
+  - id: state-machine
+    path: references/state-machine.md
+    description: "Pipeline state machine — canonical task.md/plan.md statuses, legal transitions, next-step mapping, state update snippet. Single source of truth for discovery, status, resume, recovery, and hooks"
+  - id: escalation-ladder
+    path: references/escalation-ladder.md
+    description: "Unified failure-handling ladder for implement/beautify/test — bounded retry, debug mode, re-approach, decompose, block with stuck-report. Replaces scattered retry-3× clauses"
+  - id: verification-levels
+    path: references/verification-levels.md
+    description: "Goal-backward verification for devflow-test Step 6b — four levels (existence, substantive, wired, runtime) checked per acceptance criterion, with verification.md report template"
 
 hooks:
   - event: SessionStart

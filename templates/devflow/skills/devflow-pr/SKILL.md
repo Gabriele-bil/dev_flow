@@ -134,6 +134,8 @@ layers touched, key abstractions, notable patterns used.]
 
 ## Step 6 - Notify user
 
+After successful `gh pr create`: set `plan.md` `**Status:** pr-opened` and `task.md` `**Status:** done`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
+
 ```text
 ✅ Pull request opened: [type]/[NNN]-[feature-name] -> main
 
@@ -164,4 +166,5 @@ DevFlow pipeline complete for TASK-[NNN].
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
 | Runs | `git add .` · `git commit` · `git push` · `gh pr create` |
+| Writes | `plan.md` `**Status:** pr-opened`, `task.md` `**Status:** done` |
 | Next step | - (end of pipeline) |

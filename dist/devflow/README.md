@@ -1,8 +1,35 @@
-# DevFlow plugin bundle
+# DevFlow
 
-This directory is the **installable DevFlow package**: core pipeline skills, slash commands, configuration, and technology **adapters**.
+**Spec-driven development pipeline for AI coding agents — with technology adapters and explicit quality gates.**
+
+AI agents write code fast and forget faster. Ask for a feature and you get files with no spec, no traceability, tests that prove nothing, and a review that happens in your head at merge time. Every session restarts from zero; every stack gets generic advice.
+
+DevFlow turns that into a pipeline. Every feature starts as a **spec** (`task.md`), becomes a **file-ordered plan** with a traceability table (every subtask → acceptance criterion → file), gets implemented in **vertical slices**, then passes **explicit gates**: multi-axis review, tests, goal-backward verification of every acceptance criterion, and a parallel multi-agent ship gate — before a PR is opened. **You stay the orchestrator**: each step is a command you invoke, with an input contract that refuses to run on bad state. Stack knowledge comes from **adapters** (Flutter, Angular, Next.js) so the agent follows *your* stack's rules, not generic ones.
+
+This directory is the installable package: core pipeline skills, slash commands, hooks, references, and adapters.
 
 ## Quick start
+
+Three commands from idea to reviewed plan:
+
+```text
+you>  /devflow.setup
+      ✅ AGENTS.md + REGISTRY.md generated (adapter: flutter)
+
+you>  /devflow.task users can archive old projects
+      ✅ Task created: devflow/features/007_archive-projects/task.md
+      HMW: How might we let users declutter without deleting history?
+      5 subtasks · 6 acceptance criteria · 1 [NEEDS CLARIFICATION] marker
+
+you>  /devflow.plan
+      ✅ Plan created: devflow/features/007_archive-projects/plan.md
+      8 files (2 create, 6 modify) · 3 vertical slices · traceability complete
+      Continue to implementation? -> devflow.implement
+```
+
+Then `devflow.implement` → `devflow.beautify` → `devflow.test` (tests + per-AC verification) → `devflow.ship` (parallel agent fan-out) → `devflow.pr`. Interrupted? `devflow.resume`. Bug escaped? `devflow.backprop` fixes the spec, not just the code.
+
+Full setup:
 
 1. **Active stack** — edit [`config.md`](config.md); set **Adapter** to `flutter`, `angular`, or `nextjs`.
 2. **Run setup once** — execute `devflow.setup` to generate root `AGENTS.md` and `REGISTRY.md` for the consumer project.
@@ -15,6 +42,8 @@ This directory is the **installable DevFlow package**: core pipeline skills, sla
    - `context7`
    - `sequential-thinking` ([server reference](https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking))
    - `dart` for Flutter adapters/projects
+
+Architecture and design rationale: [`docs/architecture.md`](../../docs/architecture.md) · honest comparison with Forge, spec-kit, and vanilla agents: [`docs/comparison.md`](../../docs/comparison.md).
 
 ## Adapters
 
@@ -70,16 +99,18 @@ Each adapter folder contains `ADAPTER.md` (stack rules + MCP hints), `skills/` (
 | `devflow.blueprint` | Large idea → multi-PR blueprint with dependency graph + adversarial review |
 | `devflow.implement` | Execute `plan.md` step by step, vertical slice by slice |
 | `devflow.beautify` | 7-axis polish: correctness, readability, security, performance, architecture, UI, a11y |
-| `devflow.test` | Write and run unit + integration tests; bounded retry; standardized report |
+| `devflow.test` | Write and run unit + integration tests; bounded retry; goal-backward per-AC verification (`verification.md`) |
 | `devflow.ship` | Pre-merge gate: 5 agents in parallel → Ship Gate Report → route to PR |
 | `devflow.pr` | Commit, push branch, open PR to main |
 | `devflow.status` | Show current pipeline state (active feature, next step, progress) |
+| `devflow.resume` | Resume interrupted session — read state, cross-check plan.md, re-enter correct step |
+| `devflow.backprop` | Backpropagate escaped bug into spec — classify gap, tighten AC, add regression test |
 | `devflow.learn` | Manage learnings log — log / search / list / prune / boost |
 | `devflow.recovery` | Diagnose + recover a stuck or corrupted pipeline |
 
 ## Hooks
 
-Ten hooks activate automatically — no user invocation required.
+Eleven hooks activate automatically — no user invocation required.
 
 | Event | Script | What it does |
 | --- | --- | --- |
@@ -123,10 +154,13 @@ Stack-agnostic checklists and guides in `references/`:
 | File | Purpose |
 | ------ | --------- |
 | `accessibility-checklist.md` | WCAG 2.1 AA — keyboard, screen readers, touch targets |
+| `escalation-ladder.md` | Bounded failure handling: retry → debug mode → re-approach → decompose → block |
 | `model-selection.md` | Haiku / Sonnet / Opus guide per pipeline step |
 | `security-checklist.md` | OWASP Top 10, auth, input validation, secrets baseline |
 | `security-threat-model.md` | AI agent threat model — prompt injection, state corruption, supply chain |
+| `state-machine.md` | Canonical pipeline statuses + legal transitions — SSOT for status/resume/recovery/hooks |
 | `testing-patterns.md` | AAA, Beyonce Rule, Prove-It Pattern, pass@k vs pass^k, coverage signals |
+| `verification-levels.md` | Goal-backward per-AC verification: existence → substantive → wired → runtime |
 
 ## Common Skills
 

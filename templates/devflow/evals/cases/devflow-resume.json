@@ -1,0 +1,15 @@
+{
+  "skill_name": "devflow-resume",
+  "trigger": {
+    "positive": [
+      { "prompt": "Resume the devflow session where we left off", "top_k": 3 },
+      { "prompt": "Continue the interrupted pipeline from the last saved state", "top_k": 3 },
+      { "prompt": "I restarted the session mid feature, pick up the pipeline where it stopped", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "Just show me the current pipeline state without continuing", "owner": "devflow-status" },
+      { "prompt": "The state file is corrupted and the pipeline is stuck, diagnose it", "owner": "devflow-recovery" },
+      { "prompt": "Where do I begin with devflow on a brand new project?", "owner": "devflow-discovery" }
+    ]
+  }
+}

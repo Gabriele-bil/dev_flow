@@ -15,6 +15,7 @@ Recover a blocked or corrupted pipeline by reading `.devflow-state.json`, inspec
 ## When NOT to Use
 
 - Pipeline is not stuck — use `devflow-status` for normal progress check
+- Session merely interrupted, state consistent — use `devflow-resume` (recovery repairs, resume re-enters)
 - User wants to abandon the feature entirely — `rm -rf devflow/features/[NNN]_*` + state reset, not recovery
 - `devflow.setup` never ran — run setup first, no state to recover
 
@@ -41,6 +42,8 @@ Extract:
 If `STATE_MISSING`: proceed to **Recovery path C**.
 
 ### Step 2 — Classify failure
+
+Valid statuses and legal transitions: `@devflow/references/state-machine.md` (authoritative — a status outside its tables is itself corruption).
 
 Determine failure category based on state + file existence:
 
@@ -79,6 +82,7 @@ For **Category C (state missing)**: infer step from feature files:
 task.md exists, plan.md absent     → next_step: devflow.plan
 plan.md exists, no [done] markers  → next_step: devflow.implement
 plan.md has [done] markers         → next_step: devflow.beautify or later
+plan.md **Status:** present        → map via state-machine.md status table
 ```
 
 ### Step 4 — Propose recovery
@@ -166,7 +170,7 @@ Next command: [exact command to continue]
 | --- | --- |
 | Reads | `.devflow-state.json`, `.devflow-observe.jsonl`, `.devflow-learnings.jsonl` |
 | Reads | `devflow/features/*/task.md`, `devflow/features/*/plan.md` |
-| Reads | `devflow/config.md` |
+| Reads | `devflow/config.md`, `@devflow/references/state-machine.md` |
 | Writes | `.devflow-state.json` (only on user-confirmed resync) |
-| Related | `devflow-status` (non-recovery status check), `devflow-discovery` (session orientation) |
+| Related | `devflow-status` (non-recovery status check), `devflow-resume` (clean session re-entry), `devflow-discovery` (session orientation) |
 | Next step | Whichever pipeline step the recovery routes to |

@@ -17,6 +17,7 @@ Emit compact status dashboard. Answers "dove sono nel pipeline?" — no step exe
 
 - `devflow.setup` not yet run (no `devflow/config.md`) — inform user, stop
 - User wants to advance to next step — redirect to correct command directly
+- User wants to continue interrupted work — `devflow.resume` (status is snapshot only)
 
 ## Workflow
 
@@ -27,6 +28,8 @@ Priority order:
 1. `.devflow-state.json` in CWD — most recent state, saved by pre-compact hook
 2. `devflow/config.md` — active adapter
 3. `devflow/features/*/plan.md` — find most recent via `ls -t`; parse progress from plan if `.devflow-state.json` absent
+
+Status semantics and next-step mapping: `@devflow/references/state-machine.md` (authoritative).
 
 ### Step 2 — List active features
 
@@ -92,6 +95,6 @@ DevFlow not configured. Run: /devflow.setup
 
 | | |
 | --- | --- |
-| Reads | `.devflow-state.json`, `devflow/config.md`, `devflow/features/*/plan.md` |
+| Reads | `.devflow-state.json`, `devflow/config.md`, `devflow/features/*/plan.md`, `@devflow/references/state-machine.md` |
 | Writes | nothing |
-| Related | `devflow-discovery` (full pipeline orientation) |
+| Related | `devflow-discovery` (full pipeline orientation), `devflow-resume` (session re-entry), `devflow-recovery` (corrupted state) |

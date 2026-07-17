@@ -30,6 +30,7 @@ Pre-merge fan-out gate. Dispatch three specialist agents in parallel → synthes
 Before dispatching, verify all of the following. Stop and report which check failed if any item is unmet.
 
 - [ ] `devflow.test` complete — all tests passing (or failures explicitly documented)
+- [ ] `verification.md` exists at `devflow/features/[NNN]_[feature-name]/verification.md` with zero FAIL verdicts (goal-backward verification from `devflow.test` Step 6b)
 - [ ] `devflow.beautify` complete
 - [ ] Active adapter analyze/typecheck clean
 - [ ] `plan.md` exists at `devflow/features/[NNN]_[feature-name]/plan.md`
@@ -50,7 +51,7 @@ Each agent receives:
 
 **Agents to dispatch:**
 
-1. `@devflow/agents/code-reviewer.md` — five-axis code review
+1. `@devflow/agents/code-reviewer.md` — six-axis code review (correctness, readability, architecture, security, performance, scope fidelity)
 2. `@devflow/agents/security-auditor.md` — security audit
 3. `@devflow/agents/test-engineer.md` — coverage gap analysis
 
@@ -109,7 +110,7 @@ Reviewed by: code-reviewer · security-auditor · test-engineer
 
 ## Step 5 - Route to devflow.pr
 
-If gate passes:
+If gate passes: set `plan.md` `**Status:** shipped`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**. Then:
 
 ```text
 ✅ Ship gate passed. Routing to devflow.pr.
@@ -138,8 +139,9 @@ Execute `@devflow/skills/devflow-pr/SKILL.md` exactly.
 
 | | |
 | --- | --- |
-| Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
+| Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
 | Reads | Files from `devflow.implement` / `devflow.beautify` summary |
+| Writes | `plan.md` — `**Status:** shipped` on gate pass |
 | Dispatches | `code-reviewer`, `security-auditor`, `test-engineer` (parallel) |
 | Routes to | `devflow-pr` skill on gate pass |
 | Replaces | Running `devflow.pr` directly when multi-perspective review is needed |

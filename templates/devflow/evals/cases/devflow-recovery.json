@@ -8,7 +8,8 @@
     ],
     "negative": [
       { "prompt": "Just tell me what state the pipeline is in", "owner": "devflow-status" },
-      { "prompt": "Log this finding as a project instinct", "owner": "devflow-learn" }
+      { "prompt": "Log this finding as a project instinct", "owner": "devflow-learn" },
+      { "prompt": "Resume work on the feature where the last session left off", "owner": "devflow-resume" }
     ]
   }
 }

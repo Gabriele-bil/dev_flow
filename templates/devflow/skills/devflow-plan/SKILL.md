@@ -136,6 +136,8 @@ Analyze:
 
 Verify **File list** order per Dependency ordering. Migrations and shared contracts before consumers; shared components before their consumers. Exceptions → **Architecture decisions**.
 
+**Scope fidelity check:** every **File List** entry must map to ≥1 **Traceability** row (subtask + acceptance criterion). Entry with no subtask = gold-plating — remove it, or return the scope to `devflow.task`. Reject speculative entries ("might need later", configurable options no AC requires); one concern per file entry.
+
 ### Step 4c - Data model extraction
 
 **Trigger:** File List contains any of: migration file, DTO, domain model, schema file, new entity type.
@@ -200,6 +202,7 @@ Continue to implementation? -> devflow.implement
 | Writing plan without reading `task.md` | Always start with `task.md` |
 | File list in layer order (all models → services → UI) | Order by user-visible increment; checkpoint per slice |
 | No Traceability row for a subtask | Every subtask → at least one file + criterion |
+| File List entry with no Traceability row (gold-plating) | Remove it or map to a subtask; new scope goes through `devflow.task` |
 | Open questions with Status `ready` | Leave open; escalate to user; never guess |
 | Reuse audit skipped ("implement will figure it out") | Audit in Step 3; document in Architecture decisions |
 | New component without checking shared/ | ≥70% coverage rule; extend first |
