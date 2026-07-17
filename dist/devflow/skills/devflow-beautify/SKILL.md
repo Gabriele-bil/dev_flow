@@ -72,6 +72,8 @@ Stack-agnostic defaults below. For stack-specific checks follow `ADAPTER.md` and
 
 Axes: correctness · readability/simplification · architecture compliance · security · performance · UI consistency · responsiveness/layout · accessibility.
 
+**UI consistency source:** `DESIGN.md` (or `docs/design.md`) present in project root → axis checks token compliance (palette, typography, spacing) against it instead of generic guidelines; hardcoded value with a DESIGN.md token equivalent = Required finding. Absent → generic guidelines, zero behavior change.
+
 **Depth profile:** read `**Complexity:**` from `plan.md` (per `@devflow/references/complexity-scoring.md`; missing → `standard`). `quick` → review only correctness + readability/simplification axes. `standard` / `thorough` → all 8 axes.
 
 Full per-axis checklist: `references/analysis-axes.md`.
@@ -102,6 +104,8 @@ Apply directly without asking:
 - **Critical** issues uncovered in correctness or security (fix immediately)
 
 #### Opinable improvements
+
+**Run mode** (`.devflow-run.json` present): no approval channel exists — do not propose, do not apply. Log each opinable candidate as an entry in `plan.md` `## Decision flags` per `@devflow/skills/devflow-run/SKILL.md` Step 2 (decision: "not applied"), continue. Interactive mode below.
 
 Propose before applying:
 
@@ -150,6 +154,8 @@ On error: resolve autonomously; max 3 attempts; then escalate per `@devflow/refe
 
 Set `plan.md` `**Status:** beautified`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
 
+**Run mode** (`.devflow-run.json` present): emit the block below but do not wait — control returns to `devflow.run`.
+
 Respond with:
 
 ```text
@@ -192,6 +198,8 @@ Continue to testing? -> devflow.test
 | Skipping security axis ("already reviewed") | Run all axes the depth profile requires; `quick` never applies to security-touching features (profile floor) |
 | Format/analyze only on new files | Run on the full changed set |
 | Treating Nit as mandatory | Fix Critical/Required; user decides Nit/Optional |
+| Applying opinable improvements while run mode active | Certain improvements only; opinable candidates → `## Decision flags`, not applied |
+| Flagging hardcoded style as Nit when DESIGN.md defines a token | Token equivalent exists → Required finding |
 | Profiling without confirmed bottleneck | Apply heuristics only; profile when benchmark confirms |
 
 ## Completion checklist
@@ -213,8 +221,9 @@ Continue to testing? -> devflow.test
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md`, `registry.md` |
 | Reads | `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status), `@devflow/references/complexity-scoring.md` (depth profile) |
+| Reads (conditional) | `DESIGN.md` / `docs/design.md` — token source for UI consistency axis; `.devflow-run.json` (existence — run-mode switch) |
 | Writes | improvements to existing files only (no new files) |
-| Writes | `plan.md` — `**Status:** beautified` |
+| Writes | `plan.md` — `**Status:** beautified`, `## Decision flags` (run mode — opinable candidates) |
 | Next step | `devflow.test` |
 | Reads (adapter) | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
 | Related skills | Per active `ADAPTER.md` → **Technology skills** |

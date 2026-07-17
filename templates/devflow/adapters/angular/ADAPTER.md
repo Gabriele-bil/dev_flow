@@ -237,6 +237,16 @@ npm run e2e
 - State: state/store contracts and transitions for each changed path.
 - HTTP: success/error/timeout mapping through data layer.
 
+### Verify (runtime)
+
+Level-4 goal-backward verification target (`devflow.test` Step 6b) — only when project defines e2e (Cypress/Playwright). Run specs covering the AC under verification:
+
+```bash
+npm run e2e -- --grep "[feature-name]"
+```
+
+No e2e setup or no spec covering the AC → level 4 `N/A` (verdict PARTIAL).
+
 ## PR: verification
 
 Before push:

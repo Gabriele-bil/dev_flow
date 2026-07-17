@@ -38,6 +38,7 @@ Read in order:
 | **`docs/product.md`** (always)    | Domain, actors, features, **implemented** vs **not implemented**, overlap checks |
 | **`constitution.md`** (as needed) | Stack, `lib/` layout, layering (UI → domain → data), engineering conventions     |
 | **`registry.md`** (as needed)     | Shared patterns: breakpoints, dashboard shell, navigation, reusable recipes      |
+| **`DESIGN.md`** (if present)      | Design system (or `docs/design.md`) — UI ideas inherit its tokens; plan tags UI  |
 
 Optional: use `Glob`, `Grep`, and `Read` on the codebase to ground the task in existing modules and avoid silent duplication of behavior.
 
@@ -137,6 +138,6 @@ Respond using template in `references/notify-template.md`.
 
 |           |                                                                                                                                               |
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Reads     | `docs/product.md` (required); `constitution.md`, `registry.md` (as needed); `refinement-hints.md` (Step 4); `examples.md` (optional guidance); `references/task-template.md`, `references/notify-template.md` |
+| Reads     | `docs/product.md` (required); `constitution.md`, `registry.md` (as needed); `DESIGN.md` / `docs/design.md` (if present); `refinement-hints.md` (Step 4); `examples.md` (optional guidance); `references/task-template.md`, `references/notify-template.md` |
 | Writes    | `devflow/features/[NNN]_[feature-name]/task.md`                                                                                               |
 | Next step | `devflow.plan` → `plan.md` (full template in `devflow/skills/devflow-plan/SKILL.md`)                                                          |

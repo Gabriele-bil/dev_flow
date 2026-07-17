@@ -27,7 +27,7 @@ you>  /devflow.plan
       Continue to implementation? -> devflow.implement
 ```
 
-Then `devflow.implement` → `devflow.beautify` → `devflow.test` (tests + per-AC verification) → `devflow.ship` (parallel agent fan-out) → `devflow.pr`. Interrupted? `devflow.resume`. Bug escaped? `devflow.backprop` fixes the spec, not just the code.
+Then `devflow.implement` → `devflow.beautify` → `devflow.test` (tests + per-AC verification) → `devflow.ship` (parallel agent fan-out) → `devflow.pr`. Interrupted? `devflow.resume`. Bug escaped? `devflow.backprop` fixes the spec, not just the code. Want the middle unattended? `devflow.run` chains implement → beautify → test with decision flags and stops before ship.
 
 Full setup:
 
@@ -104,6 +104,7 @@ Each adapter folder contains `ADAPTER.md` (stack rules + MCP hints), `skills/` (
 | `devflow.pr` | Commit, push branch, open PR to main |
 | `devflow.status` | Show current pipeline state (active feature, next step, progress) |
 | `devflow.resume` | Resume interrupted session — read state, cross-check plan.md, re-enter correct step |
+| `devflow.run` | Opt-in autonomy: chain implement → beautify → test unattended; decision flags; stop before ship |
 | `devflow.backprop` | Backpropagate escaped bug into spec — classify gap, tighten AC, add regression test |
 | `devflow.learn` | Manage learnings log — log / search / list / prune / boost |
 | `devflow.recovery` | Diagnose + recover a stuck or corrupted pipeline |

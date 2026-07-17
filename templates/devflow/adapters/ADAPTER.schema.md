@@ -35,6 +35,7 @@ Canonical section checklist for all DevFlow adapters. Use when creating a new ad
 | Caveman response rules | `## Caveman response rules` | `[O]` — stack teams may add style reminders |
 | Codegen triggers | within `## Implement` | `[O]` — only for stacks with code generation |
 | Responsive tests | within `## Test` | `[O]` — for UI-heavy stacks |
+| Runtime verify target | `### Verify (runtime)` | `[O]` — command exercising the running artifact; used by `devflow.test` Step 6b as verification level 4; absent → verification degrades to levels 1–3 (verdict PARTIAL) |
 | Required test focus | `### Required test focus` | `[O]` — explicit test targets per concern |
 | Web Interface Guidelines review | `### Beautify: web interface guidelines` | `[O]` — UI-heavy stacks; load `common-web-interface-guidelines` skill, apply rules on UI files |
 

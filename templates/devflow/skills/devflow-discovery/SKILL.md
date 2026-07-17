@@ -68,6 +68,7 @@ Tests passing, ready to merge?
 | "Write tests", "Test this" | `devflow.test` |
 | "Open PR", "Commit", "Ship" | `devflow.pr` |
 | "Resume", "Continue where we left off", "Pick up the session" | `devflow.resume` |
+| "Chain the middle steps unattended", "implement through test without stopping" | `/devflow.run` (explicit command — opt-in autonomy) |
 | "Bug slipped through", "Failing test exposed spec gap" | `devflow.backprop` |
 | "Set up project", "Initialize" | `devflow.setup` |
 

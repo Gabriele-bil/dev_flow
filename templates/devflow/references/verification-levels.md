@@ -9,9 +9,9 @@ Four-level verification run by `devflow.test` (Step 6b) after tests pass. Works 
 | **1 — Existence** | Do expected files, symbols, routes, migrations exist? | File on disk; symbol defined (grep declaration); route/migration present |
 | **2 — Substantive** | Real code, not stubs? | Scan implementing files for stub signals (table below) |
 | **3 — Wired** | Reachable in the running app? | Symbol imported/used **outside** its defining file; route registered; provider/middleware applied; UI reachable via navigation. Dead code = not satisfied |
-| **4 — Runtime** | Does it behave end-to-end? | Run adapter integration/e2e targets covering the AC (`ADAPTER.md` → **Test**). No matching target → mark `N/A` |
+| **4 — Runtime** | Does it behave end-to-end? | Run adapter **Verify (runtime)** command covering the AC (`ADAPTER.md` → **Test → Verify (runtime)**); fallback: integration/e2e targets from **Test → Commands**. No matching target → mark `N/A` |
 
-Levels 1–3 are pure static inspection (grep/read — cheap). Level 4 executes only targets the adapter already defines.
+Levels 1–3 are pure static inspection (grep/read — cheap). Level 4 executes only targets the adapter already defines — run only specs covering the AC under verification, never the full suite again. Visual verification (screenshot diffing, occlusion) is out of scope.
 
 ## Level 2 stub signals
 

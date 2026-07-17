@@ -1,0 +1,14 @@
+{
+  "skill_name": "devflow-run",
+  "trigger": {
+    "positive": [
+      { "prompt": "Chain the implement, beautify and test steps in one unattended session and give me a consolidated report", "top_k": 3 },
+      { "prompt": "Execute the middle of the pipeline autonomously without pausing at each step gate", "top_k": 3 },
+      { "prompt": "Take this approved plan through implementation, review and tests unattended, stop before ship", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "Resume the interrupted pipeline from the last saved state", "owner": "devflow-resume" },
+      { "prompt": "Dispatch the specialist review agents for the pre-merge gate", "owner": "devflow-ship" }
+    ]
+  }
+}

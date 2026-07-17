@@ -96,13 +96,14 @@ Failure handling:
 - Attempt 3: isolate and fix root cause
 - After each failed attempt: append error + what was tried to `.checkpoint.json` `errors_tried` per `@devflow/references/state-machine.md` → **Checkpoint file** — resume/recovery skip already-tried fixes
 - After 3 attempts: escalate per `@devflow/references/escalation-ladder.md` — Level 2 debug mode (one hypothesis, minimal probe), Level 3 re-approach (question the plan step), Level 5 block with stuck-report. Never mark a failing test as passing
+- Context pressure (host compaction warning, long retry session) → write `devflow/features/[NNN]_[feature-name]/handoff.md` per `@devflow/references/state-machine.md` → **Handoff file**, stop, tell user: restart session + `devflow.resume`
 
 ### Step 6b - Goal-backward verification
 
 After all tests pass, verify **backwards from the spec** per `@devflow/references/verification-levels.md`:
 
 1. For each acceptance criterion in `task.md`: locate implementing file(s) via `plan.md` → **Traceability** table.
-2. Run the four levels — existence, substantive (no stubs), wired (reachable, not dead code), runtime (adapter integration targets when defined, else `N/A`). Depth per profile: `quick` → levels 1–3; `standard` → levels 1–3 + level 4 when adapter defines targets; `thorough` → level 4 mandatory (no adapter target → verdict PARTIAL with note).
+2. Run the four levels — existence, substantive (no stubs), wired (reachable, not dead code), runtime (adapter `ADAPTER.md` → **Verify (runtime)** target when defined; fallback: integration targets from **Test → Commands**; neither → `N/A`). Depth per profile: `quick` → levels 1–3; `standard` → levels 1–3 + level 4 when adapter defines targets; `thorough` → level 4 mandatory (no adapter target → verdict PARTIAL with note).
 3. Write `devflow/features/[NNN]_[feature-name]/verification.md` using the report template in the reference.
 4. Any **FAIL** verdict → do NOT set status `tested`. Implementation gap → fix (re-enter escalation ladder at Level 1) or report. Spec gap (AC missing/too weak) → suggest `devflow.backprop`.
 
@@ -169,7 +170,7 @@ All tests passing and verification clean? Choose how to continue:
 3. Skip full suite and open PR directly -> devflow.pr
 ```
 
-Wait for user choice before continuing.
+Wait for user choice before continuing. **Run mode** (`.devflow-run.json` present): emit the block but do not wait — control returns to `devflow.run` (ship stays human).
 
 ## Anti-Patterns
 
@@ -196,9 +197,11 @@ Wait for user choice before continuing.
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md`, `registry.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
 | Reads | `@devflow/references/verification-levels.md` (Step 6b), `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status), `@devflow/references/complexity-scoring.md` (depth profile) |
+| Reads (conditional) | `.devflow-run.json` (existence — run-mode switch) |
 | Reads (optional) | `@devflow/references/testing-patterns.md` — stack-agnostic patterns reference |
 | Writes | Test output paths per active `ADAPTER.md` → **Test** |
 | Writes | `devflow/features/[NNN]_[feature-name]/verification.md` — per-AC verdict table |
 | Writes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json` — `errors_tried` on retry loops (state-machine.md → Checkpoint file) |
+| Writes (conditional) | `devflow/features/[NNN]_[feature-name]/handoff.md` — on context pressure (state-machine.md → Handoff file) |
 | Writes | `plan.md` — `**Status:** tested` (only when tests pass + verification has no FAIL) |
 | Next step | `devflow.ship` (or `devflow.pr` directly for solo quick changes) |

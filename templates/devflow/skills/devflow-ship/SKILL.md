@@ -104,6 +104,10 @@ Produce a unified report:
 ### Coverage Gaps
 - [from test-engineer: uncovered acceptance criteria or public surfaces]
 
+### Open Decision Flags
+(from plan.md ## Decision flags — autonomous decisions made under devflow.run; user reviews each before PR. Omit section when plan.md has no flags)
+- F[N] — [decision]; alternatives: [...]; files: [...]
+
 ### Done Well
 - [positive observations from all agents]
 
@@ -126,7 +130,11 @@ Profile: [quick | standard | thorough] · Reviewed by: [agents actually dispatch
 
 ## Step 5 - Route to devflow.pr
 
-If gate passes: set `plan.md` `**Status:** shipped`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**. Then:
+If gate passes: set `plan.md` `**Status:** shipped`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
+
+**Run mode** (`.devflow-run.json` present — reached via `devflow.run --until ship`): do NOT execute `devflow-pr`. Present report, stop; PR stays human. Control returns to `devflow.run`.
+
+Otherwise:
 
 ```text
 ✅ Ship gate passed. Routing to devflow.pr.
@@ -148,6 +156,8 @@ Execute `@devflow/skills/devflow-pr/SKILL.md` exactly.
 | Downgrading profile at ship to shrink fan-out | Profile fixed at plan; change requires plan.md edit + user confirmation |
 | Synthesizing before all agents complete | Wait for all dispatched reports before Step 3 |
 | Downgrading severity in synthesis | Report as declared; escalate if disputed |
+| Omitting decision flags from the report | Every `## Decision flags` entry surfaces in **Open Decision Flags** — autonomous decisions get human review before PR |
+| Auto-routing to `devflow.pr` with run mode active | Run never crosses the PR boundary; present report and stop |
 | Re-running after fixing only some Critical issues | Fix all Critical; re-run full gate from Step 1 |
 
 ---
@@ -159,6 +169,7 @@ Execute `@devflow/skills/devflow-pr/SKILL.md` exactly.
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
 | Reads | Files from `devflow.implement` / `devflow.beautify` summary |
 | Reads | `@devflow/references/complexity-scoring.md` (depth profile → fan-out) |
+| Reads (conditional) | `plan.md` `## Decision flags` (→ **Open Decision Flags** report section); `.devflow-run.json` (existence — never route to `devflow.pr` when present) |
 | Writes | `plan.md` — `**Status:** shipped` on gate pass |
 | Dispatches | review agents per depth profile — `quick`: `code-reviewer`; `standard`: + `security-auditor`, `test-engineer`; `thorough`: + `accessibility-auditor`, `docs-reviewer` (parallel) |
 | Routes to | `devflow-pr` skill on gate pass |

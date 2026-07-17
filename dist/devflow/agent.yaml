@@ -57,6 +57,9 @@ pipeline:
     - command: /devflow.resume
       skill: devflow-resume
       description: "Resume an interrupted DevFlow session — read saved state, cross-check plan.md markers, confirm position, re-enter the correct pipeline step"
+    - command: /devflow.run
+      skill: devflow-run
+      description: "Chain implement → beautify → test as one unattended session — decision flags instead of pauses, consolidated report, stop before ship"
     - command: /devflow.backprop
       skill: devflow-backprop
       description: "Backpropagate a bug or failing test into the spec — trace to acceptance criterion, classify the gap, tighten task.md, add regression test"
@@ -118,6 +121,9 @@ skills:
     - id: devflow-resume
       path: skills/devflow-resume/SKILL.md
       description: "Resumes an interrupted DevFlow session — reads saved state, cross-checks plan.md markers, confirms resume position, re-enters correct pipeline skill"
+    - id: devflow-run
+      path: skills/devflow-run/SKILL.md
+      description: "Chains implement → beautify → test as one unattended session — autonomy policy table, decision flags instead of pauses, consolidated report, stops before ship"
     - id: devflow-backprop
       path: skills/devflow-backprop/SKILL.md
       description: "Backpropagates a bug or failing test into the spec — traces failure to its acceptance criterion, classifies the gap, tightens task.md, adds regression test"

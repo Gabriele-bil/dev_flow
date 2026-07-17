@@ -263,6 +263,16 @@ pnpm test -- --passWithNoTests --watchAll=false --coverage
 - State (Zustand): state transitions, selector output.
 - Server Actions / API Routes: success/error mapping.
 
+### Verify (runtime)
+
+Level-4 goal-backward verification target (`devflow.test` Step 6b) — only when Playwright is configured. Run smoke specs covering the AC under verification:
+
+```bash
+pnpm exec playwright test --grep "[feature-name]"
+```
+
+No Playwright setup or no spec covering the AC → level 4 `N/A` (verdict PARTIAL).
+
 ## PR: verification
 
 Before push:

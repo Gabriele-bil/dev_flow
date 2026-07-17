@@ -276,6 +276,16 @@ Use `flutter_test` and Riverpod test utilities; mock Supabase — no real networ
 
 For UI screens, assert layout variants at compact vs expanded widths using `MediaQuery` overrides per project patterns (`AppBreakpoints`).
 
+### Verify (runtime)
+
+Level-4 goal-backward verification target (`devflow.test` Step 6b). Run only specs covering the AC under verification:
+
+```bash
+flutter test integration_test/features/[feature-name]/ -d emulator-[ID]
+```
+
+No integration spec covering the AC → level 4 `N/A` (verdict PARTIAL).
+
 ## PR: verification
 
 Before push:

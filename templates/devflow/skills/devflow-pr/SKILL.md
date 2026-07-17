@@ -51,10 +51,10 @@ Select type by feature nature:
 
 ## Step 2 - Commit
 
-Delete the feature checkpoint first — pipeline complete, session context never committed (`@devflow/references/state-machine.md` → **Checkpoint file**). Then stage and commit all changes in a single commit:
+Delete the feature checkpoint and any leftover handoff first — pipeline complete, session context never committed (`@devflow/references/state-machine.md` → **Checkpoint file**, **Handoff file**). Then stage and commit all changes in a single commit:
 
 ```bash
-rm -f devflow/features/[NNN]_[feature-name]/.checkpoint.json
+rm -f devflow/features/[NNN]_[feature-name]/.checkpoint.json devflow/features/[NNN]_[feature-name]/handoff.md
 git add .
 git commit -m "[type]: [short description of the feature]"
 ```
@@ -167,6 +167,6 @@ DevFlow pipeline complete for TASK-[NNN].
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
 | Runs | `git add .` · `git commit` · `git push` · `gh pr create` |
-| Deletes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json` (before staging) |
+| Deletes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json`, `devflow/features/[NNN]_[feature-name]/handoff.md` (before staging) |
 | Writes | `plan.md` `**Status:** pr-opened`, `task.md` `**Status:** done` |
 | Next step | - (end of pipeline) |

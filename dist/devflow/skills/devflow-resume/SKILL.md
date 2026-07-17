@@ -51,6 +51,14 @@ Also read the feature checkpoint when present — restores working context lost 
 cat devflow/features/[NNN]_[feature-name]/.checkpoint.json 2>/dev/null
 ```
 
+Also read the handoff when present — prose context written under context pressure (schema: `state-machine.md` → **Handoff file**); its **Next action** overrides position guessing:
+
+```bash
+cat devflow/features/[NNN]_[feature-name]/handoff.md 2>/dev/null
+```
+
+`.devflow-run.json` present (stale run marker from interrupted `devflow.run`): note it for Step 3 — run mode died with its session, never silently re-arm.
+
 ### Step 2 — Cross-check state against files
 
 Trust order: `plan.md` > `.devflow-state.json` (state file is derived cache — see `@devflow/references/state-machine.md`).
@@ -80,7 +88,9 @@ Plan status: [status]  →  next: [next_step]
 Progress:    [done]/[total] files done
 First pending: [file path, if mid-implement]
 Checkpoint:  [slice + last decision + last error tried, if .checkpoint.json present]
+Handoff:     [next action from handoff.md, if present]
 [Drift note, if state file disagreed with plan.md]
+[Stale run marker found — resume interactively (delete .devflow-run.json) or re-arm devflow.run?, if present]
 
 Continue with [next_step]? (yes / no / different step)
 ```
@@ -91,6 +101,8 @@ On confirmation, execute the skill for `next_step` honoring its input contract:
 
 - `devflow.implement` mid-run: enter at first `[pending]` File List entry. Never re-implement a `[done]` file unless explicitly asked.
 - All other steps: run from their Step 0.
+
+After position confirmed: delete consumed `handoff.md` (`rm -f devflow/features/[NNN]_[feature-name]/handoff.md`); delete stale `.devflow-run.json` unless user chose to re-arm via `devflow.run`.
 
 ## Common Rationalizations
 
@@ -113,8 +125,9 @@ On confirmation, execute the skill for `next_step` honoring its input contract:
 
 | | |
 | --- | --- |
-| Reads | `.devflow-state.json`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md` (existence), `devflow/features/[NNN]_[feature-name]/.checkpoint.json` (working context), `devflow/config.md` |
+| Reads | `.devflow-state.json`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md` (existence), `devflow/features/[NNN]_[feature-name]/.checkpoint.json` (working context), `devflow/features/[NNN]_[feature-name]/handoff.md` (context-pressure handoff), `.devflow-run.json` (stale-marker check), `devflow/config.md` |
 | Reads | `@devflow/references/state-machine.md` — status/transition source of truth |
-| Writes | nothing (routing only) |
+| Deletes | `handoff.md` (after position confirmed), stale `.devflow-run.json` (unless user re-arms `devflow.run`) |
+| Writes | nothing else (routing only) |
 | Routes to | pipeline skill matching `next_step` |
 | Related | `devflow-status` (snapshot only), `devflow-recovery` (corrupted state) |

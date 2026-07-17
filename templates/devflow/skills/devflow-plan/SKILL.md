@@ -170,6 +170,17 @@ If not triggered: skip.
 
 Score feature per `@devflow/references/complexity-scoring.md`: 5 signals (files touched, task type, judgment, cross-component surface, novelty), each 0–4, sum 0–20 → profile (`0–6 quick`, `7–13 standard`, `14–20 thorough`). Apply profile floor: auth/payments/security boundaries/migrations/user-input handling → minimum `standard`. Record in `plan.md` frontmatter: `**Complexity:** N (profile)`. Read by `devflow.beautify`, `devflow.test`, `devflow.ship` to scale rigor.
 
+### Step 4e - Design system detection (conditional)
+
+**Trigger:** `DESIGN.md` (or `docs/design.md`) exists in consumer root AND feature has UI files.
+
+If triggered:
+
+1. Tag each UI **File List** entry `[ui]`.
+2. Note under **Architecture decisions:** `- **Design system:** DESIGN.md detected — [ui] entries constrained by its tokens (palette/typography/spacing)`.
+
+Read by `devflow.implement` (loads DESIGN.md for `[ui]` batches) and `devflow.beautify` (UI axis checks token compliance). Not triggered → no tags, zero behavior change.
+
 ### Step 5 - Write plan file
 
 Create `devflow/features/[NNN]_[feature-name]/plan.md` using the template in `references/plan-template.md`. Sections in order: Overview, Architecture decisions, Risks and mitigations, Open questions, Traceability, File List, Implementation checkpoints, Adapter-specific sections, Edge Cases & Error Handling, Pre-implement checklist.
@@ -225,6 +236,7 @@ Continue to implementation? -> devflow.implement
 | Reads (adapter) | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md`; technology skills per ADAPTER table |
 | Reads | `@devflow/references/complexity-scoring.md` (Step 4d — score + profile) |
 | Writes | `devflow/features/[NNN]_[feature-name]/plan.md` |
+| Reads (conditional) | `DESIGN.md` / `docs/design.md` (Step 4e — existence check + UI tagging) |
 | Writes (optional) | `devflow/features/[NNN]_[feature-name]/data-model.md` (Step 4c — triggered when feature touches persistent entities) |
 | Next step | `devflow.implement` |
 | Related skills | Per active `ADAPTER.md` → **Technology skills** |
