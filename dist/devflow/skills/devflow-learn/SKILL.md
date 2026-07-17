@@ -10,6 +10,13 @@ argument-hint: [log, search <query>, list, prune, boost <id>]
 
 Read, write, and maintain `.devflow-instincts.yaml` — the project's persistent instinct store. Complements the auto-detected signals written by the `stop-learn-distill` hook.
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## When NOT to Use
 
 - Pipeline step execution — use `devflow.task`, `devflow.plan`, etc. instead

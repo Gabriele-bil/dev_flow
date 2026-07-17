@@ -11,6 +11,13 @@ effort: low
 
 Optional interactive session between `devflow.task` and `devflow.plan`. Validate and resolve ambiguities in `task.md` through structured Q&A, update the artifact incrementally, and set `Status: clarified` to signal readiness for planning.
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## When NOT to Use
 
 - `task.md` Status is `done` — clarification has no effect on a completed task

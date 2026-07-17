@@ -100,7 +100,7 @@ Each adapter folder contains `ADAPTER.md` (stack rules + MCP hints), `skills/` (
 | `devflow.implement` | Execute `plan.md` step by step, vertical slice by slice |
 | `devflow.beautify` | 7-axis polish: correctness, readability, security, performance, architecture, UI, a11y |
 | `devflow.test` | Write and run unit + integration tests; bounded retry; goal-backward per-AC verification (`verification.md`) |
-| `devflow.ship` | Pre-merge gate: 5 agents in parallel → Ship Gate Report → route to PR |
+| `devflow.ship` | Pre-merge gate: 1–5 agents in parallel per depth profile → Ship Gate Report → route to PR |
 | `devflow.pr` | Commit, push branch, open PR to main |
 | `devflow.status` | Show current pipeline state (active feature, next step, progress) |
 | `devflow.resume` | Resume interrupted session — read state, cross-check plan.md, re-enter correct step |

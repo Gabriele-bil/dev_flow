@@ -69,7 +69,7 @@ Propose, then apply after approval:
 
 ### Step 5 — Regression test
 
-Name it before writing: `[test file path] :: [test name referencing the AC]`. Test must fail on current code (Prove-It), pass after fix. Write it per active `ADAPTER.md` → **Test** conventions. Code fix itself: trivial → apply now; non-trivial → re-enter `devflow.implement` for affected File List entries (status transition per `@devflow/references/state-machine.md`, user-confirmed).
+Name it before writing: `[test file path] :: [test name referencing the AC]`. Test must fail on current code (Prove-It), pass after fix. Write it per active `ADAPTER.md` → **Test** conventions. Code fix itself: trivial → apply now; non-trivial → re-enter `devflow.implement` for affected File List entries (status transition per `@devflow/references/state-machine.md`, user-confirmed). Slice `deps:` annotations present in **File List** → scope re-entry to the affected slice plus downstream slices listing it in `deps`; untouched independent slices stay `[done]`.
 
 ### Step 6 — Log the gap (systemic rule)
 

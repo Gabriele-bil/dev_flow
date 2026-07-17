@@ -7,6 +7,9 @@
 #      rank their own skill within top_k by keyword overlap against every core
 #      skill's description; negative prompts must rank their declared "owner"
 #      skill above the skill under test.
+#   3. Catalog drift: agent.yaml ids/paths/commands vs filesystem. Every skill,
+#      adapter skill, agent, reference, and command on disk must be in the
+#      catalog; every catalog path must exist on disk. Fails on mismatch.
 # This is a lexical approximation (bag-of-words overlap), not semantic
 # judgment -- see evals/README.md. Usage: bash scripts/run-evals.sh
 #
@@ -218,6 +221,77 @@ if [[ $TOTAL_POS -gt 0 ]]; then
   RANK1_RATE=$(awk -v p="$PASSED_POS" -v t="$TOTAL_POS" 'BEGIN { printf "%.0f", (p/t)*100 }')
   echo "Trigger top-k pass rate: $PASSED_POS/$TOTAL_POS ($RANK1_RATE%)"
 fi
+echo ""
+
+# ── 3. Catalog drift check: agent.yaml vs filesystem ──────────────────────
+echo "== Catalog drift check =="
+CATALOG="$PLUGIN_ROOT/agent.yaml"
+DRIFT=0
+if [[ ! -f "$CATALOG" ]]; then
+  echo "  ERROR: agent.yaml not found at $CATALOG"
+  ERRORS=$((ERRORS + 1))
+else
+  CATALOG_IDS=$(grep -E '^[[:space:]]*-?[[:space:]]*id:' "$CATALOG" | sed -E 's/.*id:[[:space:]]*//' | tr -d '"' | tr -d ' ')
+
+  catalog_has_id() {
+    grep -qxF "$1" <<< "$CATALOG_IDS"
+  }
+
+  require_id() {
+    # $1 = id, $2 = human-readable origin (disk path)
+    if ! catalog_has_id "$1"; then
+      echo "  ERROR: '$1' ($2) exists on disk but has no id entry in agent.yaml"
+      ERRORS=$((ERRORS + 1))
+      DRIFT=$((DRIFT + 1))
+    fi
+  }
+
+  # Core skills: skills/<name>/SKILL.md
+  while IFS= read -r F; do
+    require_id "$(basename "$(dirname "$F")")" "${F#"$PLUGIN_ROOT/"}"
+  done < <(find "$SKILLS_DIR" -maxdepth 2 -name "SKILL.md" | sort)
+
+  # Adapter skills: adapters/*/skills/<name>/SKILL.md
+  while IFS= read -r F; do
+    require_id "$(basename "$(dirname "$F")")" "${F#"$PLUGIN_ROOT/"}"
+  done < <(find "$PLUGIN_ROOT/adapters" -path '*/skills/*' -name "SKILL.md" 2>/dev/null | sort)
+
+  # Agents: agents/<name>.md
+  while IFS= read -r F; do
+    require_id "$(basename "$F" .md)" "${F#"$PLUGIN_ROOT/"}"
+  done < <(find "$PLUGIN_ROOT/agents" -maxdepth 1 -name "*.md" 2>/dev/null | sort)
+
+  # References: references/<name>.md
+  while IFS= read -r F; do
+    require_id "$(basename "$F" .md)" "${F#"$PLUGIN_ROOT/"}"
+  done < <(find "$PLUGIN_ROOT/references" -maxdepth 1 -name "*.md" 2>/dev/null | sort)
+
+  # Commands: commands/devflow.<name>.md -> "command: /devflow.<name>" in catalog
+  while IFS= read -r F; do
+    CMDNAME="$(basename "$F" .md)"        # e.g. devflow.analyze
+    SUFFIX="${CMDNAME#devflow.}"          # e.g. analyze
+    if ! grep -qE "command: /devflow\.${SUFFIX}\$" "$CATALOG"; then
+      echo "  ERROR: command '/${CMDNAME}' (${F#"$PLUGIN_ROOT/"}) has no command entry in agent.yaml"
+      ERRORS=$((ERRORS + 1))
+      DRIFT=$((DRIFT + 1))
+    fi
+  done < <(find "$PLUGIN_ROOT/commands" -maxdepth 1 -name "devflow.*.md" 2>/dev/null | sort)
+
+  # Reverse: every path: in the catalog must exist on disk
+  while IFS= read -r P; do
+    if [[ ! -f "$PLUGIN_ROOT/$P" ]]; then
+      echo "  ERROR: agent.yaml path '$P' does not exist on disk"
+      ERRORS=$((ERRORS + 1))
+      DRIFT=$((DRIFT + 1))
+    fi
+  done < <(grep -E '^[[:space:]]*path:' "$CATALOG" | sed -E 's/.*path:[[:space:]]*//' | tr -d '"' | tr -d ' ')
+
+  if [[ $DRIFT -eq 0 ]]; then
+    echo "  OK: agent.yaml in sync with filesystem"
+  fi
+fi
+
+echo ""
 echo "Results: $ERRORS error(s), $WARNINGS warning(s)"
 
 # cleanup description token tmpfiles

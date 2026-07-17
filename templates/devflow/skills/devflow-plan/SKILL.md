@@ -27,7 +27,7 @@ Deliverable: `plan.md` only.
 
 ## Vertical slicing (mandatory for plans with > 5 files)
 
-For plans >5 files: define ≥2 vertical slice increments in **Architecture decisions** — each slice is one end-to-end user-visible increment (not a layer). Group **File List** entries under slice headings.
+For plans >5 files: define ≥2 vertical slice increments in **Architecture decisions** — each slice is one end-to-end user-visible increment (not a layer). Group **File List** entries under slice headings. Optionally annotate each slice heading `(deps: ...)` with the slice numbers it builds on (format: `references/plan-template.md` → **Slice dependency annotations**) — enables ordered resume, re-implementation scoped to affected slices after `devflow.backprop`, and parallel slice execution. Omit when slices are strictly sequential.
 
 Example in Architecture decisions:
 

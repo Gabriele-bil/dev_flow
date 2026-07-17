@@ -125,7 +125,7 @@ In fallback mode, explicitly notify the user that the branch was created from cu
 
 Before the first file: set `plan.md` `**Status:** implementing`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
 
-Implement all files from the plan in the exact order defined in the **File List**.
+Implement all files from the plan in the exact order defined in the **File List**. Slice headings carrying `deps:` annotations: enter a slice only when every listed dep slice is fully `[done]` — File List order already satisfies this on sequential plans; the annotation matters when slices were reordered or a dep slice still has `[pending]` entries.
 
 Each file must:
 

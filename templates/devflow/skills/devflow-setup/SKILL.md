@@ -11,6 +11,13 @@ disable-model-invocation: true
 
 Create or refresh global AI context files (`AGENTS.md`, `REGISTRY.md`) and product context (`docs/product.md`) in the consumer project root.
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## When NOT to Use
 
 - No adapter supported by devflow is detected and user cannot identify the stack — resolve adapter choice first
@@ -22,12 +29,7 @@ Command is **standalone** (pre-pipeline), not feature step like `task/plan/imple
 
 ## Input
 
-- Optional `$ARGUMENTS` with `--force`
-
-`--force` behavior:
-
-- present: overwrite full file contents
-- absent: update only `devflow-managed` sections
+- Optional `$ARGUMENTS` with `--force` — present: overwrite full file contents; absent: update only `devflow-managed` sections
 
 ## Managed block format (required)
 

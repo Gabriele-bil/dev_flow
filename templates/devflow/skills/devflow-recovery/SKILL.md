@@ -12,6 +12,13 @@ Pipeline rescue. Diagnoses state, identifies failure point, proposes recovery pa
 
 Recover a blocked or corrupted pipeline by reading `.devflow-state.json`, inspecting relevant files, and routing to the correct recovery action.
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## When NOT to Use
 
 - Pipeline is not stuck — use `devflow-status` for normal progress check

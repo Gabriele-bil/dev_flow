@@ -11,6 +11,13 @@ effort: low
 
 Read-only cross-artifact consistency check. Verify `task.md` and `plan.md` are internally consistent and constitution-compliant before implementation begins. Run between `devflow.plan` (Status: ready) and `devflow.implement`.
 
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
 ## When NOT to Use
 
 - `plan.md` does not exist or its Status is not `ready` — run `devflow.plan` first

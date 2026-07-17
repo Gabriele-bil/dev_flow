@@ -65,6 +65,18 @@ in this order to respect dependencies.
 
 **Parallelism markers (optional):** Mark parallelizable leaf files with a `[P]` prefix on the entry line. A file is `[P]`-eligible only when: (1) no other `[P]` file in the same batch touches it, and (2) it does not modify shared contracts, migrations, or state-management contracts. `[P]` coexists with `[pending]`/`[done]` — `[P]` = parallelism potential, status markers = completion state. Do not mark files that touch shared contracts, migrations, or state-management contracts.
 
+**Slice dependency annotations (optional):** When file entries are grouped
+under vertical slices, head each group with a bold slice line:
+`**Slice N — [name]** (deps: none | N, M)`. `deps:` lists slice numbers that
+must be fully `[done]` before this slice starts; omit the annotation when
+slices are strictly sequential (each depends on the previous). Same notation
+as the `devflow.blueprint` dependency graph, one level down. Read by
+`devflow.resume` (resume ordering), `devflow.backprop` (re-implementation
+scoped to affected slice + dependents), and any future parallel slice
+execution.
+
+**Slice 1 — [name]** (deps: none)
+
 ### [NNN]. `[path/to/file.ext]` - [create | modify] [pending]
 [1-2 sentences on what this file contains and why it exists.]
 
