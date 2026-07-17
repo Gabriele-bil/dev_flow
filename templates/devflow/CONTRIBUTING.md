@@ -49,7 +49,7 @@ Additional requirements:
 
 1. Copy `adapters/flutter/` as template
 2. Rename to `adapters/<name>/`
-3. Rewrite `ADAPTER.md` with stack rules (Technology skills table, MCP, commands, pre-handoff checklists per pipeline step)
+3. Rewrite `ADAPTER.md` (core: Technology skills table, MCP, step-files index) and the `steps/*.md` files (per-step commands, plan sections, checklists — one file per pipeline step: setup, plan, implement, beautify, test, pr)
 4. Add technology skills under `adapters/<name>/skills/`
 5. Add setup templates under `adapters/<name>/templates/` (`AGENTS.template.md`, `REGISTRY.template.md`, `PRODUCT.template.md`)
 6. Document in root `README.md`
@@ -134,4 +134,4 @@ Keep: technical terms exact, file paths exact, commands exact, all verbs, negati
 - No duplicate content between skills — reference other skills
 - No vague advice skills — actionable workflows only
 - No reference material in `SKILL.md` over 100 lines — use `references/`
-- No adapter skills contradicting `ADAPTER.md` — ADAPTER.md is SSOT for stack behavior
+- No adapter skills contradicting `ADAPTER.md` + `steps/*.md` — the adapter contract (core + step files) is SSOT for stack behavior

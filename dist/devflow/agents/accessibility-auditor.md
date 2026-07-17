@@ -17,7 +17,7 @@ Before auditing:
 
 - `devflow/features/[NNN]_[feature-name]/task.md` — acceptance criteria and affected UI surfaces
 - `devflow/features/[NNN]_[feature-name]/plan.md` — component structure and interaction flows
-- Active `ADAPTER.md` → **Beautify: accessibility** — stack-specific patterns (Flutter `Semantics`, Angular `aria-*`)
+- Active adapter beautify step file (`@devflow/adapters/<adapter>/steps/beautify.md`; legacy: `ADAPTER.md`) → **Beautify: accessibility** — stack-specific patterns (Flutter `Semantics`, Angular `aria-*`)
 - Full checklist: `@devflow/references/accessibility-checklist.md`
 
 ## Core Principles
@@ -57,7 +57,7 @@ Before auditing:
 
 - Touch targets ≥ 44×44px
 - Sufficient spacing between interactive elements
-- Stack-specific rules in active `ADAPTER.md`
+- Stack-specific rules in the active adapter (core `ADAPTER.md` + `steps/beautify.md`)
 
 ### 5. Forms
 
@@ -108,7 +108,7 @@ Use dev-flow taxonomy throughout the report:
 
 ## Rules
 
-1. Read `task.md` acceptance criteria and the active `ADAPTER.md` accessibility section before auditing
+1. Read `task.md` acceptance criteria and the active adapter accessibility section (`steps/beautify.md`; legacy: `ADAPTER.md`) before auditing
 2. Every Critical and Required finding includes a specific fix
 3. Never approve with Critical issues open
 4. Praise specific good accessibility practices — not generic "looks accessible"

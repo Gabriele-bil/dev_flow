@@ -55,9 +55,9 @@ Three adapters ship out of the box:
 | `angular` | `pnpm run lint`, `pnpm run test`, `pnpm run build` | Angular v20+ · NgRx Signal Store · Tailwind |
 | `nextjs` | `pnpm lint`, `pnpm test`, `pnpm build` | Next.js 15+ · Zustand · Tailwind · shadcn/ui |
 
-Each adapter folder contains `ADAPTER.md` (stack rules + MCP hints), `skills/` (technology skills), and `templates/` (setup templates for `AGENTS.md`, `REGISTRY.md`, `docs/product.md`).
+Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP hints), `steps/` (per-step contract files — `setup.md`, `plan.md`, `implement.md`, `beautify.md`, `test.md`, `pr.md` — each pipeline skill loads only its own), `skills/` (technology skills), and `templates/` (setup templates for `AGENTS.md`, `REGISTRY.md`, `docs/product.md`).
 
-**Add a stack:** copy `adapters/flutter/` to `adapters/<name>/`, replace `ADAPTER.md` and `skills/`, then point `config.md` at `<name>`.
+**Add a stack:** copy `adapters/flutter/` to `adapters/<name>/`, replace `ADAPTER.md`, `steps/`, and `skills/`, then point `config.md` at `<name>`.
 
 ## Setup command
 

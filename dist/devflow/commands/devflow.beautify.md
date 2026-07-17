@@ -14,7 +14,7 @@ Use `@devflow/skills/devflow-beautify/SKILL.md` and execute it exactly.
 - Scope: only files touched by the current `devflow.implement` run (see skill for edge cases).
 - Tag every finding with the skill’s severities (**Critical**, required with no prefix, **Nit**, **Optional** / **Consider**, **FYI**) and include **file path and line references** where applicable.
 - Summarize completion using the skill template: **Findings by severity** (Critical / Required / Nit·Optional·FYI) plus **Improvements by area**; do not refactor unrelated or pre-existing code outside the implement summary.
-- After edits: run format / analyze / conditional codegen per `@devflow/config.md` → active `ADAPTER.md` and the skill’s Step 5.
+- After edits: run format / analyze / conditional codegen per `@devflow/config.md` → active adapter `steps/beautify.md` and the skill’s Step 5.
 
 Optional input (`plan.md` path):
 `$ARGUMENTS`

@@ -49,7 +49,7 @@ Files from `devflow.implement` summary + `devflow/features/[NNN]_[feature-name]/
 
 ### Step 0 - Resolve adapter
 
-Read `@devflow/config.md` and `@devflow/adapters/<adapter>/ADAPTER.md`. Use its **Beautify** commands and stack-specific review axes.
+Read `@devflow/config.md`, then `@devflow/adapters/<adapter>/ADAPTER.md` (core) plus `@devflow/adapters/<adapter>/steps/beautify.md`. Legacy adapters without `steps/`: the **Beautify** sections live in `ADAPTER.md`. Use the beautify step file's commands and stack-specific review axes.
 
 ### Step 1 - Read docs
 
@@ -68,7 +68,7 @@ If implement summary includes test files, skim them first — they reflect inten
 
 ### Step 3 - Analysis areas (multi-axis review)
 
-Stack-agnostic defaults below. For stack-specific checks follow `ADAPTER.md` and technology skills. Review **every** in-scope file against all axes; collect all findings before applying changes.
+Stack-agnostic defaults below. For stack-specific checks follow the adapter beautify step file and technology skills. Review **every** in-scope file against all axes; collect all findings before applying changes.
 
 Axes: correctness · readability/simplification · architecture compliance · security · performance · UI consistency · responsiveness/layout · accessibility.
 
@@ -146,7 +146,7 @@ After edits, check **only** implement-touched files for unused imports, unreacha
 
 ### Step 5 - Run commands
 
-After all approved and certain changes are applied, run the **format**, **analyze/typecheck**, and conditional **codegen** commands from `ADAPTER.md` → **Beautify**, in the order specified there.
+After all approved and certain changes are applied, run the **format**, **analyze/typecheck**, and conditional **codegen** commands from the adapter beautify step file, in the order specified there.
 
 On error: resolve autonomously; max 3 attempts; then escalate per `@devflow/references/escalation-ladder.md` (debug mode → re-approach → block).
 
@@ -210,8 +210,8 @@ Continue to testing? -> devflow.test
 - [ ] Performance: heuristics applied; profiling only when warranted
 - [ ] **Critical** and required issues fixed or explicitly escalated to the user
 - [ ] Dead code in scope handled or listed for user decision
-- [ ] Format and analyze/typecheck from `ADAPTER.md` completed (or failure reported after retries)
-- [ ] Codegen run only when `ADAPTER.md` says to and annotations changed
+- [ ] Format and analyze/typecheck from the adapter beautify step file completed (or failure reported after retries)
+- [ ] Codegen run only when the adapter beautify step file says to and annotations changed
 
 ## I/O Reference
 
@@ -225,5 +225,5 @@ Continue to testing? -> devflow.test
 | Writes | improvements to existing files only (no new files) |
 | Writes | `plan.md` — `**Status:** beautified`, `## Decision flags` (run mode — opinable candidates) |
 | Next step | `devflow.test` |
-| Reads (adapter) | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
+| Reads (adapter) | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/beautify.md` |
 | Related skills | Per active `ADAPTER.md` → **Technology skills** |

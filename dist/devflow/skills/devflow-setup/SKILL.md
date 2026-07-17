@@ -62,16 +62,16 @@ Before loading templates, determine the active technology stack and update the c
    **Adapter:** <adapter>  
    **Adapter root:** `devflow/adapters/<adapter>/`
 
-   Pipeline skills read this file first, then load `@devflow/adapters/<adapter>/ADAPTER.md` for technology-specific commands, plan sections, checklists, and skill references.
+   Pipeline skills read this file first, then load `@devflow/adapters/<adapter>/ADAPTER.md` (core: technology skills, MCP) plus `@devflow/adapters/<adapter>/steps/<step>.md` for the active step's commands, plan sections, and checklists.
    ```
 
-4. Build adapter contract path:
-   `@devflow/adapters/<adapter>/ADAPTER.md`
+4. Build adapter contract paths:
+   `@devflow/adapters/<adapter>/ADAPTER.md` (core) and `@devflow/adapters/<adapter>/steps/setup.md` (setup templates + dependencies). Legacy adapters without `steps/`: all sections live in `ADAPTER.md`.
 
 ### Step 2 - Load contract and templates
 
-1. Read adapter contract file.
-2. Read `Setup dependencies` section from `@devflow/adapters/<adapter>/ADAPTER.md` and extract:
+1. Read adapter contract files (core + setup step file).
+2. Read `Setup dependencies` section from `@devflow/adapters/<adapter>/steps/setup.md` (legacy: `ADAPTER.md`) and extract:
    - JavaScript package list (runtime + dev where applicable)
    - Flutter package list (`dependencies`, `dev_dependencies` if explicitly declared)
    - Optional adapter notes for setup installs
@@ -132,7 +132,7 @@ Build final values for template placeholders from:
 | existing `docs/product.md` | product/app hints for continuity | no |
 | Adapter-defined project manifests (for example language/package manifests) | package/project name | no |
 | `@devflow/config.md` | adapter id | yes |
-| `@devflow/adapters/<adapter>/ADAPTER.md` | stack commands, key rules | yes |
+| `@devflow/adapters/<adapter>/ADAPTER.md` + `steps/setup.md` | stack commands, key rules | yes |
 | **Mandatory questionnaire answers** | all unresolved placeholders | yes |
 
 If a value cannot be inferred, keep a literal placeholder token:
@@ -244,7 +244,7 @@ Before final response:
 
 | | |
 | --- | --- |
-| Reads | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (including `Setup dependencies`), adapter + fallback templates |
+| Reads | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/setup.md` (including `Setup dependencies`), adapter + fallback templates |
 | Writes | `AGENTS.md`, `REGISTRY.md`, `docs/product.md` (consumer project root); `@devflow/config.md`; `.gitignore` (appends `.devflow-state.json` if missing) |
 | Side effects | Installs adapter setup dependencies using project package manager or Flutter pub |
 | Next step | `devflow.task` |

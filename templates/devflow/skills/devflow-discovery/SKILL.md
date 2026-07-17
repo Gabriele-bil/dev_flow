@@ -75,7 +75,7 @@ Tests passing, ready to merge?
 ## Adapter Resolution (every step except task and setup)
 
 1. Read `@devflow/config.md` — get active adapter
-2. Read `@devflow/adapters/<adapter>/ADAPTER.md` — authoritative for stack rules
+2. Read `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/<step>.md` for the active step — authoritative for stack rules. Legacy adapters without `steps/`: all sections in `ADAPTER.md`
 
 Current adapters: `flutter`, `angular`, `nextjs`. Common skills: `@devflow/adapters/common/skills/`.
 

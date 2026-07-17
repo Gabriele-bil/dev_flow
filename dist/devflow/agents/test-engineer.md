@@ -13,7 +13,7 @@ Before analysis:
 
 - `devflow/features/[NNN]_[feature-name]/task.md` — acceptance criteria (each needs ≥1 test)
 - `devflow/features/[NNN]_[feature-name]/plan.md` — traceability table (all subtasks must map to tests)
-- Active `ADAPTER.md` → **Test** section — frameworks, placement, coverage threshold
+- Active adapter test step file (`@devflow/adapters/<adapter>/steps/test.md`; legacy: `ADAPTER.md` → **Test**) — frameworks, placement, coverage threshold
 - `@devflow/references/testing-patterns.md` — AAA, naming, mock boundaries, anti-patterns
 
 ## Core Principles

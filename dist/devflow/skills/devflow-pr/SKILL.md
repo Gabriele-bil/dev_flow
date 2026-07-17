@@ -23,7 +23,7 @@ Commit all changes, push feature branch, open PR to `main`. Final DevFlow step.
 
 ## Step 0 - Resolve adapter
 
-Read `@devflow/config.md` and `@devflow/adapters/<adapter>/ADAPTER.md`. Use the **PR** section for pre-push verification commands, expected success output, and checklist items that must appear in the PR body.
+Read `@devflow/config.md`, then `@devflow/adapters/<adapter>/ADAPTER.md` (core) plus `@devflow/adapters/<adapter>/steps/pr.md`. Legacy adapters without `steps/`: the **PR** section lives in `ADAPTER.md`. Use the PR step file for pre-push verification commands, expected success output, and checklist items that must appear in the PR body.
 
 ---
 
@@ -79,7 +79,7 @@ Rules:
 
 ## Step 3 - Pre-push verification
 
-Run **every command** in `ADAPTER.md` → **PR** (usually analyze/typecheck, then project-wide tests). Confirm expected success output before push. Do NOT proceed if any command reports issues.
+Run **every command** in the adapter PR step file (usually analyze/typecheck, then project-wide tests). Confirm expected success output before push. Do NOT proceed if any command reports issues.
 
 If either command fails, stop and fix the issue before continuing to Step 4.
 
@@ -127,13 +127,13 @@ and how it fits into the product.]
 layers touched, key abstractions, notable patterns used.]
 
 ## Testing
-[How the feature was tested — mirror what `ADAPTER.md` requires:
+[How the feature was tested — mirror what the adapter PR step file requires:
 - Unit tests: what was covered
 - Integration / e2e: which flows and targets
 - Analyze/typecheck and format: outcome]
 
 ## Checklist
-[Use the checklist bullets from `ADAPTER.md` → **PR**; add repo-wide items below if not already covered]
+[Use the checklist bullets from the adapter PR step file; add repo-wide items below if not already covered]
 - [ ] No hardcoded TODO or placeholder comments
 - [ ] `registry.md` updated if new patterns were introduced
 ```
@@ -172,7 +172,7 @@ DevFlow pipeline complete for TASK-[NNN].
 
 | | |
 | --- | --- |
-| Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
+| Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/pr.md` |
 | Runs | `git add .` · `git commit` · `git push` · `gh pr create` |
 | Deletes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json`, `devflow/features/[NNN]_[feature-name]/handoff.md` (before staging) |
 | Writes | `plan.md` `**Status:** pr-opened`, `task.md` `**Status:** done` |

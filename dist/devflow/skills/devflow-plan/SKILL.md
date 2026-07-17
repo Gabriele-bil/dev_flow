@@ -41,7 +41,7 @@ For plans with 5 or fewer files, slicing is optional — note in Overview if seq
 
 ## Dependency ordering (reflect in File List)
 
-Order **File list** bottom-up per `constitution.md` and `ADAPTER.md` → **Dependency ordering**. `constitution.md` wins for layout; adapter wins for stack tooling. Deviations for vertical slices → note in **Architecture decisions**.
+Order **File list** bottom-up per `constitution.md` and the adapter plan step file (`steps/plan.md`) → **Dependency ordering**. `constitution.md` wins for layout; adapter wins for stack tooling. Deviations for vertical slices → note in **Architecture decisions**.
 
 ## Core Principles
 
@@ -78,7 +78,7 @@ Feature numbering: IDs strictly incremental; never reuse prefix. Next = highest 
 ### Step 0 - Resolve adapter
 
 1. Read `@devflow/config.md` — note Adapter id and root.
-2. Read `@devflow/adapters/<adapter>/ADAPTER.md` in full (authoritative for: technology skills, MCP, extra sections, localization, stack analysis).
+2. Read `@devflow/adapters/<adapter>/ADAPTER.md` (core: technology skills, MCP) plus `@devflow/adapters/<adapter>/steps/plan.md` (plan extra sections, dependency ordering, localization). Legacy adapters without `steps/`: all sections live in `ADAPTER.md` — read it in full.
 
 ### Step 0b - Constitution Gate
 
@@ -128,7 +128,7 @@ Before planning any file:
 Analyze:
 
 - Which subtasks in `task.md` require new files vs existing file changes
-- All bullets under **Plan** / **Implement** / **Test** in `ADAPTER.md` that apply to this feature (state management, UI, DB, i18n, responsive layout, etc.) — use `registry.md` and `constitution.md` to ground them
+- All bullets in the adapter plan step file (`steps/plan.md`) that apply to this feature — and, only when the feature touches those areas (state management, UI, DB, i18n, responsive layout), the relevant bullets from `steps/implement.md` / `steps/test.md` — use `registry.md` and `constitution.md` to ground them
 - Edge cases and error states that must be handled
 - Any required database or external-system edits called out by the adapter
 
@@ -187,7 +187,7 @@ Create `devflow/features/[NNN]_[feature-name]/plan.md` using the template in `re
 
 Format rules:
 
-- Adapter-specific sections: follow `ADAPTER.md` layout exactly (optional/required blocks, localization/data rules).
+- Adapter-specific sections: follow the adapter plan step file layout exactly (optional/required blocks, localization/data rules).
 - Language: English.
 - Compression: caveman-compress — drop articles/filler/hedging; keep technical terms/paths/commands exact.
 
@@ -223,7 +223,7 @@ Continue to implementation? -> devflow.implement
 | New component without checking shared/ | ≥70% coverage rule; extend first |
 | Dependencies without explicit ordering | Sort file list; document rationale in Architecture decisions |
 | Architecture decisions made during implement | All decisions in `plan.md` before implement |
-| Adapter sections omitted | Apply every required `ADAPTER.md` section |
+| Adapter sections omitted | Apply every required section from the adapter plan step file |
 | No implementation checkpoints on long plans | ≥2 checkpoints for plans >5 files |
 | Complexity score skipped or guessed | Score per `complexity-scoring.md` signals in Step 4d; downstream steps default to `standard` without it |
 
@@ -233,7 +233,7 @@ Continue to implementation? -> devflow.implement
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md` |
 | Reads | `constitution.md`, `registry.md`, `@devflow/adapters/common/skills/common-clean-code/SKILL.md` |
-| Reads (adapter) | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md`; technology skills per ADAPTER table |
+| Reads (adapter) | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/plan.md`; technology skills per ADAPTER table |
 | Reads | `@devflow/references/complexity-scoring.md` (Step 4d — score + profile) |
 | Writes | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads (conditional) | `DESIGN.md` / `docs/design.md` (Step 4e — existence check + UI tagging) |

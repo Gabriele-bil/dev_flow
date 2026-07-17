@@ -11,7 +11,7 @@ Use `@devflow/skills/devflow-pr/SKILL.md` and execute it exactly.
 
 **Anchors (do not skip):**
 
-- Read `@devflow/config.md` and the active `ADAPTER.md` for pre-push commands and PR checklist items.
+- Read `@devflow/config.md` and the active adapter core (`ADAPTER.md`) + `steps/pr.md` for pre-push commands and PR checklist items.
 - Run the adapter’s verification commands and capture real output before ticking checklist items.
 - Commit with a single conventional message; push `[type]/[NNN]-[feature-name]`; open PR toward `main` with `gh pr create`.
 

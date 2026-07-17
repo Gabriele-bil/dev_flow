@@ -49,7 +49,7 @@ Files from `devflow.implement` + `devflow.beautify` + `devflow/features/[NNN]_[f
 
 ### Step 0 - Resolve adapter
 
-Read `@devflow/config.md` and `@devflow/adapters/<adapter>/ADAPTER.md`. The **Test** section defines placement, frameworks, coverage expectations, and shell commands — follow it exactly for this run.
+Read `@devflow/config.md`, then `@devflow/adapters/<adapter>/ADAPTER.md` (core) plus `@devflow/adapters/<adapter>/steps/test.md`. Legacy adapters without `steps/`: the **Test** section lives in `ADAPTER.md`. The test step file defines placement, frameworks, coverage expectations, and shell commands — follow it exactly for this run.
 
 ### Step 1 - Read docs
 
@@ -83,10 +83,10 @@ Report gap inventory before writing tests so user can see what will and will not
 
 Read `task.md` **Acceptance criteria** section first — derive at least one test case per criterion. Then use `plan.md`, the coverage gap inventory from Step 2b, and the implement/beautify summaries:
 
-1. **Placement** — mirror source layout and integration paths per `ADAPTER.md` → **Test**.
-2. **Unit tests** — cover models, state, domain rules, and UI assertions per `ADAPTER.md` (load any technology skills it references).
-3. **Integration tests** — target user flows from `task.md` per `ADAPTER.md` (targets/environments and execution order).
-4. **Execute** — run the exact commands from `ADAPTER.md`; paste raw stdout/stderr in the Step 7 report.
+1. **Placement** — mirror source layout and integration paths per the adapter test step file.
+2. **Unit tests** — cover models, state, domain rules, and UI assertions per the adapter test step file (load any technology skills it references).
+3. **Integration tests** — target user flows from `task.md` per the adapter test step file (targets/environments and execution order).
+4. **Execute** — run the exact commands from the adapter test step file; paste raw stdout/stderr in the Step 7 report.
 
 Failure handling:
 
@@ -103,7 +103,7 @@ Failure handling:
 After all tests pass, verify **backwards from the spec** per `@devflow/references/verification-levels.md`:
 
 1. For each acceptance criterion in `task.md`: locate implementing file(s) via `plan.md` → **Traceability** table.
-2. Run the four levels — existence, substantive (no stubs), wired (reachable, not dead code), runtime (adapter `ADAPTER.md` → **Verify (runtime)** target when defined; fallback: integration targets from **Test → Commands**; neither → `N/A`). Depth per profile: `quick` → levels 1–3; `standard` → levels 1–3 + level 4 when adapter defines targets; `thorough` → level 4 mandatory (no adapter target → verdict PARTIAL with note).
+2. Run the four levels — existence, substantive (no stubs), wired (reachable, not dead code), runtime (adapter test step file → **Verify (runtime)** target when defined; fallback: integration targets from **Test → Commands**; neither → `N/A`). Depth per profile: `quick` → levels 1–3; `standard` → levels 1–3 + level 4 when adapter defines targets; `thorough` → level 4 mandatory (no adapter target → verdict PARTIAL with note).
 3. Write `devflow/features/[NNN]_[feature-name]/verification.md` using the report template in the reference.
 4. Any **FAIL** verdict → do NOT set status `tested`. Implementation gap → fix (re-enter escalation ladder at Level 1) or report. Spec gap (AC missing/too weak) → suggest `devflow.backprop`.
 
@@ -195,11 +195,11 @@ Wait for user choice before continuing. **Run mode** (`.devflow-run.json` presen
 | --- | --- |
 | Reads | files from `devflow.implement` / `devflow.beautify` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
-| Reads | `constitution.md`, `registry.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
+| Reads | `constitution.md`, `registry.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/test.md` |
 | Reads | `@devflow/references/verification-levels.md` (Step 6b), `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status), `@devflow/references/complexity-scoring.md` (depth profile) |
 | Reads (conditional) | `.devflow-run.json` (existence — run-mode switch) |
 | Reads (optional) | `@devflow/references/testing-patterns.md` — stack-agnostic patterns reference |
-| Writes | Test output paths per active `ADAPTER.md` → **Test** |
+| Writes | Test output paths per the adapter test step file |
 | Writes | `devflow/features/[NNN]_[feature-name]/verification.md` — per-AC verdict table |
 | Writes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json` — `errors_tried` on retry loops (state-machine.md → Checkpoint file) |
 | Writes (conditional) | `devflow/features/[NNN]_[feature-name]/handoff.md` — on context pressure (state-machine.md → Handoff file) |

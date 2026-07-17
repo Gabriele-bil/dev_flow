@@ -161,6 +161,13 @@ skills:
   adapters:
     flutter:
       path: adapters/flutter/ADAPTER.md
+      step_files:
+        - path: adapters/flutter/steps/setup.md
+        - path: adapters/flutter/steps/plan.md
+        - path: adapters/flutter/steps/implement.md
+        - path: adapters/flutter/steps/beautify.md
+        - path: adapters/flutter/steps/test.md
+        - path: adapters/flutter/steps/pr.md
       skills:
         - id: flutter-architecture
           path: adapters/flutter/skills/flutter-architecture/SKILL.md
@@ -189,6 +196,13 @@ skills:
 
     angular:
       path: adapters/angular/ADAPTER.md
+      step_files:
+        - path: adapters/angular/steps/setup.md
+        - path: adapters/angular/steps/plan.md
+        - path: adapters/angular/steps/implement.md
+        - path: adapters/angular/steps/beautify.md
+        - path: adapters/angular/steps/test.md
+        - path: adapters/angular/steps/pr.md
       skills:
         - id: angular-animations
           path: adapters/angular/skills/angular-animations/SKILL.md
@@ -223,6 +237,13 @@ skills:
 
     nextjs:
       path: adapters/nextjs/ADAPTER.md
+      step_files:
+        - path: adapters/nextjs/steps/setup.md
+        - path: adapters/nextjs/steps/plan.md
+        - path: adapters/nextjs/steps/implement.md
+        - path: adapters/nextjs/steps/beautify.md
+        - path: adapters/nextjs/steps/test.md
+        - path: adapters/nextjs/steps/pr.md
       skills:
         - id: nextjs-architecture
           path: adapters/nextjs/skills/nextjs-architecture/SKILL.md

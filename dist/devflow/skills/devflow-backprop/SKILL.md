@@ -69,7 +69,7 @@ Propose, then apply after approval:
 
 ### Step 5 — Regression test
 
-Name it before writing: `[test file path] :: [test name referencing the AC]`. Test must fail on current code (Prove-It), pass after fix. Write it per active `ADAPTER.md` → **Test** conventions. Code fix itself: trivial → apply now; non-trivial → re-enter `devflow.implement` for affected File List entries (status transition per `@devflow/references/state-machine.md`, user-confirmed). Slice `deps:` annotations present in **File List** → scope re-entry to the affected slice plus downstream slices listing it in `deps`; untouched independent slices stay `[done]`.
+Name it before writing: `[test file path] :: [test name referencing the AC]`. Test must fail on current code (Prove-It), pass after fix. Write it per the adapter test step file (`@devflow/adapters/<adapter>/steps/test.md`; legacy: `ADAPTER.md` → **Test**) conventions. Code fix itself: trivial → apply now; non-trivial → re-enter `devflow.implement` for affected File List entries (status transition per `@devflow/references/state-machine.md`, user-confirmed). Slice `deps:` annotations present in **File List** → scope re-entry to the affected slice plus downstream slices listing it in `deps`; untouched independent slices stay `[done]`.
 
 ### Step 6 — Log the gap (systemic rule)
 
@@ -112,7 +112,7 @@ Instinct:   [id] logged ([N] total in family[; clarify question proposed])
 | | |
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md` (Traceability) |
-| Reads | `references/backprop-patterns.md`, `@devflow/references/state-machine.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (Test conventions) |
+| Reads | `references/backprop-patterns.md`, `@devflow/references/state-machine.md`, `@devflow/adapters/<adapter>/steps/test.md` (Test conventions) |
 | Writes | `task.md` — AC added/tightened, `## Notes` backprop entry |
 | Writes | `plan.md` — Traceability row for changed AC |
 | Writes | regression test file per adapter conventions |
