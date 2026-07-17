@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.9.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.8.0...devflow-v1.9.0) (2026-07-17)
+
+
+### Features
+
+* Add scope fidelity axis to code review, implement backprop and resume commands, and update documentation. ([e7b6c83](https://github.com/Gabriele-bil/dev_flow/commit/e7b6c83b129b5cb8324a83a4509ebec76b1c40aa))
+* Add structured workflow step definitions for flutter, angular, and nextjs adapters ([66ddedc](https://github.com/Gabriele-bil/dev_flow/commit/66ddedcc5d7bab29e1d6bdef686507c5cdaf0469))
+* Expand DevFlow agent capabilities with new blueprint, clarify, analyze, and ship skills while adding specialized adapter skills for Flutter, Angular, Next.js, and common utilities. ([be4a733](https://github.com/Gabriele-bil/dev_flow/commit/be4a7336c7945b56aa595537bbedd468ce98cc8c))
+* Implement devflow.run command for autonomous multi-skill execution with decision flagging and design token awareness ([7e0a378](https://github.com/Gabriele-bil/dev_flow/commit/7e0a3788ef38161b72f65fc27284d2e332c604d6))
+* Introduce complexity-based depth profiles for skill agent fan-out, expand review coverage, and implement new validation hooks. ([66e44fb](https://github.com/Gabriele-bil/dev_flow/commit/66e44fbfcbbb3323e26e479b8b5df996056f076f))
+
 ## [1.8.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.7.0...devflow-v1.8.0) (2026-06-28)
 
 
