@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.10.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.9.0...devflow-v1.10.0) (2026-07-19)
+
+
+### Features
+
+* Add filter savings telemetry and record tokless port completion ([939a69e](https://github.com/Gabriele-bil/dev_flow/commit/939a69ed27c8b3c89c731d97cca62d436de3f17b))
+* Add measure-session-tokens.sh for A/B evidence on instruction-level changes ([23ca89c](https://github.com/Gabriele-bil/dev_flow/commit/23ca89cad7e0191a5107d08f543209cd59e44e96))
+* Expand shell command filtering, optimize locale-safe confidence math, and introduce token economy guidelines for index-first exploration ([bf4a2c8](https://github.com/Gabriele-bil/dev_flow/commit/bf4a2c8be3b61baabb13ec75768386916c358523))
+
+
+### Bug Fixes
+
+* Add it_IT locale regression test and explicit trigger phrasing for flutter-supabase skill ([c830ea3](https://github.com/Gabriele-bil/dev_flow/commit/c830ea3c9f2b98deeb34dafcb26b7bfaf11cea19))
+
 ## [1.9.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.8.0...devflow-v1.9.0) (2026-07-17)
 
 
