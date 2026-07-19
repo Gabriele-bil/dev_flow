@@ -31,7 +31,7 @@ All proposals P1a–P3b implemented (commits `055d417`, `4bb15a8` + telemetry fo
 
 Bonus found during porting: decimal-comma locale bug (it_IT `awk printf "%.2f"` → yq union operator → corrupted instincts YAML) fixed in `stop-learn-distill.sh` + `run-evals.sh`, regression test T14b added.
 
-Measurement appendix: partially addressed — filter hook now appends per-command savings telemetry to `.devflow-filter-stats.jsonl` (`DEVFLOW_FILTER_STATS` to override/disable); `devflow.status` reports aggregate `Savings:` line. Instruction-port A/B (step 3 below) still open.
+Measurement appendix: filter telemetry live (`.devflow-filter-stats.jsonl` + `devflow.status` `Savings:` line); A/B tooling ready (`scripts/measure-session-tokens.sh` — token totals + tool-call mix per transcript). Open: actual A/B pipeline runs per protocol step 3.
 
 ---
 
@@ -296,8 +296,12 @@ Karpathy rule 4 is mostly covered by task.md acceptance criteria. Small delta: `
 
 Accept or reject each proposal on data, not upstream claims:
 
-1. **Baseline:** run one representative feature through the pipeline on the current plugin version; record per-step token usage (Claude Code `/cost`, or caveman-stats if installed, or transcript token counts from `~/.claude/projects/`).
-2. **Filter hook (P2a):** compare `wc -c` of raw vs. filtered output on captured fixtures for each new command class — the hook's own test suite can assert compression ratios.
-3. **Instruction ports (P1a/P1b/P2b):** A/B the same task with and without the new SKILL.md sections; compare total input+output tokens and tool-call counts (grep/Read call count is the direct proxy for P1b).
+1. **Baseline:** run one representative feature through the pipeline on the current plugin version; record per-step token usage with `scripts/measure-session-tokens.sh --project <consumer-dir>` (aggregates input/output/cache tokens + tool-call mix per transcript from `~/.claude/projects/`).
+2. **Filter hook (P2a): ✅ instrumented.** `.devflow-filter-stats.jsonl` records raw vs. kept chars per filtered command; `devflow.status` reports the aggregate. Test suite asserts `kept_chars < raw_chars`.
+3. **Instruction ports (P1a/P1b/P2b): tooling ready, runs pending.** A/B protocol:
+   - **A (baseline):** consumer project on plugin build from commit before `055d417`; run one feature through task→plan→implement→test.
+   - **B:** same feature (fresh branch, same prompts) on current build.
+   - Compare with `measure-session-tokens.sh`: `explore` column (Read+Grep+Glob count) is the direct P1b proxy; `semantic` counts index MCP calls; total `in`+`cache-w` tokens for P1a/P2b effect.
+   - One run per arm is indicative only; ≥3 feature pairs before accepting/rejecting.
 4. **Upstream references:** rtk claims 60–90% on command output (`rtk gain` shows measured local numbers if installed); caveman claims 65% output reduction. Treat both as ceilings, not expectations.
 5. Log results in the learnings log (`devflow-learn`) so future tuning has a paper trail.
