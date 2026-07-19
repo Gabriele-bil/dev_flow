@@ -8,16 +8,30 @@ Analysis of [tokless](https://github.com/HoangP8/tokless) (local checkout: `~/De
 
 | # | Tokless technique | Mechanism class | Claimed savings | DevFlow status | Verdict |
 |---|-------------------|-----------------|-----------------|----------------|---------|
-| 1 | Owner-managed instruction sections | Config mechanics | n/a (dedup) | ❌ Missing | **Port pattern (P3)** |
-| 2 | Principles (karpathy-skills) | Instruction text | n/a (fewer retries) | 🟡 Partial | **Port delta (P1)** |
+| 1 | Owner-managed instruction sections | Config mechanics | n/a (dedup) | ✅ Ported | **Done (P3a)** |
+| 2 | Principles (karpathy-skills) | Instruction text | n/a (fewer retries) | ✅ Ported | **Done (P1a + P3b)** |
 | 3 | Caveman response style | Instruction text | 65% output tokens | ❌ Out of scope | Document only |
-| 4 | Ponytail build discipline | Instruction text | n/a (less code generated) | ❌ Missing | **Port (P1)** |
-| 5 | rtk CLI output proxy | PreToolUse hook | 60–90% on dev-ops output | 🟡 Partial (PostToolUse filter) | **Extend existing (P2)** |
-| 6 | Codegraph index-first exploration | MCP + decision tree | one call vs. dozens | ❌ Missing | **Port decision tree (P1)** |
-| 7 | context-mode sandbox derivation | MCP + decision tree | raw bytes never enter context | 🟡 Partial | **Port guidance (P2)** |
-| 8 | Idempotent config editing | Config mechanics | n/a (correctness) | 🟡 Partial | **Port pattern (P3)** |
+| 4 | Ponytail build discipline | Instruction text | n/a (less code generated) | ✅ Ported | **Done (P1a)** |
+| 5 | rtk CLI output proxy | PreToolUse hook | 60–90% on dev-ops output | ✅ Extended | **Done (P2a)** |
+| 6 | Codegraph index-first exploration | MCP + decision tree | one call vs. dozens | ✅ Ported | **Done (P1b)** |
+| 7 | context-mode sandbox derivation | MCP + decision tree | raw bytes never enter context | ✅ Ported | **Done (P2b)** |
+| 8 | Idempotent config editing | Config mechanics | n/a (correctness) | ✅ Ported | **Done (P3a)** |
 
 The highest-leverage ports are the three instruction-level techniques (2, 4, 6): they cost nothing at runtime, require only SKILL.md edits, and attack the two biggest token sinks in agent sessions — exploratory tool-call churn and over-generated code.
+
+## Implementation status (2026-07-19)
+
+All proposals P1a–P3b implemented (commits `055d417`, `4bb15a8` + telemetry follow-up):
+
+- **P1a** — lazy ladder + supporting rules in `devflow-implement` Step 4; seventh **Simplicity** axis in `agents/code-reviewer.md`
+- **P1b + P2b** — `references/token-economy.md` (index-first tree + derive-don't-dump); pointers in discovery/plan/implement/test/ship; CONTRIBUTING quality-bar line
+- **P2a** — filter hook covers pytest/go/cargo/gradle/mvn/docker/tsc/eslint/jest/vitest + `DEVFLOW_FILTER_EXTRA` env extension; test suite extended
+- **P3a** — conflict-surface rule in `devflow-setup` Step 7; **Managed-Section Discipline** in CONTRIBUTING
+- **P3b** — verify-criteria-first rule in `devflow-implement` Step 4
+
+Bonus found during porting: decimal-comma locale bug (it_IT `awk printf "%.2f"` → yq union operator → corrupted instincts YAML) fixed in `stop-learn-distill.sh` + `run-evals.sh`, regression test T14b added.
+
+Measurement appendix: partially addressed — filter hook now appends per-command savings telemetry to `.devflow-filter-stats.jsonl` (`DEVFLOW_FILTER_STATS` to override/disable); `devflow.status` reports aggregate `Savings:` line. Instruction-port A/B (step 3 below) still open.
 
 ---
 

@@ -7,6 +7,9 @@
 # Output over threshold → head + all error/warning lines + tail, emitted via
 # hookSpecificOutput.updatedToolOutput (replaces tool output in context, cap 10k chars).
 # Not applicable / under threshold → exit 0 silently (original output kept).
+# Savings telemetry: each filtered command appends one JSONL line to
+# .devflow-filter-stats.jsonl (DEVFLOW_FILTER_STATS=<path> overrides, =off disables).
+# Read by devflow.status → "Filter savings" line.
 
 # ── Thresholds (single place — override via env) ─────────────────────────────
 THRESHOLD_CHARS="${DEVFLOW_FILTER_THRESHOLD:-2000}"  # below this: no filtering
@@ -77,6 +80,22 @@ KEPT=$(printf '%s' "$KEPT" | tr -d '[:space:]')
 FILTERED=$(printf '%s' "$FILTERED" | head -c $((MAX_OUTPUT_CHARS - 120)))
 RESULT="$FILTERED
 [devflow-filter] kept $KEPT of $TOTAL lines ($CHARS chars raw)"
+
+# ── Savings telemetry (one JSONL line per filtered command) ──────────────────
+STATS_FILE="${DEVFLOW_FILTER_STATS:-.devflow-filter-stats.jsonl}"
+if [ "$STATS_FILE" != "off" ]; then
+  if [ ! -f "$STATS_FILE" ] && [ -f .gitignore ] \
+     && ! grep -qF ".devflow-filter-stats.jsonl" .gitignore 2>/dev/null; then
+    printf '\n# devflow filter savings\n.devflow-filter-stats.jsonl\n' >> .gitignore 2>/dev/null || true
+  fi
+  CMD_HEAD=$(printf '%s' "$CMD" | tr '\n' ' ' | head -c 60)
+  jq -cn --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || true)" \
+    --arg cmd "$CMD_HEAD" \
+    --argjson raw "$CHARS" --argjson kept "${#RESULT}" \
+    --argjson raw_lines "$TOTAL" --argjson kept_lines "$KEPT" \
+    '{ts:$ts,cmd:$cmd,raw_chars:$raw,kept_chars:$kept,raw_lines:$raw_lines,kept_lines:$kept_lines}' \
+    >> "$STATS_FILE" 2>/dev/null || true
+fi
 
 jq -n --arg out "$RESULT" '{
   suppressOutput: true,

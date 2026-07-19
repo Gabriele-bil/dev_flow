@@ -76,3 +76,6 @@ node_modules/
 .devflow-observe.jsonl
 .devflow-observe.jsonl.1
 .tokensave
+
+# devflow filter savings
+.devflow-filter-stats.jsonl

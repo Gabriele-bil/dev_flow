@@ -6,6 +6,7 @@
 set -euo pipefail
 
 HOOK="$(cd "$(dirname "$0")/.." && pwd)/post-bash-output-filter.sh"
+export DEVFLOW_FILTER_STATS=off  # keep repo clean; T8 overrides with temp path
 PASS=0
 FAIL=0
 ERRORS=()
@@ -137,6 +138,22 @@ FILTERED=$(echo "$out" | jq -r '.hookSpecificOutput.updatedToolOutput' 2>/dev/nu
 [ -n "$FILTERED" ] && [ "${#FILTERED}" -lt 10000 ] \
   && assert "huge lines capped under 10k (${#FILTERED} chars)" pass \
   || assert "huge lines capped under 10k (${#FILTERED:-0} chars)" fail
+
+# T8: savings telemetry appended to stats file
+echo "--- T8: stats telemetry ---"
+STATS="$(mktemp -d)/stats.jsonl"
+out=$(DEVFLOW_FILTER_STATS="$STATS" run_hook "Bash" "flutter test" "$(big_output 300)")
+[ -f "$STATS" ] && assert "stats file created" pass || assert "stats file created" fail
+jq -e '.raw_chars > 0 and .kept_chars > 0 and .kept_chars < .raw_chars and .raw_lines == 300 and (.cmd | startswith("flutter test"))' \
+  "$STATS" >/dev/null 2>&1 \
+  && assert "stats line has expected fields" pass \
+  || assert "stats line has expected fields" fail
+COUNT=$(wc -l < "$STATS" | tr -d ' ')
+[ "$COUNT" = "1" ] && assert "one line per filtered command" pass || assert "one line per filtered command" fail
+out=$(run_hook "Bash" "flutter test" "$(big_output 300)")
+COUNT=$(wc -l < "$STATS" | tr -d ' ')
+[ "$COUNT" = "1" ] && assert "DEVFLOW_FILTER_STATS=off: no append" pass \
+  || assert "DEVFLOW_FILTER_STATS=off: no append" fail
 
 echo ""
 echo "Results: $PASS passed, $FAIL failed"
