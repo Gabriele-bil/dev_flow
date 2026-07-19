@@ -1,6 +1,6 @@
 ---
 name: flutter-supabase
-description: Use for Flutter data/auth/storage/realtime code with Supabase — provider-based client access, datasource boundaries, Postgrest queries, storage paths, realtime streams, RPC/functions, repository error mapping.
+description: Supabase rules for Flutter — provider-based client access, datasource boundaries, Postgrest queries, storage paths, realtime streams, RPC/functions, repository error mapping. Use when writing Flutter data/auth/storage/realtime code backed by Supabase.
 ---
 
 # Skill: Flutter + Supabase

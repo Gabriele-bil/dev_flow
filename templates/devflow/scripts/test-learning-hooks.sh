@@ -277,6 +277,24 @@ else
 fi
 teardown
 
+# T14b: confidence bump under decimal-comma locale (it_IT regression:
+# awk printf "%.2f" emitted "0,55" → yq union operator → YAML corrupted)
+setup
+for i in 1 2 3 4; do
+  jq -cn '{event:"pre",tool:"Write",file:"lib/auth.dart",ts:"2026-05-03T10:00:01Z"}' >> .devflow-observe.jsonl
+done
+echo '{}' | LC_ALL=it_IT.UTF-8 bash "$HOOKS_DIR/stop-learn-distill.sh" > /dev/null
+echo '{}' | LC_ALL=it_IT.UTF-8 bash "$HOOKS_DIR/stop-learn-distill.sh" > /dev/null
+COUNT=$(yq '.instincts | length' .devflow-instincts.yaml 2>/dev/null)
+assert_equals "locale it_IT: YAML valid, still 1 instinct" "$COUNT" "1"
+CONF=$(yq '.instincts[0].confidence' .devflow-instincts.yaml 2>/dev/null)
+if LC_ALL=C awk -v c="$CONF" 'BEGIN {exit (c+0 > 0.5) ? 0 : 1}'; then
+  pass "locale it_IT: confidence bumped above 0.5 (got $CONF)"
+else
+  fail "locale it_IT: confidence bumped" "got $CONF, want > 0.5"
+fi
+teardown
+
 # T15: passthrough preserves stdin exactly
 setup
 for i in 1 2 3 4; do
