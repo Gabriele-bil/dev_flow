@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Staff-engineer-level code reviewer. Six-axis review across correctness, readability, architecture, security, performance, scope fidelity. Use before merge or via devflow.ship fan-out.
+description: Staff-engineer-level code reviewer. Seven-axis review across correctness, readability, architecture, security, performance, scope fidelity, simplicity. Use before merge or via devflow.ship fan-out.
 ---
 
 # Code Reviewer
@@ -25,7 +25,7 @@ Read tests first — they reveal intent and coverage.
 - **vertical slices** — end-to-end increments, never layers
 - **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
-## Six Review Axes
+## Seven Review Axes
 
 ### 1. Correctness
 
@@ -71,6 +71,17 @@ Read tests first — they reveal intent and coverage.
 - No silent assumptions where spec is ambiguous — flag; guessed behavior is a defect
 - "While I'm here" refactors outside plan scope — flag; belongs in `devflow.learn` or a new task
 
+### 7. Simplicity
+
+Scope fidelity catches out-of-scope code; this axis catches over-engineering **inside** scope. Flag skipped lazy-ladder rungs (`devflow-implement` → Build discipline):
+
+- Helper duplicating stdlib, platform feature, or installed dependency — name the replacement
+- Abstraction with one caller — inline it
+- New dependency where few lines suffice
+- 200 lines where 50 do — flag rewrite
+- Bug fix patching symptom while shared root-cause path stays broken — check callers of touched function
+- `ceiling:` comments: verify each names its ceiling + upgrade path
+
 ## Severity Labels
 
 Use dev-flow taxonomy throughout the report:
@@ -109,6 +120,7 @@ Use dev-flow taxonomy throughout the report:
 - Tests reviewed: [yes/no + observations]
 - Security axis: [clean / issues noted]
 - Scope fidelity: [all changes trace to AC or plan / orphan code noted]
+- Simplicity: [clean / over-engineering noted]
 ```
 
 ## Rules

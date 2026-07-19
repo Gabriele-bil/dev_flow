@@ -270,7 +270,7 @@ echo '{}' | bash "$HOOKS_DIR/stop-learn-distill.sh" > /dev/null
 COUNT=$(yq '.instincts | length' .devflow-instincts.yaml 2>/dev/null)
 assert_equals "dedup: only 1 instinct (not 2)" "$COUNT" "1"
 CONF=$(yq '.instincts[0].confidence' .devflow-instincts.yaml 2>/dev/null)
-if awk "BEGIN {exit ($CONF > 0.5) ? 0 : 1}"; then
+if LC_ALL=C awk -v c="$CONF" 'BEGIN {exit (c+0 > 0.5) ? 0 : 1}'; then
   pass "dedup: confidence bumped above 0.5 (got $CONF)"
 else
   fail "dedup: confidence bumped" "got $CONF, want > 0.5"

@@ -22,8 +22,7 @@ Create or refresh global AI context files (`AGENTS.md`, `REGISTRY.md`) and produ
 
 - No adapter supported by devflow is detected and user cannot identify the stack — resolve adapter choice first
 - `devflow.setup` already ran and only a specific managed section needs updating — pass `--force` and edit directly instead of re-running the full questionnaire
-Output must be concise, stable, and safe to re-run.
-`AGENTS.md` must keep any template-provided `code-review-graph` skill reference intact.
+Output must be concise, stable, safe to re-run; `AGENTS.md` keeps any template-provided `code-review-graph` skill reference intact.
 
 Command is **standalone** (pre-pipeline), not feature step like `task/plan/implement`.
 
@@ -189,8 +188,8 @@ Target location: consumer project root. Same rules for all four files (`AGENTS.m
 
 When non-force mode cannot find valid managed markers in an existing file (`docs/product.md`, `constitution.md`):
 
-- append rendered managed blocks to the end of the file
-- do not rewrite existing user sections
+- Marker-less DevFlow-looking content present (headings matching template sections — pre-marker leftovers)? → stop, list conflicts, ask user: replace with managed blocks or append fresh. Never guess; never leave two copies of same section (plugin `CONTRIBUTING.md` → **Managed-Section Discipline**)
+- Otherwise append rendered managed blocks to the end of the file; do not rewrite existing user sections
 
 ### Step 7b - Gitignore (runtime artifacts)
 
@@ -237,6 +236,7 @@ Before final response:
 | Installing setup dependencies globally | Use project package manager (`pnpm add`, `flutter pub add`). |
 | Leaving `[TODO: fill]` placeholders before routing to `devflow.task` | Fill all placeholders first. |
 | Generating marker-less content | Wrap all managed content with `<!-- devflow-managed:start / :end -->`. |
+| Appending managed blocks onto marker-less DevFlow-looking content | Surface conflict, ask replace-or-append; duplicate sections corrupt consumer context files. |
 | Expanding templates with long narrative prose | Output must be token-lean, imperative, filler-free. |
 | Using adapter template that doesn't exist without fallback | Fall back to global templates if adapter template missing. |
 

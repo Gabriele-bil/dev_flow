@@ -88,6 +88,8 @@ Read `task.md` **Acceptance criteria** section first — derive at least one tes
 3. **Integration tests** — target user flows from `task.md` per the adapter test step file (targets/environments and execution order).
 4. **Execute** — run the exact commands from the adapter test step file; paste raw stdout/stderr in the Step 7 report.
 
+**Output discipline (intermediate runs):** retry loops and analysis runs follow `@devflow/references/token-economy.md` → **Derive, don't dump** — filter at source, quote decisive failure lines, report delta on re-runs. Step 7 report still pastes mandated raw evidence.
+
 Failure handling:
 
 - Max 3 attempts per failing test
@@ -185,6 +187,7 @@ Wait for user choice before continuing. **Run mode** (`.devflow-run.json` presen
 | 100% coverage with no assertions | Every test must assert at least one specific output |
 | Flaky test fixed with `retry(3)` | Fix root cause; use deterministic setup |
 | Happy-path-only tests | ≥1 error path per public function (`standard`+ profiles; `quick` = happy + regression per AC) |
+| Pasting full output of every retry attempt | Decisive lines only during retries; raw evidence in Step 7 report (`token-economy.md`) |
 | Skipping `testing-patterns.md` for novel scenarios | Read `@devflow/references/testing-patterns.md` first |
 | Skipping verification because tests pass | Tests are forward-looking; Step 6b proves each AC exists, is real, is wired |
 | Setting `tested` with FAIL verdicts in verification.md | FAIL = not tested; fix or route to `devflow.backprop` |
@@ -196,7 +199,7 @@ Wait for user choice before continuing. **Run mode** (`.devflow-run.json` presen
 | Reads | files from `devflow.implement` / `devflow.beautify` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md`, `registry.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/test.md` |
-| Reads | `@devflow/references/verification-levels.md` (Step 6b), `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status), `@devflow/references/complexity-scoring.md` (depth profile) |
+| Reads | `@devflow/references/verification-levels.md` (Step 6b), `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status), `@devflow/references/complexity-scoring.md` (depth profile), `@devflow/references/token-economy.md` (output discipline) |
 | Reads (conditional) | `.devflow-run.json` (existence — run-mode switch) |
 | Reads (optional) | `@devflow/references/testing-patterns.md` — stack-agnostic patterns reference |
 | Writes | Test output paths per the adapter test step file |

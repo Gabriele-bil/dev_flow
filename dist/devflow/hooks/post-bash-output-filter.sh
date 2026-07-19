@@ -1,6 +1,9 @@
 #!/bin/bash
 # post-bash-output-filter.sh — PostToolUse(Bash) hook: compress verbose command output.
-# Recognizes adapter command classes (flutter/dart, pnpm/npm/yarn/ng, git diff|log).
+# Recognizes adapter command classes (flutter/dart, pnpm/npm/yarn/ng, git diff|log)
+# plus generic dev-tool classes (pytest, go, cargo, gradle/mvn, docker build|compose,
+# tsc, eslint, jest, vitest). Extend without editing this script:
+# DEVFLOW_FILTER_EXTRA=<ERE> — extra command-class regex, ORed with the built-in set.
 # Output over threshold → head + all error/warning lines + tail, emitted via
 # hookSpecificOutput.updatedToolOutput (replaces tool output in context, cap 10k chars).
 # Not applicable / under threshold → exit 0 silently (original output kept).
@@ -23,12 +26,18 @@ TOOL=$(printf '%s' "$RAW" | jq -r '.tool_name // .tool_use.name // empty' 2>/dev
 CMD=$(printf '%s' "$RAW" | jq -r '.tool_input.command // .tool_use.input.command // empty' 2>/dev/null)
 [ -z "$CMD" ] && exit 0
 
-# Command classes: adapter Implement/Test/PR commands + git diff/log.
+# Command classes: adapter Implement/Test/PR commands + git diff/log + generic dev tools.
 # Keyed to ADAPTER.md commands: flutter analyze|test|build, dart format|analyze|test,
 # pnpm|npm|yarn [run] lint|test|build, ng lint|test|build.
-if ! printf '%s' "$CMD" | grep -qE '(^|[;&|[:space:]])(flutter[[:space:]]+(test|analyze|build)|dart[[:space:]]+(format|analyze|test)|(pnpm|npm|yarn)([[:space:]]+run)?[[:space:]]+(lint|test|build)|ng[[:space:]]+(lint|test|build)|git[[:space:]]+(diff|log))([[:space:]]|$)'; then
-  exit 0
+# Generic: pytest, go test|build|vet, cargo test|build|check|clippy, gradle/gradlew/mvn,
+# docker build|compose, tsc, eslint, jest, vitest (bare names also match npx/python -m forms).
+CLASS_RE='(^|[;&|[:space:]])(flutter[[:space:]]+(test|analyze|build)|dart[[:space:]]+(format|analyze|test)|(pnpm|npm|yarn)([[:space:]]+run)?[[:space:]]+(lint|test|build)|ng[[:space:]]+(lint|test|build)|git[[:space:]]+(diff|log)|pytest|go[[:space:]]+(test|build|vet)|cargo[[:space:]]+(test|build|check|clippy)|(\./)?gradlew|gradle|mvn|docker[[:space:]]+(build|compose)|tsc|eslint|jest|vitest)([[:space:]]|$)'
+MATCHED=0
+printf '%s' "$CMD" | grep -qE "$CLASS_RE" && MATCHED=1
+if [ "$MATCHED" -eq 0 ] && [ -n "${DEVFLOW_FILTER_EXTRA:-}" ]; then
+  printf '%s' "$CMD" | grep -qE "$DEVFLOW_FILTER_EXTRA" 2>/dev/null && MATCHED=1
 fi
+[ "$MATCHED" -eq 1 ] || exit 0
 
 # Tool output may be a plain string or an object ({stdout, stderr, ...}).
 OUTPUT=$(printf '%s' "$RAW" | jq -r '

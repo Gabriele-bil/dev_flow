@@ -108,6 +108,8 @@ Always read:
 
 Then apply the **Technology skills** table in the active `ADAPTER.md`: load each listed `@devflow/adapters/.../SKILL.md` when its trigger matches the feature (DB, UI, forms, etc.).
 
+**Exploration (planning research):** structural questions about existing code (who calls X, where is Y, blast radius) → index-first per `@devflow/references/token-economy.md`: one semantic query when code-index MCP available; trust results, no re-grep. grep/Read only for what index does not cover.
+
 ### Step 2 - MCP usage
 
 Follow the **MCP** section of the active `ADAPTER.md` (tooling order and when to add optional servers).
@@ -235,6 +237,7 @@ Continue to implementation? -> devflow.implement
 | Reads | `constitution.md`, `registry.md`, `@devflow/adapters/common/skills/common-clean-code/SKILL.md` |
 | Reads (adapter) | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/plan.md`; technology skills per ADAPTER table |
 | Reads | `@devflow/references/complexity-scoring.md` (Step 4d — score + profile) |
+| Reads | `@devflow/references/token-economy.md` (Step 1 — index-first exploration) |
 | Writes | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads (conditional) | `DESIGN.md` / `docs/design.md` (Step 4e — existence check + UI tagging) |
 | Writes (optional) | `devflow/features/[NNN]_[feature-name]/data-model.md` (Step 4c — triggered when feature touches persistent entities) |

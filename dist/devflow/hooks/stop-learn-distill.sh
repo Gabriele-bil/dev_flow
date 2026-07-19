@@ -67,7 +67,8 @@ while IFS= read -r filepath; do
 
   if [ -n "$EXISTING_CONF" ] && [ "$EXISTING_CONF" != "null" ]; then
     # Bump confidence by 0.05, cap at 0.95
-    NEW_CONF=$(awk "BEGIN {v=$EXISTING_CONF+0.05; if(v>0.95) v=0.95; printf \"%.2f\", v}")
+    # LC_ALL=C: decimal-comma locales (it_IT, de_DE) break yq float assignment
+    NEW_CONF=$(LC_ALL=C awk -v c="$EXISTING_CONF" 'BEGIN {v=c+0.05; if(v>0.95) v=0.95; printf "%.2f", v}')
     yq -i \
       "(.instincts[] | select(.id == \"$INSTINCT_ID\") | .confidence) = $NEW_CONF |
        (.instincts[] | select(.id == \"$INSTINCT_ID\") | .ts) = \"$TS\"" \

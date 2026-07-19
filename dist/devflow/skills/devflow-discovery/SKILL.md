@@ -79,6 +79,10 @@ Tests passing, ready to merge?
 
 Current adapters: `flutter`, `angular`, `nextjs`. Common skills: `@devflow/adapters/common/skills/`.
 
+## Exploration Strategy (all steps)
+
+At orientation, detect code-index MCP (tokensave / codegraph / serena / LSP-based); note availability for session. Present → index-first rule: one semantic query before grep/Read for any structural question; trust results, no re-grep. Absent → grep/Read as usual. Full decision tree: `@devflow/references/token-economy.md`.
+
 ## Anti-Rationalization
 
 | Thought | Reality |
@@ -109,4 +113,5 @@ Current adapters: `flutter`, `angular`, `nextjs`. Common skills: `@devflow/adapt
 | --- | --- |
 | Injected by | `hooks/session-start.sh` at SessionStart |
 | Reads | Nothing — orientation only |
+| Reads (optional) | `@devflow/references/token-economy.md` — index-first exploration tree |
 | Leads to | Correct pipeline entry point for current state |

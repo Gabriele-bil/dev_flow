@@ -7,6 +7,7 @@ Skills must be:
 - **Specific** — actionable steps, not vague guidance
 - **Verifiable** — explicit input contract + completion checklist with evidence
 - **Token-lean** — caveman-compress style; no filler, articles, hedging
+- **Derive, don't dump** — skills running commands state derived answer + decisive lines, never wholesale output paste (`references/token-economy.md`)
 - **Pipeline-integrated** — I/O Reference table; explicit reads/writes/next-step
 
 ## Adding a Pipeline Skill
@@ -126,6 +127,16 @@ Keep: technical terms exact, file paths exact, commands exact, all verbs, negati
 - Runtime artifacts (`.tmp`, `.jsonl`, `.json`): append to `.gitignore` if `.gitignore` exists
 
 **Naming convention:** `<event>-<purpose>.sh` — e.g. `pre-config-protect.sh`, `stop-format-typecheck.sh`
+
+## Managed-Section Discipline (writes into consumer files)
+
+Any skill writing DevFlow content into consumer-owned files (`AGENTS.md`, `constitution.md`, settings):
+
+- Wrap owned content in `<!-- devflow-managed:start:<section-id> -->` / `<!-- devflow-managed:end:<section-id> -->`
+- Re-run replaces exactly the fenced region; user head/tail content preserved byte-for-byte; never append second copy
+- Markers absent but DevFlow-looking content present → surface conflict to user; never guess, never duplicate
+- Removal deletes fenced region only; delete file only if empty after removal
+- Add/remove exactly what you own — never clobber neighbouring user/tool sections; clean up empty parent keys only
 
 **Behavioral tests (required):** every hook manipulating consumer state gets a suite in `hooks/tests/test-<purpose>.sh` (plain bash asserts, temp-dir fixtures — copy structure from `test-pre-compact.sh`). Run all suites: `bash scripts/run-hook-tests.sh`. `bash -n` alone is not coverage.
 

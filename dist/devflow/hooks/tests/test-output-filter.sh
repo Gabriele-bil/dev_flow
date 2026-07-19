@@ -92,6 +92,32 @@ for cmd in "pnpm test -- --watchAll=false" "pnpm run lint" "npm run build" "ng t
     || assert "recognizes: $cmd" fail
 done
 
+# T5b: generic dev-tool command classes recognized
+echo "--- T5b: generic command class coverage ---"
+for cmd in "pytest -q tests/" "python -m pytest tests/unit" "go test ./..." "cargo test --workspace" "cargo clippy" "./gradlew build" "mvn package" "docker build -t app ." "docker compose up -d" "tsc --noEmit" "eslint src/" "npx jest --ci" "npx vitest run"; do
+  out=$(run_hook "Bash" "$cmd" "$(big_output 300)")
+  echo "$out" | jq -e '.hookSpecificOutput.updatedToolOutput' >/dev/null 2>&1 \
+    && assert "recognizes: $cmd" pass \
+    || assert "recognizes: $cmd" fail
+done
+
+# T5c: near-miss commands stay unfiltered
+echo "--- T5c: near-miss commands ignored ---"
+for cmd in "docker ps" "go version" "cat gradle.properties"; do
+  out=$(run_hook "Bash" "$cmd" "$(big_output 300)")
+  [ -z "$out" ] && assert "ignores: $cmd" pass || assert "ignores: $cmd" fail
+done
+
+# T5d: DEVFLOW_FILTER_EXTRA extends command classes
+echo "--- T5d: env-extended command class ---"
+out=$(DEVFLOW_FILTER_EXTRA='(^|[[:space:]])mytool[[:space:]]+build' run_hook "Bash" "mytool build --release" "$(big_output 300)")
+echo "$out" | jq -e '.hookSpecificOutput.updatedToolOutput' >/dev/null 2>&1 \
+  && assert "extra class recognized with env" pass \
+  || assert "extra class recognized with env" fail
+out=$(run_hook "Bash" "mytool build --release" "$(big_output 300)")
+[ -z "$out" ] && assert "extra class ignored without env" pass \
+  || assert "extra class ignored without env" fail
+
 # T6: object-shaped tool_response ({stdout, stderr})
 echo "--- T6: object tool_response ---"
 out=$(jq -cn --arg out "$(big_output 300)" \

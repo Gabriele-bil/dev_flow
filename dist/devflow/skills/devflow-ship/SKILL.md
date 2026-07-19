@@ -54,6 +54,7 @@ Each agent receives:
 - List of files created/modified by `devflow.implement` and `devflow.beautify`
 - Active adapter name (from `@devflow/config.md`)
 - Optional reviewer notes from `$ARGUMENTS`
+- Exploration + output rules: `@devflow/references/token-economy.md` (index-first when code-index MCP available; derive, don't dump)
 
 **Agents per depth profile:**
 
@@ -65,7 +66,7 @@ Each agent receives:
 
 Agent definitions:
 
-1. `@devflow/agents/code-reviewer.md` — six-axis code review (correctness, readability, architecture, security, performance, scope fidelity)
+1. `@devflow/agents/code-reviewer.md` — seven-axis code review (correctness, readability, architecture, security, performance, scope fidelity, simplicity)
 2. `@devflow/agents/security-auditor.md` — security audit
 3. `@devflow/agents/test-engineer.md` — coverage gap analysis
 4. `@devflow/agents/accessibility-auditor.md` — WCAG 2.1 AA audit (thorough only)
@@ -168,7 +169,7 @@ Execute `@devflow/skills/devflow-pr/SKILL.md` exactly.
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
 | Reads | Files from `devflow.implement` / `devflow.beautify` summary |
-| Reads | `@devflow/references/complexity-scoring.md` (depth profile → fan-out) |
+| Reads | `@devflow/references/complexity-scoring.md` (depth profile → fan-out), `@devflow/references/token-economy.md` (agent prompt rules) |
 | Reads (conditional) | `plan.md` `## Decision flags` (→ **Open Decision Flags** report section); `.devflow-run.json` (existence — never route to `devflow.pr` when present) |
 | Writes | `plan.md` — `**Status:** shipped` on gate pass |
 | Dispatches | review agents per depth profile — `quick`: `code-reviewer`; `standard`: + `security-auditor`, `test-engineer`; `thorough`: + `accessibility-auditor`, `docs-reviewer` (parallel) |

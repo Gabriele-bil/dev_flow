@@ -119,7 +119,7 @@ for ((i = 0; i < ${#SKILL_NAMES[@]}; i++)); do
     INTER=$(comm -12 "$FA" "$FB" | wc -l | tr -d ' ')
     UNION=$(cat "$FA" "$FB" | sort -u | wc -l | tr -d ' ')
     [[ "$UNION" -eq 0 ]] && continue
-    SIM=$(awk -v i="$INTER" -v u="$UNION" 'BEGIN { printf "%.2f", (i/u)*100 }')
+    SIM=$(LC_ALL=C awk -v i="$INTER" -v u="$UNION" 'BEGIN { printf "%.2f", (i/u)*100 }')
     SIM_INT=${SIM%.*}
     if [[ $SIM_INT -ge 75 ]]; then
       echo "  ERROR: $A <-> $B description similarity ${SIM}% (>=75%)"
