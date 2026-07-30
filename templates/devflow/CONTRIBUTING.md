@@ -10,6 +10,18 @@ Skills must be:
 - **Derive, don't dump** — skills running commands state derived answer + decisive lines, never wholesale output paste (`references/token-economy.md`)
 - **Pipeline-integrated** — I/O Reference table; explicit reads/writes/next-step
 
+## Choosing a Mechanism
+
+Three mechanisms, three jobs. Don't blur them.
+
+| Mechanism | Use for | Control | Example |
+| --- | --- | --- | --- |
+| **Hook** | Must run every time, no exceptions — safety, formatting, config protection | Deterministic — shell script, exit code decides | `pre-bash-destructive-guard.sh` blocks `rm -rf /` unconditionally |
+| **Skill** | Needs judgment, context, multi-step reasoning | Probabilistic — Claude follows workflow guidance | `devflow-ship` weighs findings, asks user on Critical |
+| **Command** | Thin entry point, no logic of its own | N/A — dispatches only | `devflow.ship.md`: "Use `@devflow/skills/devflow-ship/SKILL.md` and execute it exactly" |
+
+Rule of thumb: if skipping the check even once is unacceptable, it's a hook, not a skill instruction. Skills can be misread or rationalized around; hooks can't. Never put a hard safety rule only in skill prose — a determined agent (or a bad day) will talk itself past it. See Anthropic's "Steering Claude Code: Skills, Hooks, Rules, Subagents and More" for the underlying deterministic-vs-probabilistic framework.
+
 ## Adding a Pipeline Skill
 
 Location: `devflow/skills/devflow-<name>/SKILL.md`
@@ -100,10 +112,7 @@ Keep: technical terms exact, file paths exact, commands exact, all verbs, negati
 
 ## Adding Hooks
 
-**Hook vs skill:**
-
-- Hook: automated, runs on every tool call/session event, no user invocation needed
-- Skill: invoked explicitly by user or another skill, contains workflow guidance for Claude
+Hook vs skill vs command — see **Choosing a Mechanism** above.
 
 **Available events:**
 

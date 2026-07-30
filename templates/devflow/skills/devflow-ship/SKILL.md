@@ -84,6 +84,8 @@ Wait for **all dispatched** reports. Do not proceed until all complete.
 
 Merge findings across all dispatched reports. Deduplicate overlapping findings (same file:line from multiple reviewers → one merged entry, noting which reviewers flagged it).
 
+**Contradictions** — same file:line, opposite verdicts (one agent clears it, another flags it): keep the more severe verdict for gating, but surface the disagreement explicitly in **Reviewer Disagreements**. Never resolve a contradiction by silently dropping the dissenting verdict — the user decides, not the synthesis step.
+
 Produce a unified report:
 
 ```markdown

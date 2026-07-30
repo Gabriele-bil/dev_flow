@@ -35,6 +35,19 @@ if [ -z "$CHURNED_FILES" ]; then
   exit 0
 fi
 
+# ── Detect revert/reset activity in this session's window ──────────────────────
+# A revert/hard-reset/discard touching recently-churned files means the churn
+# signal (and any instinct distilled from it) was likely wrong — decay it
+# instead of reinforcing it. Reverts are remembered, not silently dropped.
+REVERT_CMD=$(
+  tail -n "$WINDOW_LINES" "$OBSERVE_LOG" 2>/dev/null \
+  | jq -r 'select(.event=="pre" and .tool=="Bash" and ((.cmd // "") != "") and
+      ((.cmd | test("git\\s+revert")) or
+       (.cmd | test("git\\s+reset\\s+.*--hard")) or
+       (.cmd | test("git\\s+(checkout|restore)\\s+(--\\s+)?\\.")))) | .cmd' 2>/dev/null \
+  | tail -1
+) || true
+
 # ── Ensure instincts file exists ──────────────────────────────────────────────
 if [ ! -f "$INSTINCTS_FILE" ]; then
   printf '%s\n' "# DevFlow project instincts" "instincts: []" > "$INSTINCTS_FILE"
@@ -66,15 +79,29 @@ while IFS= read -r filepath; do
     "$INSTINCTS_FILE" 2>/dev/null | head -1) || true
 
   if [ -n "$EXISTING_CONF" ] && [ "$EXISTING_CONF" != "null" ]; then
-    # Bump confidence by 0.05, cap at 0.95
-    # LC_ALL=C: decimal-comma locales (it_IT, de_DE) break yq float assignment
-    NEW_CONF=$(LC_ALL=C awk -v c="$EXISTING_CONF" 'BEGIN {v=c+0.05; if(v>0.95) v=0.95; printf "%.2f", v}')
-    yq -i \
-      "(.instincts[] | select(.id == \"$INSTINCT_ID\") | .confidence) = $NEW_CONF |
-       (.instincts[] | select(.id == \"$INSTINCT_ID\") | .ts) = \"$TS\"" \
-      "$INSTINCTS_FILE" 2>/dev/null || true
-  else
-    # Append new instinct stub
+    if [ -n "$REVERT_CMD" ]; then
+      # Contested: a revert/reset happened alongside churn on this file —
+      # decay confidence instead of reinforcing it. Floor 0.05, never delete.
+      REVERT_NOTE=$(printf '%s' "$REVERT_CMD" | cut -c1-80 | tr -d '"\\')
+      NEW_CONF=$(LC_ALL=C awk -v c="$EXISTING_CONF" 'BEGIN {v=c-0.2; if(v<0.05) v=0.05; printf "%.2f", v}')
+      yq -i \
+        "(.instincts[] | select(.id == \"$INSTINCT_ID\") | .confidence) = $NEW_CONF |
+         (.instincts[] | select(.id == \"$INSTINCT_ID\") | .contested) = true |
+         (.instincts[] | select(.id == \"$INSTINCT_ID\") | .evidence) = \"contested: $REVERT_NOTE\" |
+         (.instincts[] | select(.id == \"$INSTINCT_ID\") | .ts) = \"$TS\"" \
+        "$INSTINCTS_FILE" 2>/dev/null || true
+    else
+      # Bump confidence by 0.05, cap at 0.95
+      # LC_ALL=C: decimal-comma locales (it_IT, de_DE) break yq float assignment
+      NEW_CONF=$(LC_ALL=C awk -v c="$EXISTING_CONF" 'BEGIN {v=c+0.05; if(v>0.95) v=0.95; printf "%.2f", v}')
+      yq -i \
+        "(.instincts[] | select(.id == \"$INSTINCT_ID\") | .confidence) = $NEW_CONF |
+         (.instincts[] | select(.id == \"$INSTINCT_ID\") | .ts) = \"$TS\"" \
+        "$INSTINCTS_FILE" 2>/dev/null || true
+    fi
+  elif [ -z "$REVERT_CMD" ]; then
+    # Append new instinct stub — skip if a revert was seen this session, since
+    # a churn immediately followed by a revert is likely noise, not a real instinct.
     yq -i \
       ".instincts += [{\"id\": \"$INSTINCT_ID\", \"trigger\": \"$TRIGGER\", \"confidence\": 0.5, \"domain\": \"$DOMAIN\", \"scope\": \"project\", \"action\": \"$ACTION\", \"evidence\": \"churn: 1 session\", \"ts\": \"$TS\"}]" \
       "$INSTINCTS_FILE" 2>/dev/null || true

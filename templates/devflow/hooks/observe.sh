@@ -69,6 +69,13 @@ if [ "$EVENT" = "pre" ]; then
     FILE_PATH=$(printf '%s' "$RAW" | jq -r '.tool_use.input.file_path // empty' 2>/dev/null) || true
   fi
 
+  # For Bash tool: capture the command (truncated) so downstream analysis
+  # (e.g. revert/reset detection in stop-learn-distill.sh) can see it.
+  CMD=""
+  if [ "$TOOL" = "Bash" ]; then
+    CMD=$(printf '%s' "$RAW" | jq -r '.tool_use.input.command // empty' 2>/dev/null | cut -c1-300) || true
+  fi
+
   # Build JSON incrementally using jq to ensure proper escaping
   jq -cn \
     --arg ts      "$TS"      \
@@ -78,14 +85,16 @@ if [ "$EVENT" = "pre" ]; then
     --arg step    "$STEP"    \
     --arg feature "$FEATURE" \
     --arg file    "$FILE_PATH" \
+    --arg cmd     "$CMD"     \
     '{
       ts:      $ts,
       event:   $event,
       tool:    $tool,
-      session: (if $session != "" then $session else empty end),
-      step:    (if $step    != "" then $step    else empty end),
-      feature: (if $feature != "" then $feature else empty end),
-      file:    (if $file    != "" then $file    else empty end)
+      session: (if $session != "" then $session else null end),
+      step:    (if $step    != "" then $step    else null end),
+      feature: (if $feature != "" then $feature else null end),
+      file:    (if $file    != "" then $file    else null end),
+      cmd:     (if $cmd     != "" then $cmd     else null end)
     } | with_entries(select(.value != null))' \
     >> "$LOG_FILE" 2>/dev/null || true
 
@@ -103,8 +112,8 @@ elif [ "$EVENT" = "post" ]; then
       ts:       $ts,
       event:    $event,
       tool:     $tool,
-      session:  (if $session != "" then $session else empty end),
-      is_error: (if $is_error != null then $is_error else empty end)
+      session:  (if $session != "" then $session else null end),
+      is_error: (if $is_error != null then $is_error else null end)
     } | with_entries(select(.value != null))' \
     >> "$LOG_FILE" 2>/dev/null || true
 

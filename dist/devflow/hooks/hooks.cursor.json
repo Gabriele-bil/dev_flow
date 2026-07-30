@@ -29,6 +29,15 @@
         ]
       },
       {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${cursorPluginRoot}/hooks/pre-bash-destructive-guard.sh"
+          }
+        ]
+      },
+      {
         "matcher": "*",
         "hooks": [
           {

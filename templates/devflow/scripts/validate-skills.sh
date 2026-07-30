@@ -22,6 +22,11 @@ OK=0
 ERRORS=0
 WARNINGS=0
 
+# Valid devflow.<verb> targets: every command, plus core skills without a
+# matching command (e.g. devflow-discovery, invoked internally as devflow.discovery)
+VALID_VERBS=$( { ls "$PLUGIN_ROOT/commands" 2>/dev/null | sed 's/\.md$//'; \
+  ls "$PLUGIN_ROOT/skills" 2>/dev/null | sed -E 's/^devflow-/devflow./'; } | sort -u)
+
 echo "Validating $TOTAL skill files..."
 echo ""
 
@@ -139,6 +144,29 @@ for FILE in "${SKILL_FILES[@]}"; do
     # Line-count check: core skills over budget should extract to references/
     if ! echo "$REL" | grep -q "^adapters/" && [[ $LINES -gt 250 ]]; then
       FILE_WARNINGS+=("style: SKILL.md is $LINES lines (>250) — extract detail to references/<file>.md")
+    fi
+
+    # Dead-reference check: every @devflow/<path> must resolve to a real file/dir
+    while IFS= read -r REF; do
+      [[ -z "$REF" ]] && continue
+      REF_PATH="${REF#@devflow/}"
+      [[ "$REF_PATH" == *"..."* ]] && continue
+      if [[ "$REF_PATH" == */ ]]; then
+        [[ -d "$PLUGIN_ROOT/$REF_PATH" ]] || FILE_ERRORS+=("dead reference: $REF (no such directory)")
+      else
+        [[ -f "$PLUGIN_ROOT/$REF_PATH" ]] || FILE_ERRORS+=("dead reference: $REF (no such file)")
+      fi
+    done < <(grep -Eo '@devflow/[A-Za-z0-9/_.-]+' "$FILE" | sort -u)
+
+    # Dead-reference check: every bare devflow.<verb> mention must be a real command or skill
+    while IFS= read -r VERB; do
+      [[ -z "$VERB" ]] && continue
+      echo "$VALID_VERBS" | grep -qxF "$VERB" || FILE_ERRORS+=("dead reference: $VERB (no matching command or skill)")
+    done < <(grep -Eo 'devflow\.[a-z][a-z-]*' "$FILE" | sort -u)
+
+    # Hardcoded-secret check (heuristic, warning only — avoid false-positive CI breaks)
+    if grep -qEn "AKIA[0-9A-Z]{16}|sk-[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|(api[_-]?key|secret|password)[[:space:]]*[:=][[:space:]]*['\"][A-Za-z0-9_/+.=-]{16,}['\"]" "$FILE"; then
+      FILE_WARNINGS+=("security: possible hardcoded secret — review before committing")
     fi
   fi
 

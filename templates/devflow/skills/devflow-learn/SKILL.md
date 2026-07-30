@@ -88,7 +88,7 @@ Find instincts matching a keyword across trigger, action, and domain.
 
 ```bash
 yq -r \
-  '.instincts[] | select((.trigger + " " + .action + " " + (.domain // "")) | test("<QUERY>"; "i")) | "• [" + (.confidence | tostring) + " " + (.domain // "general") + "] " + .trigger + " → " + .action' \
+  '.instincts[] | select((.trigger + " " + .action + " " + (.domain // "")) | test("<QUERY>"; "i")) | (if .contested then "⚠ " else "• " end) + "[" + (.confidence | tostring) + " " + (.domain // "general") + "] " + .trigger + " → " + .action' \
   .devflow-instincts.yaml 2>/dev/null
 ```
 
@@ -105,11 +105,13 @@ Show all instincts, sorted by confidence descending.
 
 ```bash
 yq -r \
-  '.instincts // [] | sort_by(.confidence) | reverse | .[] | "• [" + (.confidence | tostring) + " " + (.domain // "general") + "] " + .trigger + " → " + .action' \
+  '.instincts // [] | sort_by(.confidence) | reverse | .[] | (if .contested then "⚠ " else "• " end) + "[" + (.confidence | tostring) + " " + (.domain // "general") + "] " + .trigger + " → " + .action' \
   .devflow-instincts.yaml 2>/dev/null
 ```
 
 If file missing or empty: "No instincts recorded yet for this project."
+
+`⚠` marks a **contested** instinct — an auto-detected churn signal that was followed by a `git revert`/`reset --hard`/discard in the same session. Confidence was decayed automatically (`stop-learn-distill.sh`, -0.2, floor 0.05); the entry is kept, not deleted, so the contradiction stays visible. Re-verify before boosting a contested instinct.
 
 ---
 

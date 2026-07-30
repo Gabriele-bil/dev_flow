@@ -58,7 +58,14 @@ if [[ -z "$ADAPTER" ]]; then
   done
 fi
 
-# Helper: run a command, emit result on stderr
+# Helper: run a command, emit result on stderr.
+# Output is capped (head+tail, MAX_OUTPUT_CHARS) to avoid dumping unbounded
+# lint/typecheck output into every Stop event — mirrors the cap applied to
+# regular Bash tool output in post-bash-output-filter.sh.
+MAX_OUTPUT_CHARS="${DEVFLOW_TYPECHECK_MAX_CHARS:-2500}"
+HEAD_LINES="${DEVFLOW_TYPECHECK_HEAD:-20}"
+TAIL_LINES="${DEVFLOW_TYPECHECK_TAIL:-15}"
+
 run_cmd() {
   local label="$1"
   shift
@@ -68,6 +75,18 @@ run_cmd() {
   if [[ $exit_code -eq 0 ]]; then
     printf '✓ %s: ok\n' "$label" >&2
   else
+    local chars=${#output}
+    if [[ "$chars" -gt "$MAX_OUTPUT_CHARS" ]]; then
+      local total
+      total=$(printf '%s\n' "$output" | wc -l | tr -d ' ')
+      output=$(printf '%s\n' "$output" | awk -v head="$HEAD_LINES" -v tail="$TAIL_LINES" -v total="$total" '
+        NR <= head || NR > total - tail { print; next }
+        { skipped++ }
+        END { }
+      ')
+      output="${output}
+  … [output truncated, ${chars} chars raw] …"
+    fi
     printf '⚠ %s issues:\n%s\n' "$label" "$output" >&2
   fi
   return 0

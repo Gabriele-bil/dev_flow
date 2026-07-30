@@ -63,6 +63,7 @@ Plan:        <plan_path>
 Status:      <plan_status>  →  next: <next_step>
 Progress:    <done>/<total> files done (<pending> remaining)
 Savings:     output filter kept <kept_chars> of <raw_chars> chars over <n> cmds (~<pct>% saved)
+Learnings:   <n> auto-detected (retry loops etc.) · <m> contested instincts — see devflow.learn list
 
 Pending files:
   - <file1>
@@ -105,6 +106,17 @@ jq -s '{n:length, raw:(map(.raw_chars)|add), kept:(map(.kept_chars)|add)}' .devf
 
 `pct = 100 * (1 - kept/raw)`, rounded. File absent → omit line, zero behavior change. Measured local data — use to accept/reject filter tuning (thresholds, command classes) instead of upstream claims.
 
+## Learnings line (optional)
+
+`Learnings:` line only when `.devflow-learnings.jsonl` or `.devflow-instincts.yaml` exists. Compute:
+
+```bash
+n=$(jq -s 'length' .devflow-learnings.jsonl 2>/dev/null || echo 0)
+m=$(yq '[.instincts[]? | select(.contested == true)] | length' .devflow-instincts.yaml 2>/dev/null || echo 0)
+```
+
+Both files absent → omit line, zero behavior change. Turns raw JSONL/YAML into a one-line headless summary instead of requiring manual `jq`/`yq` reads — full detail stays in `devflow.learn list`.
+
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
@@ -120,5 +132,6 @@ jq -s '{n:length, raw:(map(.raw_chars)|add), kept:(map(.kept_chars)|add)}' .devf
 | --- | --- |
 | Reads | `.devflow-state.json`, `devflow/config.md`, `devflow/features/*/plan.md`, `@devflow/references/state-machine.md`, `@devflow/references/status-schema.md` (`--json` mode) |
 | Reads (optional) | `.devflow-filter-stats.jsonl` — filter savings telemetry (Savings line) |
+| Reads (optional) | `.devflow-learnings.jsonl`, `.devflow-instincts.yaml` — auto-detected/contested learnings count (Learnings line) |
 | Writes | nothing |
-| Related | `devflow-discovery` (full pipeline orientation), `devflow-resume` (session re-entry), `devflow-recovery` (corrupted state) |
+| Related | `devflow-discovery` (full pipeline orientation), `devflow-resume` (session re-entry), `devflow-recovery` (corrupted state), `devflow-learn` (full learnings detail) |

@@ -76,11 +76,12 @@ Hooks are automation the agent doesn't have to remember. All in `templates/devfl
 | SessionStart | `session-start.sh` | Inject discovery skill + active-step context hint |
 | SessionStart | `session-start-learnings.sh` | Inject past learnings |
 | PreToolUse | `pre-config-protect.sh` | Block linter/analyzer config edits |
-| PreToolUse / PostToolUse | `observe.sh` | Tool-call log (`.devflow-observe.jsonl`) |
+| PreToolUse | `pre-bash-destructive-guard.sh` | Block catastrophic `rm -rf`, hard-reset/clean/discard, force-push to main/master, `commit --no-verify`/`--no-gpg-sign` |
+| PreToolUse / PostToolUse | `observe.sh` | Tool-call log (`.devflow-observe.jsonl`), Bash command capture, retry-loop detection |
 | PostToolUse | `post-edit-accumulate.sh` | Track modified files for batch checks |
 | PostToolUse | `post-task-create.sh` | Maintain feature-number counter |
 | PreCompact | `pre-compact.sh` | Snapshot plan progress → `.devflow-state.json` + resume reminder |
-| Stop | `stop-format-typecheck.sh` · `stop-debug-check.sh` · `stop-notify.sh` · `stop-learn-distill.sh` | Format/analyze, debug-print scan, notification, churn-based learning distillation |
+| Stop | `stop-format-typecheck.sh` · `stop-debug-check.sh` · `stop-notify.sh` · `stop-learn-distill.sh` | Format/analyze, debug-print scan, notification, churn-based learning distillation (decays/contests instincts followed by a same-session revert) |
 
 ## Adapter contract
 
