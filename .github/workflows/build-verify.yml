@@ -22,10 +22,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup jq
-        uses: jqlang/setup-jq@v1
-        with:
-          version: '1.7'
+      - name: Install jq
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq jq
 
       - name: Build plugin
         run: bash scripts/build-plugin.sh
