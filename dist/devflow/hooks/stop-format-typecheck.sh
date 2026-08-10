@@ -21,41 +21,69 @@ done < "$TMP_FILE"
 # Reset tmp file immediately for the next response
 rm -f "$TMP_FILE"
 
-# Detect adapter from devflow/config.md
-ADAPTER=""
 CONFIG_FILE="devflow/config.md"
 
-if [[ -f "$CONFIG_FILE" ]]; then
-  ADAPTER=$(grep -i '^\*\*Adapter:\*\*' "$CONFIG_FILE" | sed 's/\*\*Adapter:\*\*[[:space:]]*//' | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
+# Monorepo mode: devflow/config.md declares a `## Apps` table.
+IS_MONOREPO=""
+if [[ -f "$CONFIG_FILE" ]] && grep -q '^## Apps' "$CONFIG_FILE"; then
+  IS_MONOREPO=1
 fi
 
-# Auto-detect if adapter not found in config
-if [[ -z "$ADAPTER" ]]; then
-  for f in "${CHANGED_FILES[@]}"; do
-    if [[ "$f" == *.dart ]]; then
-      ADAPTER="flutter"
-      break
+# Detect adapter from devflow/config.md (single-app only — monorepo resolves
+# one adapter per app below instead of a single repo-wide adapter).
+ADAPTER=""
+if [[ -z "$IS_MONOREPO" ]]; then
+  if [[ -f "$CONFIG_FILE" ]]; then
+    ADAPTER=$(grep -i '^\*\*Adapter:\*\*' "$CONFIG_FILE" | sed 's/\*\*Adapter:\*\*[[:space:]]*//' | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
+  fi
+
+  # Auto-detect if adapter not found in config
+  if [[ -z "$ADAPTER" ]]; then
+    for f in "${CHANGED_FILES[@]}"; do
+      if [[ "$f" == *.dart ]]; then
+        ADAPTER="flutter"
+        break
+      fi
+    done
+  fi
+
+  if [[ -z "$ADAPTER" ]]; then
+    # Distinguish Next.js from Angular before falling back to .ts detection.
+    # Check for next.config.* in project root (most reliable signal).
+    if compgen -G "next.config.*" > /dev/null 2>&1; then
+      ADAPTER="nextjs"
+    elif [[ -f "package.json" ]] && grep -q '"next"' package.json 2>/dev/null; then
+      ADAPTER="nextjs"
     fi
-  done
-fi
+  fi
 
-if [[ -z "$ADAPTER" ]]; then
-  # Distinguish Next.js from Angular before falling back to .ts detection.
-  # Check for next.config.* in project root (most reliable signal).
-  if compgen -G "next.config.*" > /dev/null 2>&1; then
-    ADAPTER="nextjs"
-  elif [[ -f "package.json" ]] && grep -q '"next"' package.json 2>/dev/null; then
-    ADAPTER="nextjs"
+  if [[ -z "$ADAPTER" ]]; then
+    for f in "${CHANGED_FILES[@]}"; do
+      if [[ "$f" == *.ts ]]; then
+        ADAPTER="angular"
+        break
+      fi
+    done
   fi
 fi
 
-if [[ -z "$ADAPTER" ]]; then
-  for f in "${CHANGED_FILES[@]}"; do
-    if [[ "$f" == *.ts ]]; then
-      ADAPTER="angular"
-      break
-    fi
-  done
+# Monorepo: parse the `## Apps` table (App | Path | Adapter | Adapter root)
+# into parallel arrays. Rows are matched against changed-file paths below by
+# longest-prefix so each app's checks run scoped to its own directory.
+APP_NAMES=()
+APP_PATHS=()
+APP_ADAPTERS=()
+
+if [[ -n "$IS_MONOREPO" ]]; then
+  while IFS='|' read -r _ col1 col2 col3 _; do
+    name=$(echo "$col1" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    path=$(echo "$col2" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    adapter=$(echo "$col3" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | tr '[:upper:]' '[:lower:]')
+    [[ -z "$name" || "$name" == "App" || "$name" == ---* ]] && continue
+    APP_NAMES+=("$name")
+    APP_PATHS+=("$path")
+    APP_ADAPTERS+=("$adapter")
+  done < <(awk '/^## Apps/{f=1;next} /^## /{f=0} f && /^\|/' "$CONFIG_FILE")
 fi
 
 # Helper: run a command, emit result on stderr.
@@ -92,87 +120,101 @@ run_cmd() {
   return 0
 }
 
-case "$ADAPTER" in
-  flutter)
-    # Filter for .dart files
-    HAS_DART=0
+# Run format+analyze for one adapter, scoped to $cwd, over files in the
+# global GROUP_FILES array (caller sets it before calling). $cwd is "."
+# in single-app mode, so this is a no-op scoping change there.
+run_checks_for_adapter() {
+  local adapter="$1"
+  local cwd="$2"
+
+  (
+    cd "$cwd" || exit 0
+
+    case "$adapter" in
+      flutter)
+        HAS_DART=0
+        for f in "${GROUP_FILES[@]}"; do
+          if [[ "$f" == *.dart ]]; then
+            HAS_DART=1
+            break
+          fi
+        done
+        [[ $HAS_DART -eq 0 ]] && exit 0
+
+        if ! command -v dart &>/dev/null; then
+          printf '⚠ dart not found in PATH, skipping format+analyze\n' >&2
+          exit 0
+        fi
+
+        run_cmd "dart format" dart format . || true
+        run_cmd "dart analyze" timeout 60 dart analyze || true
+        ;;
+
+      nextjs)
+        HAS_TS=0
+        for f in "${GROUP_FILES[@]}"; do
+          if [[ "$f" == *.ts || "$f" == *.tsx ]]; then
+            HAS_TS=1
+            break
+          fi
+        done
+        [[ $HAS_TS -eq 0 ]] && exit 0
+
+        if ! command -v pnpm &>/dev/null; then
+          printf '⚠ pnpm not found in PATH, skipping lint+typecheck\n' >&2
+          exit 0
+        fi
+
+        run_cmd "pnpm lint" pnpm lint || true
+        run_cmd "pnpm exec tsc --noEmit" timeout 60 pnpm exec tsc --noEmit || true
+        ;;
+
+      angular)
+        HAS_TS=0
+        for f in "${GROUP_FILES[@]}"; do
+          if [[ "$f" == *.ts ]]; then
+            HAS_TS=1
+            break
+          fi
+        done
+        [[ $HAS_TS -eq 0 ]] && exit 0
+
+        if ! command -v pnpm &>/dev/null; then
+          printf '⚠ pnpm not found in PATH, skipping lint+typecheck\n' >&2
+          exit 0
+        fi
+
+        run_cmd "pnpm run lint" pnpm run lint || true
+        run_cmd "pnpm exec tsc --noEmit" timeout 60 pnpm exec tsc --noEmit || true
+        ;;
+
+      *)
+        printf '⚠ devflow: adapter "%s" not recognized or not detected, skipping format+analyze\n' "$adapter" >&2
+        ;;
+    esac
+  )
+}
+
+if [[ -n "$IS_MONOREPO" ]]; then
+  for i in "${!APP_NAMES[@]}"; do
+    app_path="${APP_PATHS[$i]}"
+    app_adapter="${APP_ADAPTERS[$i]}"
+    [[ -z "$app_path" ]] && continue
+
+    GROUP_FILES=()
     for f in "${CHANGED_FILES[@]}"; do
-      if [[ "$f" == *.dart ]]; then
-        HAS_DART=1
-        break
-      fi
+      case "$f" in
+        "$app_path"/*) GROUP_FILES+=("$f") ;;
+      esac
     done
+    [[ ${#GROUP_FILES[@]} -eq 0 ]] && continue
 
-    if [[ $HAS_DART -eq 0 ]]; then
-      printf '%s' "$RAW"
-      exit 0
-    fi
-
-    if ! command -v dart &>/dev/null; then
-      printf '⚠ dart not found in PATH, skipping format+analyze\n' >&2
-      printf '%s' "$RAW"
-      exit 0
-    fi
-
-    run_cmd "dart format" dart format . || true
-    run_cmd "dart analyze" timeout 60 dart analyze || true
-    ;;
-
-  nextjs)
-    # Filter for .ts / .tsx files
-    HAS_TS=0
-    for f in "${CHANGED_FILES[@]}"; do
-      if [[ "$f" == *.ts || "$f" == *.tsx ]]; then
-        HAS_TS=1
-        break
-      fi
-    done
-
-    if [[ $HAS_TS -eq 0 ]]; then
-      printf '%s' "$RAW"
-      exit 0
-    fi
-
-    if ! command -v pnpm &>/dev/null; then
-      printf '⚠ pnpm not found in PATH, skipping lint+typecheck\n' >&2
-      printf '%s' "$RAW"
-      exit 0
-    fi
-
-    run_cmd "pnpm lint" pnpm lint || true
-    run_cmd "pnpm exec tsc --noEmit" timeout 60 pnpm exec tsc --noEmit || true
-    ;;
-
-  angular)
-    # Filter for .ts files
-    HAS_TS=0
-    for f in "${CHANGED_FILES[@]}"; do
-      if [[ "$f" == *.ts ]]; then
-        HAS_TS=1
-        break
-      fi
-    done
-
-    if [[ $HAS_TS -eq 0 ]]; then
-      printf '%s' "$RAW"
-      exit 0
-    fi
-
-    if ! command -v pnpm &>/dev/null; then
-      printf '⚠ pnpm not found in PATH, skipping lint+typecheck\n' >&2
-      printf '%s' "$RAW"
-      exit 0
-    fi
-
-    run_cmd "pnpm run lint" pnpm run lint || true
-    run_cmd "pnpm exec tsc --noEmit" timeout 60 pnpm exec tsc --noEmit || true
-    ;;
-
-  *)
-    # Unknown or undetected adapter — skip silently
-    printf '⚠ devflow: adapter "%s" not recognized or not detected, skipping format+analyze\n' "$ADAPTER" >&2
-    ;;
-esac
+    run_checks_for_adapter "$app_adapter" "$app_path"
+  done
+else
+  GROUP_FILES=("${CHANGED_FILES[@]}")
+  run_checks_for_adapter "$ADAPTER" "."
+fi
 
 # Passthrough
 printf '%s' "$RAW"

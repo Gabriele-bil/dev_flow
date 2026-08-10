@@ -4,7 +4,7 @@ Used by `devflow.setup` Step 7c — after successful file writes, install depend
 
 Rules:
 
-1. Execute installs from the consumer project root only.
+1. Execute installs from the consumer project root only (single-app), or once per declared app from that app's own directory (monorepo — each app has its own manifest).
 2. Detect runtime first:
    - Flutter project: `pubspec.yaml` exists → use Flutter commands.
    - JavaScript project: `package.json` exists → detect package manager in order:

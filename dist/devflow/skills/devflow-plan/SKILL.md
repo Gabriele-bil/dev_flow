@@ -75,10 +75,11 @@ Feature numbering: IDs strictly incremental; never reuse prefix. Next = highest 
 
 ## Workflow
 
-### Step 0 - Resolve adapter
+### Step 0 - Resolve adapter + app
 
-1. Read `@devflow/config.md` — note Adapter id and root.
-2. Read `@devflow/adapters/<adapter>/ADAPTER.md` (core: technology skills, MCP) plus `@devflow/adapters/<adapter>/steps/plan.md` (plan extra sections, dependency ordering, localization). Legacy adapters without `steps/`: all sections live in `ADAPTER.md` — read it in full.
+1. Note `task.md`'s `**App:**` field if present (monorepo repos only).
+2. Resolve adapter, adapter root, and app working directory per `@devflow/references/adapter-resolution.md`. `task.md` monorepo but missing `**App:**` → hard stop, ask user.
+3. Read `@devflow/adapters/<adapter>/ADAPTER.md` (core: technology skills, MCP) plus `@devflow/adapters/<adapter>/steps/plan.md` (plan extra sections, dependency ordering, localization). Legacy adapters without `steps/`: all sections live in `ADAPTER.md` — read it in full.
 
 ### Step 0b - Constitution Gate
 
@@ -187,6 +188,8 @@ Read by `devflow.implement` (loads DESIGN.md for `[ui]` batches) and `devflow.be
 
 Create `devflow/features/[NNN]_[feature-name]/plan.md` using the template in `references/plan-template.md`. Sections in order: Overview, Architecture decisions, Risks and mitigations, Open questions, Traceability, File List, Implementation checkpoints, Adapter-specific sections, Edge Cases & Error Handling, Pre-implement checklist.
 
+Header: copy `**App:**` from `task.md` verbatim when present; omit the line entirely when absent (single-app repos) — never invent it.
+
 Format rules:
 
 - Adapter-specific sections: follow the adapter plan step file layout exactly (optional/required blocks, localization/data rules).
@@ -235,7 +238,7 @@ Continue to implementation? -> devflow.implement
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md` |
 | Reads | `constitution.md`, `registry.md`, `@devflow/adapters/common/skills/common-clean-code/SKILL.md` |
-| Reads (adapter) | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/plan.md`; technology skills per ADAPTER table |
+| Reads (adapter) | `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/plan.md`; technology skills per ADAPTER table |
 | Reads | `@devflow/references/complexity-scoring.md` (Step 4d — score + profile) |
 | Reads | `@devflow/references/token-economy.md` (Step 1 — index-first exploration) |
 | Writes | `devflow/features/[NNN]_[feature-name]/plan.md` |

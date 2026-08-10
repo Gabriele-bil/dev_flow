@@ -7,6 +7,7 @@ Used by `devflow.plan` Step 5 — write `devflow/features/[NNN]_[feature-name]/p
 
 **ID:** PLAN-[NNN]
 **Task:** [link to task.md]
+**App:** [name] <!-- omit entire line in single-app repos (no ## Apps table in devflow/config.md) -->
 **Date:** [YYYY-MM-DD]
 **Status:** ready
 **Complexity:** [N] ([quick | standard | thorough])

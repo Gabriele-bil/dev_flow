@@ -9,6 +9,7 @@ Machine-readable pipeline status for CI and scripts. `devflow.status --json` run
   "schema_version": 1,
   "generated_at": "2026-07-17T10:00:00Z",
   "adapter": "flutter",
+  "app": "",
   "feature": "003_user-profile",
   "plan_path": "devflow/features/003_user-profile/plan.md",
   "plan_status": "implementing",
@@ -26,7 +27,8 @@ Machine-readable pipeline status for CI and scripts. `devflow.status --json` run
 | --- | --- | --- |
 | `schema_version` | constant `1` | bump on breaking change to this file |
 | `generated_at` | emitter run time (UTC ISO-8601) | not `.devflow-state.json` `saved_at` |
-| `adapter` | `devflow/config.md` `**Adapter:**` line | `"unknown"` when unparsable |
+| `adapter` | `devflow/config.md` `**Adapter:**` line (single-app) or `## Apps` table row for the resolved app (monorepo) | `"unknown"` when unparsable |
+| `app` | `plan.md` `**App:**` line | `""` in single-app repos (no `## Apps` table) |
 | `feature`, `plan_path` | latest `devflow/features/*/plan.md` | most recently modified |
 | `plan_status` | `plan.md` `**Status:**` (authoritative) | legal values: `state-machine.md` |
 | `next_step` | status → step mapping in `state-machine.md` | |
@@ -55,6 +57,9 @@ Run by `devflow.status` Step 3-JSON. Requires `jq`.
 command -v jq >/dev/null 2>&1 || { echo '{"schema_version":1,"health":"no-pipeline","error":"jq missing"}'; exit 1; }
 [ -f devflow/config.md ] || { jq -n '{schema_version:1, health:"no-pipeline"}'; exit 1; }
 
+IS_MONOREPO=false
+grep -q '^## Apps' devflow/config.md 2>/dev/null && IS_MONOREPO=true
+
 ADAPTER=$(grep -m1 '^\*\*Adapter:\*\*' devflow/config.md 2>/dev/null | sed 's/^\*\*Adapter:\*\*[[:space:]]*//' | tr -d '\r' | sed 's/[[:space:]]*$//')
 [ -z "$ADAPTER" ] && ADAPTER="unknown"
 
@@ -62,6 +67,17 @@ PLAN_FILE=$(find devflow/features -name "plan.md" -type f 2>/dev/null | xargs ls
 [ -z "$PLAN_FILE" ] && { jq -n --arg a "$ADAPTER" '{schema_version:1, adapter:$a, health:"no-pipeline"}'; exit 1; }
 
 FEATURE=$(echo "$PLAN_FILE" | sed 's|devflow/features/||; s|/plan.md||')
+
+APP=""
+if [ "$IS_MONOREPO" = true ]; then
+  APP=$(grep -m1 '^\*\*App:\*\*' "$PLAN_FILE" 2>/dev/null | sed 's/^\*\*App:\*\*[[:space:]]*//' | tr -d '\r' | sed 's/[[:space:]]*$//')
+  if [ -n "$APP" ]; then
+    ADAPTER=$(awk -F'|' -v app="$APP" '{gsub(/^[ \t]+|[ \t]+$/, "", $2); gsub(/^[ \t]+|[ \t]+$/, "", $4); if ($2 == app) { print $4; exit }}' devflow/config.md)
+    [ -z "$ADAPTER" ] && ADAPTER="unknown"
+  else
+    ADAPTER="unknown"
+  fi
+fi
 PLAN_STATUS=$(grep -m1 '^\*\*Status:\*\*' "$PLAN_FILE" | sed 's/^\*\*Status:\*\*[[:space:]]*//' | tr -d '\r' | sed 's/[[:space:]]*$//')
 COMPLEXITY=$(grep -m1 '^\*\*Complexity:\*\*' "$PLAN_FILE" | grep -oE 'quick|standard|thorough' | head -1)
 [ -z "$COMPLEXITY" ] && COMPLEXITY="standard"
@@ -97,11 +113,11 @@ STATE_STATUS=$(jq -r '.plan_status // empty' .devflow-state.json 2>/dev/null)
 [ -n "$STATE_STATUS" ] && [ "$STATE_STATUS" != "$PLAN_STATUS" ] && DRIFT=true
 
 jq -n \
-  --arg a "$ADAPTER" --arg f "$FEATURE" --arg p "$PLAN_FILE" \
+  --arg a "$ADAPTER" --arg app "$APP" --arg f "$FEATURE" --arg p "$PLAN_FILE" \
   --arg s "$PLAN_STATUS" --arg n "$NEXT" --arg c "$COMPLEXITY" --arg h "$HEALTH" \
   --argjson done "$DONE" --argjson pending "$PENDING" --argjson pf "$PENDING_JSON" \
   --argjson ckpt "$CKPT" --argjson drift "$DRIFT" \
-  '{schema_version: 1, generated_at: (now | todate), adapter: $a, feature: $f,
+  '{schema_version: 1, generated_at: (now | todate), adapter: $a, app: $app, feature: $f,
     plan_path: $p, plan_status: $s, next_step: $n, complexity: $c,
     progress: {done: $done, pending: $pending, total: ($done + $pending)},
     pending_files: $pf, checkpoint_present: $ckpt, state_drift: $drift, health: $h}'

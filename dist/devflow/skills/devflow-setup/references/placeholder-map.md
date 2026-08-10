@@ -2,6 +2,8 @@
 
 Used by `devflow.setup` Step 4 (adapter defaults for constitution fields) and Step 5 (required placeholder fields).
 
+**Monorepo mode:** `product-name`, `product-domain`, `target-users`, `primary-outcome`, and `feature-[N]-*` fields are collected **once, globally**. `format-cmd`, `analyze-cmd`, `test-cmd`, `naming-rule`/`naming-conventions`, `pattern-N-*`, `layer-order`, `layer-N-*`, `import-conventions`, `key-decisions` are collected **once per declared app** — same field names, one full set per app, rendered into that app's own `constitution-<app-name>` block (see SKILL.md Step 6).
+
 ## Constitution field adapter defaults
 
 Use when the questionnaire answer is empty or `[TODO: fill]`.

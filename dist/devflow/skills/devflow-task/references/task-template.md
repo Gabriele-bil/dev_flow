@@ -1,6 +1,6 @@
 # Task file template
 
-Used by `devflow.task` Step 8 — write `devflow/features/[NNN]_[feature-name]/task.md` using this format.
+Used by `devflow.task` Step 9 — write `devflow/features/[NNN]_[feature-name]/task.md` using this format.
 
 ```markdown
 # Task - [Feature Name]
@@ -8,6 +8,7 @@ Used by `devflow.task` Step 8 — write `devflow/features/[NNN]_[feature-name]/t
 **ID:** TASK-[NNN]
 **Date:** [YYYY-MM-DD]
 **Status:** draft
+**App:** [name] <!-- omit entire line when devflow/config.md has no ## Apps table (single-app repos) -->
 
 ---
 
@@ -83,5 +84,6 @@ Format rules:
 - **Compression**: caveman-compress — drop articles/filler/hedging; fragments OK; keep technical terms/paths/commands exact.
 - **Unknown values**: use `[NEEDS CLARIFICATION: <reason>]` inline; never guess. No variants of this format.
 - **Status**: `draft` (initial), `clarified` (post `devflow.clarify`), `done` (pipeline complete).
+- **App**: present only in monorepo repos (`devflow/config.md` has a `## Apps` table); value must match an App name in that table exactly. Never present in single-app repos.
 
 See **`examples.md`** in this skill directory for full worked examples.

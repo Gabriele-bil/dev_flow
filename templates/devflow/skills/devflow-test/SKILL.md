@@ -49,7 +49,7 @@ Files from `devflow.implement` + `devflow.beautify` + `devflow/features/[NNN]_[f
 
 ### Step 0 - Resolve adapter
 
-Read `@devflow/config.md`, then `@devflow/adapters/<adapter>/ADAPTER.md` (core) plus `@devflow/adapters/<adapter>/steps/test.md`. Legacy adapters without `steps/`: the **Test** section lives in `ADAPTER.md`. The test step file defines placement, frameworks, coverage expectations, and shell commands — follow it exactly for this run.
+Resolve adapter, adapter root, and app working directory per `@devflow/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `@devflow/adapters/<adapter>/ADAPTER.md` (core) plus `@devflow/adapters/<adapter>/steps/test.md`. Legacy adapters without `steps/`: the **Test** section lives in `ADAPTER.md`. The test step file defines placement, frameworks, coverage expectations, and shell commands — follow it exactly for this run (monorepo: run test commands from the resolved app's working directory).
 
 ### Step 1 - Read docs
 
@@ -198,7 +198,7 @@ Wait for user choice before continuing. **Run mode** (`.devflow-run.json` presen
 | --- | --- |
 | Reads | files from `devflow.implement` / `devflow.beautify` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
-| Reads | `constitution.md`, `registry.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/test.md` |
+| Reads | `constitution.md`, `registry.md`, `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/test.md` |
 | Reads | `@devflow/references/verification-levels.md` (Step 6b), `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status), `@devflow/references/complexity-scoring.md` (depth profile), `@devflow/references/token-economy.md` (output discipline) |
 | Reads (conditional) | `.devflow-run.json` (existence — run-mode switch) |
 | Reads (optional) | `@devflow/references/testing-patterns.md` — stack-agnostic patterns reference |

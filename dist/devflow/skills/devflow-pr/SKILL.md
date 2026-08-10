@@ -23,7 +23,7 @@ Commit all changes, push feature branch, open PR to `main`. Final DevFlow step.
 
 ## Step 0 - Resolve adapter
 
-Read `@devflow/config.md`, then `@devflow/adapters/<adapter>/ADAPTER.md` (core) plus `@devflow/adapters/<adapter>/steps/pr.md`. Legacy adapters without `steps/`: the **PR** section lives in `ADAPTER.md`. Use the PR step file for pre-push verification commands, expected success output, and checklist items that must appear in the PR body.
+Resolve adapter, adapter root, and app working directory per `@devflow/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `@devflow/adapters/<adapter>/ADAPTER.md` (core) plus `@devflow/adapters/<adapter>/steps/pr.md`. Legacy adapters without `steps/`: the **PR** section lives in `ADAPTER.md`. Use the PR step file for pre-push verification commands, expected success output, and checklist items that must appear in the PR body (monorepo: run verification commands from the resolved app's working directory).
 
 ---
 
@@ -172,7 +172,7 @@ DevFlow pipeline complete for TASK-[NNN].
 
 | | |
 | --- | --- |
-| Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/pr.md` |
+| Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/pr.md` |
 | Runs | `git add .` · `git commit` · `git push` · `gh pr create` |
 | Deletes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json`, `devflow/features/[NNN]_[feature-name]/handoff.md` (before staging) |
 | Writes | `plan.md` `**Status:** pr-opened`, `task.md` `**Status:** done` |

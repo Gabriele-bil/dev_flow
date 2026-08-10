@@ -31,21 +31,11 @@ jq -n \
 
 ok ".antigravity-plugin/plugin.json generato (v$VERSION)"
 
-# Copia plugin.json anche alla radice del plugin (richiesto da agy plugin validate/install)
-step "Copia plugin.json alla radice di dist/"
-cp "$DIST_DIR/.antigravity-plugin/plugin.json" "$DIST_DIR/plugin.json"
-ok "plugin.json copiato alla radice"
-
-# Genera hooks.json alla radice (richiesto da agy plugin validate/install)
-step "Generazione hooks.json alla radice"
-
-if [ -f "$TEMPLATE_DIR/hooks/hooks.json" ]; then
-  sed 's|\${CLAUDE_PLUGIN_ROOT}|\${ANTIGRAVITY_PLUGIN_ROOT}|g' \
-    "$TEMPLATE_DIR/hooks/hooks.json" > "$DIST_DIR/hooks.json"
-  ok "hooks.json generato alla radice"
-else
-  warn "hooks/hooks.json non trovato — hooks.json non generato alla radice"
-fi
+# NB: plugin.json e hooks.json NON vanno copiati alla radice di dist/devflow —
+# quella radice è anche il plugin root che Claude Code installa, e un
+# hooks.json lì con ANTIGRAVITY_PLUGIN_ROOT (mai valorizzata da Claude Code)
+# rompe silenziosamente tutti gli hook del plugin Claude Code ad ogni sessione.
+# Manifest e hook Antigravity restano confinati a .antigravity-plugin/.
 
 # Genera hooks.antigravity.json (sostituisce variabile plugin root)
 step "Generazione hooks/hooks.antigravity.json"

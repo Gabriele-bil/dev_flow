@@ -29,7 +29,7 @@ Recover a blocked or corrupted pipeline by reading `.devflow-state.json`, inspec
 ## Input contract
 
 - [ ] `.devflow-state.json` exists (or explicitly missing — that is the failure)
-- [ ] `devflow/config.md` present (adapter known)
+- [ ] `devflow/config.md` present (adapter known; monorepo: `plan.md`'s App resolves in the `## Apps` table)
 - Failure condition: both files absent → inform user: "DevFlow not initialized. Run `/devflow.setup`"
 
 ## Workflow
@@ -61,6 +61,7 @@ Determine failure category based on state + file existence:
 | **C — State missing** | `.devflow-state.json` absent | Infer state from feature files; reconstruct |
 | **D — Feature missing** | State references feature that doesn't exist | Reset state; list remaining features |
 | **E — Adapter mismatch** | `devflow/config.md` adapter differs from plan requirements | Surface conflict; user decides |
+| **F — App mismatch** | Monorepo: `plan.md`'s `**App:**` missing, or not a row in `devflow/config.md`'s `## Apps` table | Surface conflict; ask user to pick a valid app or fix `plan.md` |
 
 ### Step 3 — Diagnose (read, do not modify)
 
@@ -182,7 +183,7 @@ Next command: [exact command to continue]
 | --- | --- |
 | Reads | `.devflow-state.json`, `.devflow-observe.jsonl`, `.devflow-learnings.jsonl`, `devflow/features/*/.checkpoint.json` |
 | Reads | `devflow/features/*/task.md`, `devflow/features/*/plan.md` |
-| Reads | `devflow/config.md`, `@devflow/references/state-machine.md` |
+| Reads | `devflow/config.md`, `@devflow/references/adapter-resolution.md`, `@devflow/references/state-machine.md` |
 | Writes | `.devflow-state.json` (only on user-confirmed resync) |
 | Related | `devflow-status` (non-recovery status check), `devflow-resume` (clean session re-entry), `devflow-discovery` (session orientation) |
 | Next step | Whichever pipeline step the recovery routes to |

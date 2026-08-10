@@ -1,6 +1,7 @@
 ---
 name: devflow-task
 description: Transforms raw idea into DevFlow task.md with HMW framing, scope, assumptions, subtasks. Use when user asks to create a task, start the pipeline, run devflow.task, or provides a feature idea.
+argument-hint: [--app <name>]
 ---
 
 # Skill: devflow.task
@@ -29,7 +30,16 @@ Turn raw idea into structured task. Read product context, output user story + su
 
 ## Workflow
 
-### Step 1 - Read context
+### Step 1 - Resolve target app (monorepo only)
+
+1. Read `@devflow/config.md`.
+2. No `## Apps` heading → single-app repo. Skip this step entirely — no app question, no `**App:**` field anywhere downstream. This is the zero-migration path; do not add any monorepo behavior here.
+3. `## Apps` heading present:
+   - `--app <name>` in `$ARGUMENTS` → validate against the table's App column. Unknown name → list valid names from the table, ask again — never guess.
+   - No `--app` → ask ("Which app is this feature for?") using **`AskQuestion`** with the table's App names as options, or list them in chat if unavailable.
+   - Keep the resolved app name for Step 2 (constitution scoping), Step 9 (task.md write), and Step 10 (`docs/product.md` write).
+
+### Step 2 - Read context
 
 Read in order:
 
@@ -40,15 +50,17 @@ Read in order:
 | **`registry.md`** (as needed)     | Shared patterns: breakpoints, dashboard shell, navigation, reusable recipes      |
 | **`DESIGN.md`** (if present)      | Design system (or `docs/design.md`) — UI ideas inherit its tokens; plan tags UI  |
 
+Monorepo (`## Apps` present in `config.md`): scope `constitution.md` to the shared managed block plus the resolved app's `constitution-<app-name>` managed block only — not the whole file.
+
 Optional: use `Glob`, `Grep`, and `Read` on the codebase to ground the task in existing modules and avoid silent duplication of behavior.
 
-### Step 2 - Classify input
+### Step 3 - Classify input
 
 - **Clear enough** — skip to Step 4 unless material unknowns remain.
 - **Ambiguous or multi-directional** — before subtasks: produce **one** crisp **How Might We** line and use Step 3 to nail actor, success, and boundaries (no full ideation pass).
 - **Brainstorm-scale** (no concrete problem or user) — stop and point the user to **`ce-brainstorm`** or **`idea-refine`**; resume `devflow-task` when they have a single direction.
 
-### Step 3 - Clarification questions (optional)
+### Step 4 - Clarification questions (optional)
 
 Stop and ask before writing the task if:
 
@@ -62,11 +74,11 @@ Rules:
 - Use **`AskQuestion`** tool if available; otherwise ask in chat
 - Skip entirely if the idea is already clear enough
 
-### Step 4 - Quick stress-test
+### Step 5 - Quick stress-test
 
 Read **`refinement-hints.md`**, run 8D pass (user value, feasibility, overlap, scope honesty, riskiest assumption, edge cases, integration, terminology); push back if scope too large.
 
-### Step 5 - Propose feature name
+### Step 6 - Propose feature name
 
 Propose 3 `kebab-case` names:
 
@@ -75,7 +87,7 @@ Propose 3 `kebab-case` names:
 
 Use **`AskQuestion`** with three options if available; otherwise list names and wait.
 
-### Step 6 - Determine incremental number
+### Step 7 - Determine incremental number
 
 **Fast path:** Read `.devflow-state.json` in project root.
 If `next_feature_number` present, use it — no further lookup.
@@ -87,7 +99,7 @@ Critical rule:
 - Never reuse an existing prefix.
 - `.devflow-state.json` updated by hook on each `task.md` write — always current.
 
-### Step 7 - Verification checklist (before write)
+### Step 8 - Verification checklist (before write)
 
 - [ ] **How Might We** line is present and neither too broad nor solution-embedded
 - [ ] Target **user** matches product actors; **user story** matches Summary
@@ -96,24 +108,25 @@ Critical rule:
 - [ ] **In scope / Out of scope** are honest for non-trivial ideas; **Key assumptions** filled when risks exist
 - [ ] No duplicate of an **implemented** feature unless explicitly framed as extension
 - [ ] No unresolved `[NEEDS CLARIFICATION: ...]` markers remain (or each is documented as an explicit accepted risk in Notes)
+- [ ] `config.md` has `## Apps` → **App** resolved (Step 1) and will be written; absent → no App field anywhere in the output
 
 If any item fails, fix the task content before writing the file.
 
-### Step 8 - Write task file
+### Step 9 - Write task file
 
-Create `devflow/features/[NNN]_[feature-name]/task.md` using template + format rules in `references/task-template.md`. See **`examples.md`** in this skill directory for full worked examples.
+Create `devflow/features/[NNN]_[feature-name]/task.md` using template + format rules in `references/task-template.md`. Write the `**App:**` frontmatter field with the Step 1 resolution when `config.md` has `## Apps`; omit the line entirely otherwise. See **`examples.md`** in this skill directory for full worked examples.
 
-### Step 9 - Update docs/product.md feature status
+### Step 10 - Update docs/product.md feature status
 
 After writing `task.md`, update `docs/product.md` **Feature status** table:
 
-- New feature: add row, status `in-progress`, short note
+- New feature: add row, status `in-progress`, short note; when monorepo, fill the **App** column with the Step 1 resolution
 - Existing `planned`: update to `in-progress`
 - Do not touch rows/sections outside `devflow-managed:feature-status` block
 
 If `docs/product.md` absent, skip and note in notify.
 
-### Step 10 - Notify user
+### Step 11 - Notify user
 
 Respond using template in `references/notify-template.md`.
 
@@ -138,6 +151,6 @@ Respond using template in `references/notify-template.md`.
 
 |           |                                                                                                                                               |
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Reads     | `docs/product.md` (required); `constitution.md`, `registry.md` (as needed); `DESIGN.md` / `docs/design.md` (if present); `refinement-hints.md` (Step 4); `examples.md` (optional guidance); `references/task-template.md`, `references/notify-template.md` |
+| Reads     | `devflow/config.md` (Apps table, monorepo only); `docs/product.md` (required); `constitution.md`, `registry.md` (as needed); `DESIGN.md` / `docs/design.md` (if present); `refinement-hints.md` (Step 4); `examples.md` (optional guidance); `references/task-template.md`, `references/notify-template.md` |
 | Writes    | `devflow/features/[NNN]_[feature-name]/task.md`                                                                                               |
 | Next step | `devflow.plan` → `plan.md` (full template in `devflow/skills/devflow-plan/SKILL.md`)                                                          |

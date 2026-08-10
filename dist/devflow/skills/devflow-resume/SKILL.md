@@ -28,7 +28,7 @@ Resume an interrupted pipeline at the exact position it stopped. Promotes the re
 
 ## Input contract
 
-- [ ] `devflow/config.md` exists (adapter known)
+- [ ] `devflow/config.md` exists (adapter known; monorepo: `plan.md`'s App resolves in the `## Apps` table — see `@devflow/references/adapter-resolution.md`)
 - [ ] `.devflow-state.json` exists OR at least one `devflow/features/*/plan.md` exists
 
 Both absent → stop: "Nothing to resume. Start with `/devflow.task` (or `/devflow.setup` on a new project)."
@@ -84,6 +84,7 @@ Present, then WAIT for user confirmation:
 📍 Resume position
 
 Feature:     [NNN]_[feature-name]
+App:         [app]   <!-- monorepo only, from plan.md's App field; omit line in single-app -->
 Plan status: [status]  →  next: [next_step]
 Progress:    [done]/[total] files done
 First pending: [file path, if mid-implement]
@@ -125,7 +126,7 @@ After position confirmed: delete consumed `handoff.md` (`rm -f devflow/features/
 
 | | |
 | --- | --- |
-| Reads | `.devflow-state.json`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md` (existence), `devflow/features/[NNN]_[feature-name]/.checkpoint.json` (working context), `devflow/features/[NNN]_[feature-name]/handoff.md` (context-pressure handoff), `.devflow-run.json` (stale-marker check), `devflow/config.md` |
+| Reads | `.devflow-state.json`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md` (existence), `devflow/features/[NNN]_[feature-name]/.checkpoint.json` (working context), `devflow/features/[NNN]_[feature-name]/handoff.md` (context-pressure handoff), `.devflow-run.json` (stale-marker check), `devflow/config.md`, `@devflow/references/adapter-resolution.md` |
 | Reads | `@devflow/references/state-machine.md` — status/transition source of truth |
 | Deletes | `handoff.md` (after position confirmed), stale `.devflow-run.json` (unless user re-arms `devflow.run`) |
 | Writes | nothing else (routing only) |

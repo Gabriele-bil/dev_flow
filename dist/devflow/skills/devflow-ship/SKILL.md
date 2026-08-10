@@ -52,7 +52,7 @@ Each agent receives:
 
 - Path to `task.md` and `plan.md`
 - List of files created/modified by `devflow.implement` and `devflow.beautify`
-- Active adapter name (from `@devflow/config.md`)
+- Active adapter name and app working directory (resolved per `@devflow/references/adapter-resolution.md`)
 - Optional reviewer notes from `$ARGUMENTS`
 - Exploration + output rules: `@devflow/references/token-economy.md` (index-first when code-index MCP available; derive, don't dump)
 
@@ -169,7 +169,7 @@ Execute `@devflow/skills/devflow-pr/SKILL.md` exactly.
 
 | | |
 | --- | --- |
-| Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
+| Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md`, `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
 | Reads | Files from `devflow.implement` / `devflow.beautify` summary |
 | Reads | `@devflow/references/complexity-scoring.md` (depth profile → fan-out), `@devflow/references/token-economy.md` (agent prompt rules) |
 | Reads (conditional) | `plan.md` `## Decision flags` (→ **Open Decision Flags** report section); `.devflow-run.json` (existence — never route to `devflow.pr` when present) |

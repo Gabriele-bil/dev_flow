@@ -16,7 +16,7 @@ Use `@devflow/skills/devflow-implement/SKILL.md` and execute it exactly.
   - disallowed dirty state: unrelated source/config changes
 - If dirty state is allowed, do **not** block the run; avoid destructive cleanup and follow the skill's branch fallback rules.
 - Implement files in **File list** order only.
-- Read `@devflow/config.md` and the active adapter core (`ADAPTER.md`) + `steps/implement.md` for MCP usage and verify commands.
+- Resolve adapter and app working directory per `@devflow/references/adapter-resolution.md`, then read the active adapter core (`ADAPTER.md`) + `steps/implement.md` for MCP usage and verify commands.
 - Run format, analyze/typecheck, and conditional codegen per the skill and the adapter implement step file; hand off only when analyze is clean or remaining issues are explicitly documented.
 - If those steps still fail after the skill’s retry budget, stop ad-hoc patching and follow **systematic debugging** (e.g. superpowers `systematic-debugging`) before continuing.
 

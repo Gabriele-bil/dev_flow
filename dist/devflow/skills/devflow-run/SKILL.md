@@ -149,7 +149,7 @@ Next (human): devflow.ship — reviews code AND open flags
 
 | | |
 | --- | --- |
-| Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `plan.md`, `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
+| Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `plan.md`, `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
 | Reads | `@devflow/references/state-machine.md` (run marker + handoff schemas), `@devflow/references/escalation-ladder.md` (failure bounds) |
 | Writes | `.devflow-run.json` — armed Step 0, deleted Step 3 (every exit path) |
 | Writes | `plan.md` — `## Decision flags` entries |

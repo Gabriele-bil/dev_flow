@@ -322,6 +322,9 @@ references:
   - id: token-economy
     path: references/token-economy.md
     description: "Token economy rules — index-first exploration decision tree (code-index MCP before grep/Read, trust results) and derive-don't-dump output discipline for build/test/diff steps"
+  - id: adapter-resolution
+    path: references/adapter-resolution.md
+    description: "Adapter and app resolution rules for single-app and monorepo mode — mode detection, adapter/app lookup from config.md and plan.md, working-directory scoping. Single source of truth for every skill that needs the active adapter"
 
 hooks:
   - event: SessionStart

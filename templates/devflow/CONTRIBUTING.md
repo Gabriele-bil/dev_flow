@@ -67,6 +67,18 @@ Additional requirements:
 5. Add setup templates under `adapters/<name>/templates/` (`AGENTS.template.md`, `REGISTRY.template.md`, `PRODUCT.template.md`)
 6. Document in root `README.md`
 
+Adapters stay single-stack and path-agnostic — never add monorepo-aware branching inside an adapter contract. Monorepo composition (which apps exist, which adapter each uses, which app a feature targets) lives entirely in `devflow/config.md`'s `## Apps` table, `task.md`/`plan.md`'s `**App:**` field, and `@devflow/references/adapter-resolution.md` — not in `ADAPTER.md`.
+
+## Monorepo Support
+
+DevFlow supports monorepos with multiple applications, each on its own adapter. This is zero-migration for existing single-app repos: absence of a `## Apps` table in `devflow/config.md` means single-app behavior, byte-identical to before.
+
+- `devflow/config.md` gains an optional `**Mode:** monorepo` line + `## Apps` table (`App | Path | Adapter | Adapter root`), written by `devflow-setup`. Apps are declared explicitly by the user during setup — never auto-scanned or inferred from folder conventions like `apps/<name>/`.
+- `task.md` and `plan.md` gain an optional `**App:**` header field — the single source of truth for which app a feature targets. Set once in `devflow-task` (asked, or via `--app <name>`), then propagated verbatim by `devflow-plan` into `plan.md`; every downstream skill reads it from `plan.md`, never re-resolves it from `task.md`.
+- **Any skill that needs to know the active adapter or app working directory must resolve it via `@devflow/references/adapter-resolution.md`** — never inline a `**Adapter:**` grep or hardcode a single adapter assumption. That file is the sole owner of mode detection, adapter/app resolution, and the working-directory scoping rule (`(cd "<app-path>" && <command>)`).
+- Template files (`AGENTS.template.md`, `REGISTRY.template.md`, `PRODUCT.template.md`, `CONSTITUTION.template.md`) are never forked per mode — all monorepo rendering logic (per-app constitution blocks, pointer lines instead of duplicated tables) lives in `devflow-setup/SKILL.md` prose, per the hook-vs-skill business-logic rule above.
+- Missing `**App:**` on a monorepo feature is a hard stop, never a guess — surface it and ask.
+
 ## Naming Conventions
 
 | Type | Convention | Example |

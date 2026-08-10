@@ -49,7 +49,7 @@ Files from `devflow.implement` summary + `devflow/features/[NNN]_[feature-name]/
 
 ### Step 0 - Resolve adapter
 
-Read `@devflow/config.md`, then `@devflow/adapters/<adapter>/ADAPTER.md` (core) plus `@devflow/adapters/<adapter>/steps/beautify.md`. Legacy adapters without `steps/`: the **Beautify** sections live in `ADAPTER.md`. Use the beautify step file's commands and stack-specific review axes.
+Resolve adapter, adapter root, and app working directory per `@devflow/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `@devflow/adapters/<adapter>/ADAPTER.md` (core) plus `@devflow/adapters/<adapter>/steps/beautify.md`. Legacy adapters without `steps/`: the **Beautify** sections live in `ADAPTER.md`. Use the beautify step file's commands and stack-specific review axes (monorepo: run commands from the resolved app's working directory).
 
 ### Step 1 - Read docs
 
@@ -225,5 +225,5 @@ Continue to testing? -> devflow.test
 | Writes | improvements to existing files only (no new files) |
 | Writes | `plan.md` — `**Status:** beautified`, `## Decision flags` (run mode — opinable candidates) |
 | Next step | `devflow.test` |
-| Reads (adapter) | `@devflow/config.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/beautify.md` |
+| Reads (adapter) | `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/beautify.md` |
 | Related skills | Per active `ADAPTER.md` → **Technology skills** |

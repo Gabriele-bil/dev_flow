@@ -37,18 +37,18 @@ Emit compact status dashboard. Answers "dove sono nel pipeline?" — no step exe
 Priority order:
 
 1. `.devflow-state.json` in CWD — most recent state, saved by pre-compact hook
-2. `devflow/config.md` — active adapter
+2. `devflow/config.md` — active adapter (single-app) or `## Apps` table (monorepo)
 3. `devflow/features/*/plan.md` — find most recent via `ls -t`; parse progress from plan if `.devflow-state.json` absent
 
-Status semantics and next-step mapping: `@devflow/references/state-machine.md` (authoritative).
+Status semantics and next-step mapping: `@devflow/references/state-machine.md` (authoritative). Adapter/app resolution: `@devflow/references/adapter-resolution.md`.
 
 ### Step 2 — List active features
 
 Scan `devflow/features/`. For each directory found:
 
 - Extract feature ID and name from directory name (`NNN_name` pattern)
-- Check if `plan.md` exists; if yes, read its `Status:` field
-- Collect list: `[id_name, status]`
+- Check if `plan.md` exists; if yes, read its `Status:` field and (monorepo only) its `App:` field
+- Collect list: `[id_name, status, app]` (`app` empty in single-app repos)
 
 ### Step 3 — Emit dashboard
 
@@ -58,6 +58,7 @@ Scan `devflow/features/`. For each directory found:
 DevFlow Status
 
 Adapter:     <adapter>
+App:         <app>   <!-- monorepo only, omit line in single-app -->
 Feature:     <feature>
 Plan:        <plan_path>
 Status:      <plan_status>  →  next: <next_step>
@@ -71,7 +72,7 @@ Pending files:
   ...
 
 All features:
-  <id_name>   [<status>]
+  <id_name>   [<status>]   [<app>]   <!-- [<app>] tag omitted in single-app -->
   ...
 
 Commands:
@@ -84,7 +85,7 @@ Commands:
 ```text
 DevFlow Status
 
-Adapter: <adapter>
+Adapter: <adapter>   <!-- monorepo: "Apps: <N> configured (web→nextjs, mobile→flutter, …)" instead -->
 No active pipeline session found.
 
 Start a feature: devflow.task
@@ -130,7 +131,7 @@ Both files absent → omit line, zero behavior change. Turns raw JSONL/YAML into
 
 | | |
 | --- | --- |
-| Reads | `.devflow-state.json`, `devflow/config.md`, `devflow/features/*/plan.md`, `@devflow/references/state-machine.md`, `@devflow/references/status-schema.md` (`--json` mode) |
+| Reads | `.devflow-state.json`, `devflow/config.md`, `devflow/features/*/plan.md`, `@devflow/references/adapter-resolution.md`, `@devflow/references/state-machine.md`, `@devflow/references/status-schema.md` (`--json` mode) |
 | Reads (optional) | `.devflow-filter-stats.jsonl` — filter savings telemetry (Savings line) |
 | Reads (optional) | `.devflow-learnings.jsonl`, `.devflow-instincts.yaml` — auto-detected/contested learnings count (Learnings line) |
 | Writes | nothing |
