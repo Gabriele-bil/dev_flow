@@ -27,7 +27,7 @@ jq -n \
     version:     $version,
     description: $description,
     author:      { name: $author }
-  }' > "$DIST_DIR/.cursor-plugin/plugin.json"
+  }' | python3 -c 'import sys, json; print(json.dumps(json.load(sys.stdin), ensure_ascii=False, indent=2))' > "$DIST_DIR/.cursor-plugin/plugin.json"
 
 ok ".cursor-plugin/plugin.json generato (v$VERSION)"
 

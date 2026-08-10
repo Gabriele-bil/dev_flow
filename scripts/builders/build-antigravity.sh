@@ -27,7 +27,7 @@ jq -n \
     version:     $version,
     description: $description,
     author:      { name: $author }
-  }' > "$DIST_DIR/.antigravity-plugin/plugin.json"
+  }' | python3 -c 'import sys, json; print(json.dumps(json.load(sys.stdin), ensure_ascii=False, indent=2))' > "$DIST_DIR/.antigravity-plugin/plugin.json"
 
 ok ".antigravity-plugin/plugin.json generato (v$VERSION)"
 
