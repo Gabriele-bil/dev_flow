@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.10.0...devflow-v1.11.0) (2026-08-10)
+
+
+### Features
+
+* Implement pre-bash-destructive-guard hook and add learning revert decay tracking. ([7af5e85](https://github.com/Gabriele-bil/dev_flow/commit/7af5e85a73b6ec88fbced273df8d7fdd52547097))
+
 ## [1.10.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.9.0...devflow-v1.10.0) (2026-07-19)
 
 
