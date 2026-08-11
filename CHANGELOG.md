@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.11.0...devflow-v1.12.0) (2026-08-11)
+
+
+### Features
+
+* Implement NestJS adapter with comprehensive step workflows, skill definitions, and architectural pattern references. ([35e9d18](https://github.com/Gabriele-bil/dev_flow/commit/35e9d183d098125b99b728719aa0fae4354ab51c))
+
 ## [1.11.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.10.0...devflow-v1.11.0) (2026-08-10)
 
 
