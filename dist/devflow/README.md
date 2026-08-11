@@ -31,7 +31,7 @@ Then `devflow.implement` → `devflow.beautify` → `devflow.test` (tests + per-
 
 Full setup:
 
-1. **Active stack** — edit [`config.md`](config.md); set **Adapter** to `flutter`, `angular`, or `nextjs`.
+1. **Active stack** — edit [`config.md`](config.md); set **Adapter** to `flutter`, `angular`, `nextjs`, or `nestjs`.
 2. **Run setup once** — execute `devflow.setup` to generate root `AGENTS.md` and `REGISTRY.md` for the consumer project.
 3. **Run the pipeline** — invoke commands under [`commands/`](commands/) (e.g. `devflow.task`) or load as a plugin and use your host’s namespaced invocations.
 4. **Enable code-review-graph** — install and configure once for all detected hosts:
@@ -54,6 +54,7 @@ Three adapters ship out of the box:
 | `flutter` | `flutter analyze`, `flutter test` | Flutter · Riverpod · Supabase |
 | `angular` | `pnpm run lint`, `pnpm run test`, `pnpm run build` | Angular v20+ · NgRx Signal Store · Tailwind |
 | `nextjs` | `pnpm lint`, `pnpm test`, `pnpm build` | Next.js 15+ · Zustand · Tailwind · shadcn/ui |
+| `nestjs` | `pnpm lint`, `pnpm test`, `pnpm build` | NestJS · TypeORM · class-validator · Swagger |
 
 Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP hints), `steps/` (per-step contract files — `setup.md`, `plan.md`, `implement.md`, `beautify.md`, `test.md`, `pr.md` — each pipeline skill loads only its own), `skills/` (technology skills), and `templates/` (setup templates for `AGENTS.md`, `REGISTRY.md`, `docs/product.md`).
 

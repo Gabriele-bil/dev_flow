@@ -273,6 +273,41 @@ skills:
           path: adapters/nextjs/skills/nextjs-testing/SKILL.md
           description: "Jest + React Testing Library for Next.js — Client Components, Server Components, Server Actions, API Routes, and Zustand stores. Load when touching *.test.tsx, *.test.ts, or __tests__/** files"
 
+    nestjs:
+      path: adapters/nestjs/ADAPTER.md
+      step_files:
+        - path: adapters/nestjs/steps/setup.md
+        - path: adapters/nestjs/steps/plan.md
+        - path: adapters/nestjs/steps/implement.md
+        - path: adapters/nestjs/steps/beautify.md
+        - path: adapters/nestjs/steps/test.md
+        - path: adapters/nestjs/steps/pr.md
+      skills:
+        - id: nestjs-architecture
+          path: adapters/nestjs/skills/nestjs-architecture/SKILL.md
+          description: "Module structure, dependency injection, injection tokens, provider scopes, circular deps, service boundaries. Load when creating or refactoring *.module.ts, *.service.ts, or any file wiring constructor DI"
+        - id: nestjs-error-handling
+          path: adapters/nestjs/skills/nestjs-error-handling/SKILL.md
+          description: "HTTP exceptions, exception filters, async error handling, structured logging. Load when creating or refactoring *.filter.ts, catch blocks, event handlers, scheduled tasks, or any file that throws/logs errors"
+        - id: nestjs-security
+          path: adapters/nestjs/skills/nestjs-security/SKILL.md
+          description: "Guards, JWT auth, rate limiting, input validation (DTOs/class-validator), output sanitization. Load when creating or refactoring *.guard.ts, auth strategies, DTOs, or any route accepting user input"
+        - id: nestjs-performance
+          path: adapters/nestjs/skills/nestjs-performance/SKILL.md
+          description: "Async lifecycle hooks, lazy module loading, query optimization, caching strategy, graceful shutdown. Load when profiling latency, touching lifecycle hooks, adding cache decorators, or handling SIGTERM/shutdown"
+        - id: nestjs-database
+          path: adapters/nestjs/skills/nestjs-database/SKILL.md
+          description: "TypeORM entities, migrations, transactions, N+1 avoidance, repository queries. Load when creating or refactoring *.entity.ts, migration files, or any repository/query-builder code"
+        - id: nestjs-api-design
+          path: adapters/nestjs/skills/nestjs-api-design/SKILL.md
+          description: "Response DTOs/serialization, interceptors, pipes, API versioning, OpenAPI docs. Load when creating or refactoring *.controller.ts, *.interceptor.ts, response DTOs, or @nestjs/swagger decorators"
+        - id: nestjs-testing
+          path: adapters/nestjs/skills/nestjs-testing/SKILL.md
+          description: "TestingModule unit tests, Supertest e2e tests, mocking external services/repositories. Load when creating or refactoring *.spec.ts, *.e2e-spec.ts, or test fixtures/mocks"
+        - id: nestjs-microservices
+          path: adapters/nestjs/skills/nestjs-microservices/SKILL.md
+          description: "MessagePattern/EventPattern communication, BullMQ background jobs, Terminus health checks. Load when creating or refactoring *.processor.ts, message/event handlers, or health controllers"
+
     common:
       skills:
         - id: common-caveman

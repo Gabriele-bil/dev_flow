@@ -54,7 +54,8 @@ Never edit user content outside managed blocks unless `--force` is set.
    - If `pubspec.yaml` exists, adapter is `flutter`.
    - If `angular.json` exists, or `analog` / `@angular/core` are in `package.json`, adapter is `angular`.
    - If `next.config.js`, `next.config.mjs`, or `next.config.ts` exists, or `next` is in `package.json`, adapter is `nextjs`.
-2. If the stack cannot be detected automatically, ask the user: "What stack are you using? (Available adapters: angular, flutter, nextjs)" and wait for their choice.
+   - If `nest-cli.json` exists, or `@nestjs/core` is in `package.json`, adapter is `nestjs`.
+2. If the stack cannot be detected automatically, ask the user: "What stack are you using? (Available adapters: angular, flutter, nextjs, nestjs)" and wait for their choice.
 3. Overwrite `@devflow/config.md` with the resolved adapter — template: `references/config-template.md` § Single app.
 
 **Monorepo:**

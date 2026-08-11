@@ -76,7 +76,7 @@ Tests passing, ready to merge?
 
 Resolve adapter, adapter root, and app working directory per `@devflow/references/adapter-resolution.md` (single-app: `@devflow/config.md`'s `**Adapter:**`; monorepo: active feature's `**App:**` looked up in the `## Apps` table). Then read `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/<step>.md` for the active step — authoritative for stack rules. Legacy adapters without `steps/`: all sections in `ADAPTER.md`.
 
-Current adapters: `flutter`, `angular`, `nextjs`. Common skills: `@devflow/adapters/common/skills/`.
+Current adapters: `flutter`, `angular`, `nextjs`, `nestjs`. Common skills: `@devflow/adapters/common/skills/`.
 
 ## Exploration Strategy (all steps)
 

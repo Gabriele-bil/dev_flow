@@ -2,7 +2,7 @@
 
 DevFlow is a **spec-driven development pipeline** that turns a raw idea into a reviewed, tested, and merged feature. Each step maps to a skill (and optional slash command) that defines inputs, steps, outputs, and success criteria.
 
-The workflow is **technology-agnostic**: stack-specific rules live in **adapters** under [`templates/devflow/adapters/`](templates/devflow/adapters/). Today the **Flutter**, **Angular**, and **Next.js** adapters ship with this repo; adding more stacks means adding a new adapter folder and switching [`templates/devflow/config.md`](templates/devflow/config.md).
+The workflow is **technology-agnostic**: stack-specific rules live in **adapters** under [`templates/devflow/adapters/`](templates/devflow/adapters/). Today the **Flutter**, **Angular**, **Next.js**, and **NestJS** adapters ship with this repo; adding more stacks means adding a new adapter folder and switching [`templates/devflow/config.md`](templates/devflow/config.md).
 
 ---
 
@@ -98,6 +98,7 @@ dev_flow/
 │       │   ├── angular/             # angular-architecture, -component, -forms, -http, -state, -testing, -theme
 │       │   ├── flutter/             # flutter-architecture, -supabase, -migrations, -theme, -riverpod, -models, -layout, -form
 │       │   ├── nextjs/              # nextjs-architecture, -server, -components, -state, -ui, -forms, -testing, -metadata, -performance
+│       │   ├── nestjs/              # nestjs-architecture, -error-handling, -security, -performance, -database, -api-design, -testing, -microservices
 │       │   └── common/              # common-clean-code, -web-interface-guidelines, -caveman, -state-patterns
 │       ├── agents/
 │       │   ├── code-reviewer.md
@@ -207,6 +208,7 @@ Use `code-review-graph` for blast-radius aware reviews in both Cursor and Claude
 | Angular | `context7`, `sequential-thinking` |
 | Flutter | `context7`, `sequential-thinking`, `dart`, `supabase` |
 | Next.js | `context7`, `sequential-thinking` |
+| NestJS | `context7`, `sequential-thinking` |
 
 ---
 
@@ -293,6 +295,21 @@ Baseline: **Next.js 15+ App Router · Zustand · Tailwind CSS + shadcn/ui · Ser
 | `nextjs-testing` | Jest + RTL, unit/integration tests, coverage |
 | `nextjs-metadata` | SEO, metadata, OG images, `generateMetadata`, sitemap, robots |
 | `nextjs-performance` | Image optimization, font loading, script strategies, bundling |
+
+### NestJS (`templates/devflow/adapters/nestjs/`)
+
+Baseline: **NestJS · TypeORM · class-validator/class-transformer · @nestjs/swagger · @nestjs/jwt + Passport · @nestjs/testing + Supertest**. Commands: `npm run lint`, `npm run test`, `npm run build`.
+
+| Skill | Purpose |
+|-------|---------|
+| `nestjs-architecture` | Modules, DI, repository pattern, provider scopes, `ConfigModule` |
+| `nestjs-error-handling` | HTTP exceptions, exception filters, async error handling, structured logging |
+| `nestjs-security` | Input validation, guards, JWT auth, rate limiting, output sanitization |
+| `nestjs-performance` | Async lifecycle hooks, lazy loading, query optimization, caching, graceful shutdown |
+| `nestjs-database` | N+1 avoidance, migrations, transactions (TypeORM) |
+| `nestjs-api-design` | DTOs/serialization, interceptors, pipes, versioning, API-consumer accessibility (OpenAPI, RFC 7807 errors) |
+| `nestjs-testing` | `TestingModule` unit tests, Supertest e2e, mocking external services |
+| `nestjs-microservices` | `@MessagePattern`/`@EventPattern`, BullMQ queues, Terminus health checks |
 
 ### Common (`templates/devflow/adapters/common/`)
 
