@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.12.0...devflow-v1.13.0) (2026-08-27)
+
+
+### Features
+
+* Add support for protected code blocks to devflow-beautify skill documentation ([83693e0](https://github.com/Gabriele-bil/dev_flow/commit/83693e02f2eeb44afb709f9612897b677b96a9c3))
+
 ## [1.12.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.11.0...devflow-v1.12.0) (2026-08-11)
 
 
