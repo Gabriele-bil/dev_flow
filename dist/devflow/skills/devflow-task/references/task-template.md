@@ -79,7 +79,7 @@ Format rules:
 - **Scope**: Out-of-scope explicit — trade-offs, not TODOs.
 - **Assumptions**: omit only for truly trivial tasks.
 - **Subtasks**: atomic, verifiable; no class names, methods, or file paths.
-- **Acceptance criteria**: observable, falsifiable, one per outcome, no solution detail.
+- **Acceptance criteria**: observable, falsifiable, one per outcome, no solution detail. Idea makes a vague quality claim ("faster", "more secure", "simpler") → reframe as a numeric or otherwise testable target (see `refinement-hints.md` dimension 4) instead of restating the adjective.
 - **Language**: English.
 - **Compression**: caveman-compress — drop articles/filler/hedging; fragments OK; keep technical terms/paths/commands exact.
 - **Unknown values**: use `[NEEDS CLARIFICATION: <reason>]` inline; never guess. No variants of this format.
