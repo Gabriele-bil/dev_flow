@@ -66,6 +66,17 @@ Scope: only files in current `devflow.implement` summary. No scope expansion; no
 
 If implement summary includes test files, skim them first — they reflect intended behavior. Missing test coverage for new behavior → **Optional** or **Nit** finding (not a blocker).
 
+### Step 2c - Protected blocks
+
+Skip any block wrapped in `devflow-beautify-ignore-start` / `devflow-beautify-ignore-end` markers (any comment syntax: `//`, `#`, `/* */`, `<!-- -->`, `--`). Do not raise findings inside a protected block and do not rewrite it — including for a Critical issue. If a protected block looks genuinely broken, surface it as **FYI:** naming the file and the marker's reason (if given) instead of fixing it; the user owns that code deliberately.
+
+```js
+// devflow-beautify-ignore-start: manually unrolled for perf, don't touch
+result[0] = buf[0] ^ key[0];
+result[1] = buf[1] ^ key[1];
+// devflow-beautify-ignore-end
+```
+
 ### Step 3 - Analysis areas (multi-axis review)
 
 Stack-agnostic defaults below. For stack-specific checks follow the adapter beautify step file and technology skills. Review **every** in-scope file against all axes; collect all findings before applying changes.
@@ -180,6 +191,7 @@ Respond with:
 - **Critical**: [list or "none"]
 - **Required**: [list or "none"]
 - **Nit / Optional / FYI**: [short list or "none"]
+- **Protected blocks skipped**: [N — omit line if 0]
 
 ### Commands run
 - format (per adapter): ✅ / ❌ (resolved after [N] attempts)
