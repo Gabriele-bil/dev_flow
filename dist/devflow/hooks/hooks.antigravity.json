@@ -38,6 +38,16 @@
         ]
       },
       {
+        "matcher": "WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/pre-fetch-cache.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
         "matcher": "*",
         "hooks": [
           {
@@ -90,6 +100,16 @@
             "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/post-task-create.sh",
             "async": true,
             "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/post-fetch-cache.sh",
+            "timeout": 10
           }
         ]
       }
