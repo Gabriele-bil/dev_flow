@@ -36,3 +36,20 @@ jobs:
             exit 1
           fi
           echo "✓ dist/ in sync con templates/"
+
+  quality-gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq jq
+
+      - name: Validate SKILL.md structure (strict)
+        run: bash templates/devflow/scripts/validate-skills.sh --strict
+
+      - name: Run trigger/routing evals
+        run: bash templates/devflow/scripts/run-evals.sh
+
+      - name: Run hook tests
+        run: bash templates/devflow/scripts/run-hook-tests.sh
