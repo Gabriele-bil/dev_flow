@@ -21,24 +21,25 @@ assert() {
 
 run_hook() {
   local command="$1"
+  local branch="${2:-${DEVFLOW_CURRENT_BRANCH:-}}"
   local payload
   payload=$(jq -cn --arg c "$command" '{tool_use: {name: "Bash", input: {command: $c}}}')
-  printf '%s' "$payload" | bash "$HOOK" 2>/dev/null || true
+  printf '%s' "$payload" | DEVFLOW_CURRENT_BRANCH="$branch" bash "$HOOK" 2>/dev/null || true
 }
 
 expect_block() {
-  local label="$1" command="$2"
+  local label="$1" command="$2" branch="${3:-${DEVFLOW_CURRENT_BRANCH:-}}"
   local out
-  out=$(run_hook "$command")
+  out=$(run_hook "$command" "$branch")
   echo "$out" | grep -qE '"decision"[[:space:]]*:[[:space:]]*"block"' \
     && assert "$label blocked" pass \
     || assert "$label blocked (output: '$out')" fail
 }
 
 expect_allow() {
-  local label="$1" command="$2"
+  local label="$1" command="$2" branch="${3:-${DEVFLOW_CURRENT_BRANCH:-}}"
   local out
-  out=$(run_hook "$command")
+  out=$(run_hook "$command" "$branch")
   [ -z "$out" ] \
     && assert "$label allowed" pass \
     || assert "$label allowed (unexpected output: '$out')" fail
@@ -63,23 +64,24 @@ expect_block "git restore ."     "git restore ."
 echo "--- T3: force-push to protected branch blocked ---"
 expect_block "push --force origin main"   "git push --force origin main"
 expect_block "push -f origin master"      "git push -f origin master"
-expect_block "bare push --force (on main)" "git push --force"
+expect_block "bare push --force (on main)" "git push --force" "main"
 
 echo "--- T4: commit hook/signature bypass blocked ---"
 expect_block "commit --no-verify"    "git commit -m x --no-verify"
 expect_block "commit --no-gpg-sign"  "git commit --no-gpg-sign -m x"
 
 echo "--- T5: scoped/normal commands allowed ---"
-expect_allow "rm -rf node_modules"           "rm -rf node_modules"
-expect_allow "rm -rf dist/build"             "rm -rf dist/build"
-expect_allow "rm single file"                "rm file.txt"
-expect_allow "git status"                    "git status"
-expect_allow "push to feature branch"        "git push origin feature-branch"
-expect_allow "force-push to feature branch"  "git push --force origin feature-branch"
-expect_allow "normal commit"                 "git commit -m 'normal commit'"
-expect_allow "git log"                       "git log --oneline"
-expect_allow "npm install"                   "npm install"
-expect_allow "soft git reset"                "git reset HEAD~1"
+expect_allow "rm -rf node_modules"               "rm -rf node_modules"
+expect_allow "rm -rf dist/build"                 "rm -rf dist/build"
+expect_allow "rm single file"                    "rm file.txt"
+expect_allow "git status"                        "git status"
+expect_allow "push to feature branch"            "git push origin feature-branch"
+expect_allow "force-push to feature branch"      "git push --force origin feature-branch"
+expect_allow "bare force-push on feature branch" "git push --force" "feature-branch"
+expect_allow "normal commit"                     "git commit -m 'normal commit'"
+expect_allow "git log"                           "git log --oneline"
+expect_allow "npm install"                       "npm install"
+expect_allow "soft git reset"                    "git reset HEAD~1"
 
 echo "--- T6: degenerate input allowed silently ---"
 out=$(printf '' | bash "$HOOK" 2>/dev/null || true)

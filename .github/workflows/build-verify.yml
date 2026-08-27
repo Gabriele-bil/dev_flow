@@ -11,6 +11,7 @@ on:
       - 'scripts/**'
       - 'dist/**'
       - '.claude-plugin/**'
+      - '.antigravity-plugin/**'
       - '.github/workflows/build-verify.yml'
 
 permissions:
@@ -30,9 +31,9 @@ jobs:
 
       - name: Check dist/ is in sync
         run: |
-          if ! git diff --quiet -- dist/ .claude-plugin/; then
+          if ! git diff --quiet -- dist/ .claude-plugin/ .antigravity-plugin/; then
             echo "::error::dist/ o marketplace.json out of sync. Esegui 'bash scripts/build-plugin.sh' localmente e committa il risultato."
-            git --no-pager diff --stat -- dist/ .claude-plugin/
+            git --no-pager diff --stat -- dist/ .claude-plugin/ .antigravity-plugin/
             exit 1
           fi
           echo "✓ dist/ in sync con templates/"

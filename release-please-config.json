@@ -29,7 +29,17 @@
         },
         {
           "type": "json",
+          "path": "dist/devflow/.antigravity-plugin/plugin.json",
+          "jsonpath": "$.version"
+        },
+        {
+          "type": "json",
           "path": ".claude-plugin/marketplace.json",
+          "jsonpath": "$.plugins[?(@.name == 'devflow')].version"
+        },
+        {
+          "type": "json",
+          "path": ".antigravity-plugin/marketplace.json",
           "jsonpath": "$.plugins[?(@.name == 'devflow')].version"
         }
       ]

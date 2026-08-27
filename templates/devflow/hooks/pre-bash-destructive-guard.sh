@@ -35,6 +35,10 @@ block() {
 }
 
 current_branch() {
+  if [[ -n "${DEVFLOW_CURRENT_BRANCH:-}" ]]; then
+    printf '%s\n' "$DEVFLOW_CURRENT_BRANCH"
+    return
+  fi
   git branch --show-current 2>/dev/null || true
 }
 
