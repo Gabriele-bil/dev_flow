@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.13.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.12.0...devflow-v1.13.0) (2026-08-27)
+
+
+### Features
+
+* Add .antigravity-plugin support to build verification and release configuration, and enhance destructive guard tests to support branch context. ([214c23c](https://github.com/Gabriele-bil/dev_flow/commit/214c23c257556b5c7715504529e79bc53ca3edd8))
+* Add support for protected code blocks to devflow-beautify skill documentation ([83693e0](https://github.com/Gabriele-bil/dev_flow/commit/83693e02f2eeb44afb709f9612897b677b96a9c3))
+
 ## [1.12.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.11.0...devflow-v1.12.0) (2026-08-11)
 
 
