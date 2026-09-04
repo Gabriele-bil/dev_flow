@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.13.0...devflow-v1.14.0) (2026-09-04)
+
+
+### Features
+
+* Add token/cost tracking hooks and update task refinement documentation with EARS phrasing requirements ([2ca4f87](https://github.com/Gabriele-bil/dev_flow/commit/2ca4f875488101c4b7e0a757057f48af427d2ab3))
+* Introduce devflow.auto orchestrator for end-to-end task-to-implementation automation with decision-flagging logic. ([89fa379](https://github.com/Gabriele-bil/dev_flow/commit/89fa379cc2bf8ce60221f8998c3041bcf2e8cf68))
+
 ## [1.13.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.12.0...devflow-v1.13.0) (2026-08-27)
 
 
