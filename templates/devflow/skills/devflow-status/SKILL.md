@@ -64,6 +64,7 @@ Plan:        <plan_path>
 Status:      <plan_status>  →  next: <next_step>
 Progress:    <done>/<total> files done (<pending> remaining)
 Savings:     output filter kept <kept_chars> of <raw_chars> chars over <n> cmds (~<pct>% saved)
+Cost:        ~<total_tokens> tokens · ~$<total_cost_usd> est. over <n> turns (this session's runs — see Cost line below)
 Learnings:   <n> auto-detected (retry loops etc.) · <m> contested instincts — see devflow.learn list
 
 Pending files:
@@ -107,6 +108,16 @@ jq -s '{n:length, raw:(map(.raw_chars)|add), kept:(map(.kept_chars)|add)}' .devf
 
 `pct = 100 * (1 - kept/raw)`, rounded. File absent → omit line, zero behavior change. Measured local data — use to accept/reject filter tuning (thresholds, command classes) instead of upstream claims.
 
+## Cost line (optional)
+
+`Cost:` line only when `.devflow-metrics.jsonl` exists (written by `stop-metrics.sh`, one JSONL entry per Stop event). Compute:
+
+```bash
+jq -s '{n:length, tokens:(map(.input_tokens+.output_tokens+(.cache_creation_tokens//0)+(.cache_read_tokens//0))|add), cost:(map(.estimated_cost_usd // 0)|add)}' .devflow-metrics.jsonl
+```
+
+File absent → omit line, zero behavior change. Token counts are exact (from transcript usage fields); `estimated_cost_usd` is an approximation from a local pricing table (`stop-metrics.sh` header) — label it "est." in the dashboard, never present as billed cost.
+
 ## Learnings line (optional)
 
 `Learnings:` line only when `.devflow-learnings.jsonl` or `.devflow-instincts.yaml` exists. Compute:
@@ -133,6 +144,7 @@ Both files absent → omit line, zero behavior change. Turns raw JSONL/YAML into
 | --- | --- |
 | Reads | `.devflow-state.json`, `devflow/config.md`, `devflow/features/*/plan.md`, `@devflow/references/adapter-resolution.md`, `@devflow/references/state-machine.md`, `@devflow/references/status-schema.md` (`--json` mode) |
 | Reads (optional) | `.devflow-filter-stats.jsonl` — filter savings telemetry (Savings line) |
+| Reads (optional) | `.devflow-metrics.jsonl` — token/cost estimate telemetry (Cost line) |
 | Reads (optional) | `.devflow-learnings.jsonl`, `.devflow-instincts.yaml` — auto-detected/contested learnings count (Learnings line) |
 | Writes | nothing |
 | Related | `devflow-discovery` (full pipeline orientation), `devflow-resume` (session re-entry), `devflow-recovery` (corrupted state), `devflow-learn` (full learnings detail) |

@@ -18,6 +18,14 @@ Use **after** reading `docs/product.md` and **before** locking Summary/scope/sub
    - No layout shift during load (CLS < 0.1)
    → Confirm these are the right targets with the user; if no hard numbers exist yet, mark [NEEDS CLARIFICATION: target threshold] rather than leaving the adjective unquantified.
    ```
+
+   Criterion has a trigger or precondition ("when X happens", "if user is Y") → phrase it EARS-style (`WHEN [trigger] THE SYSTEM SHALL [response]` / `IF [precondition] THEN THE SYSTEM SHALL [response]`) instead of a bare declarative sentence — the trigger/precondition slot forces the actor and condition into the open, catching the "shall for whom, under what state" gap before `devflow.plan`:
+
+   ```
+   VAGUE: "Shows error on invalid input"
+
+   EARS: "WHEN user submits form with empty required field THE SYSTEM SHALL show inline error below that field"
+   ```
 5. **Riskiest assumption** — Which single belief can invalidate task? Put in **Key assumptions** (+ validation hint if needed).
 6. **Edge cases & error states** — Are null/empty/error paths explicit or implied? If implied, mark the boundary in Key assumptions.
 7. **Integration dependencies** — Does success require external systems or services not yet named? If so, name them or mark `[NEEDS CLARIFICATION]`.

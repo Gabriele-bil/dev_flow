@@ -79,3 +79,6 @@ node_modules/
 
 # devflow filter savings
 .devflow-filter-stats.jsonl
+
+# devflow test summary
+.devflow-test-summary.json

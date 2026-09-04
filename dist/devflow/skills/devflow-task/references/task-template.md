@@ -80,6 +80,7 @@ Format rules:
 - **Assumptions**: omit only for truly trivial tasks.
 - **Subtasks**: atomic, verifiable; no class names, methods, or file paths.
 - **Acceptance criteria**: observable, falsifiable, one per outcome, no solution detail. Idea makes a vague quality claim ("faster", "more secure", "simpler") → reframe as a numeric or otherwise testable target (see `refinement-hints.md` dimension 4) instead of restating the adjective.
+- **EARS phrasing (optional, recommended for criteria with a trigger/precondition)**: `WHEN [trigger] THE SYSTEM SHALL [response]` or `IF [precondition] THEN THE SYSTEM SHALL [response]`. Use plain bullet form when the criterion has no meaningful trigger (e.g. a static UI state); switch to EARS when trigger/precondition ambiguity is the actual risk — it forces the missing actor or condition into the open instead of leaving it implicit.
 - **Language**: English.
 - **Compression**: caveman-compress — drop articles/filler/hedging; fragments OK; keep technical terms/paths/commands exact.
 - **Unknown values**: use `[NEEDS CLARIFICATION: <reason>]` inline; never guess. No variants of this format.

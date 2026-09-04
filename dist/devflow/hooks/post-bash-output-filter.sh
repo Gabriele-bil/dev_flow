@@ -10,6 +10,13 @@
 # Savings telemetry: each filtered command appends one JSONL line to
 # .devflow-filter-stats.jsonl (DEVFLOW_FILTER_STATS=<path> overrides, =off disables).
 # Read by devflow.status → "Filter savings" line.
+# Structured test-summary: for pytest/jest/vitest/flutter-test/go-test/cargo-test/
+# ng-test commands, best-effort parses the framework's own pass/fail summary line
+# and overwrites .devflow-test-summary.json (latest run wins — not a JSONL log;
+# DEVFLOW_TEST_SUMMARY=<path> overrides, =off disables). Runs independent of the
+# threshold check above (a short "all passed" run still gets recorded). Read by
+# devflow.test Step 3-6 as a structured signal instead of re-deriving pass/fail
+# counts from raw scrollback.
 
 # ── Thresholds (single place — override via env) ─────────────────────────────
 THRESHOLD_CHARS="${DEVFLOW_FILTER_THRESHOLD:-2000}"  # below this: no filtering
@@ -51,6 +58,85 @@ OUTPUT=$(printf '%s' "$RAW" | jq -r '
      | map(select(. != null and . != "")) | join("\n"))
   else "" end' 2>/dev/null)
 [ -z "$OUTPUT" ] && exit 0
+
+# ── Structured test-summary extraction (runs regardless of threshold) ────────
+SUMMARY_FILE="${DEVFLOW_TEST_SUMMARY:-.devflow-test-summary.json}"
+if [ "$SUMMARY_FILE" != "off" ]; then
+  T_FRAMEWORK="" T_PASSED="" T_FAILED="" T_SKIPPED=""
+
+  if printf '%s' "$CMD" | grep -qE '(^|[[:space:]])pytest([[:space:]]|$)|python[[:space:]]+-m[[:space:]]+pytest'; then
+    T_LINE=$(printf '%s\n' "$OUTPUT" | grep -E '=+.*(passed|failed|error)' | tail -1)
+    if [ -n "$T_LINE" ]; then
+      T_FRAMEWORK="pytest"
+      T_PASSED=$(printf '%s' "$T_LINE" | grep -oE '[0-9]+ passed'  | grep -oE '[0-9]+' | head -1)
+      T_FAILED=$(printf '%s' "$T_LINE" | grep -oE '[0-9]+ failed'  | grep -oE '[0-9]+' | head -1)
+      T_SKIPPED=$(printf '%s' "$T_LINE" | grep -oE '[0-9]+ skipped' | grep -oE '[0-9]+' | head -1)
+    fi
+  elif printf '%s' "$CMD" | grep -qE 'vitest'; then
+    T_LINE=$(printf '%s\n' "$OUTPUT" | grep -E '^ *Tests +' | tail -1)
+    if [ -n "$T_LINE" ]; then
+      T_FRAMEWORK="vitest"
+      T_PASSED=$(printf '%s' "$T_LINE" | grep -oE '[0-9]+ passed' | grep -oE '[0-9]+' | head -1)
+      T_FAILED=$(printf '%s' "$T_LINE" | grep -oE '[0-9]+ failed' | grep -oE '[0-9]+' | head -1)
+      T_SKIPPED=$(printf '%s' "$T_LINE" | grep -oE '[0-9]+ skipped' | grep -oE '[0-9]+' | head -1)
+    fi
+  elif printf '%s' "$CMD" | grep -qE 'jest'; then
+    T_LINE=$(printf '%s\n' "$OUTPUT" | grep -E '^Tests:' | tail -1)
+    if [ -n "$T_LINE" ]; then
+      T_FRAMEWORK="jest"
+      T_PASSED=$(printf '%s' "$T_LINE" | grep -oE '[0-9]+ passed' | grep -oE '[0-9]+' | head -1)
+      T_FAILED=$(printf '%s' "$T_LINE" | grep -oE '[0-9]+ failed' | grep -oE '[0-9]+' | head -1)
+      T_SKIPPED=$(printf '%s' "$T_LINE" | grep -oE '[0-9]+ skipped' | grep -oE '[0-9]+' | head -1)
+    fi
+  elif printf '%s' "$CMD" | grep -qE '(^|[[:space:]])flutter[[:space:]]+test'; then
+    T_LINE=$(printf '%s\n' "$OUTPUT" | grep -oE '\+[0-9]+( -[0-9]+)?' | tail -1)
+    if [ -n "$T_LINE" ]; then
+      T_FRAMEWORK="flutter_test"
+      T_PASSED=$(printf '%s' "$T_LINE" | grep -oE '^\+[0-9]+' | grep -oE '[0-9]+')
+      T_FAILED=$(printf '%s' "$T_LINE" | grep -oE ' -[0-9]+' | grep -oE '[0-9]+')
+    fi
+  elif printf '%s' "$CMD" | grep -qE '(^|[[:space:]])go[[:space:]]+(test|vet)'; then
+    T_OK=$(printf '%s\n' "$OUTPUT" | grep -cE '^ok[[:space:]]' 2>/dev/null; true)
+    T_FAIL=$(printf '%s\n' "$OUTPUT" | grep -cE '^FAIL[[:space:]]' 2>/dev/null; true)
+    if [ "${T_OK:-0}" -gt 0 ] || [ "${T_FAIL:-0}" -gt 0 ]; then
+      T_FRAMEWORK="go_test"
+      T_PASSED="${T_OK:-0}"
+      T_FAILED="${T_FAIL:-0}"
+    fi
+  elif printf '%s' "$CMD" | grep -qE '(^|[[:space:]])cargo[[:space:]]+test'; then
+    T_LINE=$(printf '%s\n' "$OUTPUT" | grep -E '^test result:' | tail -1)
+    if [ -n "$T_LINE" ]; then
+      T_FRAMEWORK="cargo_test"
+      T_PASSED=$(printf '%s' "$T_LINE" | grep -oE '[0-9]+ passed' | grep -oE '[0-9]+' | head -1)
+      T_FAILED=$(printf '%s' "$T_LINE" | grep -oE '[0-9]+ failed' | grep -oE '[0-9]+' | head -1)
+    fi
+  elif printf '%s' "$CMD" | grep -qE '(^|[[:space:]])ng[[:space:]]+test'; then
+    T_LINE=$(printf '%s\n' "$OUTPUT" | grep -E 'Executed [0-9]+ of [0-9]+' | tail -1)
+    if [ -n "$T_LINE" ]; then
+      T_FRAMEWORK="karma"
+      T_EXECUTED=$(printf '%s' "$T_LINE" | grep -oE 'Executed [0-9]+' | grep -oE '[0-9]+')
+      T_TOTAL=$(printf '%s' "$T_LINE" | grep -oE 'of [0-9]+' | grep -oE '[0-9]+')
+      T_FAILED=$(printf '%s' "$T_LINE" | grep -oE '[0-9]+ FAILED' | grep -oE '[0-9]+' | head -1)
+      [ -z "$T_FAILED" ] && T_FAILED=0
+      [ -n "$T_EXECUTED" ] && T_PASSED=$(( T_EXECUTED - T_FAILED ))
+      [ -n "$T_TOTAL" ] && [ -n "$T_EXECUTED" ] && T_SKIPPED=$(( T_TOTAL - T_EXECUTED ))
+    fi
+  fi
+
+  if [ -n "$T_FRAMEWORK" ] && { [ -n "$T_PASSED" ] || [ -n "$T_FAILED" ]; } && command -v jq >/dev/null 2>&1; then
+    [ -z "$T_PASSED" ]  && T_PASSED=0
+    [ -z "$T_FAILED" ]  && T_FAILED=0
+    [ -z "$T_SKIPPED" ] && T_SKIPPED=0
+    jq -cn --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || true)" \
+      --arg framework "$T_FRAMEWORK" --arg cmd "$(printf '%s' "$CMD" | tr '\n' ' ' | head -c 120)" \
+      --argjson passed "$T_PASSED" --argjson failed "$T_FAILED" --argjson skipped "$T_SKIPPED" \
+      '{ts:$ts, framework:$framework, cmd:$cmd, passed:$passed, failed:$failed, skipped:$skipped}' \
+      > "$SUMMARY_FILE" 2>/dev/null || true
+    if [ -f .gitignore ] && ! grep -qF ".devflow-test-summary.json" .gitignore 2>/dev/null; then
+      printf '\n# devflow test summary\n.devflow-test-summary.json\n' >> .gitignore 2>/dev/null || true
+    fi
+  fi
+fi
 
 CHARS=${#OUTPUT}
 [ "$CHARS" -le "$THRESHOLD_CHARS" ] && exit 0

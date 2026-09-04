@@ -107,6 +107,7 @@ Critical rule:
 - [ ] **`NNN` prefix** matches `next_feature_number` from `.devflow-state.json` (or verified unique via directory scan if state absent)
 - [ ] **In scope / Out of scope** are honest for non-trivial ideas; **Key assumptions** filled when risks exist
 - [ ] Vague quality claims in the raw idea ("faster", "more secure", "simpler") are reframed as numeric/testable **Acceptance criteria**, not left as bare adjectives
+- [ ] Criteria with a trigger/precondition use EARS phrasing (`WHEN`/`IF ... THEN THE SYSTEM SHALL ...`) per `refinement-hints.md` dimension 4 — not required for criteria with no meaningful trigger
 - [ ] No duplicate of an **implemented** feature unless explicitly framed as extension
 - [ ] No unresolved `[NEEDS CLARIFICATION: ...]` markers remain (or each is documented as an explicit accepted risk in Notes)
 - [ ] `config.md` has `## Apps` → **App** resolved (Step 1) and will be written; absent → no App field anywhere in the output

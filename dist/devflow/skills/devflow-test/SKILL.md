@@ -86,7 +86,7 @@ Read `task.md` **Acceptance criteria** section first — derive at least one tes
 1. **Placement** — mirror source layout and integration paths per the adapter test step file.
 2. **Unit tests** — cover models, state, domain rules, and UI assertions per the adapter test step file (load any technology skills it references).
 3. **Integration tests** — target user flows from `task.md` per the adapter test step file (targets/environments and execution order).
-4. **Execute** — run the exact commands from the adapter test step file; paste raw stdout/stderr in the Step 7 report.
+4. **Execute** — run the exact commands from the adapter test step file; paste raw stdout/stderr in the Step 7 report. If `.devflow-test-summary.json` exists after the run (written by `post-bash-output-filter.sh` for recognized test-runner commands), read its `passed`/`failed`/`skipped` counts as a structured cross-check against the raw output instead of re-deriving them by eye — stale runs (from a command that isn't the one just executed) are still possible, so raw stdout/stderr stays the evidence of record in the Step 7 report.
 
 **Output discipline (intermediate runs):** retry loops and analysis runs follow `@devflow/references/token-economy.md` → **Derive, don't dump** — filter at source, quote decisive failure lines, report delta on re-runs. Step 7 report still pastes mandated raw evidence.
 
@@ -202,6 +202,7 @@ Wait for user choice before continuing. **Run mode** (`.devflow-run.json` presen
 | Reads | `@devflow/references/verification-levels.md` (Step 6b), `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status), `@devflow/references/complexity-scoring.md` (depth profile), `@devflow/references/token-economy.md` (output discipline) |
 | Reads (conditional) | `.devflow-run.json` (existence — run-mode switch) |
 | Reads (optional) | `@devflow/references/testing-patterns.md` — stack-agnostic patterns reference |
+| Reads (optional) | `.devflow-test-summary.json` — structured pass/fail/skipped counts from the most recent recognized test-runner command (written by `post-bash-output-filter.sh`; cross-check only, not evidence of record) |
 | Writes | Test output paths per the adapter test step file |
 | Writes | `devflow/features/[NNN]_[feature-name]/verification.md` — per-AC verdict table |
 | Writes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json` — `errors_tried` on retry loops (state-machine.md → Checkpoint file) |

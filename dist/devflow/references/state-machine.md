@@ -107,7 +107,9 @@ Append to existing arrays instead of overwriting: read current file with `jq '.d
   "feature": "003_user-profile",
   "from": "implement",
   "until": "test",
-  "started_at": "2026-07-17T10:00:00Z"
+  "started_at": "2026-07-17T10:00:00Z",
+  "ship_grader_iterations": 2,
+  "ship_grader_iteration_count": 0
 }
 ```
 
@@ -117,6 +119,11 @@ Lifecycle:
 - Deleted by `devflow.run` on every exit path (complete, contract failure, block, handoff)
 - Never committed — `devflow.run` appends it to `.gitignore` when present
 - Stale marker (found at session start, no run in progress) → `devflow.resume` asks: continue interactively (delete marker) or re-arm `devflow.run`; corrupted → `devflow.recovery`
+
+Optional fields, read by `devflow-ship` Step 4b (autonomous grader loop):
+
+- `ship_grader_iterations` — max auto-resend cycles for a Required-only (zero Critical) Ship Gate verdict before surfacing the report instead of looping again. Absent → default 2.
+- `ship_grader_iteration_count` — running counter for the current feature's ship gate, incremented by `devflow.ship` on each auto-resend, reset to 0 whenever `devflow.run` re-arms the marker for a new `from`/`until` span. Critical findings ignore this counter entirely — they always hard-stop regardless of iterations remaining.
 
 ## Handoff file (context pressure)
 

@@ -133,6 +133,8 @@ Hook vs skill vs command — see **Choosing a Mechanism** above.
 | `SessionStart` | Fires once at session start; use for context injection |
 | `PreToolUse` | Fires before a tool call; block with `{"decision":"block","reason":"..."}` on stdout |
 | `PostToolUse` | Fires after a tool call; async hooks emit no stdout; sync hooks may emit control JSON — `hookSpecificOutput.updatedToolOutput` rewrites tool output in context (cap 10k chars) |
+| `PreModelSwitch` | Fires before a model switch; block with `{"decision":"block","reason":"..."}` on stdout — use only for a high-confidence, narrowly-scoped rule (see `pre-model-switch.sh`); fail-open on ambiguous input |
+| `PostModelSwitch` | Fires after a model switch completes; audit/log only, no blocking — async, no passthrough required |
 | `PreCompact` | Fires before context compaction; output becomes part of compacted context |
 | `Stop` | Fires after each Claude response; reads full response on stdin, must write it back on stdout (passthrough); async hooks skip passthrough requirement |
 | `SessionEnd` | Fires when session closes; async OK |
