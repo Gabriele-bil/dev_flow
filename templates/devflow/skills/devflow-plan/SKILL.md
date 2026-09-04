@@ -99,6 +99,8 @@ Before Step 1:
 - **Critical violations** → stop before Step 1.
 - **Required violations** → document in Open questions; stop before Step 5 (Write plan file).
 
+Both severities stop unconditionally — **never bypassed, run mode or not**.
+
 ### Step 1 - Read docs
 
 Always read:
@@ -196,6 +198,8 @@ Format rules:
 - Language: English.
 - Compression: caveman-compress — drop articles/filler/hedging; keep technical terms/paths/commands exact.
 
+**Run mode** (`.devflow-run.json` present): a genuine **Open questions** entry (plan-level ambiguity, not a constitution violation) does not escalate to the user — pick defensible default (repo precedent > `constitution.md` > adapter convention), append it to `plan.md` **`## Decision flags`** (create on first flag; format per `@devflow/skills/devflow-run/SKILL.md` Step 2), and keep Status `ready`. Constitution Gate Critical/Required violations above are the one exception — those stop regardless of mode.
+
 ### Step 6 - Notify user
 
 Respond with:
@@ -242,6 +246,8 @@ Continue to implementation? -> devflow.implement
 | Reads | `@devflow/references/complexity-scoring.md` (Step 4d — score + profile) |
 | Reads | `@devflow/references/token-economy.md` (Step 1 — index-first exploration) |
 | Writes | `devflow/features/[NNN]_[feature-name]/plan.md` |
+| Writes (conditional) | `plan.md` `## Decision flags` (run mode — resolved Open questions) |
+| Reads (conditional) | `.devflow-run.json` (existence — run-mode switch, per `devflow-auto`) |
 | Reads (conditional) | `DESIGN.md` / `docs/design.md` (Step 4e — existence check + UI tagging) |
 | Writes (optional) | `devflow/features/[NNN]_[feature-name]/data-model.md` (Step 4c — triggered when feature touches persistent entities) |
 | Next step | `devflow.implement` |

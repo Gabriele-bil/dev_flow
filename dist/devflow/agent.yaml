@@ -75,6 +75,9 @@ pipeline:
     - command: /devflow.run
       skill: devflow-run
       description: "Chain implement → beautify → test as one unattended session — decision flags instead of pauses, consolidated report, stop before ship"
+    - command: /devflow.auto
+      skill: devflow-auto
+      description: "Chain task → plan → analyze → implement as one unattended session from a raw feature idea — decision flags instead of pauses, consolidated report, stop before beautify"
     - command: /devflow.backprop
       skill: devflow-backprop
       description: "Backpropagate a bug or failing test into the spec — trace to acceptance criterion, classify the gap, tighten task.md, add regression test"
@@ -138,6 +141,8 @@ skills:
       description: "Resumes an interrupted DevFlow session — reads saved state, cross-checks plan.md markers, confirms resume position, re-enters correct pipeline skill"
     - id: devflow-run
       path: skills/devflow-run/SKILL.md
+    - id: devflow-auto
+      path: skills/devflow-auto/SKILL.md
       description: "Chains implement → beautify → test as one unattended session — autonomy policy table, decision flags instead of pauses, consolidated report, stops before ship"
     - id: devflow-backprop
       path: skills/devflow-backprop/SKILL.md

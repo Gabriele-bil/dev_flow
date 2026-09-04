@@ -23,6 +23,8 @@ idea
 
 Each step produces an artifact that feeds the next. Do not skip steps.
 
+**Autonomous entry point:** `devflow.auto <idea>` chains `task → plan → analyze → implement` unattended (defensible defaults + decision flags instead of clarification pauses; Constitution and `devflow.analyze` Critical/Required findings still hard-stop). Stops before `devflow.beautify` — continue manually or with `devflow.run --from beautify`.
+
 ---
 
 ## Commands (entry points)
@@ -35,6 +37,7 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 | `devflow.clarify` | [`templates/devflow/skills/devflow-clarify/SKILL.md`](templates/devflow/skills/devflow-clarify/SKILL.md) | `task.md` (with markers) → resolved `task.md` (Status: clarified) — optional step between task and plan |
 | `devflow.analyze` | [`templates/devflow/skills/devflow-analyze/SKILL.md`](templates/devflow/skills/devflow-analyze/SKILL.md) | `task.md` + `plan.md` → consistency report (traceability, AC testability, terminology, constitution alignment, coverage balance) |
 | `devflow.blueprint` | [`templates/devflow/skills/devflow-blueprint/SKILL.md`](templates/devflow/skills/devflow-blueprint/SKILL.md) | Large idea → multi-PR blueprint with dependency graph + adversarial review |
+| `devflow.auto` | [`templates/devflow/skills/devflow-auto/SKILL.md`](templates/devflow/skills/devflow-auto/SKILL.md) | Idea → chained `task → plan → analyze → implement`, unattended, stops before beautify |
 | `devflow.implement` | [`templates/devflow/skills/devflow-implement/SKILL.md`](templates/devflow/skills/devflow-implement/SKILL.md) | `plan.md` → code on `feat|fix|…/[NNN]-[name]` |
 | `devflow.beautify` | [`templates/devflow/skills/devflow-beautify/SKILL.md`](templates/devflow/skills/devflow-beautify/SKILL.md) | Implemented files → polished code |
 | `devflow.test` | [`templates/devflow/skills/devflow-test/SKILL.md`](templates/devflow/skills/devflow-test/SKILL.md) | Feature → unit + integration tests |

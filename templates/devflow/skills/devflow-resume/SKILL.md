@@ -57,7 +57,7 @@ Also read the handoff when present — prose context written under context press
 cat devflow/features/[NNN]_[feature-name]/handoff.md 2>/dev/null
 ```
 
-`.devflow-run.json` present (stale run marker from interrupted `devflow.run`): note it for Step 3 — run mode died with its session, never silently re-arm.
+`.devflow-run.json` present (stale run marker from interrupted `devflow.run` or `devflow.auto` — check `from`/`until` to tell which): note it for Step 3 — run mode died with its session, never silently re-arm.
 
 ### Step 2 — Cross-check state against files
 
@@ -91,7 +91,7 @@ First pending: [file path, if mid-implement]
 Checkpoint:  [slice + last decision + last error tried, if .checkpoint.json present]
 Handoff:     [next action from handoff.md, if present]
 [Drift note, if state file disagreed with plan.md]
-[Stale run marker found — resume interactively (delete .devflow-run.json) or re-arm devflow.run?, if present]
+[Stale run marker found — resume interactively (delete .devflow-run.json) or re-arm devflow.run / devflow.auto?, if present]
 
 Continue with [next_step]? (yes / no / different step)
 ```
@@ -103,7 +103,7 @@ On confirmation, execute the skill for `next_step` honoring its input contract:
 - `devflow.implement` mid-run: enter at first `[pending]` File List entry. When slice headings carry `deps:` annotations (`plan-template.md` → **Slice dependency annotations**): enter at the first `[pending]` entry of a slice whose dep slices are all `[done]`; note any blocked slice skipped. Never re-implement a `[done]` file unless explicitly asked.
 - All other steps: run from their Step 0.
 
-After position confirmed: delete consumed `handoff.md` (`rm -f devflow/features/[NNN]_[feature-name]/handoff.md`); delete stale `.devflow-run.json` unless user chose to re-arm via `devflow.run`.
+After position confirmed: delete consumed `handoff.md` (`rm -f devflow/features/[NNN]_[feature-name]/handoff.md`); delete stale `.devflow-run.json` unless user chose to re-arm via `devflow.run` or `devflow.auto`.
 
 ## Common Rationalizations
 
@@ -128,7 +128,7 @@ After position confirmed: delete consumed `handoff.md` (`rm -f devflow/features/
 | --- | --- |
 | Reads | `.devflow-state.json`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md` (existence), `devflow/features/[NNN]_[feature-name]/.checkpoint.json` (working context), `devflow/features/[NNN]_[feature-name]/handoff.md` (context-pressure handoff), `.devflow-run.json` (stale-marker check), `devflow/config.md`, `@devflow/references/adapter-resolution.md` |
 | Reads | `@devflow/references/state-machine.md` — status/transition source of truth |
-| Deletes | `handoff.md` (after position confirmed), stale `.devflow-run.json` (unless user re-arms `devflow.run`) |
+| Deletes | `handoff.md` (after position confirmed), stale `.devflow-run.json` (unless user re-arms `devflow.run` or `devflow.auto`) |
 | Writes | nothing else (routing only) |
 | Routes to | pipeline skill matching `next_step` |
 | Related | `devflow-status` (snapshot only), `devflow-recovery` (corrupted state) |

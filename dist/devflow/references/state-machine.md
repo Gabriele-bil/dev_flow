@@ -10,7 +10,7 @@ Single source of truth for DevFlow statuses and transitions. Cited by `devflow-d
 | `plan.md` | `**Status:**` + `[done]`/`[pending]` markers | pipeline skills at step boundaries |
 | `.devflow-state.json` | snapshot (feature, plan_status, next_step, progress) | `hooks/pre-compact.sh`, `hooks/post-task-create.sh`, skills via State update snippet |
 | `devflow/features/[NNN]_[name]/.checkpoint.json` | working context (step, slice, decisions, errors_tried) | `devflow.implement` (slice boundaries), `devflow.test` (retry loops); deleted by `devflow.pr` |
-| `.devflow-run.json` | autonomous-run marker (feature, from, until) | `devflow.run` Step 0; deleted at every run exit |
+| `.devflow-run.json` | autonomous-run marker (feature, from, until) | `devflow.run` Step 0 or `devflow.auto` Step 0; deleted at every run exit |
 | `devflow/features/[NNN]_[name]/handoff.md` | context-pressure handoff (current slice, next action, open decisions, errors tried) | `devflow.implement` / `devflow.test` on pressure signal; consumed + deleted by `devflow.resume`; leftover deleted by `devflow.pr` |
 
 `plan.md` is authoritative; `.devflow-state.json` is a derived cache. On conflict → trust `plan.md`, resync via `devflow.recovery`.
@@ -99,7 +99,12 @@ Append to existing arrays instead of overwriting: read current file with `jq '.d
 
 ## Run marker (autonomous mode)
 
-`.devflow-run.json` at project root — presence switches pipeline skills to **run mode**: ambiguity → decision flag in `plan.md` `## Decision flags` (see `devflow-run` skill → Step 2), intermediate notify gates do not wait for user.
+`.devflow-run.json` at project root — presence switches pipeline skills to **run mode**: ambiguity → decision flag in `plan.md` `## Decision flags` (see `devflow-run` skill → Step 2, `devflow-auto` skill → Step 2), intermediate notify gates do not wait for user.
+
+Shared by two orchestrators, distinguished by `from`/`until` vocabulary:
+
+- `devflow.run` — `from`/`until` ∈ `implement` | `beautify` | `test` | `ship`; `feature` known upfront (task.md + plan.md already exist)
+- `devflow.auto` — `from`/`until` ∈ `task` | `plan` | `analyze` | `implement`; `feature` is `null` until its `task` step writes `task.md`, then updated in place
 
 ```json
 {
@@ -115,10 +120,10 @@ Append to existing arrays instead of overwriting: read current file with `jq '.d
 
 Lifecycle:
 
-- Written by `devflow.run` Step 0 — only after explicit user confirmation; no other skill arms run mode
-- Deleted by `devflow.run` on every exit path (complete, contract failure, block, handoff)
-- Never committed — `devflow.run` appends it to `.gitignore` when present
-- Stale marker (found at session start, no run in progress) → `devflow.resume` asks: continue interactively (delete marker) or re-arm `devflow.run`; corrupted → `devflow.recovery`
+- Written by `devflow.run` Step 0 or `devflow.auto` Step 0 — only after explicit user confirmation; no other skill arms run mode
+- Deleted by the owning orchestrator (`devflow.run` or `devflow.auto`) on every exit path (complete, contract failure, block, handoff)
+- Never committed — the arming orchestrator appends it to `.gitignore` when present
+- Stale marker (found at session start, no run in progress) → `devflow.resume` asks: continue interactively (delete marker) or re-arm the orchestrator named in `from`/`until` (`devflow.run` or `devflow.auto`); corrupted → `devflow.recovery`
 
 Optional fields, read by `devflow-ship` Step 4b (autonomous grader loop):
 

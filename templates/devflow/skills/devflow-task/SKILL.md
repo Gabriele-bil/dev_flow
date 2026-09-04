@@ -74,6 +74,8 @@ Rules:
 - Use **`AskQuestion`** tool if available; otherwise ask in chat
 - Skip entirely if the idea is already clear enough
 
+**Run mode** (`.devflow-run.json` present): do not stop or ask — pick defensible default per unresolved point (repo precedent > `docs/product.md` > most conservative/fail-closed reading), record each as a one-line assumption in `task.md` **`## Notes`**; never leave a raw `[NEEDS CLARIFICATION: ...]` marker unresolved. Missing **App** on a monorepo feature still hard-stops — never guessed, run mode or not.
+
 ### Step 5 - Quick stress-test
 
 Read **`refinement-hints.md`**, run 8D pass (user value, feasibility, overlap, scope honesty, riskiest assumption, edge cases, integration, terminology); push back if scope too large.
@@ -86,6 +88,8 @@ Propose 3 `kebab-case` names:
 - Consistent with `devflow/features/` names
 
 Use **`AskQuestion`** with three options if available; otherwise list names and wait.
+
+**Run mode** (`.devflow-run.json` present): do not wait — take the first proposed name, note the other two as alternatives in `task.md` **`## Notes`**.
 
 ### Step 7 - Determine incremental number
 
@@ -154,5 +158,6 @@ Respond using template in `references/notify-template.md`.
 |           |                                                                                                                                               |
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | Reads     | `devflow/config.md` (Apps table, monorepo only); `docs/product.md` (required); `constitution.md`, `registry.md` (as needed); `DESIGN.md` / `docs/design.md` (if present); `refinement-hints.md` (Step 4); `examples.md` (optional guidance); `references/task-template.md`, `references/notify-template.md` |
+| Reads (conditional) | `.devflow-run.json` (existence — run-mode switch, per `devflow-auto`) |
 | Writes    | `devflow/features/[NNN]_[feature-name]/task.md`                                                                                               |
 | Next step | `devflow.plan` → `plan.md` (full template in `devflow/skills/devflow-plan/SKILL.md`)                                                          |
