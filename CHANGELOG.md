@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.15.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.14.0...devflow-v1.15.0) (2026-09-11)
+
+
+### Features
+
+* Add .claude settings for MCP permissions and document token economy guidelines in CLAUDE.md ([0e938fd](https://github.com/Gabriele-bil/dev_flow/commit/0e938fd25b79dc6a58315b875181edf75cc476f2))
+* Add tool/context configurations to agents and skills, update plugin manifest metadata, and add timeouts to hook commands ([1a0a9fc](https://github.com/Gabriele-bil/dev_flow/commit/1a0a9fc45d9b96c4836085ae75e44a63961a684a))
+* Upgrade to Next.js 15 and React 19 standards, include NestJS in manifest, and update architectural patterns across adapters. ([9d1710f](https://github.com/Gabriele-bil/dev_flow/commit/9d1710fa9df97d7b0aa93a39b343dfa813ef356f))
+
 ## [1.14.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.13.0...devflow-v1.14.0) (2026-09-04)
 
 
