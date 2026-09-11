@@ -2,7 +2,7 @@
 
 Single source of truth for NestJS behavior. Pipeline skills (`devflow-plan`, `devflow-implement`, `devflow-beautify`, `devflow-test`, `devflow-pr`) **must** read `@devflow/config.md`, resolve adapter, then load this core file **plus** the `steps/<step>.md` file for the active step (see **Step files** below). Do not load step files for other steps.
 
-Baseline: **NestJS 10+ · TypeORM · class-validator + class-transformer · Passport-JWT · Jest + Supertest**. Backend/API only — no DOM, no UI framework. Keep output token-lean and imperative.
+Baseline: **NestJS 10+/11+ · Express v5 default · TypeORM · class-validator + class-transformer · Passport-JWT · Jest + Supertest**. Backend/API only — no DOM, no UI framework. Keep output token-lean and imperative.
 
 ## Technology skills (load by feature type)
 

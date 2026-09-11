@@ -120,15 +120,70 @@ function LikeButton({ likes, postId }: Props) {
 }
 ```
 
-## useFormStatus and useActionState
+## React 19 Primitives
+
+### 1. `ref` as a standard prop (No `forwardRef`)
+
+In React 19, `ref` is passed directly as a prop in function components:
+
+```tsx
+// components/ui/custom-input.tsx
+export function CustomInput({
+  ref,
+  label,
+  ...props
+}: {
+  ref?: React.Ref<HTMLInputElement>
+  label: string
+} & React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <div>
+      <label>{label}</label>
+      <input ref={ref} {...props} />
+    </div>
+  )
+}
+```
+
+### 2. `use()` hook for unwrapping Promise props
+
+In Next.js 15, route `params` and `searchParams` passed down to Client Components can be unwrapped with `use()`:
 
 ```tsx
 'use client'
+import { use } from 'react'
+
+export function UserHeader({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
+  return <h1>User: {id}</h1>
+}
+```
+
+## useFormStatus and useActionState
+
+In React 19, `useActionState` is imported from `'react'`:
+
+```tsx
+'use client'
+import { useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
+import { updateUserAction } from '../actions'
 
 function SubmitButton() {
   const { pending } = useFormStatus()
   return <button disabled={pending}>{pending ? 'Saving...' : 'Save'}</button>
+}
+
+export function EditUserForm({ initialName }: { initialName: string }) {
+  const [state, formAction, isPending] = useActionState(updateUserAction, { error: null })
+
+  return (
+    <form action={formAction}>
+      <input name="name" defaultValue={initialName} disabled={isPending} />
+      {state.error && <p className="text-destructive">{state.error}</p>}
+      <SubmitButton />
+    </form>
+  )
 }
 ```
 

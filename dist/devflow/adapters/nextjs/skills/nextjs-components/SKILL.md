@@ -11,7 +11,14 @@ Full code examples: `references/components-patterns.md`.
 
 ## Baseline
 
-Next.js 14+, React 18+, TypeScript strict.
+Next.js 15+, React 19, TypeScript strict.
+
+## React 19 Primitives
+
+- **`ref` as prop**: In React 19, `ref` is a standard prop on function components (`function MyInput({ ref, ...props })`). Do NOT use `forwardRef`.
+- **`use()` hook**: In Client Components, unwrap Promises passed as props (e.g. `const params = use(props.params)`) and read context conditionally.
+- **`useActionState`**: React 19 native hook (`const [state, formAction, isPending] = useActionState(serverAction, initialState)`). Replaces `useFormState` and includes built-in `isPending`.
+- **`useOptimistic`**: For immediate optimistic UI updates during async transitions.
 
 ## When to Use `'use client'`
 
@@ -29,6 +36,7 @@ Add directive ONLY if component uses:
 - Server Component fetches → passes as props to Client Component
 - Never re-fetch in Client Component
 - Props must be serializable: no functions, no class instances, no raw `Date` (use ISO string)
+- When passing Promise props (like Next.js 15 dynamic `params`), unwrap in the Client Component using React 19 `use(props.params)`.
 
 Full code → `references/components-patterns.md`.
 
@@ -62,8 +70,8 @@ Use `useOptimistic` for reactive UI before server confirmation. Full code → `r
 
 ## useFormStatus and useActionState
 
-- `useFormStatus` — access parent form state (`pending`, `data`, `method`, `action`)
-- `useActionState` — manage Server Action state/error with progressive enhancement
+- `useFormStatus` — access parent form state (`pending`, `data`, `method`, `action`) inside child submit buttons
+- `useActionState` — manage Server Action state, errors, and `isPending` natively with progressive enhancement
 
 Full code → `references/components-patterns.md`.
 

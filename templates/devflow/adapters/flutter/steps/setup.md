@@ -31,6 +31,10 @@ Dependencies below are authoritative for `devflow.setup` auto-install.
 - `flutter_hooks`
 - `freezed_annotation`
 - `json_annotation`
+- `supabase_flutter`
+- `flutter_form_builder`
+- `form_builder_validators`
+- `skeletonizer`
 
 ### flutter-dev-dependencies
 

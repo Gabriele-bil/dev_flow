@@ -380,4 +380,19 @@ export class DeprecationInterceptor implements NestInterceptor {
     return next.handle();
   }
 }
+
+## Express v5 Route Path Patterns (NestJS 11+)
+
+In NestJS 11+ (defaulting to Express v5), route matching strictly follows updated path patterns:
+
+```typescript
+// ❌ Express v4 legacy syntax (causes runtime errors or unmatched routes in Express v5)
+@Get('*')                     // Raw asterisk wildcard disallowed
+@Get('users/:id?')            // Regex optional parameter syntax disallowed
+@Get('files/(.*)')            // Raw regex disallowed in string path
+
+// ✅ Express v5 syntax
+@Get('*splat')                // Named wildcard pattern
+@Get('users/{:id}')           // Brace syntax for optional parameters
+@Get('{:slug}')               // Root optional segment
 ```

@@ -9,14 +9,14 @@ Use when touching Flutter UI styling.
 
 ## Objectives
 
-- Keep visual decisions centralized under [`lib/core/theme`](lib/core/theme): `MaterialTheme` builds `ThemeData`; shared imports use [`lib/core/theme/_theme.dart`](lib/core/theme/_theme.dart).
+- Keep visual decisions centralized under `lib/core/theme`: `MaterialTheme` builds `ThemeData`; shared imports use `lib/core/theme/_theme.dart`.
 - Prefer semantic Material 3 `ColorScheme` roles over raw values.
 - Make styling predictable, reusable, and easy to review.
 - Avoid local overrides that create design drift.
 
 ## 1) Theme-first rule (mandatory)
 
-Never hardcode visual values in widgets. Pull from `ThemeData`, `ColorScheme`, `TextTheme`, and layout tokens (`AppLayout` in [`app_layout.dart`](lib/core/theme/app_layout.dart)).
+Never hardcode visual values in widgets. Pull from `ThemeData`, `ColorScheme`, `TextTheme`, and layout tokens (`AppLayout` in `lib/core/theme/app_layout.dart`).
 
 ```dart
 final theme = Theme.of(context);
@@ -36,7 +36,7 @@ BorderRadius.circular(12); // use AppLayout (or a new token) instead
 
 ## 2) Color system conventions
 
-This app uses **explicit** light/dark `ColorScheme` values in [`theme.dart`](lib/core/theme/theme.dart) (`MaterialTheme.lightScheme()`, `MaterialTheme.darkScheme()`, plus high/medium contrast variants). When extending palettes, keep using roles by intent:
+Use explicit light/dark `ColorScheme` values in `lib/core/theme/theme.dart` (`MaterialTheme.lightScheme()`, `MaterialTheme.darkScheme()`, or `ColorScheme.fromSeed`). When extending palettes, keep using roles by intent:
 
 - `primary` / `onPrimary`: CTA and content on CTA
 - `surface` / `onSurface`: page surfaces + default readable text
@@ -48,7 +48,7 @@ Add `app_colors.dart` in the same folder only if you need non-semantic colors no
 
 ## 3) Typography conventions
 
-Google Fonts and the merged `TextTheme` are produced by [`createTextTheme`](lib/core/theme/util.dart) in [`App`](lib/app.dart) (body: Outfit, display: Plus Jakarta Sans), then passed into `MaterialTheme`.
+Configure Google Fonts and the merged `TextTheme` centrally (e.g. via `google_fonts` in `lib/core/theme/util.dart` or `app.dart`), then pass into `MaterialTheme` / `ThemeData`.
 
 Use `TextTheme` as the source of truth in widgets. If needed, tweak one property with `copyWith`.
 
@@ -59,7 +59,7 @@ Text('Profile', style: text.titleLarge);
 Rules:
 
 - Do not create inline `TextStyle(...)` in feature widgets.
-- Do not change font pairing in random screens; adjust `App` + `util.dart` / theme wiring instead.
+- Do not change font pairing in random screens; adjust central theme wiring instead.
 - Use `labelLarge` for button text, `title*` for titles, `body*` for content.
 
 ## 4) Component theming strategy

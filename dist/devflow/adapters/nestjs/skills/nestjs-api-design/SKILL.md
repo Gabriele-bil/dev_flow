@@ -34,9 +34,14 @@ Logging, response-envelope transformation, timeouts, caching, error-type mapping
 
 Built-ins first: `ParseUUIDPipe`, `ParseIntPipe`, `ParseEnumPipe`, `DefaultValuePipe`. Custom `PipeTransform` for domain-specific parsing (`ParseDatePipe`, comma-separated-list parsing) — keeps handlers free of manual `parseInt`/`isUUID`/type-coercion checks. Global `ValidationPipe({ transform: true, transformOptions: { enableImplicitConversion: true } })` complements per-param pipes for whole-DTO query/body transformation.
 
-## 4) API Versioning (MEDIUM)
+## 4) API Versioning & Route Path Matching (MEDIUM)
 
 Enable via `app.enableVersioning({ type: VersioningType.URI | HEADER | MEDIA_TYPE, defaultVersion: '1' })` — pick one strategy, apply consistently, never mix ad hoc `v1/users`-style manual route prefixes with the built-in system. `@Version('2')` on a controller/handler for breaking changes; `@Version(VERSION_NEUTRAL)` for endpoints unaffected by the bump; `@Version(['1','2'])` when one handler serves multiple versions. Deprecate old versions explicitly — `Deprecation`/`Sunset`/`Link` response headers via an interceptor — rather than silently dropping them.
+
+**Express v5 Route Syntax (NestJS 11+):**
+- Wildcards MUST be named: use `@Get('*splat')` instead of `@Get('*')`.
+- Optional parameters MUST use braces: use `@Get('{:name}')` or `@Get('users/{:id}')` instead of `/:name?`.
+- Raw regex characters in path strings are disallowed.
 
 ## 5) API-Consumer Accessibility (OpenAPI + Structured Errors)
 

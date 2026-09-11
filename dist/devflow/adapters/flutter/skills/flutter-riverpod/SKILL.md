@@ -21,13 +21,16 @@ Full code: `references/riverpod-patterns.md`.
 
 ## Core Rules
 
-1. Prefer `@riverpod` code generation for type-safe providers.
-2. Keep a single source of truth in providers (avoid duplicated mutable widget state).
-3. In UI, use `ref.watch` for rendering, `ref.read` for actions, `ref.listen` for side effects.
-4. Use `select`/`selectAsync` when only a sub-field should trigger rebuilds.
-5. Make invalidation strategy explicit (`invalidate`, `refresh`, `invalidateSelf`).
-6. **Loading UI must use the `skeleton` extension** on `AsyncValue` (never `when(loading: …)` spinners/shimmers for content).
-7. **Skeleton mock lives on the entity** — pass `Entity.mock()` (or `Entity.mockList()`) as `mock:`; never inline ad-hoc fake data in widgets.
+1. Prefer `@riverpod` code generation for type-safe providers (`Notifier` and `AsyncNotifier`).
+2. Do not use legacy `StateNotifierProvider` or `StateProvider` (deprecated in Riverpod 3.0).
+3. In Riverpod 3.0, use the unified `Ref` class (subclasses like `NotifierRef` are removed).
+4. Use `AsyncValue.value` instead of deprecated `valueOrNull` (returns null during loading/error).
+5. Keep a single source of truth in providers (avoid duplicated mutable widget state).
+6. In UI, use `ref.watch` for rendering, `ref.read` for actions, `ref.listen` for side effects.
+7. Use `select`/`selectAsync` when only a sub-field should trigger rebuilds.
+8. Make invalidation strategy explicit (`invalidate`, `refresh`, `invalidateSelf`).
+9. **Loading UI must use the `skeleton` extension** on `AsyncValue` (never `when(loading: …)` spinners/shimmers for content).
+10. **Skeleton mock lives on the entity** — pass `Entity.mock()` (or `Entity.mockList()`) as `mock:`; never inline ad-hoc fake data in widgets.
 
 ## Provider Selection
 

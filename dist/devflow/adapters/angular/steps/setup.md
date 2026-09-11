@@ -29,4 +29,5 @@ Dependencies below are authoritative for `devflow.setup` auto-install.
 
 ### js-dev-dependencies
 
-- none
+- `vitest`
+- `jsdom`

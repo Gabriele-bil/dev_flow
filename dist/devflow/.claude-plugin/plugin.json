@@ -1,7 +1,7 @@
 {
   "name": "devflow",
   "version": "1.14.0",
-  "description": "Spec-driven development pipeline: idea → task → plan → implement → beautify → test → PR. Adapter-based architecture — supports Angular, Flutter and Next.js.",
+  "description": "Spec-driven development pipeline: idea → task → plan → implement → beautify → test → PR. Adapter-based architecture — supports Angular, Flutter, NestJS and Next.js.",
   "author": {
     "name": "DevFlow"
   },

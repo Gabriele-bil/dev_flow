@@ -33,11 +33,14 @@ Pattern: Server Component fetches data → passes as props to Client Component (
 
 ## 2) Data Fetching and Cache
 
-Cache strategies: **STATIC** (default, cached at build), **DYNAMIC** (`cache: 'no-store'`), **ISR** (`next: { revalidate: N }`), **TAG-BASED** (`next: { tags: [...] }` + `revalidateTag()`).
+> **Next.js 15 default:** `fetch` requests and GET Route Handlers are **uncached by default** (`cache: 'no-store'`). Client navigations also bypass stale cache by default.
 
-For non-fetch caching (DB queries, ORMs) use `'use cache'` (Next.js 15+, replaces `unstable_cache`; requires `cacheComponents: true` in `next.config.ts`). Constraint: `cookies()`, `headers()`, `searchParams` are NOT accessible inside `'use cache'` — extract outside and pass as arguments.
+Cache strategies:
+- **UNCACHED (default in v15):** standard `fetch()` or DB call with no caching.
+- **CACHED (opt-in):** `fetch(url, { next: { revalidate: N } })` for ISR, or `next: { tags: [...] }` + `revalidateTag()`.
+- **`'use cache'` directive (Next.js 15+):** For non-fetch caching (DB queries, ORMs; replaces `unstable_cache`). Configure `cacheLife()` and `cacheTag()`. Constraint: `cookies()`, `headers()`, `searchParams` cannot be read inside `'use cache'` — pass needed values as arguments.
 
-`fetch()` calls with identical URL + options dedupe automatically within a request lifecycle. Use `React.cache()` to preload data and avoid waterfalls when a Server Component needs to kick off a fetch before a child requests it.
+`fetch()` calls with identical URL + options dedupe automatically within a single request lifecycle. Use `React.cache()` to dedupe non-fetch functions (ORM/DB queries) within a request.
 
 Route-level overrides: `export const dynamic`, `revalidate`, `fetchCache` in `page.tsx`.
 
@@ -71,15 +74,17 @@ File: `app/api/[resource]/route.ts`. Named exports map to HTTP methods: `GET`, `
 | File upload endpoint | Any user-triggered data change |
 | Streaming response (SSE, chunked) | Revalidation after save |
 
-Full code: GET/POST handlers with Zod validation, dynamic route segments (`params` is async in Next.js 15+) → `references/server-patterns.md`.
+Full code: GET/POST handlers with Zod validation, dynamic route segments (`params` must be awaited: `const { resource } = await params`) → `references/server-patterns.md`.
 
-## 5) Cookies, Headers, Redirect, notFound
+## 5) Async Request APIs (Cookies, Headers, Params)
 
-All available in Server Components and Server Actions. Import from `next/headers` or `next/navigation`.
+> **Next.js 15+ breaking change:** `cookies()`, `headers()`, `params`, and `searchParams` return Promises. You MUST `await` them in Server Components, Route Handlers, and Server Actions.
+> - Server Component: `export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ [key: string]: string }> }) { const { id } = await params; ... }`
+> - Cookies: `const cookieStore = await cookies(); const token = cookieStore.get('token');`
+> - Headers: `const headersList = await headers();`
+> Codemod: `npx @next/codemod@latest next-async-request-api .`
 
 `redirect()` and `notFound()` throw internally — place them AFTER try/catch blocks, never inside them.
-
-> **Next.js 15+ breaking change:** `cookies()` and `headers()` return a Promise. Always `await` before calling `.get()`, `.set()`, `.delete()`. Codemod: `npx @next/codemod@latest next-async-request-api .`
 
 Full code → `references/server-patterns.md`.
 

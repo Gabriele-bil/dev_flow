@@ -23,12 +23,12 @@ Pattern: Server Component fetches data → passes as props to Client Component. 
 ## Cache strategies
 
 ```ts
-// STATIC — cached at build time, never refetched (default when no option given)
-const res = await fetch('https://api.example.com/static-data')
+// UNCACHED (Next.js 15+ default) — always fresh, equivalent to cache: 'no-store'
+const res = await fetch('https://api.example.com/live-data')
 
-// DYNAMIC — always fresh, never cached
-const res = await fetch('https://api.example.com/live-data', {
-  cache: 'no-store',
+// STATIC (opt-in) — cached indefinitely at build time
+const res = await fetch('https://api.example.com/static-data', {
+  cache: 'force-cache',
 })
 
 // ISR — revalidate every N seconds (Incremental Static Regeneration)

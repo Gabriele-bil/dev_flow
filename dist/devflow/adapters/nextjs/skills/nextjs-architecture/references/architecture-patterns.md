@@ -164,18 +164,19 @@ export default function Default() {
 ```
 
 ```tsx
-// app/@modal/(.)product/[id]/page.tsx — modale
+// app/@modal/(.)product/[id]/page.tsx — modal client component
 'use client'
+import { use } from 'react'
 import { useRouter } from 'next/navigation'
 
-export default async function ProductModal({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  const product = await getProduct(id)
+export default function ProductModal({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params) // React 19 use() to unwrap async params in Client Component
+  const router = useRouter()
 
   return (
-    <dialog open>
-      <button onClick={() => useRouter().back()}>Chiudi</button>
-      <ProductDetail product={product} />
+    <dialog open className="backdrop:bg-black/50 p-6 rounded-lg">
+      <button onClick={() => router.back()} className="text-sm font-semibold">Chiudi</button>
+      <p>Product ID: {id}</p>
     </dialog>
   )
 }

@@ -45,7 +45,7 @@ Use `_client.auth.currentUser` / `currentSession`, `signInWithPassword`, `signIn
 
 ## 7) Storage patterns
 
-Upload with `storage.from(bucket).uploadBinary(...)`, delete with `.remove([path])`. Path convention: `[bucket]/[user_id]/[pet_id]/[filename]`. Full code → `references/supabase-patterns.md`.
+Upload with `storage.from(bucket).uploadBinary(...)`, delete with `.remove([path])`. Path convention: `[bucket]/[user_id]/[entity_id]/[filename]`. Full code → `references/supabase-patterns.md`.
 
 ## 8) Realtime patterns
 

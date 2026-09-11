@@ -30,9 +30,9 @@ Zod schema defined once, before the form, reused unchanged in Server Action vali
 
 - Validating client-side only without Server Action validation
 - Duplicating Zod schema — one schema, reused everywhere
-- Managing loading state manually instead of `useTransition` or `useFormStatus`
+- Managing loading state manually instead of `isPending` from `useActionState` / `useTransition` or `useFormStatus`
 - Not mapping server errors with `form.setError` after failed action response
-- `<form action={serverAction}>` without client validation — use hybrid pattern
+- `<form action={serverAction}>` without client validation — use hybrid pattern with `useActionState` or `handleSubmit` + `startTransition`
 
 ## Review checklist
 

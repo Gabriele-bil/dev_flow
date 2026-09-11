@@ -37,24 +37,30 @@ Is the state used by only one component?
 ### Riverpod (Flutter)
 
 ```dart
-// Provider definition — outside widget tree
-final userProvider = StateNotifierProvider<UserNotifier, UserState>(
-  (ref) => UserNotifier(),
-);
+// Provider definition with @riverpod codegen
+@riverpod
+class UserNotifier extends _$UserNotifier {
+  @override
+  UserState build() => const UserState(name: '');
 
-// Read (no rebuild)
-final user = ref.read(userProvider);
+  void updateName(String name) {
+    state = state.copyWith(name: name);
+  }
+}
+
+// Read (one-shot in callbacks)
+final user = ref.read(userNotifierProvider);
 
 // Watch (rebuild on change)
-final user = ref.watch(userProvider);
+final user = ref.watch(userNotifierProvider);
 
-// Notify
-ref.read(userProvider.notifier).updateName('Alice');
+// Mutate
+ref.read(userNotifierProvider.notifier).updateName('Alice');
 ```
 
-**Pattern**: Notifier owns mutation; widget only reads/watches.
+**Pattern**: Notifier owns mutation; widget only reads/watches via `ref`.
 **Scope**: `ProviderScope` at app root; `ProviderContainer` for test isolation.
-**Async**: Use `AsyncNotifier` + `AsyncValue` for loading/error/data states.
+**Async**: Use `AsyncNotifier` + `AsyncValue` (`.skeleton(mock:)` extension) for loading/error/data states.
 
 ### Signal Store (Angular)
 
@@ -81,24 +87,30 @@ export class UserComponent {
 ### Zustand (Next.js)
 
 ```typescript
-// Store definition
+// Store definition (curried create for TypeScript)
 interface UserState {
   name: string;
   setName: (name: string) => void;
 }
 
-const useUserStore = create<UserState>((set) => ({
+export const useUserStore = create<UserState>()((set) => ({
   name: '',
   setName: (name) => set({ name }),
 }));
 
-// Component usage
-const name = useUserStore((state) => state.name); // slice selector
+// Component usage: granular selector
+const name = useUserStore((state) => state.name);
+
+// Multi-property selector requires useShallow (Zustand 5) to prevent infinite re-renders:
+import { useShallow } from 'zustand/react/shallow';
+const { name, setName } = useUserStore(
+  useShallow((state) => ({ name: state.name, setName: state.setName }))
+);
 ```
 
-**Pattern**: `create` defines store; components use slice selectors to prevent over-render.
+**Pattern**: `create` defines store; components use slice selectors (or `useShallow`) to prevent over-render.
 **Scope**: Module-level store (global); `createStore` + `useStore` for feature-scoped.
-**Server**: Zustand is client-side only; server state via React Server Components or SWR/React Query.
+**Server**: Zustand is client-side only; server state is fetched in Server Components and managed via Next.js cache and Server Actions. Never duplicate server cache in Zustand.
 
 ## Shared Mental Model
 
@@ -106,13 +118,13 @@ All three solutions share the same conceptual structure:
 
 | Concept | Riverpod | Signal Store | Zustand |
 | --------- | ---------- | -------------- | --------- |
-| State container | `StateNotifier` | `signalStore` | `create` |
+| State container | `@riverpod` Notifier | `signalStore` | `create` |
 | Read state | `ref.watch` | `store.field` (signal) | `useStore(sel)` |
 | Mutate state | notifier method | store method | set / action |
-| Derived state | `.select` | `withComputed` | slice selector |
-| Async state | `AsyncNotifier` | `withMethods` + RxJS | devtools + middleware |
-| Feature scope | `ProviderScope` | component `providers` | `createStore` |
-| Test isolation | `ProviderContainer` | `TestBed` overrides | mock store |
+| Derived state | `.select` / `@riverpod` fn | `withComputed` | slice selector / `useShallow` |
+| Async state | `AsyncNotifier` (`AsyncValue`) | `withMethods` + RxJS / `resource()` | devtools + middleware |
+| Feature scope | `ProviderScope` | component `providers` | `createStore` / context |
+| Test isolation | `ProviderContainer` | `TestBed` overrides | mock store / `setState` |
 
 ## Anti-Patterns
 
@@ -123,7 +135,7 @@ All three solutions share the same conceptual structure:
 | Deriving state in components | Define derived state in store (`withComputed`, selectors, `.select`) |
 | One store for entire application | Feature stores with clear ownership per domain |
 | Async state without loading/error/empty | Handle all async states (`AsyncValue`, loading signal, Zustand middleware) |
-| Server state in client store (Next.js) | Server state → React Query/SWR; UI state only in Zustand |
+| Server state in client store (Next.js) | Server state → Server Components + Next.js cache; UI state only in Zustand |
 | Testing with real store | Inject mock store / `ProviderContainer` per test |
 
 ## I/O Reference

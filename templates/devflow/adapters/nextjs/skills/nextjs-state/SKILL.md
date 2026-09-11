@@ -51,8 +51,20 @@ Always `use[Feature]Store`: `useUIStore`, `useCartStore`, `useNotificationStore`
 Subscribe only to the required slice — never the entire store.
 
 ```ts
-// ✅ Subscribe only to sidebarOpen
+// ✅ Subscribe only to a single primitive slice
 const sidebarOpen = useUIStore((state) => state.sidebarOpen)
+
+// ✅ Multi-property selector: MUST use useShallow from 'zustand/react/shallow' in Zustand 5
+import { useShallow } from 'zustand/react/shallow'
+const { sidebarOpen, toggleSidebar } = useUIStore(
+  useShallow((state) => ({
+    sidebarOpen: state.sidebarOpen,
+    toggleSidebar: state.toggleSidebar,
+  }))
+)
+
+// ❌ Object selector without useShallow (causes infinite re-render loops in Zustand 5 / React 19)
+const { sidebarOpen } = useUIStore((state) => ({ sidebarOpen: state.sidebarOpen }))
 
 // ❌ Subscribe to entire store (re-renders on every change)
 const store = useUIStore()
@@ -136,12 +148,13 @@ beforeEach(() => {
 - Monolithic store — prefer one store per domain
 - Direct mutation without `set` — always use `set`
 - Subscribe to entire store — always use selectors
+- Returning object from selector without `useShallow` — triggers infinite re-render loops in Zustand 5
 - Initialize store from Server Component — store is client-only
 
 ## Review Checklist
 
 - [ ] Naming: `use[Feature]Store`
-- [ ] Granular selector (not entire store)
+- [ ] Granular selector or `useShallow` for multi-value selectors (never naked object selector)
 - [ ] No server data in store
 - [ ] `persist` only for state that must survive refresh
 - [ ] Store testable with `setState` reset
