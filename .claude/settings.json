@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__headroom__headroom_retrieve",
+      "Bash(pnpm lint *)",
+      "Bash(pnpm test *)"
+    ]
+  }
+}
