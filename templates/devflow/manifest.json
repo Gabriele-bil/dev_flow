@@ -1,11 +1,17 @@
 {
   "name": "devflow",
   "description": "Spec-driven development pipeline: idea → task → plan → implement → beautify → test → PR. Adapter-based architecture — supports Angular, Flutter, NestJS and Next.js.",
-  "version": "1.14.0",
+  "version": "1.15.0",
   "author": "DevFlow",
   "repository": "https://github.com/Gabriele-bil/dev_flow",
   "homepage": "https://github.com/Gabriele-bil/dev_flow",
-  "keywords": ["claude-code", "plugin", "spec-driven-development", "devflow", "pipeline"],
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "spec-driven-development",
+    "devflow",
+    "pipeline"
+  ],
   "cursor_support": true,
   "antigravity_support": true
 }
