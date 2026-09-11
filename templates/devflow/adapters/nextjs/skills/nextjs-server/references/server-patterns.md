@@ -44,7 +44,7 @@ const res = await fetch('https://api.example.com/products', {
 
 ## Non-fetch cache (DB queries, ORMs) — `'use cache'`
 
-`'use cache'` is the modern replacement for `unstable_cache` (Next.js 15+). Requires `cacheComponents: true` in `next.config.ts`.
+`'use cache'` is the modern replacement for `unstable_cache` (Next.js 16+). Requires `cacheComponents: true` in `next.config.ts`.
 
 ```ts
 // next.config.ts
@@ -283,7 +283,7 @@ export async function POST(request: NextRequest) {
 ### Dynamic route segments
 
 ```ts
-// app/api/products/[id]/route.ts — params is async in Next.js 15+
+// app/api/products/[id]/route.ts — params is async in Next.js 16+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -303,7 +303,7 @@ All available in Server Components and Server Actions. Import from `next/headers
 import { cookies, headers } from 'next/headers'
 import { redirect, notFound } from 'next/navigation'
 
-// Read cookie — await required in Next.js 15+
+// Read cookie — await required in Next.js 16+
 const cookieStore = await cookies()
 const sessionCookie = cookieStore.get('session')?.value
 
@@ -312,7 +312,7 @@ const cookieStore = await cookies()
 cookieStore.set('session', token, { httpOnly: true, secure: true, sameSite: 'lax' })
 cookieStore.delete('session')
 
-// Read request headers — await required in Next.js 15+
+// Read request headers — await required in Next.js 16+
 const headersList = await headers()
 const userAgent = headersList.get('user-agent')
 const ip = headersList.get('x-forwarded-for')
@@ -324,7 +324,7 @@ redirect('/login')
 notFound()
 ```
 
-> **Next.js 15+ breaking change:** `cookies()` and `headers()` return a Promise. Always `await` before calling `.get()`, `.set()`, `.delete()`. Codemod: `npx @next/codemod@latest next-async-request-api .`
+> **Next.js 16+ (and 15) breaking change:** `cookies()`, `headers()`, and `params` return a Promise. Always `await` before calling `.get()`, `.set()`, `.delete()`. Codemod: `npx @next/codemod@latest upgrade .`
 
 ## Error Handling
 

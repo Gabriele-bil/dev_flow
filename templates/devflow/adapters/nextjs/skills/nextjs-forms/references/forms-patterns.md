@@ -103,6 +103,34 @@ export function ProfileForm() {
 }
 ```
 
+## Native React 19 + Server Action (`useActionState`)
+
+For lightweight or progressively-enhanced forms without React Hook Form:
+
+```tsx
+'use client'
+import { useActionState } from 'react'
+import { updateProfileState, type FormState } from './_lib/actions'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+
+const initialState: FormState = { success: false, error: null }
+
+export function SimpleProfileForm() {
+  const [state, formAction, isPending] = useActionState(updateProfileState, initialState)
+
+  return (
+    <form action={formAction} className="space-y-4">
+      <Input name="email" type="email" placeholder="email@example.com" required />
+      {state.error && <p className="text-sm text-destructive">{state.error}</p>}
+      <Button type="submit" disabled={isPending}>
+        {isPending ? 'Saving...' : 'Save'}
+      </Button>
+    </form>
+  )
+}
+```
+
 ## Server Action — validate with same schema
 
 ```ts

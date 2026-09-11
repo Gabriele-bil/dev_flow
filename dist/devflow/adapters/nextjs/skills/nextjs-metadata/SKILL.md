@@ -15,7 +15,7 @@ Export `metadata` object from `page.tsx` or `layout.tsx` — `title`, `descripti
 
 ## 2) Dynamic Metadata — `generateMetadata`
 
-Use for pages where title/description depend on fetched data. In Next.js 15+, `params` is async. Fetch inside `generateMetadata` is automatically deduped with the same fetch in `page.tsx` if using the same cache key; use React's `cache()` to dedup non-fetch data functions. Full code → `references/metadata-patterns.md`.
+Use for pages where title/description depend on fetched data. In Next.js 16+, `params` is async (`await params`). Fetch inside `generateMetadata` is automatically deduped with the same fetch in `page.tsx` if using the same cache key; use React's `cache()` to dedup non-fetch data functions. Full code → `references/metadata-patterns.md`.
 
 ## 3) OG Image Generation — `next/og`
 

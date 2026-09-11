@@ -19,7 +19,7 @@ Full code examples: `references/architecture-patterns.md`.
 
 ## 1) Baseline (mandatory)
 
-- Next.js 15+ App Router. No Pages Router.
+- Next.js 16+ App Router. No Pages Router.
 - TypeScript strict mode (`"strict": true` in `tsconfig.json`).
 - Default component = Server Component. No directive needed.
 - `'use client'` only when absolutely required (see section 5).
@@ -66,7 +66,7 @@ Rules:
 
 ## 4) Recommended App Structure
 
-Standard layout: route groups `(marketing)` / `(app)` split public vs authenticated areas, feature routes carry their own `_components/` and `actions.ts`, shared `lib/` and `components/` at root, `middleware.ts` at project root (not inside `app/`). Full tree → `references/architecture-patterns.md`.
+Standard layout: route groups `(marketing)` / `(app)` split public vs authenticated areas, feature routes carry their own `_components/` and `actions.ts`, shared `lib/` and `components/` at root, `proxy.ts` at project root (not inside `app/`). Full tree → `references/architecture-patterns.md`.
 
 ## 5) Server/Client Boundary Rules
 

@@ -2,7 +2,7 @@
 
 Single source of truth for Next.js behavior. Pipeline skills (`devflow-plan`, `devflow-implement`, `devflow-beautify`, `devflow-test`, `devflow-pr`) **must** read `@devflow/config.md`, resolve adapter, then load this core file **plus** the `steps/<step>.md` file for the active step (see **Step files** below). Do not load step files for other steps.
 
-Baseline: **Next.js 15+ App Router · Zustand · Tailwind CSS + shadcn/ui · Server Actions + API Routes · Jest + RTL**. Keep output token-lean and imperative.
+Baseline: **Next.js 16+ App Router · Zustand 5 · Tailwind CSS v4 + shadcn/ui · Server Actions + API Routes · Turbopack · Jest + RTL**. Keep output token-lean and imperative.
 
 ## Technology skills (load by feature type)
 

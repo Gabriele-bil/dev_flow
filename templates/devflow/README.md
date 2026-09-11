@@ -47,14 +47,14 @@ Architecture and design rationale: [`docs/architecture.md`](../../docs/architect
 
 ## Adapters
 
-Three adapters ship out of the box:
+Four adapters ship out of the box (plus shared common utilities):
 
 | Adapter | Commands | Stack |
 | --------- | ---------- | ------- |
-| `flutter` | `flutter analyze`, `flutter test` | Flutter · Riverpod · Supabase |
-| `angular` | `pnpm run lint`, `pnpm run test`, `pnpm run build` | Angular v20+ · NgRx Signal Store · Tailwind |
-| `nextjs` | `pnpm lint`, `pnpm test`, `pnpm build` | Next.js 15+ · Zustand · Tailwind · shadcn/ui |
-| `nestjs` | `pnpm lint`, `pnpm test`, `pnpm build` | NestJS · TypeORM · class-validator · Swagger |
+| `flutter` | `flutter analyze`, `flutter test` | Flutter 3.47+ · Riverpod 3 · Supabase |
+| `angular` | `pnpm run lint`, `pnpm run test`, `pnpm run build` | Angular v22+ · NgRx Signal Store · Vitest |
+| `nextjs` | `pnpm lint`, `pnpm test`, `pnpm build` | Next.js 16+ · Zustand 5 · Tailwind v4 · shadcn/ui |
+| `nestjs` | `pnpm lint`, `pnpm test`, `pnpm build` | NestJS 11+/12+ · Express v5 · TypeORM · class-validator / Standard Schema · Swagger |
 
 Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP hints), `steps/` (per-step contract files — `setup.md`, `plan.md`, `implement.md`, `beautify.md`, `test.md`, `pr.md` — each pipeline skill loads only its own), `skills/` (technology skills), and `templates/` (setup templates for `AGENTS.md`, `REGISTRY.md`, `docs/product.md`).
 

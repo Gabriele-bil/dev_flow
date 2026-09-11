@@ -11,7 +11,7 @@ Full code examples: `references/components-patterns.md`.
 
 ## Baseline
 
-Next.js 15+, React 19, TypeScript strict.
+Next.js 16+, React 19, TypeScript strict.
 
 ## React 19 Primitives
 
@@ -36,7 +36,7 @@ Add directive ONLY if component uses:
 - Server Component fetches → passes as props to Client Component
 - Never re-fetch in Client Component
 - Props must be serializable: no functions, no class instances, no raw `Date` (use ISO string)
-- When passing Promise props (like Next.js 15 dynamic `params`), unwrap in the Client Component using React 19 `use(props.params)`.
+- When passing Promise props (like Next.js 16 dynamic `params`), unwrap in the Client Component using React 19 `use(props.params)`.
 
 Full code → `references/components-patterns.md`.
 

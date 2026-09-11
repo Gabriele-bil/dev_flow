@@ -123,9 +123,9 @@ describe('POST /api/items', () => {
 })
 
 describe('GET /api/items/[id]', () => {
-  it('handles async params in Next.js 15+', async () => {
+  it('handles async params in Next.js 16+', async () => {
     const request = new NextRequest('http://localhost/api/items/123')
-    // Next.js 15 requires params to be passed as a Promise:
+    // Next.js 16 (and 15) requires params to be passed as a Promise:
     const response = await GET(request, { params: Promise.resolve({ id: '123' }) })
     expect(response.status).toBe(200)
   })

@@ -45,7 +45,7 @@ components/                    # Shared UI components
 ├── ui/                        # shadcn/ui primitives (Button, Input, etc.)
 └── [feature]/                 # Feature-specific shared components
 
-middleware.ts                  # At project root — NOT inside app/
+proxy.ts                       # At project root — NOT inside app/ (Next.js 16+)
 ```
 
 ## 5) Server/Client Boundary Rules

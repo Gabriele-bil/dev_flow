@@ -24,7 +24,7 @@ Full code examples: `references/security-patterns.md`.
 
 ## 1) Validate All Input (HIGH)
 
-Global `ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true })` in `main.ts` — non-negotiable baseline. Every DTO field carries `class-validator` decorators (`@IsString`, `@IsEmail`, `@IsInt`, `@Min`/`@Max`, `@IsUUID('4')` for path params). Never `@Body() body: any`. Query DTOs use `@Type(() => Number)` + `@IsOptional()` for defaults/coercion.
+Global `ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true })` in `main.ts` — non-negotiable baseline. Every DTO field carries `class-validator` decorators (`@IsString`, `@IsEmail`, `@IsInt`, `@Min`/`@Max`, `@IsUUID('4')` for path params). Never `@Body() body: any`. Query DTOs use `@Type(() => Number)` + `@IsOptional()` for defaults/coercion. In NestJS 12+, Standard Schema is natively supported in route decorators (`@Body(zodSchema)` / `@Query(zodSchema)` with Zod, Valibot, or ArkType) as a lightweight alternative to class-based DTOs.
 
 ## 2) Use Guards for Auth/Authorization (HIGH)
 

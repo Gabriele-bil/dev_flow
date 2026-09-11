@@ -147,7 +147,7 @@ export function CustomInput({
 
 ### 2. `use()` hook for unwrapping Promise props
 
-In Next.js 15, route `params` and `searchParams` passed down to Client Components can be unwrapped with `use()`:
+In Next.js 16+, route `params` and `searchParams` passed down to Client Components can be unwrapped with `use()`:
 
 ```tsx
 'use client'

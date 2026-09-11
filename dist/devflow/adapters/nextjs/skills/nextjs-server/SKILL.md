@@ -33,12 +33,12 @@ Pattern: Server Component fetches data → passes as props to Client Component (
 
 ## 2) Data Fetching and Cache
 
-> **Next.js 15 default:** `fetch` requests and GET Route Handlers are **uncached by default** (`cache: 'no-store'`). Client navigations also bypass stale cache by default.
+> **Next.js 16+ default:** `fetch` requests and GET Route Handlers are **uncached by default** (`cache: 'no-store'`). Client navigations also bypass stale cache by default.
 
 Cache strategies:
-- **UNCACHED (default in v15):** standard `fetch()` or DB call with no caching.
+- **UNCACHED (default in v16+):** standard `fetch()` or DB call with no caching.
 - **CACHED (opt-in):** `fetch(url, { next: { revalidate: N } })` for ISR, or `next: { tags: [...] }` + `revalidateTag()`.
-- **`'use cache'` directive (Next.js 15+):** For non-fetch caching (DB queries, ORMs; replaces `unstable_cache`). Configure `cacheLife()` and `cacheTag()`. Constraint: `cookies()`, `headers()`, `searchParams` cannot be read inside `'use cache'` — pass needed values as arguments.
+- **`'use cache'` directive (Next.js 16+ stable):** For non-fetch caching (DB queries, ORMs; replaces `unstable_cache`). Configure `cacheLife()` and `cacheTag()`. Constraint: `cookies()`, `headers()`, `searchParams` cannot be read inside `'use cache'` — pass needed values as arguments.
 
 `fetch()` calls with identical URL + options dedupe automatically within a single request lifecycle. Use `React.cache()` to dedupe non-fetch functions (ORM/DB queries) within a request.
 
@@ -78,11 +78,11 @@ Full code: GET/POST handlers with Zod validation, dynamic route segments (`param
 
 ## 5) Async Request APIs (Cookies, Headers, Params)
 
-> **Next.js 15+ breaking change:** `cookies()`, `headers()`, `params`, and `searchParams` return Promises. You MUST `await` them in Server Components, Route Handlers, and Server Actions.
+> **Next.js 16+ (and 15) breaking change:** `cookies()`, `headers()`, `params`, and `searchParams` return Promises. You MUST `await` them in Server Components, Route Handlers, and Server Actions.
 > - Server Component: `export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ [key: string]: string }> }) { const { id } = await params; ... }`
 > - Cookies: `const cookieStore = await cookies(); const token = cookieStore.get('token');`
 > - Headers: `const headersList = await headers();`
-> Codemod: `npx @next/codemod@latest next-async-request-api .`
+> Codemod: `npx @next/codemod@latest upgrade .`
 
 `redirect()` and `notFound()` throw internally — place them AFTER try/catch blocks, never inside them.
 
@@ -106,7 +106,7 @@ Default runtime = **Node.js**. Do not change unless necessary (`export const run
 
 | Use Node.js (default) when | Use Edge when |
 | --- | --- |
-| DB access (Prisma, Drizzle, pg) | Middleware (globally distributed) |
+| DB access (Prisma, Drizzle, pg) | Proxy / Routing (globally distributed) |
 | File system access | Request geolocation / A-B testing |
 | Node.js-only packages | Ultra-low latency, no Node.js APIs needed |
 | Auth, cron, heavy computation | Simple request rewriting |

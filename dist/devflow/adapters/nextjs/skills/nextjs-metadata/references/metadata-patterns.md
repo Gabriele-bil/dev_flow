@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 
 ## 2) Dynamic Metadata — `generateMetadata`
 
-Use for pages where title/description depend on fetched data. In Next.js 15+, `params` is async:
+Use for pages where title/description depend on fetched data. In Next.js 16+, `params` is async:
 
 ```tsx
 // app/product/[id]/page.tsx
