@@ -82,3 +82,9 @@ node_modules/
 
 # devflow test summary
 .devflow-test-summary.json
+
+# devflow token/cost metrics (estimate)
+.devflow-metrics.jsonl
+
+# devflow fetch cache
+.devflow-fetch-cache/

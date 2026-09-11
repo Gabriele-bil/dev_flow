@@ -3,6 +3,7 @@ name: devflow-implement
 description: Implements DevFlow plan files per architecture conventions, MCP-assisted validation. Use when user runs devflow.implement, executes plan.md, or third pipeline step.
 argument-hint: [optional-plan-path]
 disable-model-invocation: true
+allowed-tools: "Bash(pnpm lint) Bash(pnpm run lint) Bash(pnpm test*) Bash(pnpm run test*) Bash(pnpm build) Bash(pnpm run build) Bash(npm run lint) Bash(npm run test*) Bash(npm run build) Bash(ng generate*) Bash(ng g *) Bash(ng lint*) Bash(ng test*) Bash(ng build*) Bash(flutter analyze*) Bash(flutter test*) Bash(flutter build*) Bash(dart format*) Bash(dart analyze*) Bash(dart run build_runner*) Bash(git status*) Bash(git diff*) Bash(git log*)"
 ---
 
 # Skill: devflow.implement

@@ -146,7 +146,7 @@ run_checks_for_adapter() {
           exit 0
         fi
 
-        run_cmd "dart format" dart format . || true
+        run_cmd "dart format" timeout 60 dart format . || true
         run_cmd "dart analyze" timeout 60 dart analyze || true
         ;;
 
@@ -165,7 +165,7 @@ run_checks_for_adapter() {
           exit 0
         fi
 
-        run_cmd "pnpm lint" pnpm lint || true
+        run_cmd "pnpm lint" timeout 60 pnpm lint || true
         run_cmd "pnpm exec tsc --noEmit" timeout 60 pnpm exec tsc --noEmit || true
         ;;
 
@@ -184,7 +184,7 @@ run_checks_for_adapter() {
           exit 0
         fi
 
-        run_cmd "pnpm run lint" pnpm run lint || true
+        run_cmd "pnpm run lint" timeout 60 pnpm run lint || true
         run_cmd "pnpm exec tsc --noEmit" timeout 60 pnpm exec tsc --noEmit || true
         ;;
 

@@ -1,6 +1,7 @@
 ---
 name: accessibility-auditor
 description: Accessibility engineer perspective on WCAG 2.1 AA compliance. Five-axis audit across keyboard/focus, screen readers, visual contrast, touch targets, and forms. Use before merge or via devflow.ship fan-out.
+tools: Read, Grep, Glob, Bash
 ---
 
 # Accessibility Auditor

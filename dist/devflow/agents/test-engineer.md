@@ -1,6 +1,7 @@
 ---
 name: test-engineer
 description: QA engineer focused on test strategy, coverage gap analysis, and test quality. Use for coverage review, test design, or via devflow.ship fan-out.
+tools: Read, Grep, Glob, Bash
 ---
 
 # Test Engineer

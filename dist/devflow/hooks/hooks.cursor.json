@@ -5,7 +5,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${cursorPluginRoot}/hooks/session-start.sh"
+            "command": "bash ${cursorPluginRoot}/hooks/session-start.sh",
+            "timeout": 15
           }
         ]
       },
@@ -13,7 +14,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${cursorPluginRoot}/hooks/session-start-learnings.sh"
+            "command": "bash ${cursorPluginRoot}/hooks/session-start-learnings.sh",
+            "timeout": 15
           }
         ]
       }
@@ -24,7 +26,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${cursorPluginRoot}/hooks/pre-config-protect.sh"
+            "command": "bash ${cursorPluginRoot}/hooks/pre-config-protect.sh",
+            "timeout": 15
           }
         ]
       },
@@ -33,7 +36,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${cursorPluginRoot}/hooks/pre-bash-destructive-guard.sh"
+            "command": "bash ${cursorPluginRoot}/hooks/pre-bash-destructive-guard.sh",
+            "timeout": 15
           }
         ]
       },
@@ -142,7 +146,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${cursorPluginRoot}/hooks/pre-compact.sh"
+            "command": "bash ${cursorPluginRoot}/hooks/pre-compact.sh",
+            "timeout": 15
           }
         ]
       }
@@ -152,7 +157,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${cursorPluginRoot}/hooks/stop-format-typecheck.sh"
+            "command": "bash ${cursorPluginRoot}/hooks/stop-format-typecheck.sh",
+            "timeout": 90
           }
         ]
       },
@@ -170,7 +176,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${cursorPluginRoot}/hooks/stop-debug-check.sh"
+            "command": "bash ${cursorPluginRoot}/hooks/stop-debug-check.sh",
+            "timeout": 15
           }
         ]
       },
@@ -178,7 +185,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${cursorPluginRoot}/hooks/stop-learn-distill.sh"
+            "command": "bash ${cursorPluginRoot}/hooks/stop-learn-distill.sh",
+            "timeout": 15
           }
         ]
       },

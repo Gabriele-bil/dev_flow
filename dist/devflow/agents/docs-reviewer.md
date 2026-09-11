@@ -1,6 +1,7 @@
 ---
 name: docs-reviewer
 description: Documentation engineer perspective on doc coverage, accuracy, and drift. Five-axis review across public API coverage, signature accuracy, examples, README/CHANGELOG sync, and plan traceability. Use before merge or via devflow.ship fan-out.
+tools: Read, Grep, Glob, Bash
 ---
 
 # Documentation Reviewer

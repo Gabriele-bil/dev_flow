@@ -43,12 +43,19 @@ jq -n \
   --arg version     "$VERSION" \
   --arg description "$DESCRIPTION" \
   --arg author      "$AUTHOR" \
+  --arg repository  "${REPOSITORY:-}" \
+  --arg homepage    "${HOMEPAGE:-}" \
+  --argjson keywords "${KEYWORDS_JSON:-[]}" \
   '{
     name:        $name,
     version:     $version,
     description: $description,
     author:      { name: $author }
-  }' | python3 -c 'import sys, json; print(json.dumps(json.load(sys.stdin), ensure_ascii=False, indent=2))' > "$DIST_DIR/.claude-plugin/plugin.json"
+  }
+  + (if $repository != "" then { repository: $repository } else {} end)
+  + (if $homepage   != "" then { homepage:   $homepage }   else {} end)
+  + (if ($keywords | length) > 0 then { keywords: $keywords } else {} end)
+  ' | python3 -c 'import sys, json; print(json.dumps(json.load(sys.stdin), ensure_ascii=False, indent=2))' > "$DIST_DIR/.claude-plugin/plugin.json"
 
 ok "plugin.json generato (v$VERSION)"
 

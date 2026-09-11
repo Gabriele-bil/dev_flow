@@ -3,6 +3,9 @@ name: devflow-auto
 description: Chains task → plan → analyze → implement as one unattended session starting from a raw feature idea — decision flags instead of pauses, consolidated report, stops before beautify. Use when user runs devflow.auto or asks to go from idea to implemented code autonomously without step gates.
 argument-hint: [idea-or-attached-context] [--app <name>]
 disable-model-invocation: true
+context: fork
+agent: general-purpose
+background: true
 ---
 
 # Skill: devflow.auto

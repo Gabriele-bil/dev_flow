@@ -3,6 +3,9 @@ name: devflow-run
 description: Chains implement → beautify → test as one unattended session — decision flags instead of pauses, consolidated report, stops before ship. Use when user runs devflow.run or asks to execute the middle pipeline autonomously without step gates.
 argument-hint: [--from implement|beautify|test] [--until beautify|test|ship]
 disable-model-invocation: true
+context: fork
+agent: general-purpose
+background: true
 ---
 
 # Skill: devflow.run

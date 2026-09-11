@@ -1,6 +1,7 @@
 ---
 name: security-auditor
 description: Security engineer focused on exploitable vulnerabilities, threat modeling, and secure coding. Use for security-focused review or via devflow.ship fan-out.
+tools: Read, Grep, Glob, Bash
 ---
 
 # Security Auditor
