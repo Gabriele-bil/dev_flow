@@ -8,7 +8,7 @@ The workflow is **technology-agnostic**: stack-specific rules live in **adapters
 
 ## Pipeline
 
-```
+```text
 idea
   └── devflow.task
         └── [devflow.clarify]  (optional — resolve [NEEDS CLARIFICATION] markers)
@@ -30,7 +30,7 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 ## Commands (entry points)
 
 | Command | Skill | Input → Output |
-|--------|--------|----------------|
+| -------- | -------- | ---------------- |
 | `devflow.setup` | [`templates/devflow/skills/devflow-setup/SKILL.md`](templates/devflow/skills/devflow-setup/SKILL.md) | Consumer repo context + adapter templates → root `AGENTS.md` + `REGISTRY.md` |
 | `devflow.task` | [`templates/devflow/skills/devflow-task/SKILL.md`](templates/devflow/skills/devflow-task/SKILL.md) | Idea → `devflow/features/[NNN]_[name]/task.md` |
 | `devflow.plan` | [`templates/devflow/skills/devflow-plan/SKILL.md`](templates/devflow/skills/devflow-plan/SKILL.md) | `task.md` → `plan.md` |
@@ -38,7 +38,7 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 | `devflow.analyze` | [`templates/devflow/skills/devflow-analyze/SKILL.md`](templates/devflow/skills/devflow-analyze/SKILL.md) | `task.md` + `plan.md` → consistency report (traceability, AC testability, terminology, constitution alignment, coverage balance) |
 | `devflow.blueprint` | [`templates/devflow/skills/devflow-blueprint/SKILL.md`](templates/devflow/skills/devflow-blueprint/SKILL.md) | Large idea → multi-PR blueprint with dependency graph + adversarial review |
 | `devflow.auto` | [`templates/devflow/skills/devflow-auto/SKILL.md`](templates/devflow/skills/devflow-auto/SKILL.md) | Idea → chained `task → plan → analyze → implement`, unattended, stops before beautify |
-| `devflow.implement` | [`templates/devflow/skills/devflow-implement/SKILL.md`](templates/devflow/skills/devflow-implement/SKILL.md) | `plan.md` → code on `feat|fix|…/[NNN]-[name]` |
+| `devflow.implement` | [`templates/devflow/skills/devflow-implement/SKILL.md`](templates/devflow/skills/devflow-implement/SKILL.md) | `plan.md` → code on `feat \| fix \| …/[NNN]-[name]` |
 | `devflow.beautify` | [`templates/devflow/skills/devflow-beautify/SKILL.md`](templates/devflow/skills/devflow-beautify/SKILL.md) | Implemented files → polished code |
 | `devflow.test` | [`templates/devflow/skills/devflow-test/SKILL.md`](templates/devflow/skills/devflow-test/SKILL.md) | Feature → unit + integration tests |
 | `devflow.ship` | [`templates/devflow/commands/devflow.ship.md`](templates/devflow/commands/devflow.ship.md) | Feature → parallel review (code + security + tests + a11y + docs) → gate before PR |
@@ -54,7 +54,7 @@ Command wrappers live in [`templates/devflow/commands/`](templates/devflow/comma
 ## Project docs (in your app repo)
 
 | File | Role | Read by |
-|------|------|---------|
+| ------ | ------ | --------- |
 | `AGENTS.md` | Global agent operating rules (token-lean, setup-managed sections) | setup + all steps (as host memory/context) |
 | `REGISTRY.md` | Shared patterns and conventions summary | setup + plan → pr |
 | `constitution.md` | Architecture, stack, layout | plan → pr |
@@ -67,7 +67,7 @@ Command wrappers live in [`templates/devflow/commands/`](templates/devflow/comma
 
 ## Repository layout
 
-```
+```text
 dev_flow/
 ├── templates/
 │   └── devflow/                     # Plugin source — edit here
@@ -167,7 +167,7 @@ The [`dist/devflow/`](dist/devflow/) folder is a **multi-platform plugin**: same
 
 ### Install via Claude Code marketplace (recommended)
 
-```
+```text
 /plugin marketplace add Gabriele-bil/dev_flow
 /plugin install devflow@devflow
 ```
@@ -207,7 +207,7 @@ Use `code-review-graph` for blast-radius aware reviews in both Cursor and Claude
 ### Required MCP baseline
 
 | Adapter | MCP servers |
-|---------|-------------|
+| --------- | ------------- |
 | Angular | `context7`, `sequential-thinking` |
 | Flutter | `context7`, `sequential-thinking`, `dart`, `supabase` |
 | Next.js | `context7`, `sequential-thinking` |
@@ -220,7 +220,7 @@ Use `code-review-graph` for blast-radius aware reviews in both Cursor and Claude
 Specialized agents live in [`templates/devflow/agents/`](templates/devflow/agents/) and are dispatched automatically by `devflow.ship`:
 
 | Agent | File | Role |
-|-------|------|------|
+| ------- | ------ | ------ |
 | Code Reviewer | [`agents/code-reviewer.md`](templates/devflow/agents/code-reviewer.md) | 5-axis code review: correctness, readability, architecture, security, performance |
 | Security Auditor | [`agents/security-auditor.md`](templates/devflow/agents/security-auditor.md) | Exploitable vulnerabilities, threat modeling, secure coding |
 | Test Engineer | [`agents/test-engineer.md`](templates/devflow/agents/test-engineer.md) | Coverage gap analysis, test strategy, test quality |
@@ -236,7 +236,7 @@ Specialized agents live in [`templates/devflow/agents/`](templates/devflow/agent
 Shared checklists and patterns in [`templates/devflow/references/`](templates/devflow/references/):
 
 | File | Purpose |
-|------|---------|
+| ------ | --------- |
 | [`accessibility-checklist.md`](templates/devflow/references/accessibility-checklist.md) | WCAG 2.1 AA checklist — keyboard, screen readers, touch targets |
 | [`model-selection.md`](templates/devflow/references/model-selection.md) | Haiku / Sonnet / Opus guide per pipeline step |
 | [`security-checklist.md`](templates/devflow/references/security-checklist.md) | OWASP Top 10, auth, input validation, secrets baseline |
@@ -258,7 +258,7 @@ Shared checklists and patterns in [`templates/devflow/references/`](templates/de
 Baseline: **Flutter · Riverpod · Supabase**. Commands: `flutter analyze`, `flutter test`.
 
 | Skill | Purpose |
-|-------|---------|
+| ------- | --------- |
 | `flutter-supabase` | Database read/write/auth, schema, RLS |
 | `flutter-supabase-migrations` | Schema migrations, SQL |
 | `flutter-theme` | UI screens, visual styling |
@@ -274,7 +274,7 @@ Feature pages: use `lib/features/<feature>/pages/` with entry file named `page.d
 Baseline: standalone + signals-first. Commands: `pnpm run lint`, `pnpm run test`, `pnpm run build`.
 
 | Skill | Purpose |
-|-------|---------|
+| ------- | --------- |
 | `angular-architecture` | App structure, folder layout, boundaries |
 | `angular-component` | New components, refactoring, template/class |
 | `angular-forms` | Reactive forms, validation, submit flows |
@@ -288,7 +288,7 @@ Baseline: standalone + signals-first. Commands: `pnpm run lint`, `pnpm run test`
 Baseline: **Next.js 15+ App Router · Zustand · Tailwind CSS + shadcn/ui · Server Actions + API Routes · Jest + RTL**. Commands: `pnpm lint`, `pnpm test`, `pnpm build`.
 
 | Skill | Purpose |
-|-------|---------|
+| ------- | --------- |
 | `nextjs-architecture` | App structure, folder layout, route segments, parallel/intercepting routes |
 | `nextjs-server` | Server Components, Server Actions, API Routes, data fetching, `'use cache'` |
 | `nextjs-components` | Client Components, React hooks, interactivity, hydration errors |
@@ -304,7 +304,7 @@ Baseline: **Next.js 15+ App Router · Zustand · Tailwind CSS + shadcn/ui · Ser
 Baseline: **NestJS · TypeORM · class-validator/class-transformer · @nestjs/swagger · @nestjs/jwt + Passport · @nestjs/testing + Supertest**. Commands: `npm run lint`, `npm run test`, `npm run build`.
 
 | Skill | Purpose |
-|-------|---------|
+| ------- | --------- |
 | `nestjs-architecture` | Modules, DI, repository pattern, provider scopes, `ConfigModule` |
 | `nestjs-error-handling` | HTTP exceptions, exception filters, async error handling, structured logging |
 | `nestjs-security` | Input validation, guards, JWT auth, rate limiting, output sanitization |
@@ -317,7 +317,7 @@ Baseline: **NestJS · TypeORM · class-validator/class-transformer · @nestjs/sw
 ### Common (`templates/devflow/adapters/common/`)
 
 | Skill | Purpose |
-|-------|---------|
+| ------- | --------- |
 | `common-clean-code` | Shared clean code patterns across all stacks |
 | `common-web-interface-guidelines` | UI/UX quality rules applied during beautify on all web adapters |
 | `common-caveman` | Token-lean, filler-free response style for plans and reviews |

@@ -97,11 +97,11 @@ Never block on ambiguity while run mode active. Where a step would normally paus
 1. Pick most defensible default: repo precedent > `constitution.md` > adapter convention.
 2. Append to `plan.md` under `## Decision flags` (create section on first flag):
 
-```markdown
-## Decision flags
+   ```markdown
+   ## Decision flags
 
-- **F1** — decision: [chosen]; alternatives: [rejected options]; rationale: [why defensible]; files: `path/a`, `path/b`
-```
+   - **F1** — decision: [chosen]; alternatives: [rejected options]; rationale: [why defensible]; files: `path/a`, `path/b`
+   ```
 
 3. Continue.
 

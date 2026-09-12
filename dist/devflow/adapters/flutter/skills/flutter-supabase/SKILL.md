@@ -77,9 +77,9 @@ Use RPC (`_client.rpc(...)`) for database-side logic. Use Edge Functions (`_clie
 
 ## I/O Reference
 
-|                |                                                                                                                                                  |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Trigger        | Any feature involving Supabase data read/write, auth, storage, realtime, or RPC calls                                                            |
-| Reads          | `constitution.md` (data layer conventions), `registry.md` (existing datasource/repository patterns)                                              |
-| Invoked by     | `devflow.plan` (when feature involves DB), `devflow.implement` (datasource and repository files)                                                 |
+| | |
+| --- | --- |
+| Trigger | Any feature involving Supabase data read/write, auth, storage, realtime, or RPC calls |
+| Reads | `constitution.md` (data layer conventions), `registry.md` (existing datasource/repository patterns) |
+| Invoked by | `devflow.plan` (when feature involves DB), `devflow.implement` (datasource and repository files) |
 | Related skills | `flutter-riverpod` (notifiers calling repositories), `flutter-models` (DTOs and domain entities), `flutter-supabase-migrations` (schema changes) |

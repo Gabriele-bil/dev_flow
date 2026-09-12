@@ -7,7 +7,7 @@ Analysis of [tokless](https://github.com/HoangP8/tokless) (local checkout: `~/De
 ## Executive summary
 
 | # | Tokless technique | Mechanism class | Claimed savings | DevFlow status | Verdict |
-|---|-------------------|-----------------|-----------------|----------------|---------|
+| --- | ------------------- | ----------------- | ----------------- | ---------------- | --------- |
 | 1 | Owner-managed instruction sections | Config mechanics | n/a (dedup) | ✅ Ported | **Done (P3a)** |
 | 2 | Principles (karpathy-skills) | Instruction text | n/a (fewer retries) | ✅ Ported | **Done (P1a + P3b)** |
 | 3 | Caveman response style | Instruction text | 65% output tokens | ❌ Out of scope | Document only |
@@ -127,7 +127,7 @@ The interesting engineering detail is the *surgical unwire*: `removeClaudeRtkHoo
 
 An MCP server over a prebuilt AST index (`.codegraph/`). The ported asset is not the tool but the **decision tree** in the instructions:
 
-```
+```text
 .codegraph/ index exists?
 ├─ YES → codegraph_explore FIRST. Always. Source + blast radius + call path
 │        in ONE call.
@@ -153,7 +153,7 @@ The three rules that make it save tokens: (a) index **first**, never as fallback
 MCP server exposing sandbox tools where **raw bytes never enter context** — code runs against the data and only derived results are printed:
 
 | Tool | Role | Replaces |
-|------|------|----------|
+| ------ | ------ | ---------- |
 | `ctx_execute` | Run code in sandbox; only stdout enters context | Bash for analysis tasks |
 | `ctx_execute_file` | Process file in sandbox; raw bytes never leave | Read on large files (>200 lines) |
 | `ctx_batch_execute` | Run N commands + auto-index output; search in same call | Multiple Bash + grep round-trips |
@@ -181,7 +181,7 @@ Cross-cutting engineering discipline: ordered-map JSON editing that preserves ke
 ## Gap analysis
 
 | Tokless technique | DevFlow today | Gap |
-|-------------------|---------------|-----|
+| ------------------- | --------------- | ----- |
 | Owner-managed sections | `devflow-setup` writes consumer config; `pre-config-protect.sh` guards files | No idempotent owner-fence merge pattern; re-setup risks duplication |
 | Principles | `devflow-clarify` (assumptions/Q&A), task.md ACs (goal-driven), CONTRIBUTING quality bar | "Simplicity First" and "Surgical Changes" absent from `devflow-implement`; scope-fidelity review axis exists (commit e7b6c83) but has no generation-side counterpart |
 | Caveman style | Not present | Deliberate — out of scope |
@@ -218,7 +218,7 @@ Mirror on the review side: add a *simplicity* check to the `devflow:code-reviewe
 
 Generalized from tokless's codegraph section, tool-agnostic:
 
-```
+```text
 Project has a code index (tokensave / codegraph / serena / LSP MCP)?
 ├─ YES → one semantic query FIRST for any structural question
 │        (how does X work, who calls Y, where is Z, blast radius).

@@ -453,7 +453,6 @@ export class Hero {
 
 For advanced patterns, see [references/component-patterns.md](references/component-patterns.md).
 
-
 ## Model Inputs (Two-Way Binding)
 
 Use `model()` when component needs `[(value)]` syntax.

@@ -11,6 +11,7 @@ Findings are grouped by theme, each with: the gap, the reference tool(s), and a 
 **Current state**: `templates/devflow/scripts/validate-skills.sh` checks frontmatter (`name`, `description`) and required sections (`## Purpose`, `## Core Principles`, `## When NOT to Use`, `## I/O Reference`). It does not check content staleness or leakage.
 
 **Reference tools** (Linting category):
+
 - **agnix** — linter/LSP for `CLAUDE.md`/`AGENTS.md`/`SKILL.md`/hooks/MCP config, with autofixes.
 - **Ctxlint** — catches *stale references, dead commands, and hardcoded secrets* in agent context files.
 - **Schliff** — deterministic 8-dimension quality scorer for instruction files, with anti-gaming detection.
@@ -18,6 +19,7 @@ Findings are grouped by theme, each with: the gap, the reference tool(s), and a 
 **Gap**: `validate-skills.sh` is structural (does the section exist?), not semantic (does the section still say something true?). A skill can reference a command that was renamed in `templates/devflow/commands/` and the linter stays green.
 
 **Proposal**:
+
 - Add a "dead reference" check to `validate-skills.sh --strict`: grep every `devflow.<verb>` and file-path mention inside a `SKILL.md` against the actual `commands/` and `skills/` directories; fail on orphaned references. This is the single highest-leverage addition — it directly protects the thing `CONTRIBUTING.md` already asks contributors to keep in sync.
 - Add a hardcoded-secret grep pass (simple regex for API-key-shaped strings) as a pre-commit-style check, reusing the pattern already established by `pre-config-protect.sh`.
 - Schliff's "anti-gaming detection" (catching instruction files that are padded to look thorough without adding constraint) is a good idea for `run-evals.sh`'s collision/trigger checks, but lower priority — skip unless trigger-quality regressions start showing up in practice.
@@ -31,6 +33,7 @@ Findings are grouped by theme, each with: the gap, the reference tool(s), and a 
 **Current state**: `pre-config-protect.sh` guards specific config files. There is no hook that intercepts destructive shell commands in general (`rm -rf`, `git reset --hard`, force-push) the way the top-level CLAUDE.md instructions already ask the *model* to be careful about — but a hook is deterministic where a system-prompt instruction is not.
 
 **Reference tools** (Security category):
+
 - **Claude Code Safety Net** — hook that catches destructive git/filesystem commands before execution, multi-CLI.
 - **GouvernAI** — runtime guardrails with tiered auto-approve/gate/block + audit trail.
 - **Agent Guard** — secret-leak guardrails via hooks + CI.
@@ -48,6 +51,7 @@ Findings are grouped by theme, each with: the gap, the reference tool(s), and a 
 **Current state**: `observe.sh` logs tool calls and retry loops to `.devflow-observe.jsonl`; `stop-learn-distill.sh` + `devflow-learn` skill distill learnings into `.devflow-learnings.jsonl`. This captures *that something happened*, not whether the resulting advice actually worked afterward.
 
 **Reference tools** (Memory & Context Persistence category):
+
 - **presence** — per-repo memory with outcome telemetry and a *calibrated-confidence gate*: "success claims need test evidence; your reverts are remembered."
 - **roampal-core** — outcome-based memory; good advice promoted, bad advice demoted over time.
 - **Selvedge** — captures the agent's *reasoning* live, as each change is made ("git blame, but for the why").
@@ -65,6 +69,7 @@ Findings are grouped by theme, each with: the gap, the reference tool(s), and a 
 **Current state**: `devflow.ship` dispatches `code-reviewer`, `security-auditor`, and `test-engineer` in parallel and "synthesizes reports." `accessibility-auditor` and `docs-reviewer` also exist in `templates/devflow/agents/` but aren't in the ship command's fixed fan-out list.
 
 **Reference tools** (Agent Orchestration category):
+
 - **Agent Collab Skills** — task splitter, output reconciler, *adversarial debate*, shared memory, acceptance gate.
 - **gstack** — end-to-end "software factory" lifecycle agents.
 
@@ -81,6 +86,7 @@ Findings are grouped by theme, each with: the gap, the reference tool(s), and a 
 **Current state**: `.devflow-observe.jsonl` and `.devflow-learnings.jsonl` are headless — written by hooks, read by `devflow-learn`/`devflow-status`, never surfaced as a human-readable timeline.
 
 **Reference tools** (Observability & Monitoring category, 22 entries):
+
 - **Multi-Agent Observability** — dashboard tracing hook events, tool calls, and task handoffs across concurrent agents (Bun/SQLite/WebSocket/Vue).
 
 **Gap**: Debugging a bad DevFlow run currently means reading raw JSONL by hand. `devflow.status` likely already surfaces a summary — worth confirming it includes retry-loop counts from `observe.sh`'s `RETRY_THRESHOLD`/`RETRY_WINDOW` logic.
@@ -94,6 +100,7 @@ Findings are grouped by theme, each with: the gap, the reference tool(s), and a 
 ## 6. No written framework for "skill vs. hook vs. rule" — worth citing, not building
 
 **Reference** (From Anthropic category):
+
 - **"Steering Claude Code: Skills, Hooks, Rules, Subagents and More"** — Anthropic's own framework, organized around *deterministic vs. probabilistic control* and context isolation.
 
 **Observation**: This isn't a code gap, it's a documentation opportunity. `templates/devflow/CONTRIBUTING.md` sets the quality bar for skill content but (unverified — worth checking) may not state *when a new mechanism should be a hook instead of a skill*. Item 2 above is a concrete instance of exactly this question.
@@ -107,7 +114,7 @@ Findings are grouped by theme, each with: the gap, the reference tool(s), and a 
 ## Summary table
 
 | # | Gap | Reference tool(s) | File(s) to touch | Priority | Status |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | 1 | No dead-reference/secret check in skill linting | agnix, Ctxlint, Schliff | `scripts/validate-skills.sh` | High | ✅ Applied |
 | 2 | No generic destructive-command hook | Claude Code Safety Net, GouvernAI, Agent Guard | `hooks/pre-bash-destructive-guard.sh` (new), `hooks/hooks.json` | Medium | ✅ Applied |
 | 3 | Learnings never decay on revert | presence, roampal-core | `skills/devflow-learn/SKILL.md`, `hooks/observe.sh` | Medium | ✅ Applied |

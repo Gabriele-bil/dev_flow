@@ -155,9 +155,9 @@ Respond using template in `references/notify-template.md`.
 
 ## I/O Reference
 
-|           |                                                                                                                                               |
-| --------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Reads     | `devflow/config.md` (Apps table, monorepo only); `docs/product.md` (required); `constitution.md`, `registry.md` (as needed); `DESIGN.md` / `docs/design.md` (if present); `refinement-hints.md` (Step 4); `examples.md` (optional guidance); `references/task-template.md`, `references/notify-template.md` |
+| | |
+| --- | --- |
+| Reads | `devflow/config.md` (Apps table, monorepo only); `docs/product.md` (required); `constitution.md`, `registry.md` (as needed); `DESIGN.md` / `docs/design.md` (if present); `refinement-hints.md` (Step 4); `examples.md` (optional guidance); `references/task-template.md`, `references/notify-template.md` |
 | Reads (conditional) | `.devflow-run.json` (existence — run-mode switch, per `devflow-auto`) |
-| Writes    | `devflow/features/[NNN]_[feature-name]/task.md`                                                                                               |
-| Next step | `devflow.plan` → `plan.md` (full template in `devflow/skills/devflow-plan/SKILL.md`)                                                          |
+| Writes | `devflow/features/[NNN]_[feature-name]/task.md` |
+| Next step | `devflow.plan` → `plan.md` (full template in `devflow/skills/devflow-plan/SKILL.md`) |

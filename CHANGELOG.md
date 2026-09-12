@@ -2,7 +2,6 @@
 
 ## [1.15.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.14.0...devflow-v1.15.0) (2026-09-11)
 
-
 ### Features
 
 * Add .claude settings for MCP permissions and document token economy guidelines in CLAUDE.md ([0e938fd](https://github.com/Gabriele-bil/dev_flow/commit/0e938fd25b79dc6a58315b875181edf75cc476f2))
@@ -11,14 +10,12 @@
 
 ## [1.14.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.13.0...devflow-v1.14.0) (2026-09-04)
 
-
 ### Features
 
 * Add token/cost tracking hooks and update task refinement documentation with EARS phrasing requirements ([2ca4f87](https://github.com/Gabriele-bil/dev_flow/commit/2ca4f875488101c4b7e0a757057f48af427d2ab3))
 * Introduce devflow.auto orchestrator for end-to-end task-to-implementation automation with decision-flagging logic. ([89fa379](https://github.com/Gabriele-bil/dev_flow/commit/89fa379cc2bf8ce60221f8998c3041bcf2e8cf68))
 
 ## [1.13.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.12.0...devflow-v1.13.0) (2026-08-27)
-
 
 ### Features
 
@@ -27,13 +24,11 @@
 
 ## [1.12.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.11.0...devflow-v1.12.0) (2026-08-11)
 
-
 ### Features
 
 * Implement NestJS adapter with comprehensive step workflows, skill definitions, and architectural pattern references. ([35e9d18](https://github.com/Gabriele-bil/dev_flow/commit/35e9d183d098125b99b728719aa0fae4354ab51c))
 
 ## [1.11.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.10.0...devflow-v1.11.0) (2026-08-10)
-
 
 ### Features
 
@@ -41,20 +36,17 @@
 
 ## [1.10.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.9.0...devflow-v1.10.0) (2026-07-19)
 
-
 ### Features
 
 * Add filter savings telemetry and record tokless port completion ([939a69e](https://github.com/Gabriele-bil/dev_flow/commit/939a69ed27c8b3c89c731d97cca62d436de3f17b))
 * Add measure-session-tokens.sh for A/B evidence on instruction-level changes ([23ca89c](https://github.com/Gabriele-bil/dev_flow/commit/23ca89cad7e0191a5107d08f543209cd59e44e96))
 * Expand shell command filtering, optimize locale-safe confidence math, and introduce token economy guidelines for index-first exploration ([bf4a2c8](https://github.com/Gabriele-bil/dev_flow/commit/bf4a2c8be3b61baabb13ec75768386916c358523))
 
-
 ### Bug Fixes
 
 * Add it_IT locale regression test and explicit trigger phrasing for flutter-supabase skill ([c830ea3](https://github.com/Gabriele-bil/dev_flow/commit/c830ea3c9f2b98deeb34dafcb26b7bfaf11cea19))
 
 ## [1.9.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.8.0...devflow-v1.9.0) (2026-07-17)
-
 
 ### Features
 
@@ -66,19 +58,16 @@
 
 ## [1.8.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.7.0...devflow-v1.8.0) (2026-06-28)
 
-
 ### Features
 
 * Add Antigravity CLI plugin support via build-antigravity script and manifest generation ([4931fd8](https://github.com/Gabriele-bil/dev_flow/commit/4931fd843b253a7cfd01b7a5b7e8d0784a74a294))
 * Initialize tokensave ([97c4a74](https://github.com/Gabriele-bil/dev_flow/commit/97c4a74774bf7a2bed1d889a9dbd5632d10c4459))
-
 
 ### Bug Fixes
 
 * Blueprint destination directory ([d23e0af](https://github.com/Gabriele-bil/dev_flow/commit/d23e0af2661ae8c799e61d4684b0a4e0f239330d))
 
 ## [1.7.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.6.0...devflow-v1.7.0) (2026-06-11)
-
 
 ### Features
 
@@ -88,14 +77,12 @@
 
 ## [1.6.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.5.0...devflow-v1.6.0) (2026-06-08)
 
-
 ### Features
 
 * Add angular-animations skill and expand angular-http dependency injection patterns ([fdf5ba8](https://github.com/Gabriele-bil/dev_flow/commit/fdf5ba8473d51f178844ff77d68fc1fbc4f425e9))
 * Upgrade Angular documentation to v22 ([8c83a7a](https://github.com/Gabriele-bil/dev_flow/commit/8c83a7a0f332f7020f5d8a514a122bed8187e103))
 
 ## [1.5.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.4.0...devflow-v1.5.0) (2026-05-29)
-
 
 ### Features
 
@@ -110,7 +97,6 @@
 * **setup:** Load CONSTITUTION.template.md and add architecture questionnaire topic ([6a2cf06](https://github.com/Gabriele-bil/dev_flow/commit/6a2cf0694ded135e4c9b1d49b5a4be3c7cd595b2))
 
 ## [1.4.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.3.0...devflow-v1.4.0) (2026-05-27)
-
 
 ### Features
 
@@ -142,7 +128,6 @@
 
 ## [1.3.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.2.0...devflow-v1.3.0) (2026-05-26)
 
-
 ### Features
 
 * Add devflow.blueprint skill for multi-PR planning with dependency graph and adversarial review ([0fe759c](https://github.com/Gabriele-bil/dev_flow/commit/0fe759cc2c7eaedf9b2b2feb2499150330008256))
@@ -155,13 +140,11 @@
 
 ## [1.2.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.1.0...devflow-v1.2.0) (2026-05-22)
 
-
 ### Features
 
 * Add flutter-architecture skill and update flutter-layout to prefer Row/Column spacing parameter over SizedBox ([6669e79](https://github.com/Gabriele-bil/dev_flow/commit/6669e79e15b4437811e61b054a5b4eb5fee4b512))
 
 ## [1.1.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.0.0...devflow-v1.1.0) (2026-05-22)
-
 
 ### Features
 
@@ -182,7 +165,6 @@
 * Improve AI generation quality across DevFlow pipeline ([527ec5c](https://github.com/Gabriele-bil/dev_flow/commit/527ec5c94cfec92d808d9d93862d965a9c9a967a))
 * Introduce DevFlow plugin with core components, agents, skills, and configuration files ([3854ae6](https://github.com/Gabriele-bil/dev_flow/commit/3854ae607bda3014293c9cd764d10ea6509950c7))
 * Introduce PRODUCT.template.md for Flutter adapter and update setup command to generate product context documentation ([616b697](https://github.com/Gabriele-bil/dev_flow/commit/616b6979af8cd806633c5dba5c44f729d317bda9))
-
 
 ### Bug Fixes
 

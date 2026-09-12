@@ -427,7 +427,6 @@ async onSubmit() {
 
 For advanced Signal Forms patterns, see [references/form-patterns.md](references/form-patterns.md).
 
-
 ## Strict Rules & Common Pitfalls
 
 | Scenario | WRONG | RIGHT |
