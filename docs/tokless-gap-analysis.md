@@ -229,9 +229,9 @@ Project has a code index (tokensave / codegraph / serena / LSP MCP)?
 
 Inject at the three points where exploration happens:
 
-- `devflow-discovery/SKILL.md` — detect available index MCPs at session orientation, record in state.
-- `devflow-plan/SKILL.md` — planning research step uses index-first rule.
-- `devflow-implement/SKILL.md` — pre-edit code reading uses index-first rule.
+- `skills/devflow-discovery/SKILL.md` — detect available index MCPs at session orientation, record in state.
+- `skills/devflow-plan/SKILL.md` — planning research step uses index-first rule.
+- `skills/devflow-implement/SKILL.md` — pre-edit code reading uses index-first rule.
 
 Keep it as a short shared block (one paragraph + tree) duplicated per skill, or referenced from a shared `references/` doc if the skills already use that pattern — follow whatever CONTRIBUTING prescribes for shared content.
 

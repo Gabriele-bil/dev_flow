@@ -98,6 +98,26 @@ err=$(cat /tmp/stderr.$$); rm -f /tmp/stderr.$$
 [ -z "$err" ] && assert "monorepo unmatched file: no adapter branch reached" pass || assert "monorepo unmatched file: no adapter branch reached (stderr: '$err')" fail
 rm -rf devflow
 
+echo "--- T6: husky pre-commit covers lint+format -> dart format/analyze skipped ---"
+rm -rf devflow .husky
+mkdir -p .husky
+printf '#!/bin/sh\ndart format --set-exit-if-changed .\nflutter analyze\n' > .husky/pre-commit
+out=$(run_hook_with "lib/main.dart" 2>/tmp/stderr.$$)
+err=$(cat /tmp/stderr.$$); rm -f /tmp/stderr.$$
+[ "$out" = "passthrough-payload" ] && assert "husky covers: RAW passthrough" pass || assert "husky covers: RAW passthrough (got '$out')" fail
+echo "$err" | grep -q "already covered by pre-commit hook manager" && assert "husky covers: skip message printed" pass || assert "husky covers: skip message printed (stderr: '$err')" fail
+echo "$err" | grep -q "dart not found" && assert "husky covers: dart never probed (no tool-check reached)" fail || assert "husky covers: dart never probed (no tool-check reached)" pass
+rm -rf .husky
+
+echo "--- T7: DEVFLOW_FORCE_TYPECHECK overrides hook-manager detection ---"
+mkdir -p .husky
+printf '#!/bin/sh\ndart format .\nflutter analyze\n' > .husky/pre-commit
+printf '%s\n' "lib/main.dart" > .devflow-changed-files.tmp
+out=$(DEVFLOW_FORCE_TYPECHECK=1 PATH="$BARE_PATH" bash "$HOOK" <<< "passthrough-payload" 2>/tmp/stderr.$$)
+err=$(cat /tmp/stderr.$$); rm -f /tmp/stderr.$$
+echo "$err" | grep -q "dart not found" && assert "force override: dart format/analyze invoked despite husky" pass || assert "force override: dart format/analyze invoked despite husky (stderr: '$err')" fail
+rm -rf .husky
+
 echo ""
 echo "Results: $PASS passed, $FAIL failed"
 if [ ${#ERRORS[@]} -gt 0 ]; then

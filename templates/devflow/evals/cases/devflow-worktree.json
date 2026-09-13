@@ -1,0 +1,29 @@
+{
+  "skill_name": "devflow-worktree",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "I want to work on two features in parallel, set up a separate worktree for this one",
+        "top_k": 3
+      },
+      {
+        "prompt": "Create an isolated git worktree for the new feature branch",
+        "top_k": 3
+      },
+      {
+        "prompt": "List the active devflow worktrees and their ports",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Open a pull request for the current feature branch",
+        "owner": "devflow-pr"
+      },
+      {
+        "prompt": "Where am I in the devflow pipeline right now?",
+        "owner": "devflow-status"
+      }
+    ]
+  }
+}

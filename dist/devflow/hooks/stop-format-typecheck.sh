@@ -94,6 +94,24 @@ MAX_OUTPUT_CHARS="${DEVFLOW_TYPECHECK_MAX_CHARS:-2500}"
 HEAD_LINES="${DEVFLOW_TYPECHECK_HEAD:-20}"
 TAIL_LINES="${DEVFLOW_TYPECHECK_TAIL:-15}"
 
+# Skip checks the consumer project's own pre-commit hook manager (husky,
+# lefthook) already runs — same lint/typecheck work would otherwise run
+# twice per commit for no benefit (this hook never blocks either way, it's
+# advisory-only, so there's no coverage gap from skipping here).
+HOOK_MANAGER_COVERS_LINT=0
+HOOK_MANAGER_COVERS_TYPECHECK=0
+if [[ -z "${DEVFLOW_FORCE_TYPECHECK:-}" ]]; then
+  HOOK_MGR_FILES=()
+  [[ -f ".husky/pre-commit" ]] && HOOK_MGR_FILES+=(".husky/pre-commit")
+  [[ -f "lefthook.yml" ]] && HOOK_MGR_FILES+=("lefthook.yml")
+  [[ -f ".lefthook.yml" ]] && HOOK_MGR_FILES+=(".lefthook.yml")
+
+  for f in "${HOOK_MGR_FILES[@]}"; do
+    grep -qE 'lint|format' "$f" 2>/dev/null && HOOK_MANAGER_COVERS_LINT=1
+    grep -qE 'tsc|typecheck|analyze' "$f" 2>/dev/null && HOOK_MANAGER_COVERS_TYPECHECK=1
+  done
+fi
+
 run_cmd() {
   local label="$1"
   shift
@@ -141,13 +159,26 @@ run_checks_for_adapter() {
         done
         [[ $HAS_DART -eq 0 ]] && exit 0
 
+        if [[ $HOOK_MANAGER_COVERS_LINT -eq 1 && $HOOK_MANAGER_COVERS_TYPECHECK -eq 1 ]]; then
+          printf '⏭ dart format+analyze: already covered by pre-commit hook manager, skipping\n' >&2
+          exit 0
+        fi
+
         if ! command -v dart &>/dev/null; then
           printf '⚠ dart not found in PATH, skipping format+analyze\n' >&2
           exit 0
         fi
 
-        run_cmd "dart format" timeout 60 dart format . || true
-        run_cmd "dart analyze" timeout 60 dart analyze || true
+        if [[ $HOOK_MANAGER_COVERS_LINT -eq 1 ]]; then
+          printf '⏭ dart format: already covered by pre-commit hook manager, skipping\n' >&2
+        else
+          run_cmd "dart format" timeout 60 dart format . || true
+        fi
+        if [[ $HOOK_MANAGER_COVERS_TYPECHECK -eq 1 ]]; then
+          printf '⏭ dart analyze: already covered by pre-commit hook manager, skipping\n' >&2
+        else
+          run_cmd "dart analyze" timeout 60 dart analyze || true
+        fi
         ;;
 
       nextjs)
@@ -160,13 +191,26 @@ run_checks_for_adapter() {
         done
         [[ $HAS_TS -eq 0 ]] && exit 0
 
+        if [[ $HOOK_MANAGER_COVERS_LINT -eq 1 && $HOOK_MANAGER_COVERS_TYPECHECK -eq 1 ]]; then
+          printf '⏭ pnpm lint+typecheck: already covered by pre-commit hook manager, skipping\n' >&2
+          exit 0
+        fi
+
         if ! command -v pnpm &>/dev/null; then
           printf '⚠ pnpm not found in PATH, skipping lint+typecheck\n' >&2
           exit 0
         fi
 
-        run_cmd "pnpm lint" timeout 60 pnpm lint || true
-        run_cmd "pnpm exec tsc --noEmit" timeout 60 pnpm exec tsc --noEmit || true
+        if [[ $HOOK_MANAGER_COVERS_LINT -eq 1 ]]; then
+          printf '⏭ pnpm lint: already covered by pre-commit hook manager, skipping\n' >&2
+        else
+          run_cmd "pnpm lint" timeout 60 pnpm lint || true
+        fi
+        if [[ $HOOK_MANAGER_COVERS_TYPECHECK -eq 1 ]]; then
+          printf '⏭ pnpm exec tsc --noEmit: already covered by pre-commit hook manager, skipping\n' >&2
+        else
+          run_cmd "pnpm exec tsc --noEmit" timeout 60 pnpm exec tsc --noEmit || true
+        fi
         ;;
 
       angular)
@@ -179,13 +223,26 @@ run_checks_for_adapter() {
         done
         [[ $HAS_TS -eq 0 ]] && exit 0
 
+        if [[ $HOOK_MANAGER_COVERS_LINT -eq 1 && $HOOK_MANAGER_COVERS_TYPECHECK -eq 1 ]]; then
+          printf '⏭ pnpm run lint+typecheck: already covered by pre-commit hook manager, skipping\n' >&2
+          exit 0
+        fi
+
         if ! command -v pnpm &>/dev/null; then
           printf '⚠ pnpm not found in PATH, skipping lint+typecheck\n' >&2
           exit 0
         fi
 
-        run_cmd "pnpm run lint" timeout 60 pnpm run lint || true
-        run_cmd "pnpm exec tsc --noEmit" timeout 60 pnpm exec tsc --noEmit || true
+        if [[ $HOOK_MANAGER_COVERS_LINT -eq 1 ]]; then
+          printf '⏭ pnpm run lint: already covered by pre-commit hook manager, skipping\n' >&2
+        else
+          run_cmd "pnpm run lint" timeout 60 pnpm run lint || true
+        fi
+        if [[ $HOOK_MANAGER_COVERS_TYPECHECK -eq 1 ]]; then
+          printf '⏭ pnpm exec tsc --noEmit: already covered by pre-commit hook manager, skipping\n' >&2
+        else
+          run_cmd "pnpm exec tsc --noEmit" timeout 60 pnpm exec tsc --noEmit || true
+        fi
         ;;
 
       *)

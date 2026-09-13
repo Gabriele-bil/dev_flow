@@ -121,9 +121,7 @@ dev_flow/
 │   └── devflow/                     # Build output — do not edit directly
 │       ├── .claude-plugin/          # Claude Code plugin manifest (generated)
 │       ├── .cursor-plugin/          # Cursor plugin manifest (generated)
-│       ├── .antigravity-plugin/     # Antigravity CLI plugin manifest (generated)
-│       ├── plugin.json              # Antigravity plugin manifest at root (generated)
-│       ├── hooks.json               # Antigravity hooks manifest at root (generated)
+│       ├── .antigravity-plugin/     # Antigravity CLI plugin manifest (generated, plugin.json confined here — never at dist root)
 │       └── ...                      # Mirror of templates/devflow/ (minus dev-only files)
 ├── scripts/
 │   ├── build-plugin.sh              # Orchestrator: reads manifest.json, calls builders

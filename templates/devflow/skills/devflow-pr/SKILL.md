@@ -1,17 +1,17 @@
 ---
 name: devflow-pr
-description: Commits all changes, pushes the current DevFlow feature branch, and opens a pull request toward main. Use at the final step of the DevFlow pipeline or when the user asks to run devflow.pr.
+description: Commits all changes, pushes the current DevFlow feature branch, and opens a pull request toward the repo's default branch. Use at the final step of the DevFlow pipeline or when the user asks to run devflow.pr.
 disable-model-invocation: true
 model: haiku
 effort: low
-allowed-tools: "Bash(pnpm lint) Bash(pnpm run lint) Bash(pnpm test*) Bash(pnpm run test*) Bash(pnpm build) Bash(pnpm run build) Bash(npm run lint) Bash(npm run test*) Bash(npm run build) Bash(ng generate*) Bash(ng g *) Bash(ng lint*) Bash(ng test*) Bash(ng build*) Bash(flutter analyze*) Bash(flutter test*) Bash(flutter build*) Bash(dart format*) Bash(dart analyze*) Bash(dart run build_runner*) Bash(git status*) Bash(git diff*) Bash(git log*)"
+allowed-tools: "Bash(pnpm lint) Bash(pnpm run lint) Bash(pnpm test*) Bash(pnpm run test*) Bash(pnpm build) Bash(pnpm run build) Bash(npm run lint) Bash(npm run test*) Bash(npm run build) Bash(ng generate*) Bash(ng g *) Bash(ng lint*) Bash(ng test*) Bash(ng build*) Bash(flutter analyze*) Bash(flutter test*) Bash(flutter build*) Bash(dart format*) Bash(dart analyze*) Bash(dart run build_runner*) Bash(git status*) Bash(git diff*) Bash(git log*) Bash(git symbolic-ref*) Bash(git show-ref*) Bash(git remote show*)"
 ---
 
 # Skill: devflow.pr
 
 ## Purpose
 
-Commit all changes, push feature branch, open PR to `main`. Final DevFlow step.
+Commit all changes, push feature branch, open PR to the repo's default branch. Final DevFlow step.
 
 ## Core Principles
 
@@ -22,9 +22,23 @@ Commit all changes, push feature branch, open PR to `main`. Final DevFlow step.
 
 ---
 
-## Step 0 - Resolve adapter
+## Step 0 - Resolve adapter and base branch
 
 Resolve adapter, adapter root, and app working directory per `@devflow/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `@devflow/adapters/<adapter>/ADAPTER.md` (core) plus `@devflow/adapters/<adapter>/steps/pr.md`. Legacy adapters without `steps/`: the **PR** section lives in `ADAPTER.md`. Use the PR step file for pre-push verification commands, expected success output, and checklist items that must appear in the PR body (monorepo: run verification commands from the resolved app's working directory).
+
+Resolve the base branch instead of assuming `main` — repos also use `master`, `develop`, or `next` as their default:
+
+```bash
+BASE_BRANCH="$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')"
+if [ -z "$BASE_BRANCH" ]; then
+  for candidate in main master develop next; do
+    git show-ref --verify --quiet "refs/remotes/origin/$candidate" && { BASE_BRANCH="$candidate"; break; }
+  done
+fi
+BASE_BRANCH="${BASE_BRANCH:-main}"
+```
+
+Use `$BASE_BRANCH` in Step 5 and Step 6 below — never a hardcoded `main`.
 
 ---
 
@@ -32,7 +46,7 @@ Resolve adapter, adapter root, and app working directory per `@devflow/reference
 
 - Any unit or integration test is still failing — fix or document the failure before opening the PR
 - The adapter’s analyze/typecheck command reports warnings or errors — resolve them first
-- The branch has not been rebased on an up-to-date `main` — rebase before pushing to avoid merge conflicts in the PR
+- The branch has not been rebased on an up-to-date base branch — rebase before pushing to avoid merge conflicts in the PR
 - The PR checklist items are not verifiable — do not open a PR with unresolved checklist items
 
 ## Input
@@ -96,11 +110,11 @@ Where `[type]` is the same prefix used when the branch was created in `devflow.i
 
 ## Step 5 - Open pull request
 
-Use `gh` CLI to open the PR toward `main`:
+Use `gh` CLI to open the PR toward `$BASE_BRANCH` (resolved in Step 0):
 
 ```bash
 gh pr create \
-  --base main \
+  --base "$BASE_BRANCH" \
   --title "[type]: [Feature Name]" \
   --body "[PR description - see format below]"
 ```
@@ -146,7 +160,7 @@ layers touched, key abstractions, notable patterns used.]
 After successful `gh pr create`: set `plan.md` `**Status:** pr-opened` and `task.md` `**Status:** done`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
 
 ```text
-✅ Pull request opened: [type]/[NNN]-[feature-name] -> main
+✅ Pull request opened: [type]/[NNN]-[feature-name] -> $BASE_BRANCH
 
 Title: [PR title]
 Link: [PR URL returned by gh CLI]

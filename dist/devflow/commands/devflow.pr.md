@@ -13,7 +13,7 @@ Use `@devflow/skills/devflow-pr/SKILL.md` and execute it exactly.
 
 - Resolve adapter and app working directory per `@devflow/references/adapter-resolution.md`, then read the active adapter core (`ADAPTER.md`) + `steps/pr.md` for pre-push commands and PR checklist items.
 - Run the adapter’s verification commands (monorepo: from the resolved app's working directory) and capture real output before ticking checklist items.
-- Commit with a single conventional message; push `[type]/[NNN]-[feature-name]`; open PR toward `main` with `gh pr create`.
+- Commit with a single conventional message; push `[type]/[NNN]-[feature-name]`; resolve the repo's actual default branch (not always `main`) and open PR toward it with `gh pr create`.
 
 Optional steering for PR body or title:
 `$ARGUMENTS`

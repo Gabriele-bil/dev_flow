@@ -1,6 +1,6 @@
 # DevFlow vs Alternatives
 
-Honest positioning against the three closest alternatives: [Forge](https://github.com/LucasDuys/forge), [GitHub spec-kit](https://github.com/github/spec-kit), and vanilla Claude Code (no plugin). A fuller Forge analysis with transposition proposals lives in [`forge-gap-analysis.md`](forge-gap-analysis.md).
+Honest positioning against the three closest alternatives: [Forge](https://github.com/LucasDuys/forge), [GitHub spec-kit](https://github.com/github/spec-kit), and vanilla Claude Code (no plugin).
 
 ## At a glance
 

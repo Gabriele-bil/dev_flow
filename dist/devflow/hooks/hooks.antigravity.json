@@ -52,6 +52,16 @@
         ]
       },
       {
+        "matcher": "Agent|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/pre-agent-fanout-cap.sh",
+            "timeout": 5
+          }
+        ]
+      },
+      {
         "matcher": "*",
         "hooks": [
           {
@@ -92,6 +102,11 @@
             "type": "command",
             "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/post-edit-accumulate.sh",
             "async": true,
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/post-edit-instinct-context.sh",
             "timeout": 5
           }
         ]
