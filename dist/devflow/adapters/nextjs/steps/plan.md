@@ -6,6 +6,19 @@ Loaded by `devflow-plan` together with the adapter core (`ADAPTER.md`).
 
 Include these in `plan.md` when applicable (after core sections from `devflow-plan`).
 
+### Dependency ordering (layering)
+
+Order the **File list** bottom-up by layer ownership:
+
+1. Data models, Zod schemas, and TypeScript interfaces (`types/`, `schemas/`)
+2. Database migrations and ORM queries (if applicable)
+3. Server Actions and API Route handlers (`actions/`, `app/api/`)
+4. Zustand stores and client-side state managers (`stores/`)
+5. UI components: primitives/shadcn first, then composite client components (`components/`)
+6. Route segments and pages (`app/**/page.tsx`, `layout.tsx`)
+7. Unit and integration tests (`__tests__/`)
+
+
 ### Server/Client boundary table
 
 For each component or route in scope, declare boundary explicitly:

@@ -49,6 +49,9 @@ jobs:
       - name: Validate SKILL.md structure (strict)
         run: bash templates/devflow/scripts/validate-skills.sh --strict
 
+      - name: Validate adapter architecture & schema (strict)
+        run: bash templates/devflow/scripts/validate-adapters.sh --strict
+
       - name: Validate doc links
         run: bash templates/devflow/scripts/validate-doc-links.sh
 

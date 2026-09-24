@@ -116,6 +116,7 @@ dev_flow/
 │       │   ├── security-threat-model.md
 │       │   └── testing-patterns.md
 │       └── scripts/
+│           ├── validate-adapters.sh
 │           └── validate-skills.sh
 ├── dist/
 │   └── devflow/                     # Build output — do not edit directly
@@ -153,6 +154,9 @@ bash scripts/build-plugin.sh
 
 # Validate all SKILL.md files
 bash templates/devflow/scripts/validate-skills.sh
+
+# Validate all adapters against ADAPTER.schema.md
+bash templates/devflow/scripts/validate-adapters.sh
 ```
 
 The build is **idempotent** — it recreates `dist/devflow/` from scratch on every run. Requires `jq` (`brew install jq`).

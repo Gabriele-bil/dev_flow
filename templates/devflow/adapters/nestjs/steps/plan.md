@@ -6,6 +6,19 @@ Loaded by `devflow-plan` together with the adapter core (`ADAPTER.md`).
 
 Include these in `plan.md` when applicable (after core sections from `devflow-plan`).
 
+### Dependency ordering (layering)
+
+Order the **File list** bottom-up by layer ownership:
+
+1. Database migrations and TypeORM `@Entity()` definitions (`entities/`, `migrations/`)
+2. DTOs and validation schemas (`dto/`)
+3. Repositories and custom data access providers (`repositories/`)
+4. Services and business logic (`services/`)
+5. Controllers and route handlers (`controllers/`)
+6. Module definitions and wiring (`*.module.ts`, `app.module.ts`)
+7. Unit tests and e2e integration tests (`*.spec.ts`, `*.e2e-spec.ts`)
+
+
 ### Module structure map
 
 Document the feature module tree for touched/new modules:
