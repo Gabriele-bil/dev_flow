@@ -92,6 +92,8 @@ Full per-axis checklist: `references/analysis-axes.md`.
 
 ### Step 4 - Apply changes
 
+Before applying edits: save git checkpoint tag (`git tag -f "devflow-checkpoint/$(git branch --show-current 2>/dev/null)/beautify" HEAD 2>/dev/null || true`).
+
 #### Severity labels
 
 Tag all findings:

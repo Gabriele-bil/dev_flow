@@ -39,12 +39,14 @@ draft → done          (clarify skipped)
 
 ```text
 ready → implementing → implemented → beautified → tested → shipped → pr-opened
+hotfix fast-track: ready → implementing → implemented → tested → shipped → pr-opened (beautify skipped, quick gate)
 any active status → blocked          (escalation ladder Level 5)
 blocked → [status recovery resolves] (devflow.recovery, user-confirmed)
 tested → shipped requires verification.md with zero FAIL verdicts
 ```
 
-Backward transitions (`implemented` → `implementing` after backprop re-work, etc.) allowed only via `devflow.recovery` or `devflow.backprop` with explicit user confirmation — never silently.
+Backward transitions (`beautified` → `implemented` or `implementing` → `ready` via `devflow.rollback`, `implemented` → `implementing` after backprop re-work) allowed via `devflow.rollback`, `devflow.recovery`, or `devflow.backprop` with explicit user confirmation — never silently.
+
 
 ## State update snippet
 

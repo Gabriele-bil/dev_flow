@@ -87,6 +87,12 @@ pipeline:
     - command: /devflow.doctor
       skill: devflow-doctor
       description: "Diagnose environment readiness, MCP servers reachability, CLI toolchains, and pipeline state integrity"
+    - command: /devflow.rollback
+      skill: devflow-rollback
+      description: "Roll back the active DevFlow step (implement or beautify) to its pre-step checkpoint without corrupting pipeline state"
+    - command: /devflow.hotfix
+      skill: devflow-hotfix
+      description: "Fast-track pipeline for critical bugfixes, targeted patches, or hotfixes — compact task+plan, implement, targeted test, and quick ship gate directly to PR"
 
 agents:
   - id: code-reviewer
@@ -174,6 +180,12 @@ skills:
     - id: devflow-doctor
       path: skills/devflow-doctor/SKILL.md
       description: "Pre-flight diagnostic tool for DevFlow. Checks MCP server reachability, CLI toolchains, active adapter configuration, and pipeline state integrity. Supports --json and --fix"
+    - id: devflow-rollback
+      path: skills/devflow-rollback/SKILL.md
+      description: "Roll back the active DevFlow step (implement or beautify) to its pre-step checkpoint without corrupting pipeline state"
+    - id: devflow-hotfix
+      path: skills/devflow-hotfix/SKILL.md
+      description: "Fast-track pipeline for critical bugfixes, targeted patches, or hotfixes — compact task+plan, implement, targeted test, and quick ship gate directly to PR"
 
   adapters:
     flutter:

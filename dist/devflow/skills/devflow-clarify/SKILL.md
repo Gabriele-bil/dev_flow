@@ -60,7 +60,7 @@ For each question in the prioritized queue, one at a time:
 1. Present the question with:
    - The specific ambiguity or marker it resolves
    - A **recommended answer** with one-sentence rationale
-   - Multiple-choice options where the answer space is bounded — use the **`AskQuestion`** tool when available (multi-choice preferred)
+   - Multiple-choice options where the answer space is bounded — use the **`AskQuestion`** or **`ask_question`** tool when available (multi-choice preferred); suggest the **/grill-me** slash command if the user desires comprehensive design grilling
 2. Wait for the user's answer.
 3. On answer accepted:
    - Update the relevant `task.md` section (see Section update rules below).

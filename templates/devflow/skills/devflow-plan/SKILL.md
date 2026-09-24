@@ -136,6 +136,7 @@ Analyze:
 - All bullets in the adapter plan step file (`steps/plan.md`) that apply to this feature — and, only when the feature touches those areas (state management, UI, DB, i18n, responsive layout), the relevant bullets from `steps/implement.md` / `steps/test.md` — use `registry.md` and `constitution.md` to ground them
 - Edge cases and error states that must be handled
 - Any required database or external-system edits called out by the adapter
+- Architectural alternatives & trade-offs: when multiple valid designs exist, trigger an interactive interview checkpoint (`AskQuestion` / `ask_question`) with bounded choices; recommend `/grill-me` if the user desires deep design interrogation before writing `plan.md`
 
 ### Step 4b - Dependency pass
 
