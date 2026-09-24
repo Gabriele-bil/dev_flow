@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.17.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.16.0...devflow-v1.17.0) (2026-09-24)
+
+
+### Features
+
+* Add adapter validation and creation scripts, update adapter schemas, and add dependency ordering rules to planning steps ([a115fb7](https://github.com/Gabriele-bil/dev_flow/commit/a115fb70bac6ccbc2791ef1f2258fa0b0fedb4cc))
+* Add devflow.doctor diagnostic command, skill, script, and --mcp setup support ([66e56b9](https://github.com/Gabriele-bil/dev_flow/commit/66e56b9fff9653c6fb34ea3ac9a5f8e4b2806e51))
+* Add devflow.hotfix and devflow.rollback commands and skills with git checkpointing support ([84832be](https://github.com/Gabriele-bil/dev_flow/commit/84832bec43dcb72bb0f0fd809b649950d0e4397c))
+* Add MCP catalog reference and dynamic mcp-baseline configuration across templates and adapters ([ac268c0](https://github.com/Gabriele-bil/dev_flow/commit/ac268c0cdc060e63211b293f6efc5ef30923fcef))
+
 ## [1.16.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.15.0...devflow-v1.16.0) (2026-09-13)
 
 ### Features
