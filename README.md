@@ -47,7 +47,8 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 | `devflow.doctor` | [`templates/devflow/skills/devflow-doctor/SKILL.md`](templates/devflow/skills/devflow-doctor/SKILL.md) | — → pre-flight diagnostic (MCP reachability, CLI tools, pipeline state) |
 | `devflow.hotfix` | [`templates/devflow/skills/devflow-hotfix/SKILL.md`](templates/devflow/skills/devflow-hotfix/SKILL.md) | Bug description → fast-track task+plan+implement+test+quick ship → PR |
 | `devflow.rollback` | [`templates/devflow/skills/devflow-rollback/SKILL.md`](templates/devflow/skills/devflow-rollback/SKILL.md) | — → revert active step (implement/beautify) to pre-step checkpoint |
-| `devflow.learn` | [`templates/devflow/skills/devflow-learn/SKILL.md`](templates/devflow/skills/devflow-learn/SKILL.md) | — → manage learnings log (log / search / list / prune) |
+| `devflow.learn` | [`templates/devflow/skills/devflow-learn/SKILL.md`](templates/devflow/skills/devflow-learn/SKILL.md) | — → manage instincts (local vs shared team gotchas, promote to REGISTRY.md) |
+| `devflow.metrics` | [`templates/devflow/skills/devflow-metrics/SKILL.md`](templates/devflow/skills/devflow-metrics/SKILL.md) | — → telemetry dashboard (bash filter savings, cost est., pass@1, step duration) |
 | `devflow.recovery` | [`templates/devflow/skills/devflow-recovery/SKILL.md`](templates/devflow/skills/devflow-recovery/SKILL.md) | Stuck pipeline → diagnosis + targeted recovery path |
 
 Command wrappers live in [`templates/devflow/commands/`](templates/devflow/commands/).

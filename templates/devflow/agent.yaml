@@ -93,6 +93,9 @@ pipeline:
     - command: /devflow.hotfix
       skill: devflow-hotfix
       description: "Fast-track pipeline for critical bugfixes, targeted patches, or hotfixes — compact task+plan, implement, targeted test, and quick ship gate directly to PR"
+    - command: /devflow.metrics
+      skill: devflow-metrics
+      description: "Display token savings dashboard, estimated cost per feature, pass@1 success rate, and step durations"
 
 agents:
   - id: code-reviewer
@@ -186,6 +189,9 @@ skills:
     - id: devflow-hotfix
       path: skills/devflow-hotfix/SKILL.md
       description: "Fast-track pipeline for critical bugfixes, targeted patches, or hotfixes — compact task+plan, implement, targeted test, and quick ship gate directly to PR"
+    - id: devflow-metrics
+      path: skills/devflow-metrics/SKILL.md
+      description: "Display token savings dashboard, estimated cost per feature, pass@k success rate, and step durations. Use when user runs devflow.metrics or inspects token efficiency"
 
   adapters:
     flutter:

@@ -1,14 +1,17 @@
 ---
 name: devflow-learn
-description: Manage `.devflow-instincts.yaml` — log/search/list/prune/boost project instincts. Use when user asks to log a finding, search learnings, or clean up instincts.
-argument-hint: [log, search <query>, list, prune, boost <id>]
+description: Manage local and team instincts (.devflow-instincts.yaml, .devflow-instincts.shared.yaml) — log, search, list, prune, boost, or promote instincts to team store and REGISTRY.md. Use when user asks to log a finding, search learnings, manage instincts, or promote team patterns.
+argument-hint: [log, search <query>, list, prune, boost <id>, promote <id>]
 ---
 
 # Skill: devflow.learn
 
 ## Purpose
 
-Read, write, and maintain `.devflow-instincts.yaml` — the project's persistent instinct store. Complements the auto-detected signals written by the `stop-learn-distill` hook.
+Read, write, and maintain persistent instincts across local and team stores:
+- **Local instincts** (`.devflow-instincts.yaml`, gitignored): machine-specific learnings and auto-detected churn signals.
+- **Shared team instincts** (`.devflow-instincts.shared.yaml`, committed): shared architectural gotchas and conventions for the whole team.
+- **Conventions registry** (`REGISTRY.md`): human-readable architectural patterns and reusable components.
 
 ## Core Principles
 
@@ -28,9 +31,10 @@ Before running any sub-command, verify:
 
 ```bash
 command -v yq >/dev/null 2>&1 || echo "ERROR: yq not installed. Run: brew install yq"
+command -v jq >/dev/null 2>&1 || echo "ERROR: jq not installed. Run: brew install jq"
 ```
 
-If `yq` is missing, tell the user and stop.
+If `yq` or `jq` is missing, tell the user and stop.
 
 ## Workflow
 
@@ -40,12 +44,11 @@ Identify the sub-command from user message or argument, then execute it.
 
 ### Sub-command: log
 
-Record a manual instinct that should inform future sessions.
+Record a manual instinct in `.devflow-instincts.yaml` (local store).
 
 #### Step 1 — Collect information (if not provided)
 
 Ask:
-
 1. Trigger: "When should this instinct fire?" (e.g. "when choosing a state management library")
 2. Action: "What should Claude do?" (one imperative sentence)
 3. Domain: file type or area (e.g. `flutter`, `typescript`, `devflow`, `general`)
@@ -60,11 +63,11 @@ ID=$(printf '%s' "$TRIGGER" | tr '[:upper:]' '[:lower:]' \
   | cut -c1-50 | sed 's/-$//')
 ```
 
-#### Step 3 — Ensure instincts file exists
+#### Step 3 — Ensure local instincts file exists
 
 ```bash
 if [ ! -f .devflow-instincts.yaml ]; then
-  printf '%s\n' "# DevFlow project instincts" "instincts: []" > .devflow-instincts.yaml
+  printf '%s\n' "# DevFlow project instincts (local)" "instincts: []" > .devflow-instincts.yaml
 fi
 ```
 
@@ -72,24 +75,29 @@ fi
 
 ```bash
 TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-yq -i ".instincts += [{\"id\": \"$ID\", \"trigger\": \"<TRIGGER>\", \"confidence\": <CONFIDENCE>, \"domain\": \"<DOMAIN>\", \"scope\": \"project\", \"action\": \"<ACTION>\", \"evidence\": \"manual\", \"ts\": \"$TS\"}]" \
+yq -i ".instincts += [{\"id\": \"$ID\", \"trigger\": \"<TRIGGER>\", \"confidence\": <CONFIDENCE>, \"domain\": \"<DOMAIN>\", \"scope\": \"local\", \"action\": \"<ACTION>\", \"evidence\": \"manual\", \"ts\": \"$TS\"}]" \
   .devflow-instincts.yaml
 ```
 
-Confirm: "Instinct `<ID>` logged (confidence `<CONFIDENCE>`)."
+Confirm: "Instinct `<ID>` logged locally (confidence `<CONFIDENCE>`)."
 
 ---
 
 ### Sub-command: search
 
-Find instincts matching a keyword across trigger, action, and domain.
+Find instincts matching a keyword across trigger, action, and domain in both shared and local stores.
 
 #### Step 1 — Run search
 
 ```bash
-yq -r \
-  '.instincts[] | select((.trigger + " " + .action + " " + (.domain // "")) | test("<QUERY>"; "i")) | (if .contested then "⚠ " else "• " end) + "[" + (.confidence | tostring) + " " + (.domain // "general") + "] " + .trigger + " → " + .action' \
-  .devflow-instincts.yaml 2>/dev/null
+for f in .devflow-instincts.shared.yaml .devflow-instincts.yaml; do
+  [ -f "$f" ] || continue
+  SCOPE="🏠 local"
+  [ "$f" = ".devflow-instincts.shared.yaml" ] && SCOPE="👥 team"
+  yq -r \
+    ".instincts[] | select((.trigger + \" \" + .action + \" \" + (.domain // \"\")) | test(\"<QUERY>\"; \"i\")) | (if .contested then \"⚠ \" else \"• \" end) + \"[\" + (.confidence | tostring) + \" \" + (.domain // \"general\") + \" $SCOPE] \" + .trigger + \" → \" + .action" \
+    "$f" 2>/dev/null
+done
 ```
 
 #### Step 2 — Display results
@@ -101,42 +109,92 @@ Otherwise show results. If >5 results, group by domain.
 
 ### Sub-command: list
 
-Show all instincts, sorted by confidence descending.
+Show all instincts (shared team + local), sorted by confidence descending.
 
 ```bash
-yq -r \
-  '.instincts // [] | sort_by(.confidence) | reverse | .[] | (if .contested then "⚠ " else "• " end) + "[" + (.confidence | tostring) + " " + (.domain // "general") + "] " + .trigger + " → " + .action' \
-  .devflow-instincts.yaml 2>/dev/null
+SHARED_JSON=$(yq -o=json '.instincts // [] | map(.scope = "team")' .devflow-instincts.shared.yaml 2>/dev/null || echo "[]")
+LOCAL_JSON=$(yq -o=json '.instincts // [] | map(.scope = "local")' .devflow-instincts.yaml 2>/dev/null || echo "[]")
+
+jq -r --argjson shared "$SHARED_JSON" --argjson local "$LOCAL_JSON" '
+  ($shared + $local)
+  | group_by(.id) | map(.[0])
+  | sort_by(.confidence) | reverse
+  | .[]
+  | (if .contested then "⚠ " else "• " end)
+    + "[" + (.confidence | tostring) + " " + (.domain // "general")
+    + (if .scope == "team" then " 👥 team" else " 🏠 local" end)
+    + "] " + .trigger + " → " + .action
+    + (if .scope == "local" and .confidence >= 0.85 then " (⭐ eligible: /devflow.learn promote " + .id + ")" else "" end)
+' 2>/dev/null
 ```
 
-If file missing or empty: "No instincts recorded yet for this project."
+If both files missing or empty: "No instincts recorded yet for this project."
 
-`⚠` marks a **contested** instinct — an auto-detected churn signal that was followed by a `git revert`/`reset --hard`/discard in the same session. Confidence was decayed automatically (`stop-learn-distill.sh`, -0.2, floor 0.05); the entry is kept, not deleted, so the contradiction stays visible. Re-verify before boosting a contested instinct.
+`⚠` marks a **contested** instinct (churn signal followed by revert/reset; confidence decayed automatically). Re-verify before boosting or promoting.
+
+---
+
+### Sub-command: promote
+
+Promote a high-confidence local instinct to `.devflow-instincts.shared.yaml` (committed) and optionally `REGISTRY.md`.
+
+#### Step 1 — Verify local instinct exists
+
+```bash
+ENTRY=$(yq -o=json ".instincts[] | select(.id == \"<ID>\")" .devflow-instincts.yaml 2>/dev/null)
+```
+
+If empty: "No local instinct with id `<ID>`. Use `/devflow.learn list`."
+
+#### Step 2 — Verify confidence threshold
+
+```bash
+CONF=$(echo "$ENTRY" | jq -r '.confidence // 0')
+```
+
+If confidence < 0.85 and `--force` not supplied: warn user that recommended threshold is ≥ 0.85 (tested across ≥5 sessions). Confirm before proceeding.
+
+#### Step 3 — Ensure shared file exists
+
+```bash
+if [ ! -f .devflow-instincts.shared.yaml ]; then
+  printf '%s\n' "# DevFlow shared team instincts (committed to git)" "instincts: []" > .devflow-instincts.shared.yaml
+fi
+```
+
+#### Step 4 — Move to shared instincts
+
+```bash
+TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+PROMOTED_ENTRY=$(echo "$ENTRY" | jq --arg ts "$TS" '.scope = "team" | .promoted_at = $ts')
+yq -i ".instincts = ([.instincts[] | select(.id != \"<ID>\")] + [$PROMOTED_ENTRY])" .devflow-instincts.shared.yaml
+yq -i ".instincts = [.instincts[] | select(.id != \"<ID>\")]" .devflow-instincts.yaml
+```
+
+#### Step 5 — Sync to REGISTRY.md (if --registry or confidence ≥ 0.85)
+
+If `REGISTRY.md` or `registry.md` exists and user provided `--registry` or confirmed:
+Append entry under `## Conventions & Patterns`:
+```markdown
+### Pattern: <TRIGGER>
+- **Domain**: `<DOMAIN>` | **Confidence**: `<CONFIDENCE>`
+- **Action**: `<ACTION>`
+- **Source**: Promoted instinct `<ID>`
+```
+
+Confirm: "✅ Promoted instinct `<ID>` to `.devflow-instincts.shared.yaml` (scope: team). Commit this file to git."
 
 ---
 
 ### Sub-command: prune
 
-Remove instincts with `confidence < 0.3`.
-
-#### Step 1 — Count before
+Remove local instincts with `confidence < 0.3` (shared team instincts are protected).
 
 ```bash
 BEFORE=$(yq '.instincts | length' .devflow-instincts.yaml 2>/dev/null || echo 0)
-```
-
-#### Step 2 — Filter in-place
-
-```bash
 yq -i '.instincts = [.instincts[] | select(.confidence >= 0.3)]' .devflow-instincts.yaml
-```
-
-#### Step 3 — Count after and report
-
-```bash
 AFTER=$(yq '.instincts | length' .devflow-instincts.yaml 2>/dev/null || echo 0)
-REMOVED=$((BEFORE - AFTER))
-echo "Pruned $REMOVED instincts. $AFTER remain."
+echo "Pruned $((BEFORE - AFTER)) local instincts. $AFTER remain."
 ```
 
 ---
@@ -145,23 +203,16 @@ echo "Pruned $REMOVED instincts. $AFTER remain."
 
 Manually increase an instinct's confidence by +0.1 (cap 0.95).
 
-#### Step 1 — Verify id exists
-
 ```bash
-yq -r ".instincts[] | select(.id == \"<ID>\") | .id" .devflow-instincts.yaml 2>/dev/null
-```
-
-If empty: "No instinct with id `<ID>`. Use `/devflow.learn list` to see available ids."
-
-#### Step 2 — Boost confidence
-
-```bash
-CURRENT=$(yq -r ".instincts[] | select(.id == \"<ID>\") | .confidence" .devflow-instincts.yaml)
+TARGET=".devflow-instincts.yaml"
+if ! yq -e ".instincts[] | select(.id == \"<ID>\")" "$TARGET" >/dev/null 2>&1; then
+  TARGET=".devflow-instincts.shared.yaml"
+fi
+CURRENT=$(yq -r ".instincts[] | select(.id == \"<ID>\") | .confidence" "$TARGET")
 NEW=$(awk "BEGIN {v=$CURRENT+0.1; if(v>0.95) v=0.95; printf \"%.2f\", v}")
-yq -i "(.instincts[] | select(.id == \"<ID>\") | .confidence) = $NEW" .devflow-instincts.yaml
+yq -i "(.instincts[] | select(.id == \"<ID>\") | .confidence) = $NEW" "$TARGET"
+echo "Instinct <ID> confidence: $CURRENT → $NEW ($TARGET)."
 ```
-
-Confirm: "Instinct `<ID>` confidence: `$CURRENT` → `$NEW`."
 
 ---
 
@@ -169,16 +220,15 @@ Confirm: "Instinct `<ID>` confidence: `$CURRENT` → `$NEW`."
 
 | Anti-Pattern | Problem | Fix |
 | --- | --- | --- |
-| Logging external content (third-party API docs, user stories) as instincts | Poisoned instincts override correct project behavior in future sessions | Log only project-specific behaviors observed in the codebase |
-| Boosting instinct confidence without re-verifying it still holds | Stale high-confidence instincts are harder to prune | Re-read the relevant code before boosting |
-| Never pruning stale instincts | Outdated instincts mislead future sessions | Run `prune` after any major refactor or adapter change |
-| Logging implementation details as instincts ("UserService uses Repository pattern") | Duplicates what code already shows; wasted context budget | Log only non-obvious behaviors not derivable from reading the code |
-| Using `boost` instead of `log` to add new knowledge | Boost only adjusts existing confidence; doesn't add new entries | Use `log` for new findings; `boost` for reinforcing known-good instincts |
+| Promoting low-confidence or unverified local instincts | Pollutes team shared context with premature rules | Require confidence ≥ 0.85 and multi-session validation |
+| Git-ignoring `.devflow-instincts.shared.yaml` | Team loses architectural gotchas discovered in earlier sessions | Keep shared file tracked in git; only local file is ignored |
+| Never pruning stale local instincts | Stale instincts mislead future sessions | Run `prune` periodically after major refactors |
+| Logging external docs or tutorials as instincts | Bloats prompt context with non-codebase knowledge | Only log codebase-specific behaviors observed during sessions |
 
 ## I/O Reference
 
 | | |
 | --- | --- |
-| Reads | `.devflow-instincts.yaml` |
-| Writes | `.devflow-instincts.yaml` |
+| Reads | `.devflow-instincts.yaml`, `.devflow-instincts.shared.yaml`, `REGISTRY.md` |
+| Writes | `.devflow-instincts.yaml`, `.devflow-instincts.shared.yaml`, `REGISTRY.md` |
 | Related | `stop-learn-distill` hook (auto-detects churn), `session-start-learnings` hook (injects instincts) |

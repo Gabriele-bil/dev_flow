@@ -104,10 +104,14 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 | `devflow.ship` | Pre-merge gate: 1–5 agents in parallel per depth profile → Ship Gate Report → route to PR |
 | `devflow.pr` | Commit, push branch, open PR to main |
 | `devflow.status` | Show current pipeline state (active feature, next step, progress) |
+| `devflow.doctor` | Diagnose environment readiness, MCP servers reachability, CLI toolchains, and pipeline state integrity |
+| `devflow.hotfix` | Fast-track pipeline for critical bugfixes, targeted patches, or hotfixes |
+| `devflow.rollback` | Roll back active step (implement/beautify) to pre-step checkpoint |
 | `devflow.resume` | Resume interrupted session — read state, cross-check plan.md, re-enter correct step |
 | `devflow.run` | Opt-in autonomy: chain implement → beautify → test unattended; decision flags; stop before ship |
 | `devflow.backprop` | Backpropagate escaped bug into spec — classify gap, tighten AC, add regression test |
-| `devflow.learn` | Manage learnings log — log / search / list / prune / boost |
+| `devflow.learn` | Manage instincts — log / search / list / prune / boost / promote to team store |
+| `devflow.metrics` | Telemetry dashboard — bash filter savings, estimated cost, pass@1, step duration |
 | `devflow.recovery` | Diagnose + recover a stuck or corrupted pipeline |
 
 ## Hooks

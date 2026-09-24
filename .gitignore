@@ -73,6 +73,8 @@ node_modules/
 # devflow learnings log
 .devflow-learnings.jsonl
 .devflow-learnings.jsonl.1
+.devflow-instincts.yaml
+!.devflow-instincts.shared.yaml
 
 # devflow observe log
 .devflow-observe.jsonl

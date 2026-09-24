@@ -213,6 +213,70 @@ COUNT=$(echo "$OUTPUT" | jq -r '.message' 2>/dev/null | grep -c "^•" || echo 0
                    || fail "max 6 instincts surfaced" "got $COUNT, want ≤6"
 teardown
 
+# T9b: shared instincts surfaced with team badge
+setup
+cat > .devflow-instincts.shared.yaml <<'YAML'
+instincts:
+  - id: team-riverpod
+    trigger: "when selecting state management"
+    confidence: 0.95
+    domain: flutter
+    scope: team
+    action: "Use Riverpod architecture"
+    evidence: "team consensus"
+    ts: "2026-05-26T10:00:00Z"
+YAML
+OUTPUT=$(bash "$HOOKS_DIR/session-start-learnings.sh")
+assert_str_contains "shared instinct: has team badge" "$OUTPUT" "👥 team"
+assert_str_contains "shared instinct: contains action" "$OUTPUT" "Riverpod architecture"
+teardown
+
+# T9c: shared instincts deduplicate and merge with local instincts
+setup
+cat > .devflow-instincts.shared.yaml <<'YAML'
+instincts:
+  - id: shared-rule
+    trigger: "when writing tests"
+    confidence: 0.9
+    domain: general
+    scope: team
+    action: "Team test rule"
+    evidence: "team"
+    ts: "2026-05-26T10:00:00Z"
+YAML
+cat > .devflow-instincts.yaml <<'YAML'
+instincts:
+  - id: shared-rule
+    trigger: "when writing tests"
+    confidence: 0.7
+    domain: general
+    scope: local
+    action: "Local old test rule"
+    evidence: "manual"
+    ts: "2026-05-25T10:00:00Z"
+  - id: local-rule
+    trigger: "when formatting"
+    confidence: 0.8
+    domain: general
+    scope: local
+    action: "Format before commit"
+    evidence: "manual"
+    ts: "2026-05-26T10:00:00Z"
+YAML
+OUTPUT=$(bash "$HOOKS_DIR/session-start-learnings.sh")
+assert_str_contains "merge: shared takes precedence" "$OUTPUT" "Team test rule"
+assert_not_contains_msg() {
+  if echo "$OUTPUT" | grep -q "Local old test rule"; then
+    fail "merge: local duplicate overridden" "found local old test rule in output"
+  else
+    pass "merge: local duplicate overridden"
+  fi
+}
+assert_not_contains_msg
+assert_str_contains "merge: local unique rule preserved" "$OUTPUT" "Format before commit"
+assert_str_contains "merge: local badge displayed" "$OUTPUT" "🏠 local"
+teardown
+
 # ── stop-learn-distill.sh tests ───────────────────────────────────────────────
 
 echo ""

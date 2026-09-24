@@ -3,6 +3,7 @@
 # Reads .devflow-instincts.yaml (auto-migrating from .devflow-learnings.jsonl if needed).
 # Outputs a JSON priority message with relevant instincts; exits silently if none.
 
+INSTINCTS_SHARED=".devflow-instincts.shared.yaml"
 INSTINCTS_FILE=".devflow-instincts.yaml"
 LEARNINGS_LOG=".devflow-learnings.jsonl"
 MAX_SHOW=6
@@ -13,7 +14,7 @@ if ! command -v jq >/dev/null 2>&1; then exit 0; fi
 if ! command -v yq >/dev/null 2>&1; then exit 0; fi
 
 # ── Auto-migrate from old JSONL format (one-time) ────────────────────────────
-if [ ! -f "$INSTINCTS_FILE" ] && [ -f "$LEARNINGS_LOG" ] && [ -s "$LEARNINGS_LOG" ]; then
+if [ ! -f "$INSTINCTS_FILE" ] && [ ! -f "$INSTINCTS_SHARED" ] && [ -f "$LEARNINGS_LOG" ] && [ -s "$LEARNINGS_LOG" ]; then
   YAML_OUT="# DevFlow project instincts — auto-migrated from .devflow-learnings.jsonl"$'\n'"instincts:"
 
   while IFS= read -r line; do
@@ -73,14 +74,42 @@ if [ ! -f "$INSTINCTS_FILE" ] && [ -f "$LEARNINGS_LOG" ] && [ -s "$LEARNINGS_LOG
   mv "$LEARNINGS_LOG" "${LEARNINGS_LOG}.migrated" 2>/dev/null || true
 fi
 
-# Guard: no instincts file or empty
-if [ ! -f "$INSTINCTS_FILE" ] || [ ! -s "$INSTINCTS_FILE" ]; then exit 0; fi
+# Guard: no instincts file or both empty
+HAS_SHARED=0
+HAS_LOCAL=0
+[ -f "$INSTINCTS_SHARED" ] && [ -s "$INSTINCTS_SHARED" ] && HAS_SHARED=1
+[ -f "$INSTINCTS_FILE" ] && [ -s "$INSTINCTS_FILE" ] && HAS_LOCAL=1
 
-# ── Read and surface instincts ────────────────────────────────────────────────
+if [ "$HAS_SHARED" -eq 0 ] && [ "$HAS_LOCAL" -eq 0 ]; then
+  exit 0
+fi
+
+# ── Read and merge instincts from shared and local stores ─────────────────────
+SHARED_JSON="[]"
+LOCAL_JSON="[]"
+
+if [ "$HAS_SHARED" -eq 1 ]; then
+  SHARED_JSON=$(yq -o=json '.instincts // [] | map(.scope = (.scope // "team"))' "$INSTINCTS_SHARED" 2>/dev/null || echo "[]")
+fi
+
+if [ "$HAS_LOCAL" -eq 1 ]; then
+  LOCAL_JSON=$(yq -o=json '.instincts // [] | map(.scope = (.scope // "local"))' "$INSTINCTS_FILE" 2>/dev/null || echo "[]")
+fi
+
 ENTRIES=$(
-  yq -r \
-    ".instincts // [] | sort_by(.confidence) | reverse | map(select(.confidence >= ${MIN_CONFIDENCE})) | .[0:${MAX_SHOW}] | .[] | \"• [\" + (.confidence | tostring) + \" \" + (.domain // \"general\") + \"] \" + .trigger + \" → \" + .action" \
-    "$INSTINCTS_FILE" 2>/dev/null
+  jq -rn --argjson shared "$SHARED_JSON" --argjson local "$LOCAL_JSON" \
+        --arg min "$MIN_CONFIDENCE" --arg max "$MAX_SHOW" '
+    ($shared + $local)
+    | group_by(.id) | map(.[0])
+    | map(select((.confidence // 0) >= ($min | tonumber)))
+    | sort_by(.confidence) | reverse
+    | .[0:($max | tonumber)]
+    | .[]
+    | (if .contested then "⚠ " else "• " end)
+      + "[" + (.confidence | tostring) + " " + (.domain // "general")
+      + (if .scope == "team" then " 👥 team" else " 🏠 local" end)
+      + "] " + .trigger + " → " + .action
+  ' 2>/dev/null
 ) || true
 
 [ -z "$ENTRIES" ] && exit 0
@@ -89,7 +118,7 @@ jq -cn \
   --arg entries "$ENTRIES" \
   '{
     priority: "INFO",
-    message: ("🧠 Project instincts (confidence ≥ 0.4):\n\n" + $entries + "\n\nUse /devflow.learn to manage instincts (log, search, list, prune, boost).")
+    message: ("🧠 Project instincts (confidence ≥ 0.4):\n\n" + $entries + "\n\nUse /devflow.learn to manage instincts (log, search, list, prune, boost, promote).")
   }'
 
 exit 0
