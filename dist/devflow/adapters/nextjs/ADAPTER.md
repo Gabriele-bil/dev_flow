@@ -23,8 +23,18 @@ Baseline: **Next.js 16+ App Router · Zustand 5 · Tailwind CSS v4 + shadcn/ui �
 - Required baseline for this adapter:
   - `context7`
   - `sequential-thinking` (MCP server: <https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking>)
+- Native to Next.js:
+  - Next.js DevTools MCP — `next-devtools-mcp` (connects to Next.js 16+ dev server `/_next/mcp`)
+- Testing & verification:
+  - Playwright MCP server — `@playwright/mcp` (semantic accessibility snapshots + runtime E2E verification)
+- Conditional (only when used in project):
+  - `postgres` (`@microsoft/postgres-mcp` or `mcp-postgres-server`, read-only) — schema introspection (add ONLY if project connects directly to Postgres; omit otherwise)
+  - `supabase` (Supabase MCP) — schema, RLS, tables (add ONLY if project uses Supabase as backend/DB; omit otherwise)
+  - `sentry` (`mcp.sentry.dev` / `getsentry/sentry-mcp`) — error triage and stack traces (add ONLY if project uses Sentry)
 - **Context7**: Next.js, React, Zustand, shadcn/ui, React Hook Form, Zod docs and version deltas.
 - **Sequential Thinking**: break complex refactors and multi-step Server Action flows into small, testable steps.
+- **Next.js DevTools MCP**: live diagnostics — `get_errors`, `get_routes`, `get_project_metadata`, `get_logs`, `get_server_action_by_id`.
+- **Playwright MCP**: runtime browser verification (Level 4 in `devflow.test`) and ARIA tree accessibility audits in `devflow.beautify`.
 
 ## Caveman response rules (mandatory)
 

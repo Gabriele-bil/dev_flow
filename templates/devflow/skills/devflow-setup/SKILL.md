@@ -144,7 +144,7 @@ For constitution fields and the full required placeholder table, see `references
 
 ### Step 5 - Placeholder map (required)
 
-Collect and resolve every field in `references/placeholder-map.md` before render — adapter-scoped fields once per app in monorepo mode (§Step 3). Collect at least 3 features globally, regardless of mode. Ask: "List your key features (name, status, notes). Add as many as needed." Add one table row per feature; monorepo adds an **App** column too, left blank at setup time (no features exist yet — `devflow.task` fills it). `devflow.task` will maintain this table as features progress.
+Collect and resolve every field in `references/placeholder-map.md` before render — adapter-scoped fields once per app in monorepo mode (§Step 3). Resolve `mcp-baseline` for `AGENTS.md` dynamically: include universal baseline (`context7`, `sequential-thinking`, code-index if present) and stack core tools (`dart`, `angular-cli`, `next-devtools`, `openapi`, `playwright`), but add conditional infrastructure servers ONLY when used in the project (`supabase` only if project uses Supabase; `postgres` only if project uses PostgreSQL; omit both if not used). Collect at least 3 features globally, regardless of mode. Ask: "List your key features (name, status, notes). Add as many as needed." Add one table row per feature; monorepo adds an **App** column too, left blank at setup time (no features exist yet — `devflow.task` fills it). `devflow.task` will maintain this table as features progress.
 
 ### Step 6 - Render token-lean content
 

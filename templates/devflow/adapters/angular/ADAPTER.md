@@ -23,13 +23,18 @@ Baseline: **standalone + signals-first**. Keep output token-lean and imperative.
 - Required baseline for this adapter:
   - `context7`
   - `sequential-thinking` (MCP server: <https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking>)
-- Optional, native to Angular CLI:
+- Native to Angular CLI:
   - Angular CLI MCP server — `npx @angular/cli mcp [-E tool]`
+- Testing & verification:
+  - Playwright MCP server — `@playwright/mcp` (semantic accessibility snapshots + runtime E2E verification)
+- Conditional (only when used in project):
+  - `sentry` (`mcp.sentry.dev` / `getsentry/sentry-mcp`) — error triage and stack traces (add ONLY if project uses Sentry)
 - **Context7**: Angular and RxJS API docs and version deltas.
 - **Sequential Thinking**: break complex refactors into small, testable steps.
 - **Angular CLI MCP**: native tools — `get_best_practices` (current Angular conventions),
   `onpush_zoneless_migration` (migration guidance), `devserver.start`/`devserver.stop`/
   `devserver.wait_for_build` (manage local dev server during implement/test loops).
+- **Playwright MCP**: runtime browser verification (Level 4 in `devflow.test`) and ARIA tree accessibility audits in `devflow.beautify`.
 
 ## Caveman response rules (mandatory)
 

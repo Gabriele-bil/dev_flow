@@ -70,5 +70,23 @@ You must collect and resolve these fields before render:
 | `naming-conventions` | CONSTITUTION | File/class/function naming rules |
 | `import-conventions` | CONSTITUTION | Import style and barrel file rules |
 | `key-decisions` | CONSTITUTION | Architectural decisions list (state, DI, routing, DB) |
+| `mcp-baseline` | AGENTS | Dynamic list of required/configured MCP servers for stack & project dependencies |
+
+## Dynamic MCP baseline resolution (`mcp-baseline`)
+
+Resolve `{{mcp-baseline}}` per project according to actual dependencies and questionnaire answers. **Never include conditional MCPs if the project does not use them**:
+
+1. **Universal baseline** (always included):
+   - `` `context7` ``, `` `sequential-thinking` ``
+   - Code index MCP (`` `serena` `` / LSP) if available in project
+2. **Stack core**:
+   - `flutter` → add `` `dart` ``
+   - `angular` → add `` `angular-cli` `` (`@angular/cli mcp`) and `` `playwright` `` (`@playwright/mcp`)
+   - `nextjs` → add `` `next-devtools` `` (`next-devtools-mcp`) and `` `playwright` `` (`@playwright/mcp`)
+   - `nestjs` → add `` `openapi` `` (`openapi-mcp`)
+3. **Conditional infrastructure (ONLY add if detected or explicitly answered; omit otherwise)**:
+   - `supabase`: Add `` `supabase` `` **ONLY** if project uses Supabase (detected in manifest dependencies `supabase_flutter`/`@supabase/*` or chosen in questionnaire). **Omit if app does not use Supabase.**
+   - `postgres`: Add `` `postgres` `` (read-only) **ONLY** if project connects directly to PostgreSQL (detected via `pg`, `postgres`, TypeORM/Prisma postgres driver, or chosen in questionnaire). **Omit if app does not use Postgres.**
+   - `sentry`: Add `` `sentry` `` **ONLY** if project uses Sentry for monitoring (detected via `@sentry/*` or `sentry_flutter`). **Omit if app does not use Sentry.**
 
 Collect at least 3 features. Ask: "List your key features (name, status, notes). Add as many as needed." Add one table row per feature. `devflow.task` will maintain this table as features progress.

@@ -12,7 +12,7 @@ Canonical section checklist for all DevFlow adapters. Use when creating a new ad
 | Section | Key | Notes |
 | --- | --- | --- |
 | Technology skills table | `## Technology skills` | `[R]` — maps feature type → skill path |
-| MCP baseline | `## MCP` | `[R]` — required baseline + optional servers |
+| MCP baseline | `## MCP` | `[R]` — required baseline + conditional servers (only added when used) |
 | Setup templates | `## Setup: templates` | `[R]` — template resolution paths |
 | Plan extra sections | `## Plan: extra sections and templates` | `[R]` — dependency ordering + stack-specific plan blocks |
 | Implement skill load matrix | `## Implement: skill load decision matrix` | `[R]` — file path → skill mapping |

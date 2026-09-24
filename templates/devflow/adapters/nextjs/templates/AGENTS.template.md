@@ -12,7 +12,7 @@
 - Load `nextjs-components` when touching Client Components (`'use client'` files).
 - State standard: Zustand for global client state. No server data in stores. URL state for filters/pagination.
 - Run quality commands after edit batches: `pnpm lint`, `pnpm test -- --passWithNoTests --watchAll=false`, `pnpm build`.
-- Required MCP baseline: `context7`, `sequential-thinking`.
+- Required MCP baseline: {{mcp-baseline}}
 <!-- devflow-managed:end:rules -->
 
 <!-- devflow-managed:start:skills -->

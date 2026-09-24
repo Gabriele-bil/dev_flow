@@ -22,9 +22,12 @@ Single source of truth for Flutter behavior. Pipeline skills (`devflow-plan`, `d
   - `context7`
   - `sequential-thinking` (MCP server: <https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking>)
   - `dart` (required on Flutter projects)
+- Conditional (only when used in project):
+  - `supabase` (Supabase MCP) — schema, RLS, tables (add ONLY if project uses Supabase as backend/DB; omit otherwise)
+  - `sentry` (`mcp.sentry.dev` / `getsentry/sentry-mcp`) — error triage and stack traces (add ONLY if project uses Sentry)
 - **Dart MCP** — package APIs, Flutter/Dart signatures (use in plan, implement, beautify).
 - **Context7** — third-party docs when Dart MCP is insufficient.
-- **Supabase MCP** — schema, RLS, tables when the feature touches the database.
+- **Supabase MCP** — schema, RLS, tables when the feature touches the database (active only on Supabase-backed apps).
 
 ## Step files (load only the active step)
 

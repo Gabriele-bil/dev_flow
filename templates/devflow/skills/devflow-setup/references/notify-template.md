@@ -12,6 +12,7 @@ AGENTS.md: [created|updated|overwritten]
 REGISTRY.md: [created|updated|overwritten]
 docs/product.md: [created|updated|overwritten]
 constitution.md: [created|updated|overwritten]
+Configured MCP baseline: [server1, server2, ...]
 
 Template source: [adapter|fallback]
 Manual placeholders: [N]

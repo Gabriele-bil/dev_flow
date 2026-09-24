@@ -14,7 +14,7 @@
 - All input validated via DTOs + `class-validator` + global `ValidationPipe`. No raw `req.body` access.
 - All endpoints documented with `@nestjs/swagger` decorators.
 - Run quality commands after edit batches: `npm run lint`, `npm test -- --passWithNoTests`, `npm run build`.
-- Required MCP baseline: `context7`, `sequential-thinking`.
+- Required MCP baseline: {{mcp-baseline}}
 <!-- devflow-managed:end:rules -->
 
 <!-- devflow-managed:start:skills -->

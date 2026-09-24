@@ -14,7 +14,7 @@
 - Accessible custom widgets: use `@angular/aria` headless directives (`ng*`), never native `<select>`/`<input list>`; load `angular-aria`.
 - Animations: native CSS `animate.enter`/`animate.leave` default (v20.2+); load `angular-animations` for enter/leave or route-transition work.
 - Run quality commands after edit batches: `pnpm run lint`, `pnpm run test -- --watch=false`, `pnpm run build`.
-- Required MCP baseline: `context7`, `sequential-thinking`.
+- Required MCP baseline: {{mcp-baseline}}
 <!-- devflow-managed:end:rules -->
 
 <!-- devflow-managed:start:skills -->

@@ -22,8 +22,16 @@ Baseline: **NestJS 11+/12+ · Express v5 default · ESM-first & Standard Schema 
 - Required baseline for this adapter:
   - `context7`
   - `sequential-thinking` (MCP server: <https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking>)
+- API design & contracts:
+  - `openapi` (OpenAPI MCP server) — inspect OpenAPI/Swagger specs, validate DTO boundaries and contract changes
+- Conditional (only when used in project):
+  - `postgres` (`@microsoft/postgres-mcp` or `mcp-postgres-server`, read-only) — schema introspection and TypeORM migrations (add ONLY if project uses PostgreSQL; omit otherwise)
+  - `supabase` (Supabase MCP) — schema, RLS, tables (add ONLY if project uses Supabase as backend/DB; omit otherwise)
+  - `sentry` (`mcp.sentry.dev` / `getsentry/sentry-mcp`) — error triage and stack traces (add ONLY if project uses Sentry)
 - **Context7**: NestJS, TypeORM, class-validator/class-transformer, Passport docs and version deltas.
 - **Sequential Thinking**: break module restructuring, auth flow changes, and multi-step migrations into small, testable steps.
+- **OpenAPI MCP**: introspect API specs, validate DTO boundaries and contract changes.
+- **Postgres MCP**: inspect live DB schema and index coverage in read-only mode to prevent migration drifts (active only on PostgreSQL-backed apps).
 
 ## Caveman response rules (mandatory)
 
