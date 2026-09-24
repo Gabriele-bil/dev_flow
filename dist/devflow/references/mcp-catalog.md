@@ -96,6 +96,7 @@ Authoritative reference for Model Context Protocol (MCP) servers across DevFlow 
 ## Setup Integration (`devflow.setup`)
 
 During `devflow.setup`:
+
 1. Scans project dependencies (`package.json`, `pubspec.yaml`) and questionnaire answers (DB / backend decisions).
 2. Generates the `{{mcp-baseline}}` value in `AGENTS.md` containing only the universal baseline + active stack core + detected infrastructure.
 3. If an app does not use Supabase, `supabase` is excluded. If an app does not use PostgreSQL, `postgres` is excluded.

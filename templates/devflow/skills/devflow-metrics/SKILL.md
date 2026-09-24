@@ -9,6 +9,7 @@ argument-hint: [--json, --feature <name>]
 ## Purpose
 
 Aggregate and visualize local telemetry across token optimization, estimated LLM costs, first-pass success rate, and step durations:
+
 - **Token savings**: characters and tokens filtered out by `post-bash-output-filter.sh` before entering prompt context.
 - **Cost telemetry**: estimated session and feature costs recorded by `stop-metrics.sh`.
 - **Quality & stability**: first-pass tool invocation success (`pass@1`) and retry loop counts from `observe.sh`.
@@ -40,6 +41,7 @@ command -v jq >/dev/null 2>&1 || { echo "ERROR: jq not installed. Run: brew inst
 ### Step 1 — Parse arguments
 
 Identify flags from user invocation:
+
 - `--json`: emit raw structured JSON payload (for CI or script consumers)
 - `--feature <name>`: isolate metrics and turn breakdowns to a single feature
 
@@ -60,6 +62,7 @@ bash "$SCRIPT_PATH" "$@"
 ### Step 3 — Interpret key indicators
 
 When presenting or inspecting dashboard numbers:
+
 1. **Context Reduction %**: values >50% indicate bash output filter is effectively suppressing terminal noise.
 2. **Cache Read Ratio**: high percentages (>40%) indicate prompt cache reuse across consecutive turns.
 3. **Pass@1 Rate**: percentages >90% indicate clean tool execution with minimal command failures.

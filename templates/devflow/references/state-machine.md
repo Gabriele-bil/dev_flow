@@ -47,7 +47,6 @@ tested → shipped requires verification.md with zero FAIL verdicts
 
 Backward transitions (`beautified` → `implemented` or `implementing` → `ready` via `devflow.rollback`, `implemented` → `implementing` after backprop re-work) allowed via `devflow.rollback`, `devflow.recovery`, or `devflow.backprop` with explicit user confirmation — never silently.
 
-
 ## State update snippet
 
 Run after editing `plan.md` `**Status:**` at any step boundary. Skips silently when `jq` missing:

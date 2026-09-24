@@ -30,6 +30,7 @@ Validate that the consumer environment satisfies all DevFlow operational prerequ
 ### Step 1 - Parse Arguments
 
 Inspect `$ARGUMENTS`:
+
 - If `--json` is present: run `bash templates/devflow/scripts/doctor.sh --json` directly and emit only the raw JSON payload with its exit code. Stop here.
 - If `--fix` is present: pass `--fix` to the diagnostic script to automatically repair safe runtime files (e.g. `.gitignore`, resetting corrupted `.devflow-state.json`).
 
@@ -53,6 +54,7 @@ Run `bash templates/devflow/scripts/doctor.sh` and capture its structured report
 ### Step 3 - Present Diagnostic Dashboard
 
 Emit the human-readable dashboard with severity indicators:
+
 - `✓ [OK]`: Prerequisite fully met.
 - `⚠ [DEGRADED]`: MCP or optional tool absent; pipeline functions using native CLI fallbacks.
 - `✗ [CRITICAL]`: Required compiler/CLI or valid git state missing; execution blocked.
@@ -60,6 +62,7 @@ Emit the human-readable dashboard with severity indicators:
 ### Step 4 - Provide Remediation Plan
 
 If any warnings or errors are found:
+
 - Display specific copy-paste terminal commands to install missing binaries.
 - Output ready-to-copy MCP configuration blocks for the detected client (Antigravity `mcp_config.json`, Claude Code `.mcp.json`, or Cursor).
 - Suggest running `devflow.setup --mcp` to automatically configure MCP servers for the project.

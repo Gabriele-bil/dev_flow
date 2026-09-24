@@ -18,7 +18,6 @@ Order the **File list** bottom-up by layer ownership:
 6. Route segments and pages (`app/**/page.tsx`, `layout.tsx`)
 7. Unit and integration tests (`__tests__/`)
 
-
 ### Server/Client boundary table
 
 For each component or route in scope, declare boundary explicitly:

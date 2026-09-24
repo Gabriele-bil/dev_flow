@@ -18,7 +18,6 @@ Order the **File list** bottom-up by layer ownership:
 6. Module definitions and wiring (`*.module.ts`, `app.module.ts`)
 7. Unit tests and e2e integration tests (`*.spec.ts`, `*.e2e-spec.ts`)
 
-
 ### Module structure map
 
 Document the feature module tree for touched/new modules:

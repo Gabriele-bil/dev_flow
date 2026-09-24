@@ -116,7 +116,7 @@ Applied by `devflow.setup` during consumer project initialization.
 | --- | :---: | --- |
 | `AGENTS.template.md` | `[R]` | Operating rules, required MCP baseline, and active technology skill pointers |
 | `REGISTRY.template.md` | `[R]` | Stack-specific shared patterns, architecture rules, and folder conventions |
-| `CONSTITUTION.template.md`| `[R]` | Core stack declarations, architecture layers, and non-negotiable principles |
+| `CONSTITUTION.template.md` | `[R]` | Core stack declarations, architecture layers, and non-negotiable principles |
 | `PRODUCT.template.md` | `[O]` | Initial product status and feature registry template |
 
 ---

@@ -9,6 +9,7 @@ argument-hint: [log, search <query>, list, prune, boost <id>, promote <id>]
 ## Purpose
 
 Read, write, and maintain persistent instincts across local and team stores:
+
 - **Local instincts** (`.devflow-instincts.yaml`, gitignored): machine-specific learnings and auto-detected churn signals.
 - **Shared team instincts** (`.devflow-instincts.shared.yaml`, committed): shared architectural gotchas and conventions for the whole team.
 - **Conventions registry** (`REGISTRY.md`): human-readable architectural patterns and reusable components.
@@ -49,6 +50,7 @@ Record a manual instinct in `.devflow-instincts.yaml` (local store).
 #### Step 1 — Collect information (if not provided)
 
 Ask:
+
 1. Trigger: "When should this instinct fire?" (e.g. "when choosing a state management library")
 2. Action: "What should Claude do?" (one imperative sentence)
 3. Domain: file type or area (e.g. `flutter`, `typescript`, `devflow`, `general`)
@@ -175,6 +177,7 @@ yq -i ".instincts = [.instincts[] | select(.id != \"<ID>\")]" .devflow-instincts
 
 If `REGISTRY.md` or `registry.md` exists and user provided `--registry` or confirmed:
 Append entry under `## Conventions & Patterns`:
+
 ```markdown
 ### Pattern: <TRIGGER>
 - **Domain**: `<DOMAIN>` | **Confidence**: `<CONFIDENCE>`

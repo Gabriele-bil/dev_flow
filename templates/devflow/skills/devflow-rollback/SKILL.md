@@ -52,10 +52,12 @@ Safely discard unwanted changes made during `devflow.implement` or `devflow.beau
 ### Step 3 - Execute Rollback
 
 1. Execute clean reset of application code:
+
    ```bash
    # Reset tracked application files to checkpoint commit
    git reset --hard "$CHECKPOINT_SHA"
    ```
+
 2. Re-verify DevFlow artifacts:
    - Ensure `devflow/features/[NNN]_[name]/task.md` and `plan.md` are preserved.
    - If rolling back from `implement`:
@@ -66,6 +68,7 @@ Safely discard unwanted changes made during `devflow.implement` or `devflow.beau
      - In `plan.md`: set `**Status:** implemented`.
      - In `.devflow-state.json`: set `plan_status: "implemented"` and `next_step: "devflow.beautify"`.
 3. Remove stale `.checkpoint.json` and `.handoff.md` from the feature directory if present:
+
    ```bash
    rm -f "devflow/features/[NNN]_[name]/.checkpoint.json"
    rm -f "devflow/features/[NNN]_[name]/handoff.md"
@@ -74,6 +77,7 @@ Safely discard unwanted changes made during `devflow.implement` or `devflow.beau
 ### Step 4 - Emit Rollback Summary
 
 Print a concise status update:
+
 ```text
 ↺ Rollback complete
 

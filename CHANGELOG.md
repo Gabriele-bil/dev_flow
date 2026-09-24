@@ -2,7 +2,6 @@
 
 ## [1.16.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.15.0...devflow-v1.16.0) (2026-09-13)
 
-
 ### Features
 
 * Add devflow-worktree skill, fanout cap hook, and edit instinct context hook ([05a43eb](https://github.com/Gabriele-bil/dev_flow/commit/05a43eb61c5a12403552c5a2aa7c823ea4a045aa))
