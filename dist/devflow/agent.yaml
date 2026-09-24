@@ -84,6 +84,9 @@ pipeline:
     - command: /devflow.worktree
       skill: devflow-worktree
       description: "Create, list, or remove isolated git worktrees for parallel feature development, with automatic dev-server port-offset assignment and overlap detection"
+    - command: /devflow.doctor
+      skill: devflow-doctor
+      description: "Diagnose environment readiness, MCP servers reachability, CLI toolchains, and pipeline state integrity"
 
 agents:
   - id: code-reviewer
@@ -168,6 +171,9 @@ skills:
     - id: devflow-worktree
       path: skills/devflow-worktree/SKILL.md
       description: "Creates, lists, or removes isolated git worktrees for parallel feature development, with automatic dev-server port-offset assignment and overlap detection"
+    - id: devflow-doctor
+      path: skills/devflow-doctor/SKILL.md
+      description: "Pre-flight diagnostic tool for DevFlow. Checks MCP server reachability, CLI toolchains, active adapter configuration, and pipeline state integrity. Supports --json and --fix"
 
   adapters:
     flutter:
@@ -371,6 +377,9 @@ references:
   - id: adapter-resolution
     path: references/adapter-resolution.md
     description: "Adapter and app resolution rules for single-app and monorepo mode — mode detection, adapter/app lookup from config.md and plan.md, working-directory scoping. Single source of truth for every skill that needs the active adapter"
+  - id: mcp-catalog
+    path: references/mcp-catalog.md
+    description: "Authoritative reference for Model Context Protocol (MCP) servers across DevFlow adapters — core principles, universal baseline, stack-specific core, conditional infrastructure, and client configs"
 
 hooks:
   - event: SessionStart

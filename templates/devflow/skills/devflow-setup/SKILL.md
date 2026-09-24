@@ -1,7 +1,7 @@
 ---
 name: devflow-setup
 description: Generates AGENTS.md, REGISTRY.md, docs/product.md via adapter templates + questionnaire. Use when running devflow.setup post-install, or adapter/stack/product context changes.
-argument-hint: [--force]
+argument-hint: [--force] [--mcp]
 disable-model-invocation: true
 ---
 
@@ -28,7 +28,7 @@ Command is **standalone** (pre-pipeline), not feature step like `task/plan/imple
 
 ## Input
 
-- Optional `$ARGUMENTS` with `--force` — present: overwrite full file contents; absent: update only `devflow-managed` sections
+- Optional `$ARGUMENTS`: `--force` (overwrite full files), `--mcp` (emit client-specific MCP configuration block per `@devflow/references/mcp-catalog.md`)
 
 ## Managed block format (required)
 
@@ -223,7 +223,7 @@ After successful file writes, install dependencies declared in the active adapte
 
 ### Step 8 - Notify user
 
-Respond using the template in `references/notify-template.md`.
+Respond using the template in `references/notify-template.md`. If `--mcp` in `$ARGUMENTS`: emit ready-to-copy client MCP config JSON (Antigravity `mcp_config.json`, Claude Code `.mcp.json`, or Cursor) and offer to write it.
 
 ## Output quality checklist
 

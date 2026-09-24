@@ -44,6 +44,7 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 | `devflow.ship` | [`templates/devflow/commands/devflow.ship.md`](templates/devflow/commands/devflow.ship.md) | Feature → parallel review (code + security + tests + a11y + docs) → gate before PR |
 | `devflow.pr` | [`templates/devflow/skills/devflow-pr/SKILL.md`](templates/devflow/skills/devflow-pr/SKILL.md) | Branch → PR to `main` |
 | `devflow.status` | [`templates/devflow/skills/devflow-status/SKILL.md`](templates/devflow/skills/devflow-status/SKILL.md) | — → current pipeline state dashboard |
+| `devflow.doctor` | [`templates/devflow/skills/devflow-doctor/SKILL.md`](templates/devflow/skills/devflow-doctor/SKILL.md) | — → pre-flight diagnostic (MCP reachability, CLI tools, pipeline state) |
 | `devflow.learn` | [`templates/devflow/skills/devflow-learn/SKILL.md`](templates/devflow/skills/devflow-learn/SKILL.md) | — → manage learnings log (log / search / list / prune) |
 | `devflow.recovery` | [`templates/devflow/skills/devflow-recovery/SKILL.md`](templates/devflow/skills/devflow-recovery/SKILL.md) | Stuck pipeline → diagnosis + targeted recovery path |
 

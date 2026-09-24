@@ -1,7 +1,7 @@
 ---
 name: devflow.setup
 description: Generate or update AGENTS.md, REGISTRY.md, and docs/product.md in the consumer project root from adapter templates with a mandatory full questionnaire.
-argument-hint: [--force]
+argument-hint: [--force] [--mcp]
 disable-model-invocation: true
 model: sonnet
 effort: medium
@@ -19,6 +19,8 @@ Use `@devflow/skills/devflow-setup/SKILL.md` and execute it exactly.
 - Write `AGENTS.md`, `REGISTRY.md`, and `docs/product.md` in the consumer project root using `devflow-managed` block markers.
 - After file writes, install adapter setup dependencies declared in `@devflow/adapters/<adapter>/steps/setup.md` under `Setup dependencies` — once per app in monorepo mode.
 - If `$ARGUMENTS` contains `--force`, overwrite full files; otherwise only replace `devflow-managed` sections.
+- If `$ARGUMENTS` contains `--mcp`, generate client-ready MCP configuration JSON (for Antigravity `mcp_config.json`, Claude Code `.mcp.json`, or Cursor) resolving universal baseline + stack core + conditional servers per `@devflow/references/mcp-catalog.md`.
 
 Optional flag:
 `$ARGUMENTS`
+
