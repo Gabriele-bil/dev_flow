@@ -10,6 +10,10 @@ description: "Spec-driven development pipeline: task → plan → implement → 
 
 pipeline:
   steps:
+    - id: discover
+      command: /devflow.discover
+      skill: devflow-discover
+      description: "Interactive architectural discovery for greenfield app creation or complex features: explores technical alternatives, evaluates trade-offs, and generates formal ADR in docs/adr/"
     - id: setup
       command: /devflow.setup
       skill: devflow-setup
@@ -121,6 +125,9 @@ agents:
 
 skills:
   core:
+    - id: devflow-discover
+      path: skills/devflow-discover/SKILL.md
+      description: "Guides architectural discovery for greenfield applications or complex features, compares technical options, and records decisions in ADRs. Use when exploring architecture choices, evaluating trade-offs, or before devflow.setup or devflow.task"
     - id: devflow-setup
       path: skills/devflow-setup/SKILL.md
       description: "Generates or updates AGENTS.md, REGISTRY.md, and docs/product.md in the consumer project root from adapter templates using token-lean managed sections and a mandatory questionnaire"
@@ -467,4 +474,4 @@ contexts:
     suggested_for: [devflow.ship]
   - id: research
     path: contexts/research.md
-    suggested_for: [devflow.task, devflow.plan]
+    suggested_for: [devflow.discover, devflow.task, devflow.plan]

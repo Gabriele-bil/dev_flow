@@ -11,9 +11,9 @@ Pipeline orientation. Use at session start or when unsure which step to run.
 ## Pipeline Overview
 
 ```text
-devflow.setup → devflow.task → devflow.plan → devflow.implement → devflow.beautify → devflow.test → devflow.ship → devflow.pr
-                             ↘ devflow.blueprint (3+ PRs / multi-session)
-                               → devflow.plan (per step) → devflow.implement → ...
+devflow.discover (optional) → devflow.setup → devflow.task → devflow.plan → devflow.implement → devflow.beautify → devflow.test → devflow.ship → devflow.pr
+                                            ↘ devflow.blueprint (3+ PRs / multi-session)
+                                              → devflow.plan (per step) → devflow.implement → ...
 ```
 
 Each step has an input contract. Each step verifies its own preconditions. User is orchestrator — skills do not invoke each other. Statuses and transitions: `@devflow/references/state-machine.md`.
@@ -21,6 +21,9 @@ Each step has an input contract. Each step verifies its own preconditions. User 
 ## Entry Point Decision Tree
 
 ```text
+Unsure about stack, high-level architecture, or feature technical design?
+  └─ YES → devflow.discover (produces docs/adr/ADR-NNN-[title].md)
+
 Returning to an interrupted session (state or plan.md with work in progress exists)?
   └─ YES → devflow.resume  (devflow.recovery if state looks corrupted)
 
@@ -58,6 +61,7 @@ Tests passing, ready to merge?
 
 | What user said | Entry point |
 | ---------------- | ------------- |
+| "Architect this", "Choose stack", "Compare technical approaches", "Discovery" | `devflow.discover` |
 | "Build X", "Add X", "I want X" | `devflow.task` |
 | "Plan this large objective", "3+ PRs", "multi-session" | `devflow.blueprint` |
 | "Plan this", "Create plan for..." | `devflow.plan` |

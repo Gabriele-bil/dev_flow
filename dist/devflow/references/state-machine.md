@@ -8,6 +8,7 @@ Single source of truth for DevFlow statuses and transitions. Cited by `devflow-d
 | --- | --- | --- |
 | `task.md` | `**Status:**` | `devflow.task`, `devflow.clarify`, `devflow.pr` |
 | `plan.md` | `**Status:**` + `[done]`/`[pending]` markers | pipeline skills at step boundaries |
+| `docs/adr/ADR-NNN-[title].md` | `**Status:**` (Accepted/Proposed) | `devflow.discover` |
 | `.devflow-state.json` | snapshot (feature, plan_status, next_step, progress) | `hooks/pre-compact.sh`, `hooks/post-task-create.sh`, skills via State update snippet |
 | `devflow/features/[NNN]_[name]/.checkpoint.json` | working context (step, slice, decisions, errors_tried) | `devflow.implement` (slice boundaries), `devflow.test` (retry loops); deleted by `devflow.pr` |
 | `.devflow-run.json` | autonomous-run marker (feature, from, until) | `devflow.run` Step 0 or `devflow.auto` Step 0; deleted at every run exit |

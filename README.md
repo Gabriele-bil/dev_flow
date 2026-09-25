@@ -89,6 +89,7 @@ dev_flow/
 │       │   ├── devflow-beautify/
 │       │   ├── devflow-clarify/
 │       │   ├── devflow-blueprint/
+│       │   ├── devflow-discover/
 │       │   ├── devflow-discovery/
 │       │   ├── devflow-implement/
 │       │   ├── devflow-learn/

@@ -72,7 +72,7 @@ esac
 # The full decision tree is redundant when next_step is a known pipeline step.
 KNOWN_STEP=false
 case "$NEXT_STEP" in
-  devflow.setup|devflow.task|devflow.blueprint|devflow.clarify|devflow.plan| \
+  devflow.discover|devflow.setup|devflow.task|devflow.blueprint|devflow.clarify|devflow.plan| \
   devflow.analyze|devflow.implement|devflow.beautify|devflow.test|devflow.ship| \
   devflow.pr|devflow.resume|devflow.backprop|devflow.recovery|devflow.run)
     KNOWN_STEP=true

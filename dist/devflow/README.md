@@ -92,6 +92,7 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 
 | Command | What it does |
 | --- | --- |
+| `devflow.discover` | Explore architectural choices for app creation or complex features → comparative trade-offs + formal ADR |
 | `devflow.setup` | Generate `AGENTS.md`, `REGISTRY.md`, and `docs/product.md` from adapter templates |
 | `devflow.task` | Raw idea → structured task with HMW framing and verifiable subtasks |
 | `devflow.plan` | `task.md` → file-ordered implementation plan with traceability |
