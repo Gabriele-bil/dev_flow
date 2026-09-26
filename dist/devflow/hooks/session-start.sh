@@ -15,7 +15,8 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 CONFIG_FILE="${DEVFLOW_CONFIG_FILE:-$SCRIPT_DIR/../config.md}"
-STATE_FILE="$PWD/.devflow-state.json"
+WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+STATE_FILE="${DEVFLOW_STATE_FILE:-$WORKSPACE_ROOT/.devflow-state.json}"
 
 # Only a consumer project actively using devflow gets orientation injected
 # (IMPORTANT priority). Signal: a devflow/ dir, a state file, or a config.md
@@ -23,7 +24,7 @@ STATE_FILE="$PWD/.devflow-state.json"
 # project with the plugin installed but not yet in use — a short INFO
 # pointer avoids paying for orientation content every session for nothing.
 PROJECT_ACTIVE=false
-if [ -d "$PWD/devflow" ] || [ -f "$STATE_FILE" ]; then
+if [ -d "$WORKSPACE_ROOT/devflow" ] || [ -f "$STATE_FILE" ]; then
   PROJECT_ACTIVE=true
 elif [ -f "$CONFIG_FILE" ] && ! grep -q "\[TODO" "$CONFIG_FILE"; then
   PROJECT_ACTIVE=true

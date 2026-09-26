@@ -3,9 +3,10 @@
 # Reads .devflow-instincts.yaml (auto-migrating from .devflow-learnings.jsonl if needed).
 # Outputs a JSON priority message with relevant instincts; exits silently if none.
 
-INSTINCTS_SHARED=".devflow-instincts.shared.yaml"
-INSTINCTS_FILE=".devflow-instincts.yaml"
-LEARNINGS_LOG=".devflow-learnings.jsonl"
+WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+INSTINCTS_SHARED="${DEVFLOW_INSTINCTS_SHARED:-$WORKSPACE_ROOT/.devflow-instincts.shared.yaml}"
+INSTINCTS_FILE="${DEVFLOW_INSTINCTS_FILE:-$WORKSPACE_ROOT/.devflow-instincts.yaml}"
+LEARNINGS_LOG="${DEVFLOW_LEARNINGS_LOG:-$WORKSPACE_ROOT/.devflow-learnings.jsonl}"
 MAX_SHOW=6
 MIN_CONFIDENCE="0.4"
 

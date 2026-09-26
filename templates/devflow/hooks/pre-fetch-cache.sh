@@ -35,7 +35,8 @@ hash_key() {
   fi
 }
 
-CACHE_DIR=".devflow-fetch-cache"
+WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+CACHE_DIR="${DEVFLOW_FETCH_CACHE_DIR:-$WORKSPACE_ROOT/.devflow-fetch-cache}"
 CACHE_FILE="$CACHE_DIR/$(hash_key "$URL").json"
 [ -f "$CACHE_FILE" ] || exit 0
 

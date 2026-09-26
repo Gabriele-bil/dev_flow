@@ -23,7 +23,8 @@ RAW=$(cat) || true
 TO_MODEL=$(printf '%s' "$RAW" | jq -r '.to_model // .target_model // .new_model // empty' 2>/dev/null) || true
 [ -z "$TO_MODEL" ] && exit 0
 
-STATE_FILE=".devflow-state.json"
+WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+STATE_FILE="${DEVFLOW_STATE_FILE:-$WORKSPACE_ROOT/.devflow-state.json}"
 STEP=""
 [ -f "$STATE_FILE" ] && STEP=$(jq -r '.next_step // .last_observed_step // empty' "$STATE_FILE" 2>/dev/null) || true
 [ -z "$STEP" ] && exit 0

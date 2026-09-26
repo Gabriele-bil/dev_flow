@@ -4,7 +4,8 @@
 
 RAW=$(cat)  # passthrough — must be re-emitted at the end
 
-TMP_FILE=".devflow-changed-files.tmp"
+WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+TMP_FILE="${DEVFLOW_CHANGED_FILES_TMP:-$WORKSPACE_ROOT/.devflow-changed-files.tmp}"
 
 # If no accumulated files, passthrough and exit
 if [[ ! -f "$TMP_FILE" ]] || [[ ! -s "$TMP_FILE" ]]; then
@@ -21,7 +22,7 @@ done < "$TMP_FILE"
 # Reset tmp file immediately for the next response
 rm -f "$TMP_FILE"
 
-CONFIG_FILE="devflow/config.md"
+CONFIG_FILE="${DEVFLOW_CONFIG_FILE:-$WORKSPACE_ROOT/devflow/config.md}"
 
 # Monorepo mode: devflow/config.md declares a `## Apps` table.
 IS_MONOREPO=""

@@ -28,14 +28,7 @@ Deliverable: `plan.md` only.
 ## Vertical slicing (mandatory for plans with > 5 files)
 
 For plans >5 files: define ≥2 vertical slice increments in **Architecture decisions** — each slice is one end-to-end user-visible increment (not a layer). Group **File List** entries under slice headings. Optionally annotate each slice heading `(deps: ...)` with the slice numbers it builds on (format: `references/plan-template.md` → **Slice dependency annotations**) — enables ordered resume, re-implementation scoped to affected slices after `devflow.backprop`, and parallel slice execution. Omit when slices are strictly sequential.
-
-Example in Architecture decisions:
-
-```text
-- **Slice 1 — data contract + shell**: DB migration + domain model + empty UI scaffold; compiles and renders blank screen
-- **Slice 2 — state + data flow**: provider + repository impl + loading/error states wired to UI
-- **Slice 3 — full UI + i18n**: complete widget tree + localization keys + responsive layout
-```
+Example: Slice 1 (data contract + shell) → Slice 2 (state + data flow) → Slice 3 (full UI + i18n).
 
 For plans with 5 or fewer files, slicing is optional — note in Overview if sequential layer ordering is clearer. Do **not** rewrite subtask wording. The **Traceability** table must still map **each original subtask** to file path(s).
 
@@ -222,20 +215,16 @@ Continue to implementation? -> devflow.implement
 
 ## Anti-Patterns
 
+Key anti-patterns (full catalog: `@devflow/skills/devflow-plan/references/plan-anti-patterns.md`):
+
 | Anti-Pattern | Fix |
 | --- | --- |
 | Writing plan without reading `task.md` | Always start with `task.md` |
 | File list in layer order (all models → services → UI) | Order by user-visible increment; checkpoint per slice |
-| No Traceability row for a subtask | Every subtask → at least one file + criterion |
-| File List entry with no Traceability row (gold-plating) | Remove it or map to a subtask; new scope goes through `devflow.task` |
+| Subtask missing Traceability row / Gold-plating | Every subtask → ≥1 file + criterion; no unmapped files |
 | Open questions with Status `ready` | Leave open; escalate to user; never guess |
-| Reuse audit skipped ("implement will figure it out") | Audit in Step 3; document in Architecture decisions |
-| New component without checking shared/ | ≥70% coverage rule; extend first |
-| Dependencies without explicit ordering | Sort file list; document rationale in Architecture decisions |
 | Architecture decisions made during implement | All decisions in `plan.md` before implement |
-| Adapter sections omitted | Apply every required section from the adapter plan step file |
-| No implementation checkpoints on long plans | ≥2 checkpoints for plans >5 files |
-| Complexity score skipped or guessed | Score per `complexity-scoring.md` signals in Step 4d; downstream steps default to `standard` without it |
+| Complexity score skipped or guessed | Score per `complexity-scoring.md` signals in Step 4d |
 
 ## I/O Reference
 
@@ -246,6 +235,7 @@ Continue to implementation? -> devflow.implement
 | Reads (adapter) | `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/plan.md`; technology skills per ADAPTER table |
 | Reads | `@devflow/references/complexity-scoring.md` (Step 4d — score + profile) |
 | Reads | `@devflow/references/token-economy.md` (Step 1 — index-first exploration) |
+| Reads | `@devflow/skills/devflow-plan/references/plan-anti-patterns.md` (Anti-patterns catalog) |
 | Writes | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Writes (conditional) | `plan.md` `## Decision flags` (run mode — resolved Open questions) |
 | Reads (conditional) | `.devflow-run.json` (existence — run-mode switch, per `devflow-auto`) |

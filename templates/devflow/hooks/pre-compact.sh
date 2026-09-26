@@ -4,7 +4,8 @@
 # Saves .devflow-state.json at the consumer project root and outputs a context reminder for Claude.
 
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-STATE_FILE=".devflow-state.json"
+WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+STATE_FILE="${DEVFLOW_STATE_FILE:-$WORKSPACE_ROOT/.devflow-state.json}"
 
 if ! command -v jq >/dev/null 2>&1; then
   printf '{"priority":"INFO","message":"devflow pre-compact: jq not found. Install jq (brew install jq) to enable pipeline state persistence."}\n'
@@ -13,8 +14,8 @@ fi
 
 # Find the most recently modified plan.md in devflow/features/
 PLAN_FILE=""
-if [ -d "devflow/features" ]; then
-  PLAN_FILE=$(find devflow/features -name "plan.md" -type f 2>/dev/null \
+if [ -d "$WORKSPACE_ROOT/devflow/features" ]; then
+  PLAN_FILE=$(find "$WORKSPACE_ROOT/devflow/features" -name "plan.md" -type f 2>/dev/null \
     | xargs ls -t 2>/dev/null \
     | head -1)
 fi
@@ -25,7 +26,7 @@ if [ -z "$PLAN_FILE" ]; then
 fi
 
 # Feature name from path: devflow/features/NNN_name/plan.md -> NNN_name
-FEATURE=$(echo "$PLAN_FILE" | sed 's|devflow/features/||' | sed 's|/plan.md||')
+FEATURE=$(echo "$PLAN_FILE" | sed "s|$WORKSPACE_ROOT/devflow/features/||" | sed 's|devflow/features/||' | sed 's|/plan.md||')
 
 # Plan status from frontmatter: format is **Status:** <value>
 PLAN_STATUS=$(grep -m1 "^\*\*Status:\*\*" "$PLAN_FILE" 2>/dev/null \
@@ -59,8 +60,8 @@ TOTAL=$((DONE_COUNT + PENDING_COUNT))
 
 # Compute next_feature_number from devflow/features/ directory
 NEXT_FEATURE_NUMBER="001"
-if [ -d "devflow/features" ]; then
-  HIGHEST=$(ls -1 "devflow/features" 2>/dev/null \
+if [ -d "$WORKSPACE_ROOT/devflow/features" ]; then
+  HIGHEST=$(ls -1 "$WORKSPACE_ROOT/devflow/features" 2>/dev/null \
     | grep -oE '^[0-9]{3}' | sort -n | tail -1)
   if [ -n "$HIGHEST" ]; then
     NEXT_FEATURE_NUMBER=$(printf '%03d' $((10#$HIGHEST + 1)))
@@ -110,8 +111,8 @@ jq -n \
   }' > "$STATE_FILE" 2>/dev/null
 
 # Ensure .devflow-state.json is gitignored in the consumer project
-if [ -f ".gitignore" ] && ! grep -qF ".devflow-state.json" .gitignore 2>/dev/null; then
-  printf '\n# devflow runtime state\n.devflow-state.json\n' >> .gitignore
+if [ -f "$WORKSPACE_ROOT/.gitignore" ] && ! grep -qF ".devflow-state.json" "$WORKSPACE_ROOT/.gitignore" 2>/dev/null; then
+  printf '\n# devflow runtime state\n.devflow-state.json\n' >> "$WORKSPACE_ROOT/.gitignore"
 fi
 
 # Build a human-readable pending list for the context message (max 10 entries)

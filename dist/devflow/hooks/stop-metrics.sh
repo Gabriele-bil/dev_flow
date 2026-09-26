@@ -22,12 +22,13 @@ RAW=$(cat) || true
 TRANSCRIPT=$(printf '%s' "$RAW" | jq -r '.transcript_path // empty' 2>/dev/null) || true
 [ -z "$TRANSCRIPT" ] || [ ! -f "$TRANSCRIPT" ] && exit 0
 
-LOG_FILE="${DEVFLOW_METRICS_LOG:-.devflow-metrics.jsonl}"
+WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+LOG_FILE="${DEVFLOW_METRICS_LOG:-$WORKSPACE_ROOT/.devflow-metrics.jsonl}"
 [ "$LOG_FILE" = "off" ] && exit 0
 
 SESSION=$(printf '%s' "$RAW" | jq -r '.session_id // empty' 2>/dev/null) || true
 
-STATE_FILE=".devflow-state.json"
+STATE_FILE="${DEVFLOW_STATE_FILE:-$WORKSPACE_ROOT/.devflow-state.json}"
 STEP=""
 FEATURE=""
 if [ -f "$STATE_FILE" ]; then
@@ -104,8 +105,8 @@ jq -cn \
    | with_entries(select(.value != null))' \
   >> "$LOG_FILE" 2>/dev/null || true
 
-if [ -f .gitignore ] && ! grep -qF ".devflow-metrics.jsonl" .gitignore 2>/dev/null; then
-  printf '\n# devflow token/cost metrics (estimate)\n.devflow-metrics.jsonl\n' >> .gitignore 2>/dev/null || true
+if [ -f "$WORKSPACE_ROOT/.gitignore" ] && ! grep -qF ".devflow-metrics.jsonl" "$WORKSPACE_ROOT/.gitignore" 2>/dev/null; then
+  printf '\n# devflow token/cost metrics (estimate)\n.devflow-metrics.jsonl\n' >> "$WORKSPACE_ROOT/.gitignore" 2>/dev/null || true
 fi
 
 exit 0

@@ -35,6 +35,9 @@ for FILE in config.md ETHOS.md AGENTS.md agent.yaml README.md; do
   fi
 done
 
+# Pulizia di sicurezza in dist/ per rimuovere file temporanei o di runtime
+find "$DIST_DIR" \( -name ".devflow-*" ! -name ".devflow-instincts.shared.yaml" -o -name ".DS_Store" -o -name "*.tmp" \) -exec rm -rf {} + 2>/dev/null || true
+
 # Genera .claude-plugin/plugin.json da manifest
 step "Generazione .claude-plugin/plugin.json"
 

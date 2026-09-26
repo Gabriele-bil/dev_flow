@@ -9,9 +9,10 @@
 set -euo pipefail
 
 EVENT="${1:-}"
-LOG_FILE=".devflow-observe.jsonl"
-LEARNINGS_FILE=".devflow-learnings.jsonl"
-STATE_FILE=".devflow-state.json"
+WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+LOG_FILE="${DEVFLOW_OBSERVE_LOG:-$WORKSPACE_ROOT/.devflow-observe.jsonl}"
+LEARNINGS_FILE="${DEVFLOW_LEARNINGS_FILE:-$WORKSPACE_ROOT/.devflow-learnings.jsonl}"
+STATE_FILE="${DEVFLOW_STATE_FILE:-$WORKSPACE_ROOT/.devflow-state.json}"
 MAX_LINES=500
 RETRY_THRESHOLD=3
 RETRY_WINDOW=20
@@ -233,8 +234,8 @@ elif [ "$EVENT" = "post" ]; then
           >> "$LEARNINGS_FILE" 2>/dev/null || true
 
         # Ensure learnings file is gitignored
-        if [ -f ".gitignore" ] && ! grep -qF ".devflow-learnings.jsonl" .gitignore 2>/dev/null; then
-          printf '\n# devflow learnings log\n.devflow-learnings.jsonl\n.devflow-learnings.jsonl.1\n' >> .gitignore 2>/dev/null || true
+        if [ -f "$WORKSPACE_ROOT/.gitignore" ] && ! grep -qF ".devflow-learnings.jsonl" "$WORKSPACE_ROOT/.gitignore" 2>/dev/null; then
+          printf '\n# devflow learnings log\n.devflow-learnings.jsonl\n.devflow-learnings.jsonl.1\n' >> "$WORKSPACE_ROOT/.gitignore" 2>/dev/null || true
         fi
       fi
     fi
@@ -257,8 +258,8 @@ fi
 # ------------------------------------------------------------------
 # Ensure .devflow-observe.jsonl is gitignored
 # ------------------------------------------------------------------
-if [ -f ".gitignore" ] && ! grep -qF ".devflow-observe.jsonl" .gitignore 2>/dev/null; then
-  printf '\n# devflow observe log\n.devflow-observe.jsonl\n.devflow-observe.jsonl.1\n' >> .gitignore 2>/dev/null || true
+if [ -f "$WORKSPACE_ROOT/.gitignore" ] && ! grep -qF ".devflow-observe.jsonl" "$WORKSPACE_ROOT/.gitignore" 2>/dev/null; then
+  printf '\n# devflow observe log\n.devflow-observe.jsonl\n.devflow-observe.jsonl.1\n' >> "$WORKSPACE_ROOT/.gitignore" 2>/dev/null || true
 fi
 
 exit 0

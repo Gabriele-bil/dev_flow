@@ -16,7 +16,8 @@ FROM_MODEL=$(printf '%s' "$RAW" | jq -r '.from_model // .current_model // empty'
 
 SESSION=$(printf '%s' "$RAW" | jq -r '.session_id // empty' 2>/dev/null) || true
 
-STATE_FILE=".devflow-state.json"
+WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+STATE_FILE="${DEVFLOW_STATE_FILE:-$WORKSPACE_ROOT/.devflow-state.json}"
 STEP=""
 FEATURE=""
 if [ -f "$STATE_FILE" ]; then
@@ -24,7 +25,7 @@ if [ -f "$STATE_FILE" ]; then
   FEATURE=$(jq -r '.feature // empty' "$STATE_FILE" 2>/dev/null) || true
 fi
 
-LOG_FILE="${DEVFLOW_MODEL_SWITCH_LOG:-.devflow-model-switch.jsonl}"
+LOG_FILE="${DEVFLOW_MODEL_SWITCH_LOG:-$WORKSPACE_ROOT/.devflow-model-switch.jsonl}"
 [ "$LOG_FILE" = "off" ] && exit 0
 
 TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ") || true
@@ -37,8 +38,8 @@ jq -cn \
    | with_entries(select(.value != null))' \
   >> "$LOG_FILE" 2>/dev/null || true
 
-if [ -f .gitignore ] && ! grep -qF ".devflow-model-switch.jsonl" .gitignore 2>/dev/null; then
-  printf '\n# devflow model-switch audit log\n.devflow-model-switch.jsonl\n' >> .gitignore 2>/dev/null || true
+if [ -f "$WORKSPACE_ROOT/.gitignore" ] && ! grep -qF ".devflow-model-switch.jsonl" "$WORKSPACE_ROOT/.gitignore" 2>/dev/null; then
+  printf '\n# devflow model-switch audit log\n.devflow-model-switch.jsonl\n' >> "$WORKSPACE_ROOT/.gitignore" 2>/dev/null || true
 fi
 
 exit 0

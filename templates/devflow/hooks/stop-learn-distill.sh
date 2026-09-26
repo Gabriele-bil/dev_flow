@@ -6,8 +6,9 @@
 
 RAW=$(cat)
 
-OBSERVE_LOG=".devflow-observe.jsonl"
-INSTINCTS_FILE=".devflow-instincts.yaml"
+WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+OBSERVE_LOG="${DEVFLOW_OBSERVE_LOG:-$WORKSPACE_ROOT/.devflow-observe.jsonl}"
+INSTINCTS_FILE="${DEVFLOW_INSTINCTS_FILE:-$WORKSPACE_ROOT/.devflow-instincts.yaml}"
 CHURN_THRESHOLD=4
 WINDOW_LINES=200
 
@@ -110,10 +111,10 @@ while IFS= read -r filepath; do
 done <<< "$CHURNED_FILES"
 
 # ── Ensure gitignore entries ──────────────────────────────────────────────────
-if [ -f ".gitignore" ]; then
-  if ! grep -qF ".devflow-instincts.yaml" .gitignore 2>/dev/null; then
+if [ -f "$WORKSPACE_ROOT/.gitignore" ]; then
+  if ! grep -qF ".devflow-instincts.yaml" "$WORKSPACE_ROOT/.gitignore" 2>/dev/null; then
     printf '\n# devflow instincts\n.devflow-instincts.yaml\n.devflow-learnings.jsonl.migrated\n' \
-      >> .gitignore 2>/dev/null || true
+      >> "$WORKSPACE_ROOT/.gitignore" 2>/dev/null || true
   fi
 fi
 

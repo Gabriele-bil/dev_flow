@@ -26,7 +26,8 @@ if [[ -z "$FILE_PATH" ]]; then
 fi
 
 # Append only if not already present
-TMP_FILE=".devflow-changed-files.tmp"
+WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+TMP_FILE="${DEVFLOW_CHANGED_FILES_TMP:-$WORKSPACE_ROOT/.devflow-changed-files.tmp}"
 
 if [[ -f "$TMP_FILE" ]] && grep -qF "$FILE_PATH" "$TMP_FILE" 2>/dev/null; then
   exit 0

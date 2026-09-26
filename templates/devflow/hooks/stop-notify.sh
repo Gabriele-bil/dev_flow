@@ -10,8 +10,9 @@ if [ "$(uname -s)" != "Darwin" ]; then
   exit 0
 fi
 
-# Try to read context from .devflow-state.json in CWD
-STATE_FILE=".devflow-state.json"
+# Try to read context from .devflow-state.json in workspace root
+WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+STATE_FILE="${DEVFLOW_STATE_FILE:-$WORKSPACE_ROOT/.devflow-state.json}"
 TITLE="DevFlow"
 BODY="Claude is done"
 

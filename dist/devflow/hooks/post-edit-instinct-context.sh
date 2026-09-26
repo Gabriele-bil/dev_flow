@@ -19,7 +19,8 @@ set -euo pipefail
 command -v jq >/dev/null 2>&1 || exit 0
 command -v yq >/dev/null 2>&1 || exit 0
 
-INSTINCTS_FILE="${CLAUDE_PROJECT_DIR:-.}/.devflow-instincts.yaml"
+WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+INSTINCTS_FILE="${CLAUDE_PROJECT_DIR:-${DEVFLOW_INSTINCTS_FILE:-$WORKSPACE_ROOT}}/.devflow-instincts.yaml"
 MIN_CONFIDENCE="${DEVFLOW_INSTINCT_MIN_CONFIDENCE:-0.4}"
 MAX_SHOW=3
 

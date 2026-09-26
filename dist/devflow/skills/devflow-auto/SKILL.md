@@ -1,6 +1,6 @@
 ---
 name: devflow-auto
-description: Chains task → plan → analyze → implement as one unattended session starting from a raw feature idea — decision flags instead of pauses, consolidated report, stops before beautify. Use when user runs devflow.auto or asks to go from idea to implemented code autonomously without step gates.
+description: Full-cycle autonomous delivery: turns a raw feature idea directly into implemented code via task, plan, analyze, and implement. Chooses defensible defaults with decision flags rather than prompting for clarification; pauses prior to beautify. Use when user runs devflow.auto or asks to build end to end from idea to code automatically without stopping for questions.
 argument-hint: [idea-or-attached-context] [--app <name>]
 disable-model-invocation: true
 context: fork

@@ -28,6 +28,9 @@ export KEYWORDS_JSON=$(jq -c '.keywords // []'   "$MANIFEST")
 CURSOR_SUPPORT=$(jq -r '.cursor_support // false' "$MANIFEST")
 ANTIGRAVITY_SUPPORT=$(jq -r '.antigravity_support // false' "$MANIFEST")
 
+# Sanifica template da artefatti di runtime temporanei
+find "$TEMPLATE_DIR" \( -name ".devflow-*" ! -name ".devflow-instincts.shared.yaml" -o -name ".DS_Store" -o -name "*.tmp" \) -exec rm -rf {} + 2>/dev/null || true
+
 step "Build plugin: $NAME v$VERSION"
 
 bash "$BUILDERS_DIR/build-claude.sh"

@@ -21,10 +21,7 @@ Create or refresh global AI context files (`AGENTS.md`, `REGISTRY.md`) and produ
 ## When NOT to Use
 
 - No adapter supported by devflow is detected and user cannot identify the stack — resolve adapter choice first
-- `devflow.setup` already ran and only a specific managed section needs updating — pass `--force` and edit directly instead of re-running the full questionnaire
-Output must be concise, stable, safe to re-run; `AGENTS.md` keeps any template-provided `code-review-graph` skill reference intact.
-
-Command is **standalone** (pre-pipeline), not feature step like `task/plan/implement`.
+- `devflow.setup` already ran and only a specific managed section needs updating — pass `--force` and edit directly instead of re-running the full questionnaire (command is standalone, pre-pipeline)
 
 ## Input
 
@@ -180,11 +177,7 @@ After rendering each file, estimate token count using word count as proxy (300 w
 - `docs/product.md`: warn if rendered content exceeds ~525 words
 - `constitution.md`: warn if rendered content exceeds ~400 words
 
-If over budget, trim in this order:
-
-1. Remove worked examples or multi-sentence explanations from bullets — replace with imperative fragment
-2. Remove any sentence starting with "This section..." or "Note that..."
-3. Shorten skill reference paths only if duplicated elsewhere in the file
+If over budget, trim in order: (1) replace long explanations with imperative fragments, (2) remove sentences starting with "This section..." or "Note that...", (3) deduplicate skill paths.
 
 Monorepo: budgets apply to each rendered file as a whole (all apps combined) — `constitution.md`'s per-app blocks share the one ~530-token/~400-word budget for the file; trim the largest app block first if over.
 
@@ -205,17 +198,7 @@ When non-force mode cannot find valid managed markers in an existing file (`docs
 
 ### Step 7b - Gitignore (runtime artifacts)
 
-Ensure `.devflow-state.json` is listed in the consumer project's `.gitignore`.
-
-- `.gitignore` exists and already contains `.devflow-state.json` → skip
-- `.gitignore` exists and does not contain it → append:
-
-  ```gitignore
-  # devflow runtime state
-  .devflow-state.json
-  ```
-
-- `.gitignore` does not exist → skip (the `pre-compact` hook appends it automatically on first run)
+Ensure `.devflow-state.json` is listed in consumer `.gitignore`. If missing, append `# devflow runtime state` and `.devflow-state.json`. Skip if already present or if `.gitignore` does not exist (handled by `pre-compact`).
 
 ### Step 7c - Install adapter setup dependencies (required)
 
@@ -241,26 +224,23 @@ Before final response:
 
 ## Anti-Patterns
 
+Key anti-patterns (full catalog: `@devflow/skills/devflow-setup/references/setup-anti-patterns.md`):
+
 | Anti-Pattern | Fix |
 | --- | --- |
-| Writing files inside `devflow/features/` during setup | Write only to consumer project root; `devflow/` is read-only during setup. |
-| Skipping the questionnaire and guessing adapter | Always run the full questionnaire; no defaults. |
-| Regenerating setup files without `--force` on existing project | Check for managed markers; preserve non-managed content. |
-| Installing setup dependencies globally | Use project package manager (`pnpm add`, `flutter pub add`). |
-| Leaving `[TODO: fill]` placeholders before routing to `devflow.task` | Fill all placeholders first. |
+| Writing files inside `devflow/features/` | Write only to consumer root; `devflow/` is read-only. |
+| Skipping questionnaire and guessing adapter | Always run full questionnaire; no silent defaults. |
+| Regenerating files without `--force` | Check managed markers; preserve user content. |
+| Installing dependencies globally | Use project package manager (`pnpm add`, `flutter pub add`). |
 | Generating marker-less content | Wrap all managed content with `<!-- devflow-managed:start / :end -->`. |
-| Appending managed blocks onto marker-less DevFlow-looking content | Surface conflict, ask replace-or-append; duplicate sections corrupt consumer context files. |
-| Expanding templates with long narrative prose | Output must be token-lean, imperative, filler-free. |
-| Using adapter template that doesn't exist without fallback | Fall back to global templates if adapter template missing. |
-| Auto-scanning the repo tree for apps, or forcing an `apps/<name>/` convention | Apps are declared explicitly by the user — ask, never infer from folder layout. |
-| Forking AGENTS/REGISTRY/CONSTITUTION/PRODUCT template files into "monorepo variants" | Business logic belongs in this skill, not templates — same template files render both modes; only the writing rules (Step 6) differ. |
-| Duplicating per-app commands into REGISTRY.md instead of pointing at `@devflow/config.md` | Second source of truth drifts; pointer line only. |
+| Auto-scanning tree for apps in monorepo | Apps are declared explicitly by user — ask, never infer. |
 
 ## I/O Reference
 
 | | |
 | --- | --- |
 | Reads | `@devflow/config.md`, `references/config-template.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/setup.md` (including `Setup dependencies`) — per declared app in monorepo mode, adapter + fallback templates |
+| Reads | `@devflow/skills/devflow-setup/references/setup-anti-patterns.md` (Anti-patterns catalog) |
 | Writes | `AGENTS.md`, `REGISTRY.md`, `docs/product.md` (consumer project root); `@devflow/config.md`; `.gitignore` (appends `.devflow-state.json` if missing) |
 | Side effects | Installs adapter setup dependencies using project package manager or Flutter pub |
 | Next step | `devflow.task` |

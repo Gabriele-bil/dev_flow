@@ -24,7 +24,8 @@ if [ -z "$NNN" ]; then
 fi
 
 NEXT=$(printf '%03d' $((10#$NNN + 1)))
-STATE_FILE=".devflow-state.json"
+WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+STATE_FILE="${DEVFLOW_STATE_FILE:-$WORKSPACE_ROOT/.devflow-state.json}"
 
 if [ -f "$STATE_FILE" ]; then
   # Merge next_feature_number into existing state

@@ -24,7 +24,8 @@ command -v jq >/dev/null 2>&1 || exit 0
 INPUT="$(cat 2>/dev/null || true)"
 [[ -z "$INPUT" ]] && exit 0
 
-STATE_FILE="${CLAUDE_PROJECT_DIR:-.}/.devflow-fanout-state.json"
+WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+STATE_FILE="${CLAUDE_PROJECT_DIR:-${DEVFLOW_FANOUT_STATE_FILE:-$WORKSPACE_ROOT}}/.devflow-fanout-state.json"
 WINDOW_MS="${DEVFLOW_FANOUT_WINDOW_MS:-10000}"
 MAX_FANOUT="${DEVFLOW_MAX_FANOUT:-5}"
 
