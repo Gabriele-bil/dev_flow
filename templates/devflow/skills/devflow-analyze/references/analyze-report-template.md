@@ -40,6 +40,12 @@ Used by `devflow.analyze` Step 3 — produce report directly in response. Do not
 - **[SEVERITY]** E: [description]
   → Suggested fix: [one-line resolution]
 
+### Pass F — ADR alignment (conditional)
+[PASS — plan respects all accepted decisions in docs/adr/]
+— or —
+- **[SEVERITY]** F: [description]
+  → Suggested fix: [one-line resolution]
+
 ---
 
 ### Summary

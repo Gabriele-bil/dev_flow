@@ -30,10 +30,20 @@ pnpm test -- --passWithNoTests --watchAll=false --coverage
 
 ### Verify (runtime)
 
-Level-4 goal-backward verification target (`devflow.test` Step 6b) — only when Playwright is configured. Run smoke specs covering the AC under verification:
+Level-4 goal-backward verification targets (`devflow.test` Step 6b):
+
+- **Level 4a (API / Server Actions):** Run route/integration tests covering server logic.
+- **Level 4b (UI / Browser Workflow):** Run Playwright smoke spec covering the AC under verification:
 
 ```bash
 pnpm exec playwright test --grep "[feature-name]"
 ```
 
-No Playwright setup or no spec covering the AC → level 4 `N/A` (verdict PARTIAL).
+When running in an agentic environment with browser tools (e.g. `browser_subagent`):
+1. Start or verify dev server is running (`pnpm dev`).
+2. Navigate to the feature route in headless/interactive browser.
+3. Assert page mounts cleanly: no unhandled exceptions, zero fatal console errors.
+4. Execute the critical user interaction flow (fill form, trigger action, observe DOM state transition).
+5. Record confirmation evidence in `verification.md`.
+
+No Playwright setup, no spec covering the AC, and no browser tool available → level 4 `N/A` (verdict PARTIAL).

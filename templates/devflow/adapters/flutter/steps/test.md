@@ -37,10 +37,23 @@ For UI screens, assert layout variants at compact vs expanded widths using `Medi
 
 ### Verify (runtime)
 
-Level-4 goal-backward verification target (`devflow.test` Step 6b). Run only specs covering the AC under verification:
+Level-4 goal-backward verification targets (`devflow.test` Step 6b):
+
+- **Level 4a (Services / State):** Run unit/integration tests targeting Riverpod providers and repositories.
+- **Level 4b (UI / Web & Device Workflow):** Run integration specs on target device or Chrome browser:
 
 ```bash
+# Chrome (Web):
+flutter test integration_test/features/[feature-name]/ -d chrome
+
+# Mobile emulator:
 flutter test integration_test/features/[feature-name]/ -d emulator-[ID]
 ```
 
-No integration spec covering the AC → level 4 `N/A` (verdict PARTIAL).
+When verifying Flutter Web in an agentic browser environment:
+1. Run local web build or dev server (`flutter run -d web-server --web-port=8080`).
+2. Navigate to web app; confirm widget tree mounts without uncaught exceptions or console errors.
+3. Verify widget interaction (tap, scroll, form entry) and responsive breakpoints.
+4. Record confirmation evidence in `verification.md`.
+
+No integration spec covering the AC and no web/device runner available → level 4 `N/A` (verdict PARTIAL).

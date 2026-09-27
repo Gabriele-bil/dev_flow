@@ -55,18 +55,25 @@ If any item fails → stop and report which check failed.
 
 ### Step 2 — Interactive Q&A loop
 
+Follow structured interview standards in `@devflow/skills/devflow-clarify/references/interactive-interview.md`.
+
 For each question in the prioritized queue, one at a time:
 
-1. Present the question with:
-   - The specific ambiguity or marker it resolves
-   - A **recommended answer** with one-sentence rationale
-   - Multiple-choice options where the answer space is bounded — use the **`AskQuestion`** or **`ask_question`** tool when available (multi-choice preferred); suggest the **/grill-me** slash command if the user desires comprehensive design grilling
+1. Formulate structured elicitation:
+   - State the specific ambiguity or marker being resolved
+   - Provide 2–4 distinct, mutually exclusive options phrased as direct user choices
+   - Mark the first choice with `(Recommended)` and a 1-sentence technical rationale
+   - Do not include an "Other" option (handled automatically by host tool write-in)
+   - Invoke **`AskQuestion`** (Claude Code) or **`ask_question`** (Antigravity); fallback to formatted markdown choices in chat
+   - Suggest **/grill-me** slash command if the user desires comprehensive edge-case and architecture interrogation
 2. Wait for the user's answer.
 3. On answer accepted:
    - Update the relevant `task.md` section (see Section update rules below).
    - If the question resolved a `[NEEDS CLARIFICATION: ...]` marker: remove the marker inline.
    - Append the Q&A pair to the `## Clarifications` section of `task.md` (see Clarifications section format).
 4. Continue to the next question.
+
+**Automated / run mode** (`.devflow-run.json` present): do not stop or prompt — automatically pick the `(Recommended)` defensible default, log the decision to `## Clarifications`, and update the target section.
 
 **Skip logic:** if the user answers "skip" or "not applicable", record the question as skipped in `## Clarifications` with the reason provided (or "no reason given" if none). Do not modify other sections for skipped questions.
 
@@ -147,6 +154,7 @@ Audit trail only — do not reformat, compress, or omit after writing.
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md` |
 | Reads | `@devflow/skills/devflow-task/refinement-hints.md` (8D scan framework) |
+| Reads | `@devflow/skills/devflow-clarify/references/interactive-interview.md` (structured interview standards) |
 | Writes | `devflow/features/[NNN]_[feature-name]/task.md` — inline marker removal, targeted section updates, `## Clarifications` section appended, `Status` → `clarified` |
 | Precedes | `devflow.plan` |
 | Follows | `devflow.task` |

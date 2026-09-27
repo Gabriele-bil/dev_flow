@@ -106,8 +106,14 @@ Failure handling:
 After all tests pass, verify **backwards from the spec** per `@devflow/references/verification-levels.md`:
 
 1. For each acceptance criterion in `task.md`: locate implementing file(s) via `plan.md` → **Traceability** table.
-2. Run the four levels — existence, substantive (no stubs), wired (reachable, not dead code), runtime (adapter test step file → **Verify (runtime)** target when defined; fallback: integration targets from **Test → Commands**; neither → `N/A`). Depth per profile: `quick` → levels 1–3; `standard` → levels 1–3 + level 4 when adapter defines targets; `thorough` → level 4 mandatory (no adapter target → verdict PARTIAL with note).
-3. Write `devflow/features/[NNN]_[feature-name]/verification.md` using the report template in the reference.
+2. Run the verification levels:
+   - **Level 1 (Existence)**: file on disk, symbol defined, route present.
+   - **Level 2 (Substantive)**: no stubs, placeholder comments, or hardcoded returns.
+   - **Level 3 (Wired)**: reachable in app flow, registered route/provider, not dead code.
+   - **Level 4a (Runtime CLI/API)**: execute adapter `Verify (runtime)` target or integration spec.
+   - **Level 4b (Browser/UI Workflow)**: Web/UI adapters (`nextjs`, `angular`, `flutter`): run Playwright/e2e target or browser agent flow to verify mounting, DOM presence, critical interactions, and zero console errors.
+   - Depth per profile: `quick` → L1–L3; `standard` → L1–L3 + L4 targets when defined; `thorough` → L4 mandatory (missing target → PARTIAL).
+3. Write `devflow/features/[NNN]_[feature-name]/verification.md` using the template in `verification-levels.md`.
 4. Any **FAIL** verdict → do NOT set status `tested`. Implementation gap → fix (re-enter escalation ladder at Level 1) or report. Spec gap (AC missing/too weak) → suggest `devflow.backprop`.
 
 Passing tests do not skip this step — tests prove behavior forward; verification proves every AC satisfied, wired, reachable.

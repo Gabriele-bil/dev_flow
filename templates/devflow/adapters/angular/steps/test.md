@@ -38,10 +38,20 @@ npm run e2e
 
 ### Verify (runtime)
 
-Level-4 goal-backward verification target (`devflow.test` Step 6b) — only when project defines e2e (Cypress/Playwright). Run specs covering the AC under verification:
+Level-4 goal-backward verification targets (`devflow.test` Step 6b):
+
+- **Level 4a (Services / HTTP):** Run integration tests covering HTTP and state layer.
+- **Level 4b (UI / Browser Workflow):** When project defines e2e (Cypress/Playwright), run specs covering the AC:
 
 ```bash
 npm run e2e -- --grep "[feature-name]"
 ```
 
-No e2e setup or no spec covering the AC → level 4 `N/A` (verdict PARTIAL).
+When running in an agentic environment with browser tools (e.g. `browser_subagent`):
+1. Start or verify dev server is running (`npm start` / `ng serve`).
+2. Navigate to feature route; verify component mounts without runtime console errors.
+3. Perform user flow (reactive form submission, route transition, state change).
+4. Verify expected DOM elements appear with correct accessibility semantics.
+5. Record confirmation evidence in `verification.md`.
+
+No e2e setup, no spec covering the AC, and no browser tool available → level 4 `N/A` (verdict PARTIAL).

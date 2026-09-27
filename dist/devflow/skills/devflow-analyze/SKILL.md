@@ -1,6 +1,6 @@
 ---
 name: devflow-analyze
-description: Read-only check: task.md+plan.md+constitution.md consistency. Flags traceability gaps, untestable ACs, terminology drift, layer violations. Use when user runs devflow.analyze — after devflow.plan (ready), before devflow.implement.
+description: Read-only check: task.md+plan.md+constitution.md+ADRs consistency. Flags traceability gaps, untestable ACs, terminology drift, layer violations, ADR misalignment. Use when user runs devflow.analyze — after devflow.plan (ready), before devflow.implement.
 model: haiku
 effort: low
 ---
@@ -41,12 +41,13 @@ If any item fails → stop, report which check failed, do not run analysis passe
 Read in order:
 
 1. `devflow/features/[NNN]_[feature-name]/task.md` — extract: subtask list, acceptance criteria list
-2. `devflow/features/[NNN]_[feature-name]/plan.md` — extract: Traceability table (subtask → AC → file(s)), File List (paths + status)
+2. `devflow/features/[NNN]_[feature-name]/plan.md` — extract: Traceability table (subtask → AC → file(s)), File List (paths + status), Architecture decisions
 3. `constitution.md` — extract: layer ordering rules and naming conventions
+4. `docs/adr/` (if referenced in `task.md`/`plan.md` or `docs/adr/README.md` exists) — extract accepted architectural decisions, rejected alternatives, and boundaries
 
 If no path is provided, resolve the highest `NNN_` prefix under `devflow/features/`.
 
-### Step 2 — Run 5 detection passes
+### Step 2 — Run 6 detection passes
 
 Run all passes independently and collect findings. Do not stop after the first failing pass — produce a complete report.
 
@@ -111,6 +112,18 @@ For each entry in `plan.md` File List:
 
 ---
 
+#### Pass F — ADR alignment (conditional)
+
+**Trigger:** `docs/adr/` exists or `task.md`/`plan.md` contains an `**ADRs:**` reference.
+
+**Goal:** `plan.md` Architecture decisions and File List do not contradict accepted decisions in active ADRs.
+
+- Scan referenced ADRs (or active ADRs in `docs/adr/`) for Accepted decisions, rejected alternatives, and scope boundaries.
+- Flag if `plan.md` re-introduces a rejected alternative or violates an accepted ADR constraint without an explicit override/waiver.
+- Severity: **Critical** if direct contradiction to an accepted ADR; **Required** if planned approach deviates without an explicit ADR waiver in Architecture decisions.
+
+---
+
 ### Step 3 — Output report
 
 Produce the Analyze Report directly in the response. **Do not write any files.** Format: `references/analyze-report-template.md`.
@@ -131,7 +144,8 @@ Blockers = Critical + Required findings.
 | --- | --- |
 | "Traceability close enough" | Untraceable subtasks → silent bugs in `devflow.test` |
 | Vague acceptance criteria | `devflow.test` writes from ACs; vague ACs → untestable |
-| Skipping analyze ("plan looks fine") | 5-pass structural check; one read catches silent gaps |
+| Skipping analyze ("plan looks fine") | 6-pass structural check; one read catches silent gaps |
+| Contradicting accepted ADRs | Plan re-introducing rejected alternative → Critical finding |
 | Running analyze mid-implementation | Run before `devflow.implement`; post-impl use `devflow.beautify` |
 | Waiving Critical findings without documentation | Document in `plan.md` Open questions |
 | Fixing findings in `plan.md` only | Check if root is in `task.md` first |
@@ -143,6 +157,7 @@ Blockers = Critical + Required findings.
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md` |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md` |
+| Reads (conditional) | `docs/adr/` (if present — active ADRs for Pass F check) |
 | Reads | `references/analyze-report-template.md` |
 | Writes | **Nothing** — strictly read-only |
 | Precedes | `devflow.implement` |

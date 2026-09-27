@@ -9,9 +9,10 @@ Four-level verification run by `devflow.test` (Step 6b) after tests pass. Works 
 | **1 — Existence** | Do expected files, symbols, routes, migrations exist? | File on disk; symbol defined (grep declaration); route/migration present |
 | **2 — Substantive** | Real code, not stubs? | Scan implementing files for stub signals (table below) |
 | **3 — Wired** | Reachable in the running app? | Symbol imported/used **outside** its defining file; route registered; provider/middleware applied; UI reachable via navigation. Dead code = not satisfied |
-| **4 — Runtime** | Does it behave end-to-end? | Run adapter **Verify (runtime)** command covering the AC (`ADAPTER.md` → **Test → Verify (runtime)**); fallback: integration/e2e targets from **Test → Commands**. No matching target → mark `N/A` |
+| **4a — Runtime (CLI/Headless)** | Does backend/CLI behave end-to-end? | Run adapter **Verify (runtime)** command covering the AC (`ADAPTER.md` → **Test → Verify (runtime)**); fallback: integration targets from **Test → Commands**. No matching target → mark `N/A` |
+| **4b — Browser/UI Workflow** | Does UI render and flow end-to-end in browser? | Web/UI adapters (`nextjs`, `angular`, `flutter`): run E2E/Playwright target or execute browser session to verify mounting, DOM presence, critical interactions, and zero console errors |
 
-Levels 1–3 are pure static inspection (grep/read — cheap). Level 4 executes only targets the adapter already defines — run only specs covering the AC under verification, never the full suite again. Visual verification (screenshot diffing, occlusion) is out of scope.
+Levels 1–3 are pure static inspection (grep/read — cheap). Level 4a executes backend/CLI runtime targets. Level 4b executes browser/UI workflow verification for Web and UI adapters.
 
 ## Level 2 stub signals
 
@@ -30,11 +31,26 @@ Levels 1–3 are pure static inspection (grep/read — cheap). Level 4 executes 
 - Route handler defined but not registered = not wired.
 - Feature flag permanently off = not wired; note the flag in the report.
 
+## Level 4b: UI/Browser Workflow Verification (Web & UI Adapters)
+
+Applicable when the adapter is Web/UI (`nextjs`, `angular`, `flutter`) and the acceptance criterion touches routes, components, forms, or user-visible workflows.
+
+### 4 Core Browser Verification Checks:
+1. **Mounting & Clean Console**: Target route or dialog mounts in browser without unhandled runtime exceptions or fatal console errors.
+2. **DOM / UI Tree Presence**: Critical elements specified in the AC (form fields, submit buttons, state badges, headers) are rendered in the DOM with accessible identifiers.
+3. **Interactive Path & State Transition**: User interaction (typing into input, clicking submit/filter, modal open/close) triggers the expected state change and visual confirmation.
+4. **Responsive Adaptability**: Layout renders correctly across target viewport widths if mandated by AC (e.g. mobile drawer vs desktop sidebar).
+
+### Tooling & Execution Options:
+- **Automated E2E:** Execute adapter-defined browser specs (e.g. `pnpm exec playwright test`, `npm run e2e`, `flutter test integration_test/`).
+- **Interactive Browser Agent:** In agentic environments equipped with browser tools (e.g. Antigravity `browser_subagent` or MCP Puppeteer/Playwright), navigate to the dev server URL, execute the user interaction flow, verify console logs, and record verification evidence.
+- **No browser runner available:** If no automated E2E exists and no browser tool is configured, mark `L4b: N/A` (verdict PARTIAL).
+
 ## Procedure (per AC)
 
 1. Locate implementing file(s) via `plan.md` → **Traceability** table (mandatory — makes this lookup free).
 2. Run levels in order; first failing level stops the chain for that AC.
-3. Record verdict: **PASS** (all applicable levels pass) · **FAIL** (any of 1–3 fails, or 4 executes and fails) · **PARTIAL** (1–3 pass, 4 is `N/A`).
+3. Record verdict: **PASS** (all applicable levels pass) · **FAIL** (any of 1–3 fails, or 4a/4b executes and fails) · **PARTIAL** (1–3 pass, 4a/4b is `N/A`).
 4. AC with no Traceability row → **FAIL** (missing requirement — candidate for `devflow.backprop`).
 
 ## Report template — `verification.md`
@@ -48,13 +64,13 @@ Write to `devflow/features/[NNN]_[feature-name]/verification.md`:
 **Date:** [YYYY-MM-DD]
 **Result:** PASS | FAIL   (FAIL if any AC verdict is FAIL)
 
-| # | Acceptance criterion | Files (Traceability) | L1 | L2 | L3 | L4 | Verdict |
-|---|---------------------|----------------------|----|----|----|----|---------|
-| 1 | [criterion] | `path/file.ext` | ✅ | ✅ | ✅ | N/A | PARTIAL |
+| # | Acceptance criterion | Files (Traceability) | L1 | L2 | L3 | L4a | L4b | Verdict |
+|---|---------------------|----------------------|----|----|----|-----|-----|---------|
+| 1 | [criterion] | `path/file.ext` | ✅ | ✅ | ✅ | ✅ | ✅ | PASS |
 
 ## Failures
 (only if any FAIL)
-- **AC [#]** failed **L[N]**: [evidence — file:line, stub signal, missing registration] → [fix pointer]
+- **AC [#]** failed **L[N]**: [evidence — file:line, stub signal, console error, missing registration] → [fix pointer]
 ```
 
 ## Gate rule

@@ -9,6 +9,7 @@ Used by `devflow.task` Step 9 — write `devflow/features/[NNN]_[feature-name]/t
 **Date:** [YYYY-MM-DD]
 **Status:** draft
 **App:** [name] <!-- omit entire line when devflow/config.md has no ## Apps table (single-app repos) -->
+**ADRs:** [docs/adr/ADR-NNN-...md or "none"] <!-- optional reference to architectural decisions from devflow.discover -->
 
 ---
 
@@ -86,5 +87,6 @@ Format rules:
 - **Unknown values**: use `[NEEDS CLARIFICATION: <reason>]` inline; never guess. No variants of this format.
 - **Status**: `draft` (initial), `clarified` (post `devflow.clarify`), `done` (pipeline complete).
 - **App**: present only in monorepo repos (`devflow/config.md` has a `## Apps` table); value must match an App name in that table exactly. Never present in single-app repos.
+- **ADRs**: optional path(s) to ADRs from `docs/adr/` governing or constraining this feature, or "none".
 
 See **`examples.md`** in this skill directory for full worked examples.

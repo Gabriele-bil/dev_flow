@@ -48,6 +48,7 @@ Read in order:
 | **`docs/product.md`** (always)    | Domain, actors, features, **implemented** vs **not implemented**, overlap checks |
 | **`constitution.md`** (as needed) | Stack, `lib/` layout, layering (UI → domain → data), engineering conventions     |
 | **`registry.md`** (as needed)     | Shared patterns: breakpoints, dashboard shell, navigation, reusable recipes      |
+| **`docs/adr/`** (if present)      | Architecture Decision Records — check `docs/adr/README.md` or active ADRs; bind task scope to accepted architectural decisions and constraints |
 | **`DESIGN.md`** (if present)      | Design system (or `docs/design.md`) — UI ideas inherit its tokens; plan tags UI  |
 
 Monorepo (`## Apps` present in `config.md`): scope `constitution.md` to the shared managed block plus the resolved app's `constitution-<app-name>` managed block only — not the whole file.
@@ -68,13 +69,13 @@ Stop and ask before writing the task if:
 - Key actors, edge cases, success criteria, or expected behaviors are undefined
 - The idea overlaps with an existing feature in `docs/product.md`
 
-Rules:
+Structured elicitation rules (per `@devflow/skills/devflow-clarify/references/interactive-interview.md`):
 
-- Max 5 questions, numbered, concise
-- Use **`AskQuestion`** tool if available; otherwise ask in chat
+- Max 5 questions, asked sequentially one at a time
+- Use **`AskQuestion`** / **`ask_question`**: offer 2–4 distinct options with first option marked `(Recommended)` and a 1-sentence technical rationale; fallback to structured markdown in chat if tool unavailable
 - Skip entirely if the idea is already clear enough
 
-**Run mode** (`.devflow-run.json` present): do not stop or ask — pick defensible default per unresolved point (repo precedent > `docs/product.md` > most conservative/fail-closed reading), record each as a one-line assumption in `task.md` **`## Notes`**; never leave a raw `[NEEDS CLARIFICATION: ...]` marker unresolved. Missing **App** on a monorepo feature still hard-stops — never guessed, run mode or not.
+**Run mode** (`.devflow-run.json` present): do not stop or ask — pick defensible default per unresolved point (the recommended option: repo precedent > `docs/product.md` > most conservative/fail-closed reading), record each as a one-line assumption in `task.md` **`## Notes`**; never leave a raw `[NEEDS CLARIFICATION: ...]` marker unresolved. Missing **App** on a monorepo feature still hard-stops — never guessed, run mode or not.
 
 ### Step 5 - Quick stress-test
 
@@ -87,7 +88,7 @@ Propose 3 `kebab-case` names:
 - 1-3 words, feature-oriented
 - Consistent with `devflow/features/` names
 
-Use **`AskQuestion`** with three options if available; otherwise list names and wait.
+Ask via **`AskQuestion`** / **`ask_question`** with three options (mark option 1 as `(Recommended)`); fallback to chat prompt if tool unavailable.
 
 **Run mode** (`.devflow-run.json` present): do not wait — take the first proposed name, note the other two as alternatives in `task.md` **`## Notes`**.
 
@@ -110,6 +111,7 @@ Critical rule:
 - [ ] **Subtasks** are atomic, verifiable, and free of implementation detail
 - [ ] **`NNN` prefix** matches `next_feature_number` from `.devflow-state.json` (or verified unique via directory scan if state absent)
 - [ ] **In scope / Out of scope** are honest for non-trivial ideas; **Key assumptions** filled when risks exist
+- [ ] **Referenced ADRs**: if task touches `docs/adr/`, boundaries and constraints from accepted ADRs are respected in scope and ACs
 - [ ] Vague quality claims in the raw idea ("faster", "more secure", "simpler") are reframed as numeric/testable **Acceptance criteria**, not left as bare adjectives
 - [ ] Criteria with a trigger/precondition use EARS phrasing (`WHEN`/`IF ... THEN THE SYSTEM SHALL ...`) per `refinement-hints.md` dimension 4 — not required for criteria with no meaningful trigger
 - [ ] No duplicate of an **implemented** feature unless explicitly framed as extension
@@ -120,7 +122,7 @@ If any item fails, fix the task content before writing the file.
 
 ### Step 9 - Write task file
 
-Create `devflow/features/[NNN]_[feature-name]/task.md` using template + format rules in `references/task-template.md`. Write the `**App:**` frontmatter field with the Step 1 resolution when `config.md` has `## Apps`; omit the line entirely otherwise. See **`examples.md`** in this skill directory for full worked examples.
+Create `devflow/features/[NNN]_[feature-name]/task.md` using template + format rules in `references/task-template.md`. Write the `**App:**` frontmatter field with the Step 1 resolution when `config.md` has `## Apps`; include `**ADRs:**` with referenced ADR path(s) if applicable; omit when absent. See **`examples.md`** in this skill directory for full worked examples.
 
 ### Step 10 - Update docs/product.md feature status
 
@@ -157,7 +159,7 @@ Respond using template in `references/notify-template.md`.
 
 | | |
 | --- | --- |
-| Reads | `devflow/config.md` (Apps table, monorepo only); `docs/product.md` (required); `constitution.md`, `registry.md` (as needed); `DESIGN.md` / `docs/design.md` (if present); `refinement-hints.md` (Step 4); `examples.md` (optional guidance); `references/task-template.md`, `references/notify-template.md` |
-| Reads (conditional) | `.devflow-run.json` (existence — run-mode switch, per `devflow-auto`) |
+| Reads | `devflow/config.md` (Apps table, monorepo only); `docs/product.md` (required); `constitution.md`, `registry.md` (as needed); `DESIGN.md` / `docs/design.md` (if present); `refinement-hints.md` (Step 4); `@devflow/skills/devflow-clarify/references/interactive-interview.md` (Step 4 & 6); `examples.md` (optional guidance); `references/task-template.md`, `references/notify-template.md` |
+| Reads (conditional) | `docs/adr/` (if present — active ADRs for architectural context); `.devflow-run.json` (existence — run-mode switch, per `devflow-auto`) |
 | Writes | `devflow/features/[NNN]_[feature-name]/task.md` |
 | Next step | `devflow.plan` → `plan.md` (full template in `devflow/skills/devflow-plan/SKILL.md`) |

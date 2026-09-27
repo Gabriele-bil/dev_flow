@@ -101,6 +101,7 @@ Always read:
 - `constitution.md` (architecture rules, conventions, stack)
 - `registry.md` (existing patterns and shared utilities)
 - `@devflow/adapters/common/skills/common-clean-code/SKILL.md` (clean code, SOLID rules)
+- `docs/adr/` (if present) — inspect referenced ADRs or `docs/adr/README.md` to ensure planned architecture respects accepted decisions
 
 Then apply the **Technology skills** table in the active `ADAPTER.md`: load each listed `@devflow/adapters/.../SKILL.md` when its trigger matches the feature (DB, UI, forms, etc.).
 
@@ -130,6 +131,7 @@ Analyze:
 - Edge cases and error states that must be handled
 - Any required database or external-system edits called out by the adapter
 - Architectural alternatives & trade-offs: when multiple valid designs exist, trigger an interactive interview checkpoint (`AskQuestion` / `ask_question`) with bounded choices; recommend `/grill-me` if the user desires deep design interrogation before writing `plan.md`
+- ADR alignment: verify proposed architecture complies with decisions in `docs/adr/`; record alignment in Architecture decisions
 
 ### Step 4b - Dependency pass
 
@@ -215,16 +217,14 @@ Continue to implementation? -> devflow.implement
 
 ## Anti-Patterns
 
-Key anti-patterns (full catalog: `@devflow/skills/devflow-plan/references/plan-anti-patterns.md`):
+Full catalog: `@devflow/skills/devflow-plan/references/plan-anti-patterns.md`.
 
-| Anti-Pattern | Fix |
-| --- | --- |
-| Writing plan without reading `task.md` | Always start with `task.md` |
-| File list in layer order (all models → services → UI) | Order by user-visible increment; checkpoint per slice |
-| Subtask missing Traceability row / Gold-plating | Every subtask → ≥1 file + criterion; no unmapped files |
-| Open questions with Status `ready` | Leave open; escalate to user; never guess |
-| Architecture decisions made during implement | All decisions in `plan.md` before implement |
-| Complexity score skipped or guessed | Score per `complexity-scoring.md` signals in Step 4d |
+Critical checks:
+- No plan without reading `task.md` and active ADRs
+- File list ordered by vertical slice, not architectural layer
+- Every subtask mapped in Traceability (no gold-plating)
+- Architecture decisions (and ADR alignment) locked before implement
+- Complexity score scored per `complexity-scoring.md` signals in Step 4d
 
 ## I/O Reference
 
@@ -238,7 +238,7 @@ Key anti-patterns (full catalog: `@devflow/skills/devflow-plan/references/plan-a
 | Reads | `@devflow/skills/devflow-plan/references/plan-anti-patterns.md` (Anti-patterns catalog) |
 | Writes | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Writes (conditional) | `plan.md` `## Decision flags` (run mode — resolved Open questions) |
-| Reads (conditional) | `.devflow-run.json` (existence — run-mode switch, per `devflow-auto`) |
+| Reads (conditional) | `docs/adr/` (if present — active ADRs referenced in `task.md`); `.devflow-run.json` (existence — run-mode switch, per `devflow-auto`) |
 | Reads (conditional) | `DESIGN.md` / `docs/design.md` (Step 4e — existence check + UI tagging) |
 | Writes (optional) | `devflow/features/[NNN]_[feature-name]/data-model.md` (Step 4c — triggered when feature touches persistent entities) |
 | Next step | `devflow.implement` |

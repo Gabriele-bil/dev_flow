@@ -8,6 +8,7 @@ Used by `devflow.plan` Step 5 — write `devflow/features/[NNN]_[feature-name]/p
 **ID:** PLAN-[NNN]
 **Task:** [link to task.md]
 **App:** [name] <!-- omit entire line in single-app repos (no ## Apps table in devflow/config.md) -->
+**ADRs:** [docs/adr/ADR-NNN-...md or "none"] <!-- copied from task.md or resolved during planning -->
 **Date:** [YYYY-MM-DD]
 **Status:** ready
 **Complexity:** [N] ([quick | standard | thorough])
@@ -24,6 +25,7 @@ state the vertical-slice execution order here.]
 
 ## Architecture decisions
 
+- **ADR alignment:** [e.g. Aligned with ADR-001 (Chosen Option X), or "None / standard codebase patterns"]
 - **[Decision title]**: [One-line rationale.]
 - [2-5 bullets total; omit only if truly trivial]
 
