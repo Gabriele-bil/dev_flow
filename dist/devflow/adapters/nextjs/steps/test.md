@@ -40,6 +40,7 @@ pnpm exec playwright test --grep "[feature-name]"
 ```
 
 When running in an agentic environment with browser tools (e.g. `browser_subagent`):
+
 1. Start or verify dev server is running (`pnpm dev`).
 2. Navigate to the feature route in headless/interactive browser.
 3. Assert page mounts cleanly: no unhandled exceptions, zero fatal console errors.

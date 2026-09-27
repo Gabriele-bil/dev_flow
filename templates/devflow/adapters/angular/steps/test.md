@@ -48,6 +48,7 @@ npm run e2e -- --grep "[feature-name]"
 ```
 
 When running in an agentic environment with browser tools (e.g. `browser_subagent`):
+
 1. Start or verify dev server is running (`npm start` / `ng serve`).
 2. Navigate to feature route; verify component mounts without runtime console errors.
 3. Perform user flow (reactive form submission, route transition, state change).

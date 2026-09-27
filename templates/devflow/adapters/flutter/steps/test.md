@@ -51,6 +51,7 @@ flutter test integration_test/features/[feature-name]/ -d emulator-[ID]
 ```
 
 When verifying Flutter Web in an agentic browser environment:
+
 1. Run local web build or dev server (`flutter run -d web-server --web-port=8080`).
 2. Navigate to web app; confirm widget tree mounts without uncaught exceptions or console errors.
 3. Verify widget interaction (tap, scroll, form entry) and responsive breakpoints.

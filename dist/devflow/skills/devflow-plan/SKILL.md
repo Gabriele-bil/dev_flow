@@ -220,6 +220,7 @@ Continue to implementation? -> devflow.implement
 Full catalog: `@devflow/skills/devflow-plan/references/plan-anti-patterns.md`.
 
 Critical checks:
+
 - No plan without reading `task.md` and active ADRs
 - File list ordered by vertical slice, not architectural layer
 - Every subtask mapped in Traceability (no gold-plating)

@@ -43,13 +43,13 @@ Turn raw idea into structured task. Read product context, output user story + su
 
 Read in order:
 
-| Source                            | Role                                                                             |
-| --------------------------------- | -------------------------------------------------------------------------------- |
-| **`docs/product.md`** (always)    | Domain, actors, features, **implemented** vs **not implemented**, overlap checks |
-| **`constitution.md`** (as needed) | Stack, `lib/` layout, layering (UI → domain → data), engineering conventions     |
-| **`registry.md`** (as needed)     | Shared patterns: breakpoints, dashboard shell, navigation, reusable recipes      |
+| Source                            | Role                                                                                                                                           |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`docs/product.md`** (always)    | Domain, actors, features, **implemented** vs **not implemented**, overlap checks                                                               |
+| **`constitution.md`** (as needed) | Stack, `lib/` layout, layering (UI → domain → data), engineering conventions                                                                   |
+| **`registry.md`** (as needed)     | Shared patterns: breakpoints, dashboard shell, navigation, reusable recipes                                                                    |
 | **`docs/adr/`** (if present)      | Architecture Decision Records — check `docs/adr/README.md` or active ADRs; bind task scope to accepted architectural decisions and constraints |
-| **`DESIGN.md`** (if present)      | Design system (or `docs/design.md`) — UI ideas inherit its tokens; plan tags UI  |
+| **`DESIGN.md`** (if present)      | Design system (or `docs/design.md`) — UI ideas inherit its tokens; plan tags UI                                                                |
 
 Monorepo (`## Apps` present in `config.md`): scope `constitution.md` to the shared managed block plus the resolved app's `constitution-<app-name>` managed block only — not the whole file.
 
