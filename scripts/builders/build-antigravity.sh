@@ -22,20 +22,24 @@ jq -n \
   --arg version     "$VERSION" \
   --arg description "$DESCRIPTION" \
   --arg author      "$AUTHOR" \
+  --arg repository  "${REPOSITORY:-}" \
+  --arg homepage    "${HOMEPAGE:-}" \
+  --argjson keywords "${KEYWORDS_JSON:-[]}" \
   '{
     name:        $name,
     version:     $version,
     description: $description,
     author:      { name: $author }
-  }' | python3 -c 'import sys, json; print(json.dumps(json.load(sys.stdin), ensure_ascii=False, indent=2))' > "$DIST_DIR/.antigravity-plugin/plugin.json"
+  }
+  + (if $repository != "" then { repository: $repository } else {} end)
+  + (if $homepage   != "" then { homepage:   $homepage }   else {} end)
+  + (if ($keywords | length) > 0 then { keywords: $keywords } else {} end)
+  ' | python3 -c 'import sys, json; print(json.dumps(json.load(sys.stdin), ensure_ascii=False, indent=2))' > "$DIST_DIR/.antigravity-plugin/plugin.json"
 
-ok ".antigravity-plugin/plugin.json generato (v$VERSION)"
+# Copia plugin.json alla radice di dist/ per conformità agy plugin validate / install
+cp "$DIST_DIR/.antigravity-plugin/plugin.json" "$DIST_DIR/plugin.json"
 
-# NB: plugin.json e hooks.json NON vanno copiati alla radice di dist/devflow —
-# quella radice è anche il plugin root che Claude Code installa, e un
-# hooks.json lì con ANTIGRAVITY_PLUGIN_ROOT (mai valorizzata da Claude Code)
-# rompe silenziosamente tutti gli hook del plugin Claude Code ad ogni sessione.
-# Manifest e hook Antigravity restano confinati a .antigravity-plugin/.
+ok ".antigravity-plugin/plugin.json e dist/devflow/plugin.json generati (v$VERSION)"
 
 # Genera hooks.antigravity.json (sostituisce variabile plugin root)
 step "Generazione hooks/hooks.antigravity.json"
@@ -48,14 +52,14 @@ else
   warn "hooks/hooks.json non trovato — hooks.antigravity.json non generato"
 fi
 
-# Aggiorna source e version in .antigravity-plugin/marketplace.json
+# Aggiorna source, version e description in .antigravity-plugin/marketplace.json
 step "Aggiornamento .antigravity-plugin/marketplace.json"
 
 MARKETPLACE="$ROOT_DIR/.antigravity-plugin/marketplace.json"
 
 if [ -f "$MARKETPLACE" ]; then
-  jq --arg name "$NAME" --arg src "./dist/$NAME" --arg ver "$VERSION" \
-    '(.plugins[] | select(.name == $name)) |= (.source = $src | .version = $ver)' \
+  jq --arg name "$NAME" --arg src "./dist/$NAME" --arg ver "$VERSION" --arg desc "$DESCRIPTION" \
+    '(.plugins[] | select(.name == $name)) |= (.source = $src | .version = $ver | .description = $desc)' \
     "$MARKETPLACE" > "${MARKETPLACE}.tmp" \
     && mv "${MARKETPLACE}.tmp" "$MARKETPLACE"
   ok "marketplace.json: source → ./dist/$NAME, version → $VERSION"

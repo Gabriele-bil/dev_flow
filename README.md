@@ -172,7 +172,21 @@ The build is **idempotent** — it recreates `dist/devflow/` from scratch on eve
 
 The [`dist/devflow/`](dist/devflow/) folder is a **multi-platform plugin**: same tree loads in Claude Code, Cursor, and Antigravity CLI (`agy`).
 
-### Install via Claude Code marketplace (recommended)
+### Unified Installer (Recommended)
+
+Install or link DevFlow across all detected platforms (Antigravity, Cursor, Claude Code) with a single command:
+
+```bash
+# Install to all detected platforms (auto-detects ~/.gemini, ~/.cursor, ~/.claude)
+bash scripts/install-plugin.sh
+
+# Or install to a specific platform:
+bash scripts/install-plugin.sh antigravity
+bash scripts/install-plugin.sh cursor
+bash scripts/install-plugin.sh claude
+```
+
+### Install via Claude Code marketplace
 
 ```text
 /plugin marketplace add Gabriele-bil/dev_flow

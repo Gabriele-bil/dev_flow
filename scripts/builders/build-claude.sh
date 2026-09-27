@@ -68,8 +68,8 @@ step "Aggiornamento .claude-plugin/marketplace.json"
 MARKETPLACE="$ROOT_DIR/.claude-plugin/marketplace.json"
 
 if [ -f "$MARKETPLACE" ]; then
-  jq --arg name "$NAME" --arg src "./dist/$NAME" --arg ver "$VERSION" \
-    '(.plugins[] | select(.name == $name)) |= (.source = $src | .version = $ver)' \
+  jq --arg name "$NAME" --arg src "./dist/$NAME" --arg ver "$VERSION" --arg desc "$DESCRIPTION" \
+    '(.plugins[] | select(.name == $name)) |= (.source = $src | .version = $ver | .description = $desc)' \
     "$MARKETPLACE" > "${MARKETPLACE}.tmp" \
     && mv "${MARKETPLACE}.tmp" "$MARKETPLACE"
   ok "marketplace.json: source → ./dist/$NAME, version → $VERSION"
