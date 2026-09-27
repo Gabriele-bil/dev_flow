@@ -19,6 +19,11 @@
         },
         {
           "type": "json",
+          "path": "dist/devflow/plugin.json",
+          "jsonpath": "$.version"
+        },
+        {
+          "type": "json",
           "path": "dist/devflow/.claude-plugin/plugin.json",
           "jsonpath": "$.version"
         },
