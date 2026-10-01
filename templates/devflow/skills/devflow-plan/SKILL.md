@@ -30,7 +30,7 @@ Deliverable: `plan.md` only.
 For plans >5 files: define ≥2 vertical slice increments in **Architecture decisions** — each slice is one end-to-end user-visible increment (not a layer). Group **File List** entries under slice headings. Optionally annotate each slice heading `(deps: ...)` with the slice numbers it builds on (format: `references/plan-template.md` → **Slice dependency annotations**) — enables ordered resume, re-implementation scoped to affected slices after `devflow.backprop`, and parallel slice execution. Omit when slices are strictly sequential.
 Example: Slice 1 (data contract + shell) → Slice 2 (state + data flow) → Slice 3 (full UI + i18n).
 
-For plans with 5 or fewer files, slicing is optional — note in Overview if sequential layer ordering is clearer. Do **not** rewrite subtask wording. The **Traceability** table must still map **each original subtask** to file path(s).
+For plans with 5 or fewer files, slicing is optional — note in Overview if sequential layer ordering is clearer. Do **not** rewrite subtask/use case wording. The **Traceability** table must still map **each original use case / subtask** to file path(s).
 
 ## Dependency ordering (reflect in File List)
 
@@ -55,7 +55,7 @@ Order **File list** bottom-up per `constitution.md` and the adapter plan step fi
 Before proceeding, verify:
 
 - [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md`
-- [ ] `task.md` has non-empty `## Summary` and `## Subtasks` sections
+- [ ] `task.md` has non-empty goal section (`## Goal & Value` or `## Summary`) and functional requirements (`## Use Cases & Scenarios` or `## Subtasks`)
 - [ ] `task.md` Status is `draft` (no `[NEEDS CLARIFICATION: ...]` markers) or `clarified` — if unresolved markers exist → stop, suggest `devflow.clarify`
 
 If any item fails → stop, report which check failed, do not write `plan.md`.
@@ -126,7 +126,7 @@ Before planning any file:
 
 Analyze:
 
-- Which subtasks in `task.md` require new files vs existing file changes
+- Which use cases / subtasks in `task.md` require new files vs existing file changes
 - All bullets in the adapter plan step file (`steps/plan.md`) that apply to this feature — and, only when the feature touches those areas (state management, UI, DB, i18n, responsive layout), the relevant bullets from `steps/implement.md` / `steps/test.md` — use `registry.md` and `constitution.md` to ground them
 - Edge cases and error states that must be handled
 - Any required database or external-system edits called out by the adapter
@@ -137,7 +137,7 @@ Analyze:
 
 Verify **File list** order per Dependency ordering. Migrations and shared contracts before consumers; shared components before their consumers. Exceptions → **Architecture decisions**.
 
-**Scope fidelity check:** every **File List** entry must map to ≥1 **Traceability** row (subtask + acceptance criterion). Entry with no subtask = gold-plating — remove it, or return the scope to `devflow.task`. Reject speculative entries ("might need later", configurable options no AC requires); one concern per file entry.
+**Scope fidelity check:** every **File List** entry must map to ≥1 **Traceability** row (use case / subtask + acceptance criterion). Entry with no mapped use case or subtask = gold-plating — remove it, or return the scope to `devflow.task`. Reject speculative entries ("might need later", configurable options no AC requires); one concern per file entry.
 
 ### Step 4c - Data model extraction
 

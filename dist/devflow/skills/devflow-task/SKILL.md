@@ -1,6 +1,6 @@
 ---
 name: devflow-task
-description: Transforms raw idea into DevFlow task.md with HMW framing, scope, assumptions, subtasks. Use when user asks to create a task, start the pipeline, run devflow.task, or provides a feature idea.
+description: Transforms raw idea into Agile product task.md with goal, user story, structured use cases (happy path + edge cases), acceptance criteria, and scope boundaries. Use when user asks to create a task, start the pipeline, run devflow.task, or provides a feature idea.
 argument-hint: [--app <name>]
 ---
 
@@ -8,13 +8,14 @@ argument-hint: [--app <name>]
 
 ## Purpose
 
-Turn raw idea into structured task. Read product context, output user story + subtasks. First DevFlow step.
+Turn raw idea into a lean, product-focused Agile task. Capture objective, user story, and concrete use cases. First DevFlow step and primary entry point for devflow.plan.
 
 ## Core Principles
 
 - **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
+- **product-only** — focus on user value, use cases, and behavior; zero technical implementation or file/class names
+- **traceability** — use case / scenario → acceptance criterion → file(s) in `plan.md`
+- **vertical slices** — end-to-end increments derived from use cases, never architectural layers
 - **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## When NOT to Use
@@ -58,7 +59,7 @@ Optional: use `Glob`, `Grep`, and `Read` on the codebase to ground the task in e
 ### Step 3 - Classify input
 
 - **Clear enough** — skip to Step 4 unless material unknowns remain.
-- **Ambiguous or multi-directional** — before subtasks: produce **one** crisp **How Might We** line and use Step 3 to nail actor, success, and boundaries (no full ideation pass).
+- **Ambiguous or multi-directional** — clarify actor, primary goal, and core user flow before writing use cases.
 - **Brainstorm-scale** (no concrete problem or user) — stop and point the user to **`ce-brainstorm`** or **`idea-refine`**; resume `devflow-task` when they have a single direction.
 
 ### Step 4 - Clarification questions (optional)
@@ -79,7 +80,7 @@ Structured elicitation rules (per `@devflow/skills/devflow-clarify/references/in
 
 ### Step 5 - Quick stress-test
 
-Read **`refinement-hints.md`**, run 8D pass (user value, feasibility, overlap, scope honesty, riskiest assumption, edge cases, integration, terminology); push back if scope too large.
+Read **`refinement-hints.md`**, run 8D pass (user value, feasibility, overlap, scope honesty, riskiest assumption, edge cases, integration, terminology). Ensure happy path and at least one alternative/error flow are captured; push back if scope too large.
 
 ### Step 6 - Propose feature name
 
@@ -106,14 +107,15 @@ Critical rule:
 
 ### Step 8 - Verification checklist (before write)
 
-- [ ] **How Might We** line is present and neither too broad nor solution-embedded
-- [ ] Target **user** matches product actors; **user story** matches Summary
-- [ ] **Subtasks** are atomic, verifiable, and free of implementation detail
+- [ ] **Goal & Value** states clear user/business problem and concrete objective (no vague adjectives)
+- [ ] Target **user** matches product actors; **user story** aligns with stated goal
+- [ ] **Use Cases** are structured with at least 1 Happy Path (`UC-1`) and 1-2 Alternative/Error/Edge cases (`UC-2`, `UC-3`)
+- [ ] **Acceptance criteria** are observable, falsifiable, and map directly to use cases (e.g. `AC-1 (UC-1)`)
+- [ ] Strictly **product-only**: zero technical details (no class names, file paths, database schemas, or API endpoints)
 - [ ] **`NNN` prefix** matches `next_feature_number` from `.devflow-state.json` (or verified unique via directory scan if state absent)
-- [ ] **In scope / Out of scope** are honest for non-trivial ideas; **Key assumptions** filled when risks exist
+- [ ] **In scope / Out of scope** are honest; non-goals prevent plan creep
 - [ ] **Referenced ADRs**: if task touches `docs/adr/`, boundaries and constraints from accepted ADRs are respected in scope and ACs
-- [ ] Vague quality claims in the raw idea ("faster", "more secure", "simpler") are reframed as numeric/testable **Acceptance criteria**, not left as bare adjectives
-- [ ] Criteria with a trigger/precondition use EARS phrasing (`WHEN`/`IF ... THEN THE SYSTEM SHALL ...`) per `refinement-hints.md` dimension 4 — not required for criteria with no meaningful trigger
+- [ ] Criteria with a trigger/precondition use EARS phrasing (`WHEN`/`IF ... THEN THE SYSTEM SHALL ...`) per `refinement-hints.md` dimension 4
 - [ ] No duplicate of an **implemented** feature unless explicitly framed as extension
 - [ ] No unresolved `[NEEDS CLARIFICATION: ...]` markers remain (or each is documented as an explicit accepted risk in Notes)
 - [ ] `config.md` has `## Apps` → **App** resolved (Step 1) and will be written; absent → no App field anywhere in the output
@@ -142,18 +144,18 @@ Respond using template in `references/notify-template.md`.
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Copying raw user wording into Summary or HMW | Rewrite and enrich from `product.md` |
-| Vague subtasks (“improve UX”) or implementation tickets (“add `FooRepository`”) | Atomic, outcome-level; no file/class names |
-| Empty Out-of-scope on large/ambiguous idea | Explicit trade-offs — reduces plan creep |
+| Technical details in task (classes, DB schemas, endpoints) | Product-only; technical decisions belong in `devflow.plan` |
+| Copying raw user wording into Goal or Problem | Rewrite and enrich from `product.md` |
+| Missing alternative/error use cases (only Happy Path defined) | Always define edge cases and error handling paths (`UC-2`, `UC-3`) |
+| Vague narrative paragraphs instead of structured flows | Structured user flows (Preconditions → Steps → Outcome) |
+| Empty Out-of-scope on large/ambiguous idea | Explicit trade-offs and non-goals — prevents plan creep |
 | Skipping clarification because task “seems clear” | Ask when material unknowns exist |
-| Skipping stress-test (Step 4) on small features | 8D pass; scope creep starts small |
 | Assuming NNN prefix is unique without reading state | Read `.devflow-state.json`; never reuse prefix |
-| Running idea-refine work inside this skill | Route to `ce-brainstorm` / `idea-refine` early |
 | Filling unknown values with guesses | Use `[NEEDS CLARIFICATION: ...]` inline |
 
 ## Relationship to `plan.md`
 
-`devflow.plan` → `plan.md`: file-ordered plan with traceability, decisions, risks, checkpoints. Keep Subtasks outcome-level; paths/names go in `plan.md`.
+`devflow.plan` consumes `task.md` to produce `plan.md`: maps each Use Case (`UC-N`) and Acceptance Criterion (`AC-N`) to file changes, architectural decisions, and verification tests. Keep `task.md` strictly functional; file paths, algorithms, and dependencies belong in `plan.md`.
 
 ## I/O Reference
 

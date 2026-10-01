@@ -40,8 +40,8 @@ If any item fails → stop, report which check failed, do not run analysis passe
 
 Read in order:
 
-1. `devflow/features/[NNN]_[feature-name]/task.md` — extract: subtask list, acceptance criteria list
-2. `devflow/features/[NNN]_[feature-name]/plan.md` — extract: Traceability table (subtask → AC → file(s)), File List (paths + status), Architecture decisions
+1. `devflow/features/[NNN]_[feature-name]/task.md` — extract: use case / subtask list, acceptance criteria list
+2. `devflow/features/[NNN]_[feature-name]/plan.md` — extract: Traceability table (use case / subtask → AC → file(s)), File List (paths + status), Architecture decisions
 3. `constitution.md` — extract: layer ordering rules and naming conventions
 4. `docs/adr/` (if referenced in `task.md`/`plan.md` or `docs/adr/README.md` exists) — extract accepted architectural decisions, rejected alternatives, and boundaries
 
@@ -55,13 +55,13 @@ Run all passes independently and collect findings. Do not stop after the first f
 
 #### Pass A — Traceability completeness
 
-**Goal:** every `task.md` subtask has at least one row in the Traceability table with a non-empty file path.
+**Goal:** every `task.md` use case / subtask has at least one row in the Traceability table with a non-empty file path.
 
-For each subtask in `task.md`:
+For each use case / subtask in `task.md`:
 
-- Find corresponding rows in `plan.md` Traceability table (match by subtask description).
-- No row found → **Critical**: subtask not covered in Traceability.
-- Row found but file path is empty or `—` → **Critical**: subtask row has no file mapping.
+- Find corresponding rows in `plan.md` Traceability table (match by UC title or subtask description).
+- No row found → **Critical**: use case / subtask not covered in Traceability.
+- Row found but file path is empty or `—` → **Critical**: use case / subtask row has no file mapping.
 
 ---
 

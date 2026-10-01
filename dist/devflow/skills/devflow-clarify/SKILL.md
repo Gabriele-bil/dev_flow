@@ -81,15 +81,15 @@ For each question in the prioritized queue, one at a time:
 
 | Ambiguity source | Target section |
 | ------------------ | ---------------- |
-| Undefined actor or user type | `## User Story` — update actor; `## Summary` only if actor is missing there |
+| Undefined actor or user type | `## User Story` — update actor; `## Goal & Value` / `## Summary` only if actor is missing there |
 | Missing or vague acceptance criterion | `## Acceptance criteria` — add or sharpen the criterion |
-| High-risk Key assumption | `## Key assumptions` — mark validated or replace with concrete statement |
+| High-risk Key assumption | `## Notes` (or `## Key assumptions`) — mark validated or replace with concrete statement |
 | Scope boundary unclear | `## Scope boundaries` — move item from vague phrasing to explicit In/Out entry |
-| Integration dependency unnamed | `## Key assumptions` — add named dependency; remove marker |
-| Terminology divergence | `## Summary` — normalize to chosen term; update `## Subtasks` / `## Acceptance criteria` for consistency |
-| Edge case unaddressed | `## Acceptance criteria` or `## Notes` — add the edge case path explicitly |
+| Integration dependency unnamed | `## Notes` — add named dependency; remove marker |
+| Terminology divergence | `## Goal & Value` / `## Summary` — normalize to chosen term; update `## Use Cases & Scenarios` / `## Acceptance criteria` for consistency |
+| Edge case unaddressed | `## Use Cases & Scenarios` (add or sharpen UC) or `## Acceptance criteria` — add the edge case path explicitly |
 
-**Do not rewrite the `## Summary` body** to incorporate the full answer verbatim — preserve the original wording. Minimal targeted edits (term normalization, actor name) are allowed. The answer itself belongs in `## Clarifications`.
+**Do not rewrite the `## Goal & Value` / `## Summary` body** to incorporate the full answer verbatim — preserve the original wording. Minimal targeted edits (term normalization, actor name) are allowed. The answer itself belongs in `## Clarifications`.
 
 ### Step 3 — Finalize
 

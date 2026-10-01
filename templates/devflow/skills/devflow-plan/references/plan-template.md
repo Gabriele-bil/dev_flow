@@ -51,9 +51,9 @@ state the vertical-slice execution order here.]
 
 ## Traceability
 
-| Subtask | Acceptance criteria | File(s) |
-|---------|---------------------|---------|
-| [Subtask description from task.md] | [acceptance criterion from task.md] | [file path(s)] |
+| Use Case / Subtask | Acceptance criteria | File(s) |
+|---------------------|---------------------|---------|
+| [UC title or subtask description from task.md] | [acceptance criterion from task.md] | [file path(s)] |
 | ... | ... | ... |
 
 ---
@@ -114,7 +114,7 @@ After **Implementation checkpoints**, append **every extra plan section** requir
 ## Pre-implement checklist
 
 - [ ] Constitution Gate passed (Step 0b) — no Critical violations
-- [ ] Every `task.md` subtask appears in **Traceability** with its acceptance criterion
+- [ ] Every `task.md` use case / subtask appears in **Traceability** with its acceptance criterion
 - [ ] Every **File List** entry maps to ≥1 **Traceability** row — no orphan/gold-plated files
 - [ ] **File list** order respects **Dependency ordering** (and any stated exceptions)
 - [ ] All **adapter-specific sections** from `ADAPTER.md` are present or correctly omitted per adapter rules (e.g. i18n keys for UI)

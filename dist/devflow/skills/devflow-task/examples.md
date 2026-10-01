@@ -8,51 +8,62 @@ Study structure/tone, not fictional product details.
 
 **User:** “We should make notifications smarter.”
 
-**Agent (after reading `docs/product.md`, constitution/registry as needed):** Restate as HMW problem. Ask with `AskQuestion` or numbered list: (1) actor (owner vs co-owner), (2) "smarter" dimension (priority/grouping/quiet hours/other), (3) success signal.
+**Agent (after reading `docs/product.md`, constitution/registry as needed):** Identify problem & actor. Ask with `AskQuestion`: (1) actor (owner vs co-owner), (2) "smarter" dimension (priority/grouping/quiet hours/other), (3) success signal.
 
 **User:** “Owners. Group by pet and don’t spam when two co-owners edit the same thing. Success is fewer taps to see what matters.”
 
-**Agent:** Run quick stress-test from `refinement-hints.md`. Propose three `kebab-case` names via `AskQuestion` (for example `notification-grouping`, `pet-notification-feed`, `smart-notification-inbox`). User picks one. Allocate next `NNN_`, run verification checklist, write `task.md`.
+**Agent:** Run quick stress-test from `refinement-hints.md`. Propose three `kebab-case` names via `AskQuestion` (`notification-grouping`, `pet-notification-feed`, `smart-notification-inbox`). User picks one. Allocate next `NNN_`, run verification checklist, write `task.md`.
 
 **Excerpt of resulting `task.md`:**
 
 ```markdown
-## Summary
+## Goal & Value
 
-Owners receive many notifications. Surface them per pet in scannable form. Reduce duplicate noise from co-owner actions on same event.
-
-## Problem framing (HMW)
-
-How might we help pet owners see the notifications that matter for each pet without repeated alerts when co-owners perform overlapping actions?
-
-## Scope boundaries
-
-**In scope**
-
-- Group or label notifications by pet for the owner’s primary notification list or hub.
-- De-duplicate or collapse notifications that represent the same underlying event across co-owner activity (behavior TBD in plan).
-
-**Out of scope (Not doing)**
-
-- Push notification delivery mechanics or new notification types not already in the product.
-- Email or SMS digests.
-
-## Key assumptions
-
-- [ ] Existing notification types and payloads are sufficient to infer “same event” for de-duplication — validate against current backend/event model.
-- [ ] Owners are the primary audience for this hub; co-owner needs are unchanged unless product says otherwise.
+- **Problem:** Pet owners with multiple pets receive an unorganized stream of alerts, cluttered by duplicate notifications when co-owners perform overlapping actions.
+- **Objective:** Surface notifications clustered by pet with duplicate suppression, allowing owners to triage updates with fewer taps.
 
 ## User Story
 
 **As a** pet owner  
-**I want to** see notifications organized by pet with less duplicate noise from co-owner activity  
-**So that** I can understand what happened quickly with fewer taps  
+**I want to** see notifications organized by pet with duplicate co-owner updates suppressed  
+**So that** I can review relevant pet events quickly without alert fatigue  
 
-## Subtasks
+## Use Cases & Scenarios
 
-- [ ] Define grouping rules and duplicate-detection rules at the product level (no implementation detail here).
-- [ ] Specify owner-facing UX for grouped vs single notifications, including edge cases (single pet, many pets).
-- [ ] Align with responsive/navigation patterns from registry for where this surface lives.
+### UC-1: Grouped Feed Review (Happy Path)
+- **Preconditions:** Owner is logged in and has at least one pet with unread notifications.
+- **User Flow:**
+  1. User navigates to Notification Center.
+  2. System displays notifications grouped under collapsible pet sections with count badges.
+  3. User expands a pet section and taps a notification to inspect details.
+- **Outcome:** Notifications for that pet are marked as read; list stays organized by pet.
+
+### UC-2: Co-Owner Action De-duplication
+- **Trigger:** Two co-owners update the same pet log event within a 5-minute window.
+- **Expected Behavior:** System collapses the duplicate alerts into a single unified entry indicating "Updated by Co-owners", avoiding multiple separate alert pings.
+
+### UC-3: Single Pet or Zero Notification State
+- **Trigger:** Owner has only one registered pet or no notifications exist.
+- **Expected Behavior:** System renders a clean flat list without redundant category headers, or an informative empty state illustration when empty.
+
+## Acceptance Criteria
+
+- [ ] **AC-1 (UC-1):** WHEN owner opens notifications THE SYSTEM SHALL display alerts grouped by pet identifier with unread counts.
+- [ ] **AC-2 (UC-2):** WHEN multiple co-owners log changes to the same event within 5 minutes THE SYSTEM SHALL collapse them into one notification item.
+- [ ] **AC-3 (UC-3):** WHEN an owner has no notifications THE SYSTEM SHALL show a friendly empty state with no empty section headers.
+
+## Scope Boundaries
+
+**In scope**
+
+- Pet-level grouping in the primary notification list.
+- Time-window de-duplication for overlapping co-owner actions.
+- Empty and single-pet layout states.
+
+**Out of scope (Not doing)**
+
+- Push notification delivery mechanics or new push channels (handled in separate push service task).
+- Email or SMS weekly digests.
 ```
 
 ---
@@ -66,47 +77,60 @@ How might we help pet owners see the notifications that matter for each pet with
 **Excerpt:**
 
 ```markdown
-## Summary
+## Goal & Value
 
-Users choose light, dark, or system mode. Choice persists across sessions.
-
-## Problem framing (HMW)
-
-How might we let users control visual theme in line with platform expectations while defaulting to the OS when they have not chosen?
-
-## Scope boundaries
-
-**In scope**
-
-- Settings entry for theme: light / dark / system.
-- Persist user choice; apply on app start and when changed.
-
-**Out of scope (Not doing)**
-
-- Per-screen theme overrides or scheduling (e.g. auto dark at night only).
-
-## Key assumptions
-
-- [ ] Material 3 / app theme pipeline supports the three modes without a full redesign — confirm against `constitution.md` / theme docs.
+- **Problem:** App currently locks to light mode, causing visual discomfort in low-light environments and ignoring device theme settings.
+- **Objective:** Enable user selection of light, dark, or system-matching theme with seamless persistence.
 
 ## User Story
 
 **As a** user  
-**I want to** set appearance to light, dark, or system default  
-**So that** the app matches my preference or device setting  
+**I want to** select my preferred theme (light, dark, or system default)  
+**So that** the app matches my device settings or visual preference  
 
-## Subtasks
+## Use Cases & Scenarios
 
-- [ ] Define user-visible labels and behavior for the three modes (localized).
-- [ ] Specify persistence and fallback when preference is “system.”
-- [ ] Specify where the control lives in settings and accessibility expectations.
+### UC-1: Select Explicit Theme (Happy Path)
+- **Preconditions:** User is on the Settings screen.
+- **User Flow:**
+  1. User opens Settings → Appearance.
+  2. User selects "Dark" (or "Light").
+  3. System updates the app theme immediately without reload.
+- **Outcome:** Visual appearance updates instantly and choice persists across future app launches.
+
+### UC-2: Follow System Preference
+- **Trigger:** User chooses "System" preference, then device OS switches between day and night mode.
+- **Expected Behavior:** App automatically switches between light and dark palettes in real time without manual user intervention.
+
+### UC-3: First Launch / Unset State
+- **Trigger:** New installation with no previously stored preference.
+- **Expected Behavior:** App defaults to "System" option and matches the current OS theme seamlessly.
+
+## Acceptance Criteria
+
+- [ ] **AC-1 (UC-1):** WHEN user selects Dark or Light mode THE SYSTEM SHALL switch the UI theme immediately and persist the selection.
+- [ ] **AC-2 (UC-2):** WHEN preference is set to System and device theme changes THE SYSTEM SHALL update app colors dynamically.
+- [ ] **AC-3 (UC-3):** WHEN app launches for the first time THE SYSTEM SHALL default to the System theme.
+
+## Scope Boundaries
+
+**In scope**
+
+- Settings radio/toggle control with Light, Dark, System options.
+- Dynamic theme application and local persistence across restarts.
+
+**Out of scope (Not doing)**
+
+- Custom accent color palettes or high-contrast custom themes.
+- Per-screen theme overrides or scheduled time-based triggers.
 ```
 
 ---
 
 ## What to notice
 
-1. **Summary** is never a paste of the user’s words.
-2. **HMW** is one sharp line, not a brainstorm doc.
-3. **Out of scope** prevents plan creep; it is not a second subtask list.
-4. **Subtasks** stay verifiable and free of class names, files, or APIs.
+1. **Goal & Value** states the problem and measurable objective; never repeats raw input.
+2. **User Story** captures the persona and benefit cleanly.
+3. **Use Cases** cover Happy Path (`UC-1`) plus edge/alternative scenarios (`UC-2`, `UC-3`) with concrete steps.
+4. **Acceptance Criteria** link directly to Use Cases and use testable EARS phrasing.
+5. **Product-only discipline**: zero references to classes, databases, APIs, or file paths — pure product specification ready for `devflow.plan`.

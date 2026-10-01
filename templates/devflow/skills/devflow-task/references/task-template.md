@@ -13,77 +13,75 @@ Used by `devflow.task` Step 9 — write `devflow/features/[NNN]_[feature-name]/t
 
 ---
 
-## Summary
+## Goal & Value
 
-[2-4 sentences. Rewrite and clarify the original idea. Remove ambiguity.
-Add implicit context from product.md. Never copy the raw input verbatim.]
-
----
-
-## Problem framing (HMW)
-
-[Single sentence: "How might we ..." — actionable, user-centered, not a solution disguised as a question.]
-
----
-
-## Scope boundaries
-
-**In scope**
-
-- [Bullet: what this task commits to at product/outcome level]
-
-**Out of scope (Not doing)**
-
-- [Bullet: explicit non-goals with short reason — not a second subtask checklist]
-
----
-
-## Key assumptions
-
-- [ ] [Assumption — optional brief hint how to validate if non-obvious]
-- [ ] [Use "None — well-understood feature" only when truly trivial]
+- **Problem:** [1-2 sentences on the user pain point or current gap. Never copy raw input verbatim.]
+- **Objective:** [Concrete outcome, business impact, or capability this feature delivers.]
 
 ---
 
 ## User Story
 
-**As a** [user type]
-**I want to** [desired action or capability]
-**So that** [benefit or goal]
+**As a** [user persona or role]  
+**I want to** [desired action or capability]  
+**So that** [benefit or value gained]  
 
 ---
 
-## Subtasks
+## Use Cases & Scenarios
 
-- [ ] [Subtask 1 - clear, atomic, verifiable]
-- [ ] [Subtask 2]
-- [ ] [Subtask N]
+### UC-1: [Main Flow / Happy Path Title]
+- **Preconditions:** [State or requirements before the interaction begins]
+- **User Flow:**
+  1. [User does action 1]
+  2. [System responds / displays 2]
+  3. [User completes action 3]
+- **Outcome:** [Observable success state for the user]
+
+### UC-2: [Alternative Flow / Edge Case Title]
+- **Trigger:** [e.g. Empty state, search yields no results, cancelled action, boundary condition]
+- **Expected Behavior:** [What the user experiences; guidance or fallback provided]
+
+### UC-3: [Error Handling / Validation Title]
+- **Trigger:** [e.g. Missing required fields, invalid input, permission denied, failure state]
+- **Expected Behavior:** [Clear user feedback and recovery path]
 
 ---
 
-## Acceptance criteria
+## Acceptance Criteria
 
-- [ ] [Observable, falsifiable condition — e.g. "user sees inline error on empty required field save"]
-- [ ] [Each criterion maps to at least one subtask; no solution detail]
+- [ ] **AC-1 (UC-1):** WHEN [trigger happy path] THE SYSTEM SHALL [verifiable outcome]
+- [ ] **AC-2 (UC-2):** WHEN [trigger edge case] THE SYSTEM SHALL [verifiable outcome]
+- [ ] **AC-3 (UC-3):** WHEN [trigger validation/error] THE SYSTEM SHALL [verifiable outcome]
+
+---
+
+## Scope Boundaries
+
+**In scope**
+
+- [Bullet: essential product deliverable included in this task]
+
+**Out of scope (Not doing)**
+
+- [Bullet: explicit non-goal with short rationale — prevents planning creep]
 
 ---
 
 ## Notes
 
-[Assumptions made, edge cases identified, decisions taken during analysis.
-Leave empty if none.]
+[Assumptions made, trade-offs accepted, or decisions taken during discovery. Leave empty if none.]
 ```
 
 Format rules:
 
-- **HMW**: one line, actionable, user-centered, not solution-disguised.
-- **Scope**: Out-of-scope explicit — trade-offs, not TODOs.
-- **Assumptions**: omit only for truly trivial tasks.
-- **Subtasks**: atomic, verifiable; no class names, methods, or file paths.
-- **Acceptance criteria**: observable, falsifiable, one per outcome, no solution detail. Idea makes a vague quality claim ("faster", "more secure", "simpler") → reframe as a numeric or otherwise testable target (see `refinement-hints.md` dimension 4) instead of restating the adjective.
-- **EARS phrasing (optional, recommended for criteria with a trigger/precondition)**: `WHEN [trigger] THE SYSTEM SHALL [response]` or `IF [precondition] THEN THE SYSTEM SHALL [response]`. Use plain bullet form when the criterion has no meaningful trigger (e.g. a static UI state); switch to EARS when trigger/precondition ambiguity is the actual risk — it forces the missing actor or condition into the open instead of leaving it implicit.
-- **Language**: English.
-- **Compression**: caveman-compress — drop articles/filler/hedging; fragments OK; keep technical terms/paths/commands exact.
+- **Product-only**: strictly functional and behavioral perspective; zero implementation detail (no class names, file paths, database schemas, or API routes).
+- **Goal & Value**: concise problem context and clear, outcome-oriented objective.
+- **Use Cases**: at least 1 Happy Path (`UC-1`) and at least 1-2 Alternative/Error/Edge Case scenarios (`UC-2`, `UC-3`). Each flow must be actionable and user-centered.
+- **Acceptance criteria**: observable, falsifiable, one per outcome, mapped directly to a Use Case (e.g. `AC-1 (UC-1)`). Use EARS phrasing (`WHEN [trigger] THE SYSTEM SHALL [response]`).
+- **Scope boundaries**: In-scope defines functional commitments; Out-of-scope marks explicit trade-offs and non-goals.
+- **Language**: English (or match repo language when established).
+- **Compression**: caveman-compress — drop articles/filler/hedging; keep technical and domain terms exact.
 - **Unknown values**: use `[NEEDS CLARIFICATION: <reason>]` inline; never guess. No variants of this format.
 - **Status**: `draft` (initial), `clarified` (post `devflow.clarify`), `done` (pipeline complete).
 - **App**: present only in monorepo repos (`devflow/config.md` has a `## Apps` table); value must match an App name in that table exactly. Never present in single-app repos.
