@@ -1,7 +1,7 @@
 ---
 name: devflow.rollback
 description: Roll back the active DevFlow step (implement or beautify) to its pre-step checkpoint without corrupting pipeline state.
-argument-hint: [--to <step>] [--force]
+argument-hint: "[--to <step>] [--force]"
 disable-model-invocation: true
 ---
 

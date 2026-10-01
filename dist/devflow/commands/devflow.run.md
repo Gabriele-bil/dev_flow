@@ -1,7 +1,7 @@
 ---
 name: devflow.run
 description: Chain implement → beautify → test as one unattended session — decision flags instead of pauses, consolidated report, stop before ship.
-argument-hint: [--from implement|beautify|test] [--until beautify|test|ship]
+argument-hint: "[--from implement|beautify|test] [--until beautify|test|ship]"
 disable-model-invocation: true
 ---
 

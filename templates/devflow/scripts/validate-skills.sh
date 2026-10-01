@@ -52,6 +52,19 @@ for FILE in "${SKILL_FILES[@]}"; do
     # Extract frontmatter block (between first and second ---)
     FRONTMATTER=$(awk '/^---/{count++; if(count==2) exit; next} count==1' "$FILE")
 
+    # Validate YAML syntax with real parser
+    if command -v ruby >/dev/null 2>&1; then
+      if ! echo "$FRONTMATTER" | ruby -ryaml -e 'YAML.safe_load(STDIN.read)' >/dev/null 2>&1; then
+        YAML_ERR=$(echo "$FRONTMATTER" | ruby -ryaml -e 'YAML.safe_load(STDIN.read)' 2>&1 | head -1)
+        FILE_ERRORS+=("invalid YAML syntax in frontmatter: $YAML_ERR")
+      fi
+    elif python3 -c "import yaml" >/dev/null 2>&1; then
+      if ! echo "$FRONTMATTER" | python3 -c "import sys, yaml; yaml.safe_load(sys.stdin)" >/dev/null 2>&1; then
+        YAML_ERR=$(echo "$FRONTMATTER" | python3 -c "import sys, yaml; yaml.safe_load(sys.stdin)" 2>&1 | head -1)
+        FILE_ERRORS+=("invalid YAML syntax in frontmatter: $YAML_ERR")
+      fi
+    fi
+
     # name: must be present and non-empty
     NAME_LINE=$(echo "$FRONTMATTER" | grep -E '^name:')
     if [[ -z "$NAME_LINE" ]]; then

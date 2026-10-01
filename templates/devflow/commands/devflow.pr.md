@@ -1,7 +1,7 @@
 ---
 name: devflow.pr
 description: Commit, push, and open a PR for the current DevFlow feature using the devflow-pr skill workflow.
-argument-hint: [optional notes for PR body]
+argument-hint: "[optional notes for PR body]"
 disable-model-invocation: true
 model: sonnet
 effort: medium

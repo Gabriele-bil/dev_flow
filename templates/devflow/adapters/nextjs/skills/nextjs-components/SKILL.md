@@ -1,6 +1,6 @@
 ---
 name: nextjs-components
-description: 'use client' components — React hooks, interactivity, context providers. Load when touching files with 'use client' directive.
+description: "'use client' components — React hooks, interactivity, context providers. Load when touching files with 'use client' directive."
 ---
 
 # Next.js Client Components

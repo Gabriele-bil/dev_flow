@@ -1,7 +1,7 @@
 ---
 name: devflow-learn
 description: Manage local and team instincts (.devflow-instincts.yaml, .devflow-instincts.shared.yaml) — log, search, list, prune, boost, or promote instincts to team store and REGISTRY.md. Use when user asks to log a finding, search learnings, manage instincts, or promote team patterns.
-argument-hint: [log, search <query>, list, prune, boost <id>, promote <id>]
+argument-hint: "[log, search <query>, list, prune, boost <id>, promote <id>]"
 ---
 
 # Skill: devflow.learn

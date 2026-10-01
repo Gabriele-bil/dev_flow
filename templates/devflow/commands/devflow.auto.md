@@ -1,7 +1,7 @@
 ---
 name: devflow.auto
 description: Chain task → plan → analyze → implement as one unattended session from a raw feature idea — decision flags instead of pauses, consolidated report, stop before beautify.
-argument-hint: [idea-or-attached-context] [--app <name>]
+argument-hint: "[idea-or-attached-context] [--app <name>]"
 disable-model-invocation: true
 ---
 

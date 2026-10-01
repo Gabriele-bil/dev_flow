@@ -1,7 +1,7 @@
 ---
 name: devflow-setup
-description: Generates AGENTS.md, REGISTRY.md, docs/product.md via adapter templates + questionnaire. Use when running devflow.setup post-install, or adapter/stack/product context changes.
-argument-hint: [--force] [--mcp]
+description: "Generates AGENTS.md, REGISTRY.md, docs/product.md via adapter templates + questionnaire. Use when running devflow.setup post-install, or adapter/stack/product context changes."
+argument-hint: "[--force] [--mcp]"
 disable-model-invocation: true
 ---
 

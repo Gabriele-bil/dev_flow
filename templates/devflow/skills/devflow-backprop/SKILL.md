@@ -1,7 +1,7 @@
 ---
 name: devflow-backprop
 description: Backpropagates a bug or failing test into the spec — traces failure to its acceptance criterion via traceability, classifies the gap, tightens task.md, adds regression test. Use when a bug found after implement reveals a spec gap.
-argument-hint: [bug-description-or-test-path]
+argument-hint: "[bug-description-or-test-path]"
 ---
 
 # Skill: devflow.backprop

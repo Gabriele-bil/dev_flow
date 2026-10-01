@@ -1,7 +1,7 @@
 ---
 name: devflow-worktree
-description: Creates, lists, or removes isolated git worktrees for parallel feature development, with automatic dev-server port-offset assignment and overlap detection. Use when the user asks to work on a feature in a separate worktree, run two features in parallel, or run devflow.worktree.
-argument-hint: [create|remove|list] [feature-name]
+description: "Creates, lists, or removes isolated git worktrees for parallel feature development, with automatic dev-server port-offset assignment and overlap detection. Use when the user asks to work on a feature in a separate worktree, run two features in parallel, or run devflow.worktree."
+argument-hint: "[create|remove|list] [feature-name]"
 disable-model-invocation: true
 model: haiku
 effort: low

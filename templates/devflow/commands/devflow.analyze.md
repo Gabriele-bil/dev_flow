@@ -1,7 +1,7 @@
 ---
 name: devflow.analyze
 description: Run cross-artifact consistency check on task.md and plan.md before implementation. Detects traceability gaps, untestable ACs, terminology drift, constitution violations, and coverage imbalances.
-argument-hint: [optional-feature-path]
+argument-hint: "[optional-feature-path]"
 disable-model-invocation: true
 model: haiku
 effort: low

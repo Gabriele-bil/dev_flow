@@ -1,7 +1,7 @@
 ---
 name: devflow.setup
 description: Generate or update AGENTS.md, REGISTRY.md, and docs/product.md in the consumer project root from adapter templates with a mandatory full questionnaire.
-argument-hint: [--force] [--mcp]
+argument-hint: "[--force] [--mcp]"
 disable-model-invocation: true
 model: sonnet
 effort: medium

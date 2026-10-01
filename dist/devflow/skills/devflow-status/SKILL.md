@@ -1,7 +1,7 @@
 ---
 name: devflow-status
 description: Shows current DevFlow pipeline state — active feature, progress, next step, and adapter. Supports --json for machine-readable output with stable exit codes. Use when the user asks where they are in the pipeline or what to do next.
-argument-hint: [--json]
+argument-hint: "[--json]"
 disable-model-invocation: true
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: devflow-auto
-description: Full-cycle autonomous delivery: turns a raw feature idea directly into implemented code via task, plan, analyze, and implement. Chooses defensible defaults with decision flags rather than prompting for clarification; pauses prior to beautify. Use when user runs devflow.auto or asks to build end to end from idea to code automatically without stopping for questions.
-argument-hint: [idea-or-attached-context] [--app <name>]
+description: "Full-cycle autonomous delivery: turns a raw feature idea directly into implemented code via task, plan, analyze, and implement. Chooses defensible defaults with decision flags rather than prompting for clarification; pauses prior to beautify. Use when user runs devflow.auto or asks to build end to end from idea to code automatically without stopping for questions."
+argument-hint: "[idea-or-attached-context] [--app <name>]"
 disable-model-invocation: true
 context: fork
 agent: general-purpose

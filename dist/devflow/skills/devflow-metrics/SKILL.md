@@ -1,7 +1,7 @@
 ---
 name: devflow-metrics
 description: Display token savings dashboard, estimated cost per feature, pass@k success rate, and step durations. Use when inspecting pipeline metrics, token consumption, or running devflow.metrics.
-argument-hint: [--json, --feature <name>]
+argument-hint: "[--json, --feature <name>]"
 ---
 
 # Skill: devflow.metrics

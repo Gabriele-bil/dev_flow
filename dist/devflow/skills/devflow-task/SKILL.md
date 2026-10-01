@@ -1,7 +1,7 @@
 ---
 name: devflow-task
 description: Transforms raw idea into Agile product task.md with goal, user story, structured use cases (happy path + edge cases), acceptance criteria, and scope boundaries. Use when user asks to create a task, start the pipeline, run devflow.task, or provides a feature idea.
-argument-hint: [--app <name>]
+argument-hint: "[--app <name>]"
 ---
 
 # Skill: devflow.task

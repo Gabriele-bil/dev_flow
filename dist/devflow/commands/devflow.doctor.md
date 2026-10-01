@@ -1,7 +1,7 @@
 ---
 name: devflow.doctor
 description: Pre-flight diagnostic check for DevFlow — verifies MCP servers, CLI toolchains, active adapter configuration, and pipeline state integrity. Supports --json and --fix.
-argument-hint: [--json] [--fix]
+argument-hint: "[--json] [--fix]"
 disable-model-invocation: true
 ---
 

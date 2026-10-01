@@ -1,7 +1,7 @@
 ---
 name: devflow.discover
 description: Explore architectural choices for app creation or complex features, compare technical trade-offs, and generate formal ADRs.
-argument-hint: [--app <name>] [--feature <slug>] [topic-or-scope]
+argument-hint: "[--app <name>] [--feature <slug>] [topic-or-scope]"
 disable-model-invocation: true
 model: haiku
 effort: low

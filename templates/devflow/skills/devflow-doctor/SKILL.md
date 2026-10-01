@@ -1,7 +1,7 @@
 ---
 name: devflow-doctor
-description: Pre-flight diagnostic tool for DevFlow. Checks MCP server reachability, CLI toolchains, active adapter configuration, and pipeline state integrity. Supports --json and --fix. Use when user runs devflow.doctor, asks to diagnose the environment, check MCP servers, or troubleshoot pipeline prerequisites.
-argument-hint: [--json] [--fix]
+description: "Pre-flight diagnostic tool for DevFlow. Checks MCP server reachability, CLI toolchains, active adapter configuration, and pipeline state integrity. Supports --json and --fix. Use when user runs devflow.doctor, asks to diagnose the environment, check MCP servers, or troubleshoot pipeline prerequisites."
+argument-hint: "[--json] [--fix]"
 disable-model-invocation: true
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: devflow-rollback
-description: Roll back the active DevFlow step (implement or beautify) to its pre-step checkpoint without corrupting pipeline state. Use when user runs devflow.rollback, wants to undo an implementation or beautification, or revert an agent hallucination.
-argument-hint: [--to <step>] [--force]
+description: "Roll back the active DevFlow step (implement or beautify) to its pre-step checkpoint without corrupting pipeline state. Use when user runs devflow.rollback, wants to undo an implementation or beautification, or revert an agent hallucination."
+argument-hint: "[--to <step>] [--force]"
 disable-model-invocation: true
 ---
 

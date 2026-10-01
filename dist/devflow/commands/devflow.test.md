@@ -1,7 +1,7 @@
 ---
 name: devflow.test
 description: Write and execute DevFlow feature tests using the devflow-test skill workflow.
-argument-hint: [optional-plan-path]
+argument-hint: "[optional-plan-path]"
 disable-model-invocation: true
 model: sonnet
 effort: medium

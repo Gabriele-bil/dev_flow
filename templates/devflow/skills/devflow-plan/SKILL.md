@@ -1,7 +1,7 @@
 ---
 name: devflow-plan
 description: Transforms DevFlow task into file-oriented implementation plan. Use when user runs devflow.plan, creates planning artifact from task, or plan.md for feature.
-argument-hint: [optional-task-path]
+argument-hint: "[optional-task-path]"
 disable-model-invocation: true
 ---
 

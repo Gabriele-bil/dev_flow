@@ -1,7 +1,7 @@
 ---
 name: devflow-hotfix
 description: Fast-track pipeline for critical bugfixes, targeted patches, or hotfixes. Chains compact task+plan, implement, targeted test, and quick single-agent ship gate directly into PR. Use when user runs devflow.hotfix, provides an urgent bug fix, or asks for a quick patch without full 8-step overhead.
-argument-hint: <bug-or-issue-description>
+argument-hint: "<bug-or-issue-description>"
 disable-model-invocation: true
 ---
 

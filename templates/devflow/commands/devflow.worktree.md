@@ -1,7 +1,7 @@
 ---
 name: devflow.worktree
 description: Create, list, or remove isolated git worktrees for parallel DevFlow feature development, with dev-server port-offset assignment.
-argument-hint: [create|remove|list] [feature-name]
+argument-hint: "[create|remove|list] [feature-name]"
 disable-model-invocation: true
 model: haiku
 effort: low

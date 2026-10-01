@@ -1,7 +1,7 @@
 ---
 name: devflow.task
 description: Create a DevFlow task from a raw feature idea using the devflow-task skill workflow.
-argument-hint: [idea-or-attached-context] [--app <name>]
+argument-hint: "[idea-or-attached-context] [--app <name>]"
 disable-model-invocation: true
 model: haiku
 effort: low
