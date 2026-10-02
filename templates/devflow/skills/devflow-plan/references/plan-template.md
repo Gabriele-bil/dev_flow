@@ -130,5 +130,5 @@ After **Implementation checkpoints**, append **every extra plan section** requir
 Format rules:
 
 - Adapter-specific sections: follow `ADAPTER.md` layout exactly (optional/required blocks, localization/data rules).
-- Language: English.
+- Language: English. All written documents must be in English regardless of conversation language.
 - Compression: caveman-compress — drop articles/filler/hedging; keep technical terms/paths/commands exact.

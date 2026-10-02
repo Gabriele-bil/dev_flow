@@ -31,22 +31,23 @@ Levels 1–3 are pure static inspection (grep/read — cheap). Level 4a executes
 - Route handler defined but not registered = not wired.
 - Feature flag permanently off = not wired; note the flag in the report.
 
-## Level 4b: UI/Browser Workflow Verification (Web & UI Adapters)
+## Level 4b: UI/Browser & Mobile Workflow Verification (Web & Mobile Adapters)
 
-Applicable when the adapter is Web/UI (`nextjs`, `angular`, `flutter`) and the acceptance criterion touches routes, components, forms, or user-visible workflows.
+Applicable when the adapter is Web/UI (`nextjs`, `angular`) or Mobile (`flutter`) and the acceptance criterion touches routes, screens, components, forms, or user-visible workflows.
 
-### 4 Core Browser Verification Checks
+### 4 Core UI & Runtime Verification Checks
 
-1. **Mounting & Clean Console**: Target route or dialog mounts in browser without unhandled runtime exceptions or fatal console errors.
-2. **DOM / UI Tree Presence**: Critical elements specified in the AC (form fields, submit buttons, state badges, headers) are rendered in the DOM with accessible identifiers.
-3. **Interactive Path & State Transition**: User interaction (typing into input, clicking submit/filter, modal open/close) triggers the expected state change and visual confirmation.
-4. **Responsive Adaptability**: Layout renders correctly across target viewport widths if mandated by AC (e.g. mobile drawer vs desktop sidebar).
+1. **Mounting & Clean Runtime**: Target route or mobile screen mounts without unhandled runtime exceptions, crash logs, or fatal console errors.
+2. **DOM / Widget Tree Presence**: Critical elements specified in the AC (form fields, submit buttons, state badges, headers) are rendered in the DOM or Flutter widget tree with accessible identifiers (`key`, semantics, ARIA, `testID`).
+3. **Interactive Path & State Transition**: User interaction (typing into input, clicking/tapping submit, modal open/close, gestures) triggers the expected state change and visual confirmation.
+4. **Responsive / Form Factor Adaptability**: Layout renders correctly across target viewport widths or device form factors if mandated by AC (e.g. mobile drawer vs desktop sidebar, phone vs tablet).
 
 ### Tooling & Execution Options
 
-- **Automated E2E:** Execute adapter-defined browser specs (e.g. `pnpm exec playwright test`, `npm run e2e`, `flutter test integration_test/`).
-- **Interactive Browser Agent:** In agentic environments equipped with browser tools (e.g. Antigravity `browser_subagent` or MCP Puppeteer/Playwright), navigate to the dev server URL, execute the user interaction flow, verify console logs, and record verification evidence.
-- **No browser runner available:** If no automated E2E exists and no browser tool is configured, mark `L4b: N/A` (verdict PARTIAL).
+- **Automated Web E2E:** Execute adapter-defined browser specs (e.g. `pnpm exec playwright test --grep "[feature]"`, `npm run e2e`).
+- **Automated Mobile E2E:** Execute mobile flows using Maestro (`maestro test .maestro/[feature].yaml`) or Flutter integration tests (`flutter test integration_test/features/[feature]/ -d emulator-[ID]`).
+- **Interactive Browser/Device Agent:** In agentic environments equipped with browser or emulator tools (e.g. Antigravity `browser_subagent`, Chrome DevTools MCP, or emulator driver), navigate to dev server or launch app on emulator, execute the user interaction flow, verify console logs/device state, and record verification evidence.
+- **No browser/device runner available:** If no automated E2E exists and no browser/device tool is configured or running, mark `L4b: N/A` (verdict PARTIAL).
 
 ## Procedure (per AC)
 

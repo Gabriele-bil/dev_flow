@@ -4,7 +4,8 @@
     "positive": [
       { "prompt": "Commit everything and open a pull request to main", "top_k": 3 },
       { "prompt": "Push the feature branch and create the PR", "top_k": 3 },
-      { "prompt": "Finish the pipeline by opening the pull request", "top_k": 3 }
+      { "prompt": "Finish the pipeline by opening the pull request", "top_k": 3 },
+      { "prompt": "Create the pull request and attach UI screenshot preview", "top_k": 3 }
     ],
     "negative": [
       { "prompt": "Run the pre-merge review gate before I merge", "owner": "devflow-ship" },
