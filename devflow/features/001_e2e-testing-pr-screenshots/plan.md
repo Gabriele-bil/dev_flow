@@ -4,7 +4,7 @@
 **Task:** [task.md](file:///Users/gabrielebilello/Developer/dev_flow/devflow/features/001_e2e-testing-pr-screenshots/task.md)
 **ADRs:** none
 **Date:** 2026-10-02
-**Status:** tested
+**Status:** pr-opened
 **Complexity:** 10 (standard)
 
 ---

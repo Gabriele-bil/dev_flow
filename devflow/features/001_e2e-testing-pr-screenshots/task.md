@@ -2,7 +2,7 @@
 
 **ID:** TASK-001
 **Date:** 2026-10-01
-**Status:** draft
+**Status:** done
 **ADRs:** none
 
 ---
