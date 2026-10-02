@@ -86,7 +86,11 @@ Read `task.md` **Acceptance criteria** section first — derive at least one tes
 
 1. **Placement** — mirror source layout and integration paths per the adapter test step file.
 2. **Unit tests** — cover models, state, domain rules, and UI assertions per the adapter test step file (load any technology skills it references).
-3. **Integration tests** — target user flows from `task.md` per the adapter test step file (targets/environments and execution order).
+3. **Integration & E2E tests** — target user flows from `task.md` per the adapter test step file:
+   - Detect platform: Web (`nextjs`, `angular`) vs Mobile (`flutter`).
+   - Web: write/execute Playwright specs or drive browser runner.
+   - Mobile: write/execute Maestro flows (`.maestro/`) or Flutter `integration_test` on emulator/device.
+   - Verify clean state transitions, absence of crashes or unhandled runtime errors, and report results.
 4. **Execute** — run the exact commands from the adapter test step file; paste raw stdout/stderr in the Step 7 report. If `.devflow-test-summary.json` exists after the run (written by `post-bash-output-filter.sh` for recognized test-runner commands), read its `passed`/`failed`/`skipped` counts as a structured cross-check against the raw output instead of re-deriving them by eye — stale runs (from a command that isn't the one just executed) are still possible, so raw stdout/stderr stays the evidence of record in the Step 7 report.
 
 **Output discipline (intermediate runs):** retry loops and analysis runs follow `@devflow/references/token-economy.md` → **Derive, don't dump** — filter at source, quote decisive failure lines, report delta on re-runs. Step 7 report still pastes mandated raw evidence.
@@ -111,7 +115,7 @@ After all tests pass, verify **backwards from the spec** per `@devflow/reference
    - **Level 2 (Substantive)**: no stubs, placeholder comments, or hardcoded returns.
    - **Level 3 (Wired)**: reachable in app flow, registered route/provider, not dead code.
    - **Level 4a (Runtime CLI/API)**: execute adapter `Verify (runtime)` target or integration spec.
-   - **Level 4b (Browser/UI Workflow)**: Web/UI adapters (`nextjs`, `angular`, `flutter`): run Playwright/e2e target or browser agent flow to verify mounting, DOM presence, critical interactions, and zero console errors.
+   - **Level 4b (UI / Browser & Mobile Workflow)**: Web/UI adapters (`nextjs`, `angular`) and Mobile (`flutter`): run Playwright/e2e target, Maestro flow, or browser/device agent flow to verify mounting, DOM/widget presence, critical interactions, clean state transitions, and zero unhandled crash or console errors.
    - Depth per profile: `quick` → L1–L3; `standard` → L1–L3 + L4 targets when defined; `thorough` → L4 mandatory (missing target → PARTIAL).
 3. Write `devflow/features/[NNN]_[feature-name]/verification.md` using the template in `verification-levels.md`.
 4. Any **FAIL** verdict → do NOT set status `tested`. Implementation gap → fix (re-enter escalation ladder at Level 1) or report. Spec gap (AC missing/too weak) → suggest `devflow.backprop`.

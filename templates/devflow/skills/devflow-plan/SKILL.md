@@ -191,7 +191,7 @@ Header: copy `**App:**` from `task.md` verbatim when present; omit the line enti
 Format rules:
 
 - Adapter-specific sections: follow the adapter plan step file layout exactly (optional/required blocks, localization/data rules).
-- Language: English.
+- Language: English. All written documents must be in English regardless of conversation language.
 - Compression: caveman-compress — drop articles/filler/hedging; keep technical terms/paths/commands exact.
 
 **Run mode** (`.devflow-run.json` present): a genuine **Open questions** entry (plan-level ambiguity, not a constitution violation) does not escalate to the user — pick defensible default (repo precedent > `constitution.md` > adapter convention), append it to `plan.md` **`## Decision flags`** (create on first flag; format per `@devflow/skills/devflow-run/SKILL.md` Step 2), and keep Status `ready`. Constitution Gate Critical/Required violations above are the one exception — those stop regardless of mode.

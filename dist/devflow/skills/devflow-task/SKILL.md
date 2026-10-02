@@ -119,6 +119,7 @@ Critical rule:
 - [ ] No duplicate of an **implemented** feature unless explicitly framed as extension
 - [ ] No unresolved `[NEEDS CLARIFICATION: ...]` markers remain (or each is documented as an explicit accepted risk in Notes)
 - [ ] `config.md` has `## Apps` → **App** resolved (Step 1) and will be written; absent → no App field anywhere in the output
+- [ ] **Language**: English — all documents must be written in English regardless of conversation language
 
 If any item fails, fix the task content before writing the file.
 

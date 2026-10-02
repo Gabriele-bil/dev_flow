@@ -80,7 +80,7 @@ Format rules:
 - **Use Cases**: at least 1 Happy Path (`UC-1`) and at least 1-2 Alternative/Error/Edge Case scenarios (`UC-2`, `UC-3`). Each flow must be actionable and user-centered.
 - **Acceptance criteria**: observable, falsifiable, one per outcome, mapped directly to a Use Case (e.g. `AC-1 (UC-1)`). Use EARS phrasing (`WHEN [trigger] THE SYSTEM SHALL [response]`).
 - **Scope boundaries**: In-scope defines functional commitments; Out-of-scope marks explicit trade-offs and non-goals.
-- **Language**: English (or match repo language when established).
+- **Language**: English. All written documents must be in English regardless of conversation language.
 - **Compression**: caveman-compress — drop articles/filler/hedging; keep technical and domain terms exact.
 - **Unknown values**: use `[NEEDS CLARIFICATION: <reason>]` inline; never guess. No variants of this format.
 - **Status**: `draft` (initial), `clarified` (post `devflow.clarify`), `done` (pipeline complete).
