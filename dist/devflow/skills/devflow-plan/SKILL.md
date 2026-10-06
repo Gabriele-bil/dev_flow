@@ -126,12 +126,15 @@ Before planning any file:
 
 Analyze:
 
-- Which use cases / subtasks in `task.md` require new files vs existing file changes
-- All bullets in the adapter plan step file (`steps/plan.md`) that apply to this feature — and, only when the feature touches those areas (state management, UI, DB, i18n, responsive layout), the relevant bullets from `steps/implement.md` / `steps/test.md` — use `registry.md` and `constitution.md` to ground them
-- Edge cases and error states that must be handled
-- Any required database or external-system edits called out by the adapter
-- Architectural alternatives & trade-offs: when multiple valid designs exist, trigger an interactive interview checkpoint (`AskQuestion` / `ask_question`) with bounded choices; recommend `/grill-me` if the user desires deep design interrogation before writing `plan.md`
-- ADR alignment: verify proposed architecture complies with decisions in `docs/adr/`; record alignment in Architecture decisions
+- Which use cases (`UC-N`) in `task.md` require new files vs existing file changes
+- BDD Gherkin scenarios (`AC-N (UC-N)`): map Given (setup/contracts), When (handlers/controllers), and Then (UI updates/assertions)
+- Explicit async states: map loading skeletons, disabled inputs (anti-double-submit), and error boundaries to planned files
+- Read vs Write isolation: preserve separation from `task.md` — plan query/view components independently from mutation handlers
+- Seed **Risks and mitigations** table directly from `task.md` `## Assumptions & Risks` (convert into concrete boundary checks)
+- Bullets in active adapter plan step file (`steps/plan.md`) applying to this feature (state, UI, DB, i18n, responsive layout)
+- Edge cases, error states, and required DB/external-system edits
+- Architectural trade-offs: when multiple designs exist, trigger `AskQuestion` checkpoint; recommend `/grill-me` for deep review
+- ADR alignment: verify architecture complies with decisions in `docs/adr/`; record in Architecture decisions
 
 ### Step 4b - Dependency pass
 
@@ -190,9 +193,8 @@ Header: copy `**App:**` from `task.md` verbatim when present; omit the line enti
 
 Format rules:
 
-- Adapter-specific sections: follow the adapter plan step file layout exactly (optional/required blocks, localization/data rules).
-- Language: English. All written documents must be in English regardless of conversation language.
-- Compression: caveman-compress — drop articles/filler/hedging; keep technical terms/paths/commands exact.
+- Adapter-specific sections: follow adapter plan step file layout exactly.
+- Language: English (all docs). Compression: caveman-compress (drop filler, keep precision).
 
 **Run mode** (`.devflow-run.json` present): a genuine **Open questions** entry (plan-level ambiguity, not a constitution violation) does not escalate to the user — pick defensible default (repo precedent > `constitution.md` > adapter convention), append it to `plan.md` **`## Decision flags`** (create on first flag; format per `@devflow/skills/devflow-run/SKILL.md` Step 2), and keep Status `ready`. Constitution Gate Critical/Required violations above are the one exception — those stop regardless of mode.
 

@@ -25,6 +25,7 @@
 ## Use Cases & Scenarios
 
 ### UC-1: AI-Driven E2E and Integration Test Execution
+
 - **Preconditions:** The feature implementation is complete and the local application/server environment is running or startable.
 - **User Flow:**
   1. The system detects the application platform (Web or Mobile/Flutter).
@@ -33,6 +34,7 @@
 - **Outcome:** Structured test report with PASS/FAIL verdicts for each criterion.
 
 ### UC-2: Ephemeral UI Screenshot Capture & Pull Request Attachment
+
 - **Preconditions:** The feature includes visual (UI) changes and the test/verification phase passed.
 - **User Flow:**
   1. During pull request preparation, the system identifies that the feature touches UI components.
@@ -42,10 +44,12 @@
 - **Outcome:** The created GitHub Pull Request displays the visual screenshot, while local `git status` remains completely clean.
 
 ### UC-3: Non-UI Feature or Headless Environment Bypass
+
 - **Trigger:** The feature touches backend logic, data contracts, or algorithms, or runs in a headless environment without a display.
 - **Expected Behavior:** The system detects no UI components were modified or no display is available, gracefully skips screenshot capture, and generates a standard text-only pull request without errors.
 
 ### UC-4: Guaranteed Cleanup on Error or Interruption
+
 - **Trigger:** Screenshot capture, upload, or pull request creation fails or is interrupted by the user.
 - **Expected Behavior:** The system triggers a cleanup hook/trap that deletes any temporary screenshot files from the working directory, preventing orphan assets from remaining untracked.
 
@@ -62,14 +66,14 @@
 
 ## Scope Boundaries
 
-**In scope**
+### In scope
 
 - Configuration and conventions for E2E/integration test runtimes on Web (Playwright/MCP) and Mobile/Flutter (Maestro or `integration_test`).
 - Ephemeral UI capture mechanism integrated into the pull request creation step (`devflow.pr`).
 - Embedding screenshot links/assets into the PR body via GitHub CLI (`gh`).
 - Guaranteed deletion (`trap` cleanup or post-upload removal) before staging files into git.
 
-**Out of scope (Not doing)**
+### Out of scope (Not doing)
 
 - Building or hosting a proprietary cloud screenshot service (rely on native GitHub PR/issue attachment mechanisms).
 - Pixel-by-pixel automated visual regression diffing with color tolerances.

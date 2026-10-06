@@ -2,7 +2,6 @@
 
 ## [1.17.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.16.0...devflow-v1.17.0) (2026-09-27)
 
-
 ### Features
 
 * Add adapter validation and creation scripts, update adapter schemas, and add dependency ordering rules to planning steps ([a115fb7](https://github.com/Gabriele-bil/dev_flow/commit/a115fb70bac6ccbc2791ef1f2258fa0b0fedb4cc))

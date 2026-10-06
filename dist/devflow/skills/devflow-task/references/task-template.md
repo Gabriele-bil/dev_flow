@@ -15,23 +15,23 @@ Used by `devflow.task` Step 9 — write `devflow/features/[NNN]_[feature-name]/t
 
 ## Goal & Value
 
-- **Problem:** [1-2 sentences on the user pain point or current gap. Never copy raw input verbatim.]
-- **Objective:** [Concrete outcome, business impact, or capability this feature delivers.]
+- **Problem:** [1-2 sentences on user pain point or current gap. Never copy raw input verbatim.]
+- **Objective:** [Concrete outcome, business impact, or capability delivered.]
 
 ---
 
 ## User Story
 
-**As a** [user persona or role]  
-**I want to** [desired action or capability]  
-**So that** [benefit or value gained]  
+**As a** [specific user persona or external actor — never a technical role]  
+**I want to** [desired action or intent — no implementation details, no compound and/or]  
+**So that** [tangible user or business benefit — no tautology repeating the action]  
 
 ---
 
 ## Use Cases & Scenarios
 
-### UC-1: [Main Flow / Happy Path Title]
-- **Preconditions:** [State or requirements before the interaction begins]
+### UC-1: [Main Flow Title] (Happy Path)
+- **Preconditions:** [State or requirements before interaction begins]
 - **User Flow:**
   1. [User does action 1]
   2. [System responds / displays 2]
@@ -40,19 +40,23 @@ Used by `devflow.task` Step 9 — write `devflow/features/[NNN]_[feature-name]/t
 
 ### UC-2: [Alternative Flow / Edge Case Title]
 - **Trigger:** [e.g. Empty state, search yields no results, cancelled action, boundary condition]
-- **Expected Behavior:** [What the user experiences; guidance or fallback provided]
+- **Expected Behavior:** [What user experiences; guidance or fallback provided]
 
 ### UC-3: [Error Handling / Validation Title]
-- **Trigger:** [e.g. Missing required fields, invalid input, permission denied, failure state]
-- **Expected Behavior:** [Clear user feedback and recovery path]
+- **Trigger:** [e.g. Missing required fields, invalid input, permission denied, service failure]
+- **Expected Behavior:** [Clear user feedback, input retention, recovery/retry path]
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] **AC-1 (UC-1):** WHEN [trigger happy path] THE SYSTEM SHALL [verifiable outcome]
-- [ ] **AC-2 (UC-2):** WHEN [trigger edge case] THE SYSTEM SHALL [verifiable outcome]
-- [ ] **AC-3 (UC-3):** WHEN [trigger validation/error] THE SYSTEM SHALL [verifiable outcome]
+<!-- BDD Gherkin format: Given / When / Then. Exactly one When per scenario. -->
+<!-- Default: compact single-line format for token efficiency; indented multiline allowed for complex assertions. -->
+
+- [ ] **AC-1 (UC-1) — [Scenario Title]:** GIVEN [initial state] WHEN [single trigger action] THEN [observable outcome]
+- [ ] **AC-2 (UC-1) — [Async Loading & Protection]:** GIVEN [action initiated] WHEN [request in progress] THEN [loading indicator displayed] AND [submit controls disabled]
+- [ ] **AC-3 (UC-2) — [Edge / Empty State]:** GIVEN [empty condition] WHEN [viewed] THEN [informative fallback displayed]
+- [ ] **AC-4 (UC-3) — [Error & Recovery]:** GIVEN [invalid state or failure] WHEN [action attempted] THEN [clear error message displayed] AND [user can retry]
 
 ---
 
@@ -68,21 +72,35 @@ Used by `devflow.task` Step 9 — write `devflow/features/[NNN]_[feature-name]/t
 
 ---
 
+## Assumptions & Risks
+
+### Assumptions
+
+- [Bullet: critical domain, business, or operational assumption]
+
+### Risks
+
+- [Bullet: identified technical, integration, or edge risk]
+
+---
+
 ## Notes
 
-[Assumptions made, trade-offs accepted, or decisions taken during discovery. Leave empty if none.]
+[Optional discovery notes, trade-offs, or decisions. Leave empty if none.]
 ```
 
 Format rules:
 
-- **Product-only**: strictly functional and behavioral perspective; zero implementation detail (no class names, file paths, database schemas, or API routes).
+- **Product-only**: strictly functional and behavioral perspective; zero implementation detail (no class names, file paths, database schemas, or internal API routes).
 - **Goal & Value**: concise problem context and clear, outcome-oriented objective.
-- **Use Cases**: at least 1 Happy Path (`UC-1`) and at least 1-2 Alternative/Error/Edge Case scenarios (`UC-2`, `UC-3`). Each flow must be actionable and user-centered.
-- **Acceptance criteria**: observable, falsifiable, one per outcome, mapped directly to a Use Case (e.g. `AC-1 (UC-1)`). Use EARS phrasing (`WHEN [trigger] THE SYSTEM SHALL [response]`).
+- **User Story**: strictly Connextra format. Real persona (never tech role); intent-based action (no compound conjunctions); true value (no tautology).
+- **Use Cases**: at least 1 Happy Path (`UC-1`) and 1-2 Alternative/Error/Edge Case scenarios (`UC-2`, `UC-3`). Isolate Read/View from Action/Write.
+- **Acceptance criteria**: strict BDD Gherkin (`GIVEN ... WHEN ... THEN ...`), exactly one `When` per scenario. Mapped directly to Use Cases (e.g. `AC-1 (UC-1)`). Observable, falsifiable, binary pass/fail. Explicit async coverage (loading, disabled controls to prevent double submit, error recovery).
 - **Scope boundaries**: In-scope defines functional commitments; Out-of-scope marks explicit trade-offs and non-goals.
+- **Assumptions & Risks**: structured bullets feed directly into `plan.md` architecture decisions and risks/mitigations table.
 - **Language**: English. All written documents must be in English regardless of conversation language.
 - **Compression**: caveman-compress — drop articles/filler/hedging; keep technical and domain terms exact.
-- **Unknown values**: use `[NEEDS CLARIFICATION: <reason>]` inline; never guess. No variants of this format.
+- **Unknown values**: use `[NEEDS CLARIFICATION: <reason>]` inline; never guess.
 - **Status**: `draft` (initial), `clarified` (post `devflow.clarify`), `done` (pipeline complete).
 - **App**: present only in monorepo repos (`devflow/config.md` has a `## Apps` table); value must match an App name in that table exactly. Never present in single-app repos.
 - **ADRs**: optional path(s) to ADRs from `docs/adr/` governing or constraining this feature, or "none".

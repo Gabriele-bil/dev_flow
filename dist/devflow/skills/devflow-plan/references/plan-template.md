@@ -35,7 +35,7 @@ state the vertical-slice execution order here.]
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| [Risk] | High / Med / Low | [Concrete mitigation] |
+| [Risk — seeded from task.md ## Assumptions & Risks] | High / Med / Low | [Concrete mitigation] |
 
 [Use 2-4 rows for non-trivial work; one row acceptable for small plans.]
 
@@ -53,8 +53,9 @@ state the vertical-slice execution order here.]
 
 | Use Case / Subtask | Acceptance criteria | File(s) |
 |---------------------|---------------------|---------|
-| [UC title or subtask description from task.md] | [acceptance criterion from task.md] | [file path(s)] |
+| [UC-N title from task.md] | [AC-N: GIVEN ... WHEN ... THEN ... from task.md] | [file path(s)] |
 | ... | ... | ... |
+
 
 ---
 

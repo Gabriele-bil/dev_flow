@@ -72,9 +72,10 @@ For each use case / subtask in `task.md`:
 For each acceptance criterion in `task.md`:
 
 - Flag if it uses untestable language: "works correctly", "looks good", "behaves as expected", "is user-friendly", "performs well", "is fast", "is clean", "is easy to use".
-- Flag if it describes internal implementation state rather than externally observable behavior (e.g. "the class exposes a method…", "the provider is initialized…").
-- Severity: **Required** — untestable AC blocks `devflow.test` from writing meaningful assertions.
-- Suggested fix for flagged criteria with a trigger/precondition: EARS phrasing (`WHEN [trigger] THE SYSTEM SHALL [response]` / `IF [precondition] THEN THE SYSTEM SHALL [response]`) per `devflow-task/refinement-hints.md` dimension 4 — forces actor/condition into the open instead of a vague declarative sentence.
+- Flag if it describes internal implementation state rather than externally observable behavior (e.g. "the class exposes a method…", "writes to table X", "returns 401").
+- Flag if scenario bundles multiple actions (`When ... And ...` chained triggers) — must follow the single `When` rule.
+- Severity: **Required** — untestable or compound AC blocks `devflow.test` from writing meaningful assertions.
+- Suggested format: BDD Gherkin phrasing (`GIVEN [context] WHEN [single action] THEN [observable outcome]`) per `devflow-task/references/bdd-acceptance-criteria.md`, or EARS phrasing (`WHEN [trigger] THE SYSTEM SHALL [response]`).
 
 ---
 
