@@ -1,6 +1,6 @@
 ---
 name: devflow.auto
-description: Chain task → plan → analyze → implement as one unattended session from a raw feature idea — decision flags instead of pauses, consolidated report, stop before beautify.
+description: Full-cycle autonomous delivery: chains task → plan → analyze → implement → beautify → test → ship → pr from a raw feature idea directly to an opened pull request in total autonomy.
 argument-hint: "[idea-or-attached-context] [--app <name>]"
 disable-model-invocation: true
 ---
@@ -9,11 +9,12 @@ Use `@devflow/skills/devflow-auto/SKILL.md` and execute it exactly.
 
 **Anchors (do not skip):**
 
-- Arm run mode only after the Step 0 user confirmation; write `.devflow-run.json` (`feature: null`, `from: "task"`, `until: "implement"`) per `@devflow/references/state-machine.md` → **Run marker**.
-- Honor the **Autonomy policy** table: never commit, push, open PR, edit configs, guess a missing monorepo `--app`, bypass Constitution Gate Critical/Required, or proceed past `devflow.analyze` Critical/Required findings.
-- Ambiguity in `devflow.task` → entry in `task.md` `## Notes`; ambiguity in `devflow.plan` → entry in `plan.md` `## Decision flags`. Never silent picks, never invented product rules.
-- Update `.devflow-run.json` `feature` field once `task.md` is written; delete the marker on every exit path (complete, contract failure, block, handoff).
-- Stop before `devflow.beautify` with the consolidated report.
+- Executes the complete pipeline from idea to PR: `task → plan → analyze → implement → beautify → test → ship → pr`.
+- Operates in total autonomy once invoked: arm run mode immediately (`feature: null`, `from: "task"`, `until: "pr"`, `orchestrator: "devflow.auto"`) without pausing for confirmation if idea is provided.
+- Stop ONLY on major discrepancies (Critical Constitution violations, Critical analyze contradictions, unresolvable test/build Level 5 blocks, Critical ship blockers, missing monorepo app).
+- For minor discrepancies, ambiguities, or non-critical findings: pick defensible defaults, continue forward, and document them in `plan.md ## Decision flags` / `task.md ## Notes` and prominently in the Pull Request description.
+- Never edit protected configs (`devflow/config.md`, CI/tooling configs).
+- Delete `.devflow-run.json` on every exit path (PR opened, block, handoff).
 
 User input (idea or attached file context, plus optional `--app`):
 `$ARGUMENTS`

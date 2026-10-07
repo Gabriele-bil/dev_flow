@@ -208,7 +208,7 @@ Read by `devflow.beautify` and `devflow.pr`. Omit if fully aligned.
 
 Set `plan.md` `**Status:** implemented`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
 
-Respond using template in `references/notify-template.md`. **Run mode** (`.devflow-run.json` present): emit the notify block but do not wait for user — control returns to `devflow.run`.
+Respond using template in `references/notify-template.md`. **Run mode** (`.devflow-run.json` present): emit the notify block but do not wait for user — control returns to the orchestrator (`devflow.run` or `devflow.auto`).
 
 ## Anti-Patterns
 

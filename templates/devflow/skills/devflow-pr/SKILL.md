@@ -144,6 +144,8 @@ Use `gh` CLI to open the PR toward `$BASE_BRANCH` (resolved in Step 0). Wrap exe
 )
 ```
 
+Extract decision flags and discrepancies: inspect `plan.md` (`## Decision flags`, `## Deviations`, `## Open questions`) and `task.md` (`## Assumptions & Risks`, `## Notes`). When running under `devflow.auto` or when autonomous decisions/flags exist, populate the `## Autonomous Decisions & Discrepancies` section in the PR body so human reviewers have full visibility of all non-critical discrepancies, assumptions, and choices made autonomously.
+
 ### PR title format
 
 ```text
@@ -165,6 +167,10 @@ and how it fits into the product.]
 ## Implementation
 [Brief description of the technical approach:
 layers touched, key abstractions, notable patterns used.]
+
+## Autonomous Decisions & Discrepancies
+<!-- Included when running under devflow.auto or when decision flags / discrepancies exist in plan.md / task.md -->
+[List any discrepancies between idea/spec and implementation, defensible defaults picked, decision flags from plan.md ## Decision flags, assumptions from task.md ## Notes, and non-critical exceptions documented during review.]
 
 ## Testing
 [How the feature was tested — mirror what the adapter PR step file requires:

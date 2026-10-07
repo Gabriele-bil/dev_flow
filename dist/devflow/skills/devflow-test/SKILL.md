@@ -183,7 +183,7 @@ All tests passing and verification clean? Choose how to continue:
 3. Skip full suite and open PR directly -> devflow.pr
 ```
 
-Wait for user choice before continuing. **Run mode** (`.devflow-run.json` present): emit the block but do not wait — control returns to `devflow.run` (ship stays human).
+Wait for user choice before continuing. **Run mode** (`.devflow-run.json` present): emit the block but do not wait — control returns to the orchestrator (`devflow.run` stops at its `--until` boundary, or `devflow.auto` continues to `devflow.ship`).
 
 ## Anti-Patterns
 
