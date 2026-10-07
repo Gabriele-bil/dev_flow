@@ -106,14 +106,15 @@ Append to existing arrays instead of overwriting: read current file with `jq '.d
 Shared by two orchestrators, distinguished by `from`/`until` vocabulary:
 
 - `devflow.run` — `from`/`until` ∈ `implement` | `beautify` | `test` | `ship`; `feature` known upfront (task.md + plan.md already exist)
-- `devflow.auto` — `from`/`until` ∈ `task` | `plan` | `analyze` | `implement`; `feature` is `null` until its `task` step writes `task.md`, then updated in place
+- `devflow.auto` — `from: "task"`, `until: "pr"`; `feature` is `null` until its `task` step writes `task.md`, then updated in place; chains all steps from raw idea to open PR, stopping only on major discrepancies and recording minor discrepancies in the PR description
 
 ```json
 {
   "active": true,
   "feature": "003_user-profile",
-  "from": "implement",
-  "until": "test",
+  "from": "task",
+  "until": "pr",
+  "orchestrator": "devflow.auto",
   "started_at": "2026-07-17T10:00:00Z",
   "ship_grader_iterations": 2,
   "ship_grader_iteration_count": 0
@@ -122,7 +123,7 @@ Shared by two orchestrators, distinguished by `from`/`until` vocabulary:
 
 Lifecycle:
 
-- Written by `devflow.run` Step 0 or `devflow.auto` Step 0 — only after explicit user confirmation; no other skill arms run mode
+- Written by `devflow.run` Step 0 (after user confirmation) or `devflow.auto` Step 0 (immediately on execution); no other skill arms run mode
 - Deleted by the owning orchestrator (`devflow.run` or `devflow.auto`) on every exit path (complete, contract failure, block, handoff)
 - Never committed — the arming orchestrator appends it to `.gitignore` when present
 - Stale marker (found at session start, no run in progress) → `devflow.resume` asks: continue interactively (delete marker) or re-arm the orchestrator named in `from`/`until` (`devflow.run` or `devflow.auto`); corrupted → `devflow.recovery`

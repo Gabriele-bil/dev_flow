@@ -204,6 +204,8 @@ Respond with:
 Continue to testing? -> devflow.test
 ```
 
+**Run mode** (`.devflow-run.json` present): emit the notify block but do not wait for user — control returns to the orchestrator (`devflow.run` or `devflow.auto`).
+
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |

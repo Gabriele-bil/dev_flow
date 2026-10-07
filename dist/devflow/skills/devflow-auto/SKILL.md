@@ -1,6 +1,6 @@
 ---
 name: devflow-auto
-description: "Full-cycle autonomous delivery: turns a raw feature idea directly into implemented code via task, plan, analyze, and implement. Chooses defensible defaults with decision flags rather than prompting for clarification; pauses prior to beautify. Use when user runs devflow.auto or asks to build end to end from idea to code automatically without stopping for questions."
+description: "Full-cycle autonomous delivery: turns a raw feature idea directly into an opened pull request via task, plan, analyze, implement, beautify, test, ship, and pr. Operates in total autonomy, choosing defensible defaults and documenting minor discrepancies in the pull request; halts only on major discrepancies (Critical blockers). Use when user runs devflow.auto or asks to deliver end to end from idea to PR automatically without pausing for questions."
 argument-hint: "[idea-or-attached-context] [--app <name>]"
 disable-model-invocation: true
 context: fork
@@ -14,42 +14,50 @@ background: true
 
 Run `/devflow.auto <idea> [--app <name>]`.
 
-- Fixed chain: `task → plan → analyze → implement` — no `--from`/`--until`, single entry, single exit
+- Full autonomous chain: `task → plan → analyze → implement → beautify → test → ship → pr` — single command, zero intermediate manual pauses, runs unattended from raw idea through an opened PR
 - `--app <name>`: required only when `devflow/config.md` has a `## Apps` table (monorepo); omit otherwise
 
 ## Purpose
 
-Opt-in gated autonomy from raw idea through implemented code. Execute `task → plan → analyze → implement` as one chained unattended session, then stop with consolidated report. Constitution gates (Critical/Required) and `devflow.analyze` Critical/Required findings stay hard stops; `beautify`/`test`/`ship`/PR stay human — run `devflow.run` or the individual steps after.
+End-to-end autonomous delivery from raw feature idea through an opened pull request. Executes `task → plan → analyze → implement → beautify → test → ship → pr` in one continuous, unattended session.
+
+Once the command is executed, it progresses automatically through the entire flow. It halts ONLY when encountering major discrepancies (Constitution Gate Critical violations, unresolvable Critical analyze contradictions, Level 5 test/build failures, or Critical ship blockers). Any minor discrepancies, ambiguities, defensible assumptions, or non-critical review findings do NOT pause the pipeline: they are resolved via defensible defaults, logged in `plan.md ## Decision flags`, and surfaced prominently in the Pull Request description (`## Autonomous Decisions & Discrepancies`) for human review.
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved
+- **spec-first** — no code before `task.md` + `plan.md` generated and verified
 - **traceability** — every subtask → acceptance criterion → file(s)
 - **vertical slices** — end-to-end increments, never layers
+- **autonomous forward-motion** — never block on minor ambiguities or non-critical findings; pick defensible defaults, record discrepancies in PR
+- **fail only on major discrepancies** — hard-stop strictly on Critical blockers (security violations, unresolvable test/build failures)
 - **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## Autonomy policy
 
-| Allowed unattended | Never unattended |
+| Allowed unattended | Never unattended (Hard stops on major discrepancies) |
 | --- | --- |
-| Write `task.md` / `plan.md`; pick defensible defaults for clarification questions, feature name, plan open questions | `git commit`, `git push`, open PR |
-| Run adapter format/analyze/codegen commands during `implement` | Edit `devflow/config.md`, CI/config files (`pre-config-protect` hook enforces) |
-| Update `task.md`/`plan.md` Status, `[done]` markers, `## Notes`, `## Decision flags`, `.checkpoint.json`, `.devflow-state.json` | Bypass Constitution Gate Critical/Required (`devflow-plan` Step 0b) |
-| Pick defensible default on ambiguity + log decision flag | Proceed past `devflow.analyze` Critical/Required findings |
-| Stop on `escalation-ladder.md` Level 5 block | Guess missing **App** on a monorepo feature — still hard stop |
-| Create feature branch per `devflow.implement` Step 3 | Apply beautify improvements — chain stops before `beautify` |
+| Write `task.md` / `plan.md`; pick defensible defaults for clarification questions, feature name, plan open questions | Bypass Constitution Gate Critical/Required (`devflow-plan` Step 0b) |
+| Run adapter format/analyze/codegen/test commands | Proceed past `devflow.analyze` **Critical** findings |
+| Update `task.md`/`plan.md` Status, `[done]` markers, `## Notes`, `## Decision flags`, `.checkpoint.json`, `.devflow-state.json` | Proceed past `devflow.ship` **Critical** blockers |
+| Pick defensible default on ambiguity + log decision flag | Exceed `escalation-ladder.md` Level 5 block (failing tests after retries) |
+| Create feature branch per `devflow.implement` Step 3 | Guess missing **App** on a monorepo feature |
+| Apply `beautify` certain improvements; opinable proposals logged to decision flags | Ignore `devflow-task` Step 3 brainstorm-scale routing (no concrete feature) |
+| Run full test suite & goal-backward verification | Edit `devflow/config.md`, CI/config files (`pre-config-protect` hook enforces) |
+| Run `ship` multi-agent review fan-out + autonomous grader loop | |
+| Record minor discrepancies & review findings in PR description | |
+| `git commit`, `git push`, open PR via `gh pr create` | |
 
 ## When NOT to Use
 
-- Idea maps to an existing/planned feature in `docs/product.md` — check first; if `task.md` already exists, run `devflow.plan` directly instead
+- Idea maps to an existing/planned feature in `docs/product.md` — check first; if `task.md` already exists, run `devflow.plan` or `devflow.run`
 - Monorepo and target app unknown — resolve `--app` first or expect a hard stop at Step 0
-- User wants to review `task.md` or `plan.md` before implementation starts — run `devflow.task` / `devflow.plan` interactively instead
 - Idea is brainstorm-scale (no concrete problem or user) — `devflow-task` Step 3 routes this away; `devflow.auto` inherits that stop, never defaults around it
+- User explicitly requests interactive step-by-step review at each phase — use individual commands (`devflow.task`, `devflow.plan`, etc.)
 - Interrupted run to continue — `devflow.resume`; corrupted state — `devflow.recovery`
 
 ## Input contract
 
-- [ ] Idea text (or attached context) present in `$ARGUMENTS` — empty → stop, ask for the idea
+- [ ] Idea text (or attached context) present in `$ARGUMENTS` — empty → stop, ask user for the feature idea
 - [ ] No active `.devflow-run.json` (stale marker from crashed run → confirm deletion with user, or route `devflow.recovery`)
 - [ ] Monorepo (`config.md` has `## Apps` table) → `--app` resolved or user asked before arming — never guessed
 
@@ -57,104 +65,157 @@ Any item fails → stop, report which check failed, do not arm run mode.
 
 ## Workflow
 
-### Step 0 - Arm run mode
+### Step 0 - Arm run mode & launch immediately
 
-Parse `$ARGUMENTS`: idea text + optional `--app`. Present run plan + policy summary, WAIT for single confirmation:
+Parse `$ARGUMENTS`: idea text + optional `--app`.
+Once invoked with the feature idea, **do not pause or wait for interactive confirmation**: arm run mode immediately and begin the autonomous pipeline!
 
-```text
-🤖 devflow.auto: task → plan → analyze → implement   (feature number assigned in task step)
-
-Unattended: write task.md/plan.md, pick defensible defaults for clarification/open questions/feature name, write plan-scoped code.
-Never unattended: commit, push, PR, config edits, bypassing Constitution or analyze Critical/Required findings.
-Ambiguity → defensible default + flag (task.md ## Notes / plan.md ## Decision flags — you review before beautify).
-
-Proceed? (yes / no)
+Write `.devflow-run.json` per `@devflow/references/state-machine.md` → **Run marker**:
+```json
+{
+  "active": true,
+  "feature": null,
+  "from": "task",
+  "until": "pr",
+  "orchestrator": "devflow.auto",
+  "started_at": "[ISO-8601 timestamp]",
+  "ship_grader_iterations": 2,
+  "ship_grader_iteration_count": 0
+}
 ```
+Append `.devflow-run.json` to `.gitignore` when `.gitignore` exists and entry missing.
+Marker presence switches pipeline step skills to run mode (autonomous defaults, decision flags, no intermediate waits).
 
-On yes: write `.devflow-run.json` per `@devflow/references/state-machine.md` → **Run marker**, with `feature: null`, `from: "task"`, `until: "implement"`; append `.devflow-run.json` to `.gitignore` when `.gitignore` exists and entry missing. Marker presence switches `devflow-task`, `devflow-plan`, and `devflow-implement` to run mode.
+Announce start:
+```text
+🤖 devflow.auto: starting autonomous flow
+Pipeline: task → plan → analyze → implement → beautify → test → ship → pr
+Mode: Unattended to PR · Minor discrepancies → logged in PR · Halts only on major blockers
+```
 
 ### Step 1 - Chain steps
 
-Execute each step skill in order:
+Execute each step skill in order through to completion:
 
-1. `@devflow/skills/devflow-task/SKILL.md` — full workflow, run-mode clauses active (Step 4 clarification, Step 6 feature name). Once `task.md` is written (Step 9), update `.devflow-run.json` `feature` field to the new `NNN_feature-name`.
-2. `@devflow/skills/devflow-plan/SKILL.md` — full workflow, run-mode clause active for Open questions. Constitution Gate Critical/Required still stops the chain (Step 2 below), never bypassed.
-3. `@devflow/skills/devflow-analyze/SKILL.md` — full 5-pass report. Any **Critical** or **Required** finding → stop chain (Step 3), do not start `implement`. Only **Nit** findings or zero findings → continue.
-4. `@devflow/skills/devflow-implement/SKILL.md` — full workflow; existing `.devflow-run.json` run-mode clause applies unchanged.
+1. `@devflow/skills/devflow-task/SKILL.md` — full workflow, run-mode clauses active:
+   - Ambiguities/clarifications: pick defensible default (repo precedent > `docs/product.md` > conservative reading), record each in `task.md ## Assumptions & Risks` and `## Notes`. Never leave raw `[NEEDS CLARIFICATION]` marker.
+   - Feature naming: pick first proposed name, record alternatives in `## Notes`.
+   - Brainstorm routing: if idea has no concrete problem/user, halt (major discrepancy).
+   - Once `task.md` is written (Step 9), update `.devflow-run.json` `feature` field to `NNN_feature-name`.
+2. `@devflow/skills/devflow-plan/SKILL.md` — full workflow, run-mode clause active:
+   - Genuine open questions: pick defensible default (repo precedent > `constitution.md` > adapter convention), append to `plan.md ## Decision flags`.
+   - Constitution Gate Critical/Required: if Critical constitution violation occurs, halt (major discrepancy).
+3. `@devflow/skills/devflow-analyze/SKILL.md` — full structural analysis:
+   - Any **Critical** finding (fundamental contradiction or unresolvable architectural clash) → stop chain (major discrepancy).
+   - Any **Required** finding or **Nit** (minor discrepancy or coverage gap) → do NOT stop; apply defensible plan adjustment or log as an autonomous decision/waiver in `plan.md ## Decision flags` to be documented in the PR; proceed to `implement`.
+4. `@devflow/skills/devflow-implement/SKILL.md` — full workflow:
+   - Create feature branch.
+   - Implement vertical slices.
+   - Ambiguities: defensible default + `plan.md ## Decision flags`.
+   - If Level 5 escalation block hit (unresolvable compile/build failure) → stop run (major discrepancy).
+5. `@devflow/skills/devflow-beautify/SKILL.md`:
+   - Apply certain improvements; opinable proposals become decision flags in `plan.md ## Decision flags`.
+   - Run adapter format and analyze/typecheck.
+6. `@devflow/skills/devflow-test/SKILL.md`:
+   - Run tests + goal-backward verification (Step 6b).
+   - If tests fail after retry budget (Level 5) → stop run (major discrepancy).
+   - On pass → continue automatically to `devflow.ship`.
+7. `@devflow/skills/devflow-ship/SKILL.md`:
+   - Multi-agent review fan-out per depth profile (`code-reviewer`, `security-auditor`, `test-engineer`, etc.).
+   - Synthesize report.
+   - Any **Critical** issue → stop run (major discrepancy).
+   - **Required-only** findings → autonomous grader loop (Step 4b). If still unresolved after iteration limit, document as exceptions in `plan.md ## Decision flags` and proceed.
+   - Gate passes → status updated to `shipped`, continue automatically to `devflow.pr`.
+8. `@devflow/skills/devflow-pr/SKILL.md`:
+   - Run pre-push verification.
+   - Commit changes, push branch, open pull request via `gh pr create`.
+   - Include the dedicated `## Autonomous Decisions & Discrepancies` section in the PR description, detailing all assumptions, decision flags, minor discrepancies, and non-critical review findings.
 
 Chain rules:
+- Between steps: zero user prompts. Forward motion is continuous.
+- Context pressure (host warning, large plan) → write handoff per `@devflow/references/state-machine.md` → **Handoff file**, stop run, notify user to restart + `devflow.resume`.
 
-- Between steps: no user prompt. Record each step's notify block for the Step 3 consolidated report.
-- `devflow-task` Step 3's brainstorm-scale routing (idea too vague or multi-directional for a single feature) still applies and still stops the chain — that is a "not a feature yet" signal, not ambiguity to default around.
-- Step input contract fails mid-chain (e.g. `devflow-plan`'s draft-with-unresolved-markers check) → stop run, report the failed check; never force a step.
-- Failures inside a step follow `@devflow/references/escalation-ladder.md`; Level 5 block → stop run, keep flags, write consolidated report with stuck-report.
-- Context pressure (host warning, large plan) → write handoff per `@devflow/references/state-machine.md` → **Handoff file**, stop run, tell user: restart + `devflow.resume`.
+### Step 2 - Discrepancy & Decision flag policy
 
-### Step 2 - Decision flags (forward-motion)
+Autonomous delivery relies on a strict distinction:
 
-Same mechanism as `devflow-run` Step 2, applied at two artifact levels:
+#### Major Discrepancies (Hard Stops — Halts execution)
+The pipeline halts immediately and alerts the user ONLY on major discrepancies:
+1. **Constitution Gate Critical violation** (`devflow-plan` Step 0b) — cannot proceed against foundational project constraints.
+2. **`devflow.analyze` Critical finding** — direct contradiction to an accepted ADR or fatal flaw rendering implementation impossible.
+3. **`escalation-ladder.md` Level 5 block** — tests failing or code broken after max retries.
+4. **`devflow.ship` Critical blocker** — severe security flaw, data corruption risk, or broken build identified by reviewers.
+5. **Missing monorepo `--app`** — impossible to determine target app without user input.
+6. **Brainstorm-scale idea** — raw idea lacks a concrete feature or user.
 
-- Task-level assumptions (clarification questions, feature name) → `task.md` `## Notes`
-- Plan-level assumptions (Open questions) → `plan.md` `## Decision flags`
+#### Minor Discrepancies (Document in PR & Proceed)
+Any other discrepancy, ambiguity, or non-critical finding does NOT stop the pipeline:
+- Unspecified UI layout, edge case behaviors, or parameter choices: pick defensible default based on repo precedent > constitution > adapter convention.
+- Discrepancies between initial idea and actual codebase constraints: adapt plan to reality, log the deviation in `plan.md ## Deviations` and `## Decision flags`.
+- `devflow.analyze` Required findings / Nits: document waiver in `plan.md ## Decision flags`.
+- `devflow.ship` Required exceptions or Nits: document in `plan.md ## Decision flags`.
+- All collected flags and discrepancies are injected into the PR description under `## Autonomous Decisions & Discrepancies`.
 
-Product rules are never invented: missing behavior with no repo precedent → most conservative behavior (fail closed / no-op) + flag.
+### Step 3 - Disarm + Consolidated report
 
-Exceptions that hard-stop even in run mode:
+Delete `.devflow-run.json` on **every** exit path (complete, blocker, handoff).
 
-- Missing `--app` on a monorepo feature
-- Constitution Gate Critical/Required violation (`devflow-plan` Step 0b)
-- `devflow-analyze` Critical or Required finding
-- `devflow-task` Step 3 brainstorm-scale routing
-
-### Step 3 - Disarm + consolidated report
-
-Delete `.devflow-run.json` on **every** exit path (complete, contract failure, block, handoff). Report:
-
+When PR is opened successfully:
 ```text
-🤖 devflow.auto complete: task → [last step executed]
+🤖 devflow.auto complete: idea → PR opened!
 
-Feature:  [NNN]_[feature-name]  ·  Status: [final plan.md Status, or "task only" if stopped early]
-Steps:    task [✅/❌] · plan [✅/⏭/❌] · analyze [✅/⏭/❌] · implement [✅/⏭/❌]
+Feature:  [NNN]_[feature-name]  ·  Status: pr-opened
+Branch:   [type]/[NNN]-[feature-name]
+PR Link:  [PR URL returned by gh CLI]
+Steps:    task [✅] · plan [✅] · analyze [✅] · implement [✅] · beautify [✅] · test [✅] · ship [✅] · pr [✅]
 Files:    [N] created · [M] modified
-Analyze:  [N] Critical · [N] Required · [N] Nit findings
-Flags:    [N] decision flags — review task.md ## Notes / plan.md ## Decision flags
-[Stopped at [step]: [failed check | Critical/Required block | stuck-report | handoff written], if not complete]
+Tests:    [N] passed · Verification: PASS [n]/[n] ACs
+Discrepancies & Flags: [N] documented in PR body (see "Autonomous Decisions & Discrepancies")
 
-Next (human): devflow.beautify — or devflow.run --from beautify for the rest of the pipeline
+Pipeline finished in total autonomy. Review the PR link above!
 ```
 
-Always wait for user here.
+When stopped at a major discrepancy:
+```text
+🚨 devflow.auto stopped at [step]: [Major Discrepancy Description]
+
+Feature:  [NNN]_[feature-name]  ·  Status: [plan.md Status or "task only"]
+Blocker:  [Critical issue details]
+Flags:    [N] decision flags recorded so far
+
+Action required: Resolve the critical discrepancy above, then continue with devflow.resume or interactive commands.
+```
 
 ## Common Rationalizations
 
 | Thought | Reality |
 | --- | --- |
-| "Idea is vague but run mode should just guess and go" | Brainstorm-scale idea routes to `ce-brainstorm`/`idea-refine` even in run mode — a default can't invent a missing feature |
-| "Analyze found only Required issues, close enough" | Required findings block same as Critical — never proceed past either unattended |
-| "User said full auto, so skip the App question too" | App on monorepo never guessed — hard stop regardless of mode; ask upfront or pass `--app` |
-| "Constitution Required violation, but time to move fast" | `devflow-plan` already hard-stops on this; `devflow.auto` adds no bypass |
-| "Task and plan clarifications are minor, no need to flag" | Every autonomous decision is logged somewhere reviewable — `## Notes` or `## Decision flags` — before implement touches code |
+| "Idea has ambiguity, I should pause and ask the user" | devflow.auto operates in total autonomy — pick defensible default, log to notes/PR |
+| "I should stop before beautify or PR for safety" | devflow.auto delivers end-to-end all the way to PR; human reviews everything on GitHub |
+| "Analyze reported a Required finding, I should stop" | Only Critical findings halt devflow.auto; Required findings are resolved or logged to PR |
+| "Ship review had minor notes, I should ask before PR" | Minor notes and exceptions are documented in the PR description, not reasons to stop |
+| "Constitution Critical violation, but I should auto-proceed" | Critical violations are major discrepancies that always hard-stop |
 
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Silent default without a `## Notes`/`## Decision flags` entry | Every autonomous choice → logged, reviewable before `beautify` |
-| Proceeding to `implement` after `analyze` reports Critical/Required | Stop chain, write consolidated report, human reviews `plan.md` first |
-| Running `devflow.task` + `devflow.plan` + `devflow.implement` separately and calling it equivalent | Use the chain — marker + flags only work end to end |
-| Arming run mode with no concrete idea in `$ARGUMENTS` | Input contract fails fast — ask for the idea, do not arm on empty input |
-| Continuing chain after `devflow-task` Step 3 routes to brainstorm | That stop is final for this run — no default resolves "no concrete problem" |
-| Leaving `.devflow-run.json` after stop | Delete marker on every exit path — stale marker corrupts next session's mode detection |
+| Pausing for user confirmation at Step 0 when idea is given | Proceed immediately into the pipeline |
+| Pausing at intermediate step gates | Chain continuously without user prompts |
+| Stopping before beautify, test, ship, or PR | Execute the full pipeline through `gh pr create` |
+| Proceeding on Critical analyze/ship/constitution blockers | Critical = major discrepancy = hard stop |
+| Silent defaults without documenting in PR | Every autonomous choice → `plan.md ## Decision flags` → PR description |
+| Leaving `.devflow-run.json` after exit | Delete marker on every exit path |
 
 ## I/O Reference
 
 | | |
 | --- | --- |
-| Reads | `@devflow/skills/devflow-task/SKILL.md`, `devflow-plan/SKILL.md`, `devflow-analyze/SKILL.md`, `devflow-implement/SKILL.md` |
+| Reads | `@devflow/skills/devflow-task/SKILL.md`, `devflow-plan/SKILL.md`, `devflow-analyze/SKILL.md`, `devflow-implement/SKILL.md`, `devflow-beautify/SKILL.md`, `devflow-test/SKILL.md`, `devflow-ship/SKILL.md`, `devflow-pr/SKILL.md` |
 | Reads | `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
 | Reads | `@devflow/references/state-machine.md` (run marker + handoff schemas), `@devflow/references/escalation-ladder.md` (failure bounds) |
-| Writes | `.devflow-run.json` — armed Step 0 (`feature: null`), `feature` field updated after `task` step, deleted Step 3 (every exit path) |
+| Writes | `.devflow-run.json` — armed Step 0 (`feature: null`, `from: "task"`, `until: "pr"`), `feature` field updated after `task` step, deleted Step 3 |
 | Writes | `devflow/features/[NNN]_[feature-name]/task.md`, `plan.md` — full workflow output, `## Notes`, `## Decision flags` |
-| Executes | `devflow-task`, `devflow-plan`, `devflow-analyze`, `devflow-implement` skills in order |
-| Next step | `devflow.beautify` (human) — or `devflow.run --from beautify` |
-| Related | `devflow-resume` (interrupted run), `devflow-recovery` (stale marker/corrupted state), `devflow-run` (continues pipeline after `implement`) |
+| Executes | `devflow-task`, `devflow-plan`, `devflow-analyze`, `devflow-implement`, `devflow-beautify`, `devflow-test`, `devflow-ship`, `devflow-pr` skills in order |
+| Output | Open Pull Request on GitHub with full autonomous report and discrepancies |
+| Related | `devflow-resume` (interrupted run), `devflow-recovery` (stale marker/corrupted state), `devflow-run` (middle pipeline batch runner) |

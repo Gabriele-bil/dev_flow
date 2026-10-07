@@ -136,7 +136,9 @@ Profile: [quick | standard | thorough] · Reviewed by: [agents actually dispatch
 Applies only when `.devflow-run.json` is present and Step 4 verdict is **Required-only** (zero Critical findings). Critical always hard-stops per Step 4 regardless of run mode — this step never runs for a Critical verdict.
 
 1. Read `ship_grader_iterations` from `.devflow-run.json` (absent → default 2) and `ship_grader_iteration_count` (absent → 0).
-2. `ship_grader_iteration_count` ≥ `ship_grader_iterations` → stop looping. Present the Ship Gate Report as-is; control returns to `devflow.run` same as any other unresolved Required state under run mode.
+2. `ship_grader_iteration_count` ≥ `ship_grader_iterations` → stop looping.
+   - If running under `devflow.run`: present the Ship Gate Report as-is; control returns to `devflow.run`.
+   - If running under `devflow.auto` (`until: "pr"`): log remaining non-critical findings to `plan.md ## Decision flags` as documented exceptions (to be included in the PR description) and proceed to Step 5.
 3. Otherwise: increment `ship_grader_iteration_count`, write it back to `.devflow-run.json`. Re-dispatch `devflow.implement` scoped strictly to the Required findings from this report (file:line + description per finding) — no unrelated changes.
 4. After `devflow.implement` returns: re-run `devflow.beautify`, then re-run the full fan-out from Step 1 at the **same depth profile** — never shrink it on a retry.
 5. Route the new Ship Gate Report back through Step 4. A Critical finding on this or any later iteration → immediate hard stop, independent of remaining iteration budget.
@@ -149,9 +151,11 @@ Each iteration re-runs the entire fan-out fresh (independent reviews), not a rec
 
 If gate passes: set `plan.md` `**Status:** shipped`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
 
-**Run mode** (`.devflow-run.json` present — reached via `devflow.run --until ship`): do NOT execute `devflow-pr`. Present report, stop; PR stays human. Control returns to `devflow.run`.
+**Run mode under devflow.run** (`.devflow-run.json` present with `until: "ship"` or `orchestrator: "devflow.run"`): do NOT execute `devflow-pr`. Present report, stop; PR stays human. Control returns to `devflow.run`.
 
-Otherwise:
+**Run mode under devflow.auto** (`.devflow-run.json` present with `until: "pr"` or `orchestrator: "devflow.auto"`): gate passed (or proceeded with documented exceptions). Execute `@devflow/skills/devflow-pr/SKILL.md` directly.
+
+Otherwise (interactive session):
 
 ```text
 ✅ Ship gate passed. Routing to devflow.pr.
@@ -174,7 +178,7 @@ Execute `@devflow/skills/devflow-pr/SKILL.md` exactly.
 | Synthesizing before all agents complete | Wait for all dispatched reports before Step 3 |
 | Downgrading severity in synthesis | Report as declared; escalate if disputed |
 | Omitting decision flags from the report | Every `## Decision flags` entry surfaces in **Open Decision Flags** — autonomous decisions get human review before PR |
-| Auto-routing to `devflow.pr` with run mode active | Run never crosses the PR boundary; present report and stop |
+| Auto-routing to `devflow.pr` under `devflow.run` | Run mode under `devflow.run` stops before PR; `devflow.auto` chains through `devflow.pr` |
 | Re-running after fixing only some Critical issues | Fix all Critical; re-run full gate from Step 1 |
 | Looping Step 4b outside run mode | Interactive sessions always ask the user per Step 4; Step 4b only engages with `.devflow-run.json` present |
 | Grader loop bypassing the Critical hard-stop | Critical always stops immediately regardless of run mode or remaining iteration budget — Step 4b only ever engages for Required-only verdicts |
@@ -190,7 +194,7 @@ Execute `@devflow/skills/devflow-pr/SKILL.md` exactly.
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md`, `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
 | Reads | Files from `devflow.implement` / `devflow.beautify` summary |
 | Reads | `@devflow/references/complexity-scoring.md` (depth profile → fan-out), `@devflow/references/token-economy.md` (agent prompt rules) |
-| Reads (conditional) | `plan.md` `## Decision flags` (→ **Open Decision Flags** report section); `.devflow-run.json` (existence — never route to `devflow.pr` when present; `ship_grader_iterations`/`ship_grader_iteration_count` for Step 4b) |
+| Reads (conditional) | `plan.md` `## Decision flags` (→ **Open Decision Flags** report section); `.devflow-run.json` (`until` field — stops before PR if `until: "ship"`, routes to `devflow.pr` if `until: "pr"`; `ship_grader_iterations`/`ship_grader_iteration_count` for Step 4b) |
 | Writes | `plan.md` — `**Status:** shipped` on gate pass |
 | Writes (conditional) | `.devflow-run.json` `ship_grader_iteration_count` — Step 4b, run mode only |
 | Dispatches | review agents per depth profile — `quick`: `code-reviewer`; `standard`: + `security-auditor`, `test-engineer`; `thorough`: + `accessibility-auditor`, `docs-reviewer` (parallel); Step 4b (run mode, Required-only) also re-dispatches `devflow.implement` then `devflow.beautify` before re-running the fan-out |
