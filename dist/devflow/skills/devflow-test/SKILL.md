@@ -129,7 +129,7 @@ If tests pass AND `verification.md` **Result** is not FAIL: set `plan.md` `**Sta
 Include actual command output. Do NOT report "all tests passed" without raw evidence.
 
 ```text
-✅ Tests complete: [type]/[NNN]-[feature-name]
+✅ Tests complete: [type]/[NNN]_[feature-name]
 
 ### Unit tests
 [N] passed · [N] failed · [N] skipped

@@ -16,7 +16,7 @@
 **Components:** Server Component default; `'use client'` only at leaf with interactivity
 **State:** Zustand for global client state; `useState` for local; URL params for filters/pagination
 **Forms:** React Hook Form + Zod; same schema reused in Server Action
-**Branches:** `feat/[NNN]-<name>`, `fix/[NNN]-<name>`
+**Branches:** `feat/[NNN]_<name>`, `fix/[NNN]_<name>`
 **Commits:** `<type>: <desc>` (`feat|fix|chore|docs|perf`)
 **Lint:** `pnpm lint`
 **Test:** `pnpm test -- --passWithNoTests --watchAll=false`

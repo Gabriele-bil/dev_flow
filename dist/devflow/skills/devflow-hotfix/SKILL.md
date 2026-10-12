@@ -40,7 +40,7 @@ Provides a streamlined, token-efficient pipeline for critical bugs, regressions,
    - `**Complexity:** quick`
    - `**Status:** ready`
    - File list with bottom-up dependency ordering (typically 1–3 files).
-5. Create and switch to git branch `fix/[NNN]-[name]`.
+5. Create and switch to git branch `fix/[NNN]_[name]`.
 6. Update `.devflow-state.json` to mark active feature and `plan_status: ready`.
 
 ### Step 2 - Implement the Fix
@@ -71,7 +71,7 @@ Provides a streamlined, token-efficient pipeline for critical bugs, regressions,
 ### Step 5 - Open Pull Request
 
 1. Commit changes with conventional commit prefix (`fix: [description]`).
-2. Push branch `fix/[NNN]-[name]` to remote.
+2. Push branch `fix/[NNN]_[name]` to remote.
 3. Open PR toward default branch (`main`) with hotfix summary and checklist.
 4. Set `plan.md` `**Status:** pr-opened` and `task.md` `**Status:** done`.
 

@@ -12,7 +12,7 @@
 **Naming:** feature folders `kebab-case`; main page files `page.ts`, `state.ts`, `service.ts`
 **Routing:** root routes in `src/app/app.routes.ts`; standalone-first components; lazy-load via `loadComponent`/`loadChildren`; guards/resolvers in `core/guards`/`core/resolvers`, functional only (`CanActivateFn`/`CanMatchFn`/`ResolveFn`); page-domain `*.routes.ts` colocated per feature
 **State:** Signal Store only (global + local); no NgRx actions/reducers/effects/selectors
-**Branches:** `feat/[NNN]-<name>`, `fix/[NNN]-<name>`
+**Branches:** `feat/[NNN]_<name>`, `fix/[NNN]_<name>`
 **Commits:** `<type>: <desc>` (`feat|fix|chore|docs|perf`)
 **Lint:** `pnpm run lint`
 **Test:** `pnpm run test -- --watch=false`

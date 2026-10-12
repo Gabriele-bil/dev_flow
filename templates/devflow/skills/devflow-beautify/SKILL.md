@@ -173,7 +173,7 @@ Set `plan.md` `**Status:** beautified`; refresh `.devflow-state.json` per `@devf
 Respond with:
 
 ```text
-✅ Beautify complete: feature/[NNN]-[feature-name]
+✅ Beautify complete: [type]/[NNN]_[feature-name]
 
 ### Files modified
 - `path/to/file.ext`

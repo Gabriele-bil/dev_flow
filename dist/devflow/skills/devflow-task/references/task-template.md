@@ -8,6 +8,7 @@ Used by `devflow.task` Step 9 — write `devflow/features/[NNN]_[feature-name]/t
 **ID:** TASK-[NNN]
 **Date:** [YYYY-MM-DD]
 **Status:** draft
+**Branch:** [type]/[number-of-task-is-present]_[name]
 **App:** [name] <!-- omit entire line when devflow/config.md has no ## Apps table (single-app repos) -->
 **ADRs:** [docs/adr/ADR-NNN-...md or "none"] <!-- optional reference to architectural decisions from devflow.discover -->
 
@@ -102,6 +103,7 @@ Format rules:
 - **Compression**: caveman-compress — drop articles/filler/hedging; keep technical and domain terms exact.
 - **Unknown values**: use `[NEEDS CLARIFICATION: <reason>]` inline; never guess.
 - **Status**: `draft` (initial), `clarified` (post `devflow.clarify`), `done` (pipeline complete).
+- **Branch**: set automatically by `devflow.task` following `[feat/fix/chore/doc/ecc...]/[number-of-task-is-present]_[name]` (e.g. `feat/002_cart-checkout` or `fix/login-crash`). Never asked to the user.
 - **App**: present only in monorepo repos (`devflow/config.md` has a `## Apps` table); value must match an App name in that table exactly. Never present in single-app repos.
 - **ADRs**: optional path(s) to ADRs from `docs/adr/` governing or constraining this feature, or "none".
 

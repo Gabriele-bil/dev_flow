@@ -38,7 +38,7 @@ Opt-in gated autonomy. Execute middle pipeline (implement → beautify → test)
 | Update `plan.md` status/`[done]`/deviations/flags, `.checkpoint.json`, `.devflow-state.json` | Route to `devflow.pr` |
 | Pick defensible default on ambiguity + log decision flag | Apply beautify **opinable** improvements (proposal-class changes) |
 | Stop on `escalation-ladder.md` Level 5 block | Proceed past ship Critical/Required findings |
-| Create feature branch per `devflow.implement` Step 3 | Install dependencies not in plan; delete files outside plan scope |
+| Switch to or create feature branch per `devflow.implement` Step 3 | Install dependencies not in plan; delete files outside plan scope |
 
 ## When NOT to Use
 

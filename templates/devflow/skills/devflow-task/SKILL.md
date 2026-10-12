@@ -89,21 +89,41 @@ Read **`refinement-hints.md`**, run pass:
 3. **Async lifecycle check:** verify loading indicators, double-submit protection, error recovery, and empty states.
 4. **BDD formulation check:** verify single `When` rule and intent over mechanics.
 
-### Step 6 - Propose feature name
+### Step 6 - Resolve feature name & branch automatically (NEVER ask user)
 
-Propose 3 `kebab-case` names:
+1. **Incremental number (`NNN`):**
+   - **Fast path:** Read `.devflow-state.json` in project root. If `next_feature_number` present, use 3-digit formatted string (e.g. `002`).
+   - **Fallback:** Scan `devflow/features/`, find highest prefix, use next 3-digit number. Start `001` if empty. Never reuse prefix.
+   - If feature numbering is not applicable/present in the repo, omit `[number-of-task-is-present]_`.
+2. **Feature name (`name`):**
+   - Automatically derive a 1-3 word `kebab-case` name from the user story, pain point, or goal (e.g. `cart-checkout`, `pet-notifications`).
+   - **CRITICAL:** Do NOT ask the user for the feature name or branch name. Never prompt via `AskQuestion` / `ask_question` or chat for naming — choose the most direct, descriptive name autonomously.
+3. **Change type (`type`):**
+   - Automatically infer the conventional commit type from the nature of the request:
+     - `feat`: new capability, user flow, or feature enhancement
+     - `fix`: bug fix or defect correction
+     - `chore`: maintenance, build, tooling, dependency update
+     - `doc`: documentation updates
+     - `perf`: performance optimization
+     - `refactor` / etc.
+4. **Branch convention:**
+   - Construct branch name using the standard convention:
+     `[feat/fix/chore/doc/ecc...]/[number-of-task-is-present]_[name]`
+   - If task number is present: `<type>/<NNN>_<name>` (e.g. `feat/002_cart-checkout`, `fix/001_login-crash`). Note the underscore `_` separating the task number and name.
+   - If no task number is present: `<type>/<name>`.
 
-- 1-3 words, feature-oriented
-- Consistent with `devflow/features/` names
+### Step 7 - Set and switch branch
 
-Ask via **`AskQuestion`** / **`ask_question`** with three options (mark option 1 as `(Recommended)`).
-
-**Run mode** (`.devflow-run.json` present): take first proposed name, note other two in `## Notes`.
-
-### Step 7 - Determine incremental number
-
-**Fast path:** Read `.devflow-state.json` in project root. If `next_feature_number` present, use it.
-**Fallback:** Read `devflow/features/`, find highest prefix, use next 3-digit number. Start `001` if empty. Never reuse prefix.
+1. Verify git working directory status:
+   - Check if current branch is clean or only has allowed DevFlow artifacts.
+2. Switch to / create branch:
+   - If git is already on the target branch `<type>/<NNN>_<name>`, proceed.
+   - Otherwise, create and switch to the new branch:
+     ```bash
+     git switch -c <type>/<NNN>_<name>
+     ```
+     (or fallback `git checkout -b <type>/<NNN>_<name>`). If the branch already exists locally, switch to it with `git switch <type>/<NNN>_<name>`.
+3. Keep resolved branch name for Step 8 (verification), Step 9 (`task.md`), and Step 11 (`notify`).
 
 ### Step 8 - Verification checklist (before write)
 
@@ -115,6 +135,7 @@ Ask via **`AskQuestion`** / **`ask_question`** with three options (mark option 1
 - [ ] **Alien test & No Ghost UI**: delivers complete, usable increment; zero placeholder buttons or unhandled elements
 - [ ] Strictly **product-only**: zero technical details (no class names, file paths, database schemas, or API endpoints)
 - [ ] **`NNN` prefix**: matches `next_feature_number` from `.devflow-state.json`
+- [ ] **Branch set**: branch created/switched without asking user, following `[feat/fix/chore/doc/ecc...]/[number-of-task-is-present]_[name]` convention
 - [ ] **In scope / Out of scope**: honest boundaries; non-goals prevent plan creep
 - [ ] **Assumptions & Risks**: structured bullets feed directly into `plan.md` risks table
 - [ ] **Referenced ADRs**: respected in scope and ACs if present
@@ -126,7 +147,7 @@ If any item fails, fix task content before writing file.
 
 ### Step 9 - Write task file
 
-Create `devflow/features/[NNN]_[feature-name]/task.md` using template + format rules in `references/task-template.md`. Write `**App:**` frontmatter field with Step 1 resolution when `config.md` has `## Apps`; include `**ADRs:**` if applicable; omit when absent. See **`examples.md`** for worked examples.
+Create `devflow/features/[NNN]_[feature-name]/task.md` using template + format rules in `references/task-template.md`. Write `**Branch:**` with the resolved branch name (`[type]/[number-of-task-is-present]_[feature-name]`), `**App:**` frontmatter field with Step 1 resolution when `config.md` has `## Apps`; include `**ADRs:**` if applicable; omit when absent. Update `.devflow-state.json` with active feature, feature_path, branch, task_status (`draft`), and next_step (`devflow.plan`). See **`examples.md`** for worked examples.
 
 ### Step 10 - Update docs/product.md feature status
 
@@ -140,12 +161,13 @@ If `docs/product.md` absent, skip and note in notify.
 
 ### Step 11 - Notify user
 
-Respond using template in `references/notify-template.md`.
+Respond using template in `references/notify-template.md` (includes feature path and active branch).
 
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
 | --- | --- |
+| Asking user for branch or feature name | Never ask: automatically infer type and kebab-case name, and set branch per `[type]/[number-of-task-is-present]_[name]` |
 | Technical details in task (classes, DB schemas, endpoints) | Product-only; technical decisions belong in `devflow.plan` |
 | Technical persona ("As a Frontend Developer", "As a Database") | Use real human role or external system actor |
 | Compound user story ("I want X and Y") | Split into separate use cases or tasks |
@@ -171,7 +193,8 @@ Respond using template in `references/notify-template.md`.
 
 | | |
 | --- | --- |
-| Reads | `devflow/config.md` (Apps table, monorepo only); `docs/product.md` (required); `constitution.md`, `registry.md` (as needed); `DESIGN.md` / `docs/design.md` (if present); `refinement-hints.md` (Step 5); `references/invest-criteria.md`, `references/story-splitting.md`, `references/bdd-acceptance-criteria.md` (Step 5); `@devflow/skills/devflow-clarify/references/interactive-interview.md` (Step 4 & 6); `examples.md` (guidance); `references/task-template.md`, `references/notify-template.md` |
+| Reads | `devflow/config.md` (Apps table, monorepo only); `docs/product.md` (required); `constitution.md`, `registry.md` (as needed); `DESIGN.md` / `docs/design.md` (if present); `refinement-hints.md` (Step 5); `references/invest-criteria.md`, `references/story-splitting.md`, `references/bdd-acceptance-criteria.md` (Step 5); `@devflow/skills/devflow-clarify/references/interactive-interview.md` (Step 4); `examples.md` (guidance); `references/task-template.md`, `references/notify-template.md` |
 | Reads (conditional) | `docs/adr/` (if present — active ADRs); `.devflow-run.json` (run-mode switch) |
-| Writes | `devflow/features/[NNN]_[feature-name]/task.md` |
+| Writes | `devflow/features/[NNN]_[feature-name]/task.md`, `.devflow-state.json` (branch, active_feature) |
+| Side effects | Creates and switches git branch `[feat/fix/chore/doc/ecc...]/[number-of-task-is-present]_[name]` |
 | Next step | `devflow.plan` → `plan.md` (full template in `devflow/skills/devflow-plan/SKILL.md`) |

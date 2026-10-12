@@ -51,7 +51,7 @@ Use `$BASE_BRANCH` in Step 5 and Step 6 below — never a hardcoded `main`.
 
 ## Input
 
-- Current feature branch `feat|fix|chore|doc|perf/[NNN]-[feature-name]`
+- Current feature branch `feat|fix|chore|doc|perf/[NNN]_[feature-name]`
 - `devflow/features/[NNN]_[feature-name]/task.md`
 - `devflow/features/[NNN]_[feature-name]/plan.md`
 
@@ -113,10 +113,10 @@ If either command fails, stop and fix the issue before continuing to Step 4.
 ## Step 4 - Push branch
 
 ```bash
-git push origin [type]/[NNN]-[feature-name]
+git push origin [type]/[NNN]_[feature-name]
 ```
 
-Where `[type]` is the same prefix used when the branch was created in `devflow.implement` (`feat`, `fix`, `chore`, `perf`, or `doc`).
+Where `[type]/[number-of-task-is-present]_[feature-name]` is the branch set in `devflow.task` (recorded in `task.md` `**Branch:**` and active git branch).
 
 ---
 
@@ -126,7 +126,7 @@ Use `gh` CLI to open the PR toward `$BASE_BRANCH` (resolved in Step 0). Wrap exe
 
 ```bash
 (
-  TEMP_IMG="/tmp/devflow-ui-preview-[NNN]-[feature-name].png"
+  TEMP_IMG="/tmp/devflow-ui-preview-[NNN]_[feature-name].png"
   trap 'rm -f "$TEMP_IMG"' EXIT INT TERM
 
   if [ -f "$TEMP_IMG" ]; then
@@ -180,7 +180,7 @@ layers touched, key abstractions, notable patterns used.]
 
 ## Visual Preview
 <!-- Included when UI changes exist -->
-![UI Preview](/tmp/devflow-ui-preview-[NNN]-[feature-name].png#UI Preview)
+![UI Preview](/tmp/devflow-ui-preview-[NNN]_[feature-name].png#UI Preview)
 
 ## Checklist
 [Use the checklist bullets from the adapter PR step file; add repo-wide items below if not already covered]
@@ -196,7 +196,7 @@ layers touched, key abstractions, notable patterns used.]
 After successful `gh pr create`: set `plan.md` `**Status:** pr-opened` and `task.md` `**Status:** done`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
 
 ```text
-✅ Pull request opened: [type]/[NNN]-[feature-name] -> $BASE_BRANCH
+✅ Pull request opened: [type]/[NNN]_[feature-name] -> $BASE_BRANCH
 
 Title: [PR title]
 Link: [PR URL returned by gh CLI]

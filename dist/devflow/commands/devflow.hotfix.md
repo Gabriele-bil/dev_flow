@@ -10,7 +10,7 @@ Use `@devflow/skills/devflow-hotfix/SKILL.md` and execute it exactly.
 **Anchors (do not skip):**
 
 - Scaffold compact `task.md` (problem statement, root cause, ACs) and `plan.md` (quick complexity, bottom-up order).
-- Create and switch to `fix/[NNN]-[name]` branch.
+- Create and switch to `fix/[NNN]_[name]` branch.
 - Implement the targeted fix and run adapter linter.
 - Write regression test and verify all tests pass.
 - Run single-agent ship review (`code-reviewer.md`) for quick gate check.

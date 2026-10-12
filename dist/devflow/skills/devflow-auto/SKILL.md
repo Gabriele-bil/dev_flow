@@ -40,7 +40,7 @@ Once the command is executed, it progresses automatically through the entire flo
 | Run adapter format/analyze/codegen/test commands | Proceed past `devflow.analyze` **Critical** findings |
 | Update `task.md`/`plan.md` Status, `[done]` markers, `## Notes`, `## Decision flags`, `.checkpoint.json`, `.devflow-state.json` | Proceed past `devflow.ship` **Critical** blockers |
 | Pick defensible default on ambiguity + log decision flag | Exceed `escalation-ladder.md` Level 5 block (failing tests after retries) |
-| Create feature branch per `devflow.implement` Step 3 | Guess missing **App** on a monorepo feature |
+| Set feature branch per `devflow-task` (`[type]/[NNN]_[name]`) | Guess missing **App** on a monorepo feature |
 | Apply `beautify` certain improvements; opinable proposals logged to decision flags | Ignore `devflow-task` Step 3 brainstorm-scale routing (no concrete feature) |
 | Run full test suite & goal-backward verification | Edit `devflow/config.md`, CI/config files (`pre-config-protect` hook enforces) |
 | Run `ship` multi-agent review fan-out + autonomous grader loop | |
@@ -109,7 +109,7 @@ Execute each step skill in order through to completion:
    - Any **Critical** finding (fundamental contradiction or unresolvable architectural clash) → stop chain (major discrepancy).
    - Any **Required** finding or **Nit** (minor discrepancy or coverage gap) → do NOT stop; apply defensible plan adjustment or log as an autonomous decision/waiver in `plan.md ## Decision flags` to be documented in the PR; proceed to `implement`.
 4. `@devflow/skills/devflow-implement/SKILL.md` — full workflow:
-   - Create feature branch.
+   - Switch to/verify feature branch set by devflow-task ([type]/[NNN]_[name]).
    - Implement vertical slices.
    - Ambiguities: defensible default + `plan.md ## Decision flags`.
    - If Level 5 escalation block hit (unresolvable compile/build failure) → stop run (major discrepancy).
@@ -165,7 +165,7 @@ When PR is opened successfully:
 🤖 devflow.auto complete: idea → PR opened!
 
 Feature:  [NNN]_[feature-name]  ·  Status: pr-opened
-Branch:   [type]/[NNN]-[feature-name]
+Branch:   [type]/[NNN]_[feature-name]
 PR Link:  [PR URL returned by gh CLI]
 Steps:    task [✅] · plan [✅] · analyze [✅] · implement [✅] · beautify [✅] · test [✅] · ship [✅] · pr [✅]
 Files:    [N] created · [M] modified

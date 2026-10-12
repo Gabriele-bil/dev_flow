@@ -12,7 +12,7 @@ Study structure, INVEST rigor, BDD Gherkin formatting, and token economy.
 
 **User:** “Owners. Group by pet and don’t spam when two co-owners edit the same thing. Success is fewer taps to see what matters.”
 
-**Agent:** Run quick stress-test from `refinement-hints.md` (INVEST check, isolate read feed from actions, async dedup). Propose three `kebab-case` names via `AskQuestion` (`notification-grouping`, `pet-notification-feed`, `smart-notification-inbox`). User picks one. Allocate next `NNN_`, run verification checklist, write `task.md`.
+**Agent:** Run quick stress-test from `refinement-hints.md` (INVEST check, isolate read feed from actions, async dedup). Automatically determine commit type (`feat`), feature name (`pet-notification-grouping`), allocate next `NNN_` (`001`), and set/switch git branch to `feat/001_pet-notification-grouping` without prompting the user. Run verification checklist, write `task.md`.
 
 **Excerpt of resulting `task.md`:**
 
@@ -22,6 +22,7 @@ Study structure, INVEST rigor, BDD Gherkin formatting, and token economy.
 **ID:** TASK-001
 **Date:** 2026-10-06
 **Status:** draft
+**Branch:** feat/001_pet-notification-grouping
 
 ---
 
