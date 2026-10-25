@@ -22,7 +22,7 @@ Apply these Flutter-specific accessibility checks in addition to core accessibil
 
 - Custom interactive widgets have `Semantics` wrappers with `label`, `button`, `onTap` as appropriate
 - Image-only or icon-only buttons include `Semantics(label: ...)` or `tooltip`
-- Color contrast: use semantic theme tokens (never hardcode colors that might fail WCAG AA)
+- Color contrast: use semantic theme tokens (never hardcode colors failing WCAG AA)
 - `ExcludeSemantics` used only when intentional (decorative content)
 - `FocusNode` management correct for keyboard navigation in custom overlays and dialogs
 

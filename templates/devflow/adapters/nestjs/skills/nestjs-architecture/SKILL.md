@@ -45,7 +45,7 @@ Never: `src/controllers/`, `src/services/`, `src/entities/` at the top level —
 
 Modules are singletons. Providing the same service in two modules creates **two separate instances** with diverging state — memory waste, sync bugs. Always: provide in one dedicated module, `export`, import that module elsewhere. Reserve `@Global()` for true cross-cutting concerns (config, logging, DB connection) — overuse hides dependencies and hurts testability.
 
-In NestJS 11+, dynamic modules use object reference comparison instead of hash generation. When sharing a configured dynamic module across modules, assign it to a constant (`export const configuredModule = FeatureModule.register(...)`) and import that variable rather than calling `register(...)` repeatedly.
+In NestJS 11+, dynamic modules use object reference comparison instead of hash generation. When sharing a configured dynamic module across modules, assign it to a constant (`export const configuredModule = FeatureModule.register(...)`) and import that variable instead of calling `register(...)` repeatedly.
 
 ## 3) Avoid Circular Dependencies (CRITICAL)
 

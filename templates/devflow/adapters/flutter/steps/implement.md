@@ -42,7 +42,7 @@ Retry failed steps up to **3** attempts each; then stop and report full output.
 - **Localization:** slang only for user-visible strings.  
 - **UI stack:** follow `flutter-theme`; async UIs need loading / error / empty with slang copy.  
 - **State:** prefer hooks + Riverpod per `flutter-riverpod`; contract-first repositories per `flutter-models` / `flutter-supabase`.  
-- **Shared components first:** before building a new widget, check `lib/shared/` (or the project-equivalent shared folder) for an existing component that covers the use case. Extend or parameterise a shared widget rather than duplicating it. Create a new shared widget when the same visual pattern appears in more than one feature.
+- **Shared components first:** before building a new widget, check `lib/shared/` (or the project-equivalent shared folder) for an existing component that covers the use case. Extend or parameterise a shared widget instead of duplicating it. Create a new shared widget when the same visual pattern appears in more than one feature.
 
 ### Barrel files (mandatory)
 

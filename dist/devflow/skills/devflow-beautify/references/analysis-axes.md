@@ -4,7 +4,7 @@ Full per-axis checklist for `devflow.beautify` Step 3. Stack-agnostic defaults; 
 
 ## Correctness
 
-- ACs from `task.md` met (not just `plan.md` behavior)
+- ACs from `task.md` met (not only `plan.md` behavior)
 - Edge cases and error paths handled (null, empty, loading/error UI, async failure)
 - State updates consistent (no races or stale UI assumptions)
 
@@ -14,9 +14,10 @@ Full per-axis checklist for `devflow.beautify` Step 3. Stack-agnostic defaults; 
 - No unnecessary nesting, long methods, or nested ternaries (prefer early return)
 - Domain/data logic not in presentation components
 - **Preserve behavior:** simplifications must not change outputs, errors, side effects, or ordering. If unsure, treat as opinionated and propose first
-- **Chesterton's fence:** before removing or inlining code, understand why it exists (performance, platform constraint, history). If unclear, propose rather than delete
-- Duplication: repeated blocks that should share a helper per `registry.md` patterns (optional extraction if it touches public API — propose first)
-- Abstractions should earn their complexity; avoid speculative generalization
+- **Chesterton's fence:** before removing or inlining code, understand why it exists (performance, platform constraint, history). If unclear, propose instead of deleting
+- Duplication: repeated blocks share a helper per `registry.md` patterns (optional extraction if it touches public API — propose first)
+- Abstractions earn their complexity; avoid speculative generalization
+- **User-facing copy & docstrings:** clear, direct, active voice; zero AI-slop boosters (`seamless`, `robust`, `comprehensive`) or restating headings in opening sentences
 
 ## Architecture compliance
 
@@ -46,7 +47,7 @@ Default beautify relies on the checks above. **Profile only when** the plan call
 
 - Use profiling tools defined by the active adapter before large refactors
 - Investigate user-visible latency/jank by checking render/update scope before micro-optimizations
-- Heavy CPU work should not run on critical UI/request paths when adapter guidance suggests background/off-main execution
+- Move heavy CPU work off critical UI/request paths when adapter guidance specifies background/off-main execution
 
 Do not add blanket memoization or rendering boundaries everywhere - overuse hurts as much as underuse.
 

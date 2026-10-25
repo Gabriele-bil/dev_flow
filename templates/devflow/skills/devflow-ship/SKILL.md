@@ -143,7 +143,7 @@ Applies only when `.devflow-run.json` is present and Step 4 verdict is **Require
 4. After `devflow.implement` returns: re-run `devflow.beautify`, then re-run the full fan-out from Step 1 at the **same depth profile** — never shrink it on a retry.
 5. Route the new Ship Gate Report back through Step 4. A Critical finding on this or any later iteration → immediate hard stop, independent of remaining iteration budget.
 
-Each iteration re-runs the full fan-out fresh (independent reviews), not a recheck of fixed lines only — a fix can introduce new Required or Critical findings elsewhere.
+Each iteration re-runs the full fan-out fresh (independent reviews), not a recheck of fixed lines only — fixes introduce new Required or Critical findings elsewhere when unchecked.
 
 ---
 
