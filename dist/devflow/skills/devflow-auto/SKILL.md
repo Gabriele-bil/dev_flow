@@ -21,7 +21,7 @@ Run `/devflow.auto <idea> [--app <name>]`.
 
 End-to-end autonomous delivery from raw feature idea through an opened pull request. Executes `task → plan → analyze → implement → beautify → test → ship → pr` in one continuous, unattended session.
 
-Once the command is executed, it progresses automatically through the entire flow. It halts ONLY when encountering major discrepancies (Constitution Gate Critical violations, unresolvable Critical analyze contradictions, Level 5 test/build failures, or Critical ship blockers). Any minor discrepancies, ambiguities, defensible assumptions, or non-critical review findings do NOT pause the pipeline: they are resolved via defensible defaults, logged in `plan.md ## Decision flags`, and surfaced prominently in the Pull Request description (`## Autonomous Decisions & Discrepancies`) for human review.
+Once invoked, progresses automatically from `task` to `pr`. Halts ONLY on major discrepancies (Constitution Gate Critical violations, unresolvable Critical analyze contradictions, Level 5 test/build failures, or Critical ship blockers). Minor discrepancies, ambiguities, defensible assumptions, and non-critical review findings do NOT pause the pipeline: resolve via defensible defaults, log in `plan.md ## Decision flags`, and surface in the PR body (`## Autonomous Decisions & Discrepancies`).
 
 ## Core Principles
 
@@ -162,7 +162,7 @@ Delete `.devflow-run.json` on **every** exit path (complete, blocker, handoff).
 
 When PR is opened successfully:
 ```text
-🤖 devflow.auto complete: idea → PR opened!
+🤖 devflow.auto complete: idea → PR opened
 
 Feature:  [NNN]_[feature-name]  ·  Status: pr-opened
 Branch:   [type]/[NNN]_[feature-name]
@@ -171,8 +171,6 @@ Steps:    task [✅] · plan [✅] · analyze [✅] · implement [✅] · beauti
 Files:    [N] created · [M] modified
 Tests:    [N] passed · Verification: PASS [n]/[n] ACs
 Discrepancies & Flags: [N] documented in PR body (see "Autonomous Decisions & Discrepancies")
-
-Pipeline finished in total autonomy. Review the PR link above!
 ```
 
 When stopped at a major discrepancy:
@@ -190,11 +188,11 @@ Action required: Resolve the critical discrepancy above, then continue with devf
 
 | Thought | Reality |
 | --- | --- |
-| "Idea has ambiguity, I should pause and ask the user" | devflow.auto operates in total autonomy — pick defensible default, log to notes/PR |
-| "I should stop before beautify or PR for safety" | devflow.auto delivers end-to-end all the way to PR; human reviews everything on GitHub |
-| "Analyze reported a Required finding, I should stop" | Only Critical findings halt devflow.auto; Required findings are resolved or logged to PR |
-| "Ship review had minor notes, I should ask before PR" | Minor notes and exceptions are documented in the PR description, not reasons to stop |
-| "Constitution Critical violation, but I should auto-proceed" | Critical violations are major discrepancies that always hard-stop |
+| "Idea has ambiguity — pause and ask user" | `devflow.auto` picks a defensible default and logs it to notes/PR |
+| "Stop before beautify or PR for safety" | `devflow.auto` delivers end-to-end through PR; human reviews on GitHub |
+| "Analyze reported a Required finding — stop" | Only Critical findings halt `devflow.auto`; Required findings are resolved or logged to PR |
+| "Ship review had minor notes — ask before PR" | Minor notes and exceptions are documented in the PR description, not reasons to stop |
+| "Constitution Critical violation — auto-proceed anyway" | Critical violations are major discrepancies that always hard-stop |
 
 ## Anti-Patterns
 

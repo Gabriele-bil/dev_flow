@@ -122,7 +122,7 @@ Each file must:
 
 - Follow architecture and naming conventions from `constitution.md`
 - Reuse existing patterns from `registry.md` where applicable
-- **Shared components first (non-negotiable):** the reuse pre-check in Step 1 identified candidates — honour those decisions now. Before writing **any** widget, component, or service class: confirm the shared folder and `registry.md` were checked and no existing element covers the need. Extend or parameterise rather than duplicate. If the element being built is generic enough for other features, write it to the shared folder directly and propose a `registry.md` entry in Step 7.
+- **Shared components first (non-negotiable):** honour Step 1 reuse decisions. Confirm shared folder and `registry.md` were checked before writing any widget, component, or service class; extend or parameterise instead of duplicating. Write new generic elements directly to the shared folder and propose a `registry.md` entry in Step 7.
 - Use relative imports pointing to the nearest barrel file (or the import style mandated by `constitution.md`)
 - Be complete; do not leave placeholder comments such as `// TODO` or `// implement this`
 - **Trace to plan (scope fidelity):** every file and function traces to a **File List** or **Traceability** entry — build only what the acceptance criteria require. Urge to add a "while I'm here" improvement → log it via `devflow.learn`; do not write it

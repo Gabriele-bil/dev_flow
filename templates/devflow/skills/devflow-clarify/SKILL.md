@@ -22,7 +22,7 @@ Optional interactive session between `devflow.task` and `devflow.plan`. Validate
 
 - `task.md` Status is `done` — clarification has no effect on a completed task
 - `task.md` has no `[NEEDS CLARIFICATION: ...]` markers and all Key assumptions are low-risk — proceed directly to `devflow.plan`
-- The user wants to change the feature scope rather than resolve ambiguity — edit `task.md` directly or re-run `devflow.task`
+- The user wants to change the feature scope instead of resolving ambiguity — edit `task.md` directly or re-run `devflow.task`
 - `devflow.plan` is already written — clarify before planning, not after; patch `plan.md` directly for post-plan changes
 
 ## Recommended triggers
@@ -60,8 +60,8 @@ Follow structured interview standards in `@devflow/skills/devflow-clarify/refere
 For each question in the prioritized queue, one at a time:
 
 1. Formulate structured elicitation:
-   - State the specific ambiguity or marker being resolved
-   - Provide 2–4 distinct, mutually exclusive options phrased as direct user choices
+   - State the specific ambiguity, trigger, or failure boundary being resolved
+   - Provide 2–4 distinct, mutually exclusive options phrased as direct user choices (grounded in concrete behavior, never abstract buzzwords)
    - Mark the first choice with `(Recommended)` and a 1-sentence technical rationale
    - Do not include an "Other" option (handled automatically by host tool write-in)
    - Invoke **`AskQuestion`** (Claude Code) or **`ask_question`** (Antigravity); fallback to formatted markdown choices in chat
@@ -96,7 +96,7 @@ For each question in the prioritized queue, one at a time:
 After the Q&A loop completes:
 
 1. Scan `task.md` for remaining `[NEEDS CLARIFICATION: ...]` markers.
-   - Resolved markers: should already be removed.
+   - Resolved markers: already removed inline during Step 2.
    - Skipped markers: leave in place — they represent accepted risk.
 2. Update `task.md` header: set `**Status:** clarified`.
 3. Output a **Clarification Summary** in the response:

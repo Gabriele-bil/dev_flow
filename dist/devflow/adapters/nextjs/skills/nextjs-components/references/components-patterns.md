@@ -23,9 +23,9 @@ export default async function Page() {
 **Wrong — boundary promoted too high:**
 
 ```tsx
-// ❌ Non fare così
+// ❌ Avoid
 'use client'
-export default function Page() { /* intera page diventa client */ }
+export default function Page() { /* entire page becomes client-rendered */ }
 ```
 
 ## Passing Data Server → Client
@@ -73,17 +73,17 @@ export default function RootLayout({ children }) {
 
 ## Next.js Hooks in Client Components
 
-### Suspense boundary — quale hook lo richiede
+### Suspense boundary requirements by hook
 
-Senza `<Suspense>` dove richiesto, Next.js degrada **tutta la pagina** a CSR bailout:
+Without `<Suspense>` where required, Next.js degrades the **entire page** to a CSR bailout:
 
 ```tsx
-// ❌ — CSR bailout: l'intera pagina diventa client-rendered
+// ❌ — CSR bailout: entire page becomes client-rendered
 export default function Page() {
-  return <SearchBar /> // contiene useSearchParams
+  return <SearchBar /> // uses useSearchParams
 }
 
-// ✅ — solo SearchBar è client-rendered, il resto rimane server
+// ✅ — only SearchBar is client-rendered; rest stays server-rendered
 import { Suspense } from 'react'
 
 export default function Page() {
@@ -95,7 +95,7 @@ export default function Page() {
 }
 ```
 
-Regola: isola i componenti con `useSearchParams` in foglie separate e avvolgili con `<Suspense>`. Per `usePathname` in route dinamiche, stessa cosa.
+Rule: isolate components using `useSearchParams` into leaf components and wrap them in `<Suspense>`. Apply the same pattern for `usePathname` inside dynamic routes.
 
 ## Optimistic Updates
 
@@ -187,21 +187,21 @@ export function EditUserForm({ initialName }: { initialName: string }) {
 }
 ```
 
-## RSC Boundaries — Errori comuni Server→Client
+## RSC Boundaries — Common Server→Client Errors
 
-### 1. Client Component async — vietato
+### 1. Async Client Component — forbidden
 
-Solo i Server Component possono essere `async`. Un Client Component async è un errore silenzioso:
+Only Server Components can be `async`. An async Client Component fails at runtime or behaves unpredictably:
 
 ```tsx
-// ❌ — async client component: invalido
+// ❌ — invalid async Client Component
 'use client'
 export default async function UserProfile() {
-  const user = await getUser() // non funziona in client component
+  const user = await getUser() // unsupported in Client Component
   return <div>{user.name}</div>
 }
 
-// ✅ — fetch nel Server Component genitore, passa come prop
+// ✅ — fetch in parent Server Component, pass via props
 // page.tsx (server)
 export default async function Page() {
   const user = await getUser()
@@ -214,22 +214,22 @@ export function UserProfile({ user }: { user: User }) {
 }
 ```
 
-### 2. Props non-serializzabili da Server → Client
+### 2. Non-serializable props from Server → Client
 
-Props che attraversano il confine Server→Client devono essere JSON-serializzabili:
+Props crossing the Server→Client boundary must be JSON-serializable:
 
-| Tipo | Passa? | Fix |
+| Type | Supported? | Fix |
 | --- | --- | --- |
 | `string`, `number`, `boolean` | ✅ | — |
-| Oggetto/array plain | ✅ | — |
+| Plain object/array | ✅ | — |
 | Server Action (`'use server'`) | ✅ | — |
-| `Date` | ⚠️ silenzioso | `.toISOString()` → `new Date(str)` nel client |
+| `Date` | ⚠️ silent string | `.toISOString()` → `new Date(str)` in client |
 | `Map`, `Set` | ❌ | `Object.fromEntries(map)` / `Array.from(set)` |
-| Istanza di classe | ❌ | Passa oggetto plain `{ id, name }` |
-| Funzione (non Server Action) | ❌ | Definisci nel client component |
+| Class instance | ❌ | Pass plain object `{ id, name }` |
+| Function (not Server Action) | ❌ | Define inside Client Component |
 
 ```tsx
-// ❌ — Date object: diventa stringa silenziosamente, poi crasha
+// ❌ — Date object: silently serialized as string, crashes on Date methods
 // page.tsx (server)
 return <PostCard createdAt={post.createdAt} /> // Date object
 
@@ -238,7 +238,7 @@ export function PostCard({ createdAt }: { createdAt: Date }) {
   return <span>{createdAt.getFullYear()}</span> // Runtime error!
 }
 
-// ✅ — serializza sul server
+// ✅ — serialize on server
 // page.tsx
 return <PostCard createdAt={post.createdAt.toISOString()} />
 // post-card.tsx
@@ -248,11 +248,11 @@ export function PostCard({ createdAt }: { createdAt: string }) {
 ```
 
 ```tsx
-// ❌ — funzione passata come prop (non Server Action)
+// ❌ — function passed as prop (not a Server Action)
 const handleClick = () => console.log('clicked')
 return <ClientButton onClick={handleClick} />
 
-// ✅ — definisci nel client component
+// ✅ — define handler inside Client Component
 'use client'
 export function ClientButton() {
   const handleClick = () => console.log('clicked')
@@ -262,18 +262,18 @@ export function ClientButton() {
 
 ## Hydration Errors
 
-Causati da mismatch HTML server vs client. Cause comuni e fix:
+Caused by server vs client HTML mismatch. Common causes and fixes:
 
-| Causa | Fix |
+| Cause | Fix |
 | --- | --- |
-| `Date.now()` / `Math.random()` nel render | Sposta in `useEffect` o usa stato inizializzato client-side |
-| `window` / `localStorage` nel render | `if (typeof window !== 'undefined')` oppure `useEffect` |
-| HTML non valido: `<div>` dentro `<p>`, `<p>` annidati | Correggi struttura HTML |
-| Estensioni browser che modificano il DOM | `suppressHydrationWarning` su `<html>` |
-| Theme (light/dark) applicato lato server | `suppressHydrationWarning` su `<html lang="en">` nel root layout |
+| `Date.now()` / `Math.random()` during render | Move to `useEffect` or client-initialized state |
+| `window` / `localStorage` during render | Check `typeof window !== 'undefined'` or move to `useEffect` |
+| Invalid HTML nesting (`<div>` inside `<p>`, nested `<p>`) | Fix HTML structure |
+| Browser extensions mutating DOM | Add `suppressHydrationWarning` on `<html>` |
+| Theme (light/dark) class applied on server | Add `suppressHydrationWarning` on `<html lang="en">` in root layout |
 
 ```tsx
-// Fix per date dinamiche — non usare nel render direttamente
+// Fix for dynamic dates — avoid calling Date directly in initial render
 'use client'
 import { useEffect, useState } from 'react'
 
@@ -286,24 +286,24 @@ function Timestamp() {
 }
 ```
 
-### IDs unici — `useId`
+### Unique IDs — `useId`
 
 ```tsx
-// ❌ — Math.random() diverso tra server e client
+// ❌ — Math.random() differs between server and client
 <input id={Math.random().toString()} />
 
-// ✅ — useId (React 18+): stabile server/client, sicuro per SSR
+// ✅ — useId (React 18+): deterministic across server/client, SSR-safe
 import { useId } from 'react'
 
 function Field() {
   const id = useId()
   return (
     <>
-      <label htmlFor={id}>Nome</label>
+      <label htmlFor={id}>Name</label>
       <input id={id} />
     </>
   )
 }
 ```
 
-Debug: l'overlay di Next.js mostra l'elemento HTML che ha causato il mismatch. Cerca "Expected server HTML to contain a matching...".
+Debug: Next.js error overlay shows the exact HTML element causing the mismatch. Look for "Expected server HTML to contain a matching...".

@@ -6,7 +6,7 @@ argument-hint: "[bug-description-or-test-path]"
 
 # Skill: devflow.backprop
 
-Spec backpropagation. A bug that escaped the pipeline means the spec was wrong, not just the code. Fix the spec, add a regression test, log the gap category — the next feature must not repeat it.
+Spec backpropagation. A bug that escaped the pipeline means the spec was wrong, not only the code. Fix the spec, add a regression test, log the gap category — the next feature must not repeat it.
 
 ## Purpose
 
@@ -104,7 +104,7 @@ Instinct:   [id] logged ([N] total in family[; clarify question proposed])
 | Rewriting task.md Summary/scope during backprop | Touch only AC, subtask, Traceability, Notes — scope changes go through devflow.task |
 | Classifying every gap as "missing requirement" | Check existing subtasks first; most gaps are incomplete criteria |
 | Regression test asserting the buggy behavior | Test asserts the tightened AC, not current output |
-| Skipping the instinct log | Step 6 is the loop-closer — without it, backprop is just a bugfix |
+| Skipping the instinct log | Step 6 is the loop-closer — without it, backprop is a plain bugfix |
 | Fixing unrelated code "while tracing" | Trace is read-only until Step 4 approval |
 
 ## I/O Reference

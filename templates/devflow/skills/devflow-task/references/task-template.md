@@ -93,7 +93,8 @@ Used by `devflow.task` Step 9 — write `devflow/features/[NNN]_[feature-name]/t
 Format rules:
 
 - **Product-only**: strictly functional and behavioral perspective; zero implementation detail (no class names, file paths, database schemas, or internal API routes).
-- **Goal & Value**: concise problem context and clear, outcome-oriented objective.
+- **Goal & Value**: concise problem context and falsifiable outcome; no empty emphasis (`robust`, `seamless`, `comprehensive`) without a concrete mechanism.
+- **Source fidelity**: never invent metrics, SLAs, personas, or domain rules not grounded in user input or `docs/product.md`. Keep model-inferred defaults visibly separated in `## Assumptions & Risks`.
 - **User Story**: strictly Connextra format. Real persona (never tech role); intent-based action (no compound conjunctions); true value (no tautology).
 - **Use Cases**: at least 1 Happy Path (`UC-1`) and 1-2 Alternative/Error/Edge Case scenarios (`UC-2`, `UC-3`). Isolate Read/View from Action/Write.
 - **Acceptance criteria**: strict BDD Gherkin (`GIVEN ... WHEN ... THEN ...`), exactly one `When` per scenario. Mapped directly to Use Cases (e.g. `AC-1 (UC-1)`). Observable, falsifiable, binary pass/fail. Explicit async coverage (loading, disabled controls to prevent double submit, error recovery).

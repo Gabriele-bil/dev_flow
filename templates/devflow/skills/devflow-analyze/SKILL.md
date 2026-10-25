@@ -71,8 +71,9 @@ For each use case / subtask in `task.md`:
 
 For each acceptance criterion in `task.md`:
 
-- Flag if it uses untestable language: "works correctly", "looks good", "behaves as expected", "is user-friendly", "performs well", "is fast", "is clean", "is easy to use".
-- Flag if it describes internal implementation state rather than externally observable behavior (e.g. "the class exposes a method…", "writes to table X", "returns 401").
+- Flag if it uses untestable language or *importance without mechanism*: "works correctly", "looks good", "behaves as expected", "is user-friendly", "performs well", "is fast", "is clean", "is easy to use", "is robust", "is seamless", "is comprehensive", "handles edge cases".
+- Flag if it relies on *specific-looking vagueness* (ungrounded claims without a concrete trigger, actor, or threshold).
+- Flag if it describes internal implementation state instead of externally observable behavior (e.g. "the class exposes a method…", "writes to table X", "returns 401").
 - Flag if scenario bundles multiple actions (`When ... And ...` chained triggers) — must follow the single `When` rule.
 - Severity: **Required** — untestable or compound AC blocks `devflow.test` from writing meaningful assertions.
 - Suggested format: BDD Gherkin phrasing (`GIVEN [context] WHEN [single action] THEN [observable outcome]`) per `devflow-task/references/bdd-acceptance-criteria.md`, or EARS phrasing (`WHEN [trigger] THE SYSTEM SHALL [response]`).
@@ -85,9 +86,9 @@ For each acceptance criterion in `task.md`:
 
 Build a term inventory from both documents. For each conceptual entity (feature name, actor, module, entity, field name), check whether multiple synonyms appear across the two documents.
 
-Flag pairs such as "user profile" / "profile page" / "account page" when they appear to refer to the same thing.
+Flag pairs such as "user profile" / "profile page" / "account page" when they refer to the same concept.
 
-- Severity: **Nit** for minor style divergence; **Required** when divergence crosses a domain boundary (e.g. the same database entity is named differently in Summary vs Architecture decisions).
+- Severity: **Nit** for minor style divergence; **Required** when divergence crosses a domain boundary (e.g. the same database entity is named differently across `task.md` and `plan.md` Architecture decisions).
 
 ---
 
@@ -100,7 +101,7 @@ For each entry in `plan.md` File List:
 - Extract the directory segment of the path.
 - Check it against the layer hierarchy and naming conventions declared in `constitution.md`.
 - Flag paths that place a file in a layer that violates declared ordering or naming conventions.
-- Severity: **Critical** — layer violations will be flagged by `devflow.beautify` and may cause compile or lint failures.
+- Severity: **Critical** — layer violations are flagged by `devflow.beautify` and cause compile or lint failures.
 
 ---
 

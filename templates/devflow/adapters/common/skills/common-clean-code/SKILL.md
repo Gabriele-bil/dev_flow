@@ -118,9 +118,9 @@ Stop and rethink when:
 - Method longer than 10 lines
 - More than one level of indentation
 - Using `else` when early return works
-- Hardcoded values that should be constants
+- Hardcoded values that belong in constants
 - Abstraction added before the third duplication
-- Feature added "just in case"
+- Speculative code added without a current requirement
 - Depending on concrete implementations over abstractions
 - God class that orchestrates everything
 

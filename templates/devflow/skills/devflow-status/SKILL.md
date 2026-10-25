@@ -11,7 +11,7 @@ Pipeline dashboard. Shows current state without advancing the pipeline. `--json`
 
 ## Purpose
 
-Emit compact status dashboard. Answers "dove sono nel pipeline?" — no step execution, no code changes.
+Emit compact status dashboard. Answers "where am I in the pipeline?" — no step execution, no code changes.
 
 ## Core Principles
 

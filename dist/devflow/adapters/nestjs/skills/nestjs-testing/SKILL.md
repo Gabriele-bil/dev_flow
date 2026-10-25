@@ -23,7 +23,7 @@ Full code examples: `references/testing-patterns.md`.
 
 ## 1) Use TestingModule for Unit Tests (HIGH)
 
-`Test.createTestingModule({ providers: [ServiceUnderTest, { provide: Dependency, useValue: mockObject }] }).compile()` — never `new UsersService(new UserRepository())` (bypasses DI, may hit a real DB). Mock every constructor dependency explicitly with `jest.fn()` per method used. `module.get<T>(Token)` retrieves both the unit under test and its mocks for assertion. Guards/interceptors get the same treatment — instantiate via `TestingModule`, not `new RolesGuard()`, so `Reflector` and other DI'd collaborators are real or properly mocked.
+`Test.createTestingModule({ providers: [ServiceUnderTest, { provide: Dependency, useValue: mockObject }] }).compile()` — never `new UsersService(new UserRepository())` (bypasses DI, can hit a real DB). Mock every constructor dependency explicitly with `jest.fn()` per method used. `module.get<T>(Token)` retrieves both the unit under test and its mocks for assertion. Guards/interceptors get the same treatment — instantiate via `TestingModule`, not `new RolesGuard()`, so `Reflector` and other DI'd collaborators are real or properly mocked.
 
 ## 2) Use Supertest for E2E Testing (HIGH)
 
@@ -31,7 +31,7 @@ Full code examples: `references/testing-patterns.md`.
 
 ## 3) Mock External Services (HIGH)
 
-Never call a real Stripe/HTTP/queue client or real database in a unit test — slow, costs money, flaky, non-deterministic. Mock at the injection boundary: `{ provide: HttpService, useValue: { get: jest.fn(), post: jest.fn() } }`, `{ provide: getRepositoryToken(User), useValue: mockRepo }`. Cover error paths explicitly (`httpService.get.mockReturnValue(throwError(() => new Error('ETIMEDOUT')))`), not just the happy path. For complex third-party SDKs, write one shared mock factory (`createMockStripe()`) reused across test files instead of ad hoc partial mocks that silently miss methods. Mock time (`jest.useFakeTimers()` / `jest.setSystemTime()`) for expiry/scheduling logic instead of real `setTimeout` waits.
+Never call a real Stripe/HTTP/queue client or real database in a unit test — slow, costs money, flaky, non-deterministic. Mock at the injection boundary: `{ provide: HttpService, useValue: { get: jest.fn(), post: jest.fn() } }`, `{ provide: getRepositoryToken(User), useValue: mockRepo }`. Cover error paths explicitly (`httpService.get.mockReturnValue(throwError(() => new Error('ETIMEDOUT')))`), not only the happy path. For complex third-party SDKs, write one shared mock factory (`createMockStripe()`) reused across test files instead of ad hoc partial mocks that silently miss methods. Mock time (`jest.useFakeTimers()` / `jest.setSystemTime()`) for expiry/scheduling logic instead of real `setTimeout` waits.
 
 ## Testing Checklist
 
@@ -40,7 +40,7 @@ Never call a real Stripe/HTTP/queue client or real database in a unit test — s
 - [ ] Controllers have a matching `*.e2e-spec.ts` using Supertest against a booted app
 - [ ] E2E test applies the same global pipes/filters/interceptors as `main.ts`
 - [ ] No real external service/DB/SDK call in a unit test
-- [ ] Error/edge-case paths (timeout, 4xx, empty result) covered, not just happy path
+- [ ] Error/edge-case paths (timeout, 4xx, empty result) covered, not only happy path
 - [ ] `app.close()` / mock cleanup (`jest.clearAllMocks()`) in `afterEach`/`afterAll`
 
 ## I/O Reference

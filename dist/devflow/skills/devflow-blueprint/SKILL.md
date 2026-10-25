@@ -40,7 +40,7 @@ Transform a large objective into a multi-PR blueprint. Output: dependency graph,
 
 Before proceeding, verify:
 
-- [ ] Objective is concrete enough to decompose into steps (not just "improve performance")
+- [ ] Objective is concrete enough to decompose into steps (not vague like "improve performance")
 - [ ] `constitution.md` and `docs/product.md` are readable (or at least one of them)
 
 If objective is too vague → stop, ask one clarifying question, wait for answer.
@@ -71,7 +71,7 @@ Rules:
 - Minimum granularity: one logical unit of work (not one file)
 - Maximum granularity: one PR reviewable in < 2 hours
 - Infrastructure/contracts steps must precede consumers (never parallelizable)
-- A step that only changes tests or docs is valid and should be named as such
+- A step that only changes tests or docs is valid; name it explicitly as such
 
 ### Step 3 — Build dependency graph
 

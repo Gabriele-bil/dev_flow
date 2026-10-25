@@ -87,7 +87,7 @@ Audit files for compliance. Output terse, high signal. Group by file.
 
 - URL reflects state — filters, tabs, pagination, expanded panels in query params
 - Links: `<a>`/`<Link>` (Cmd/Ctrl+click, middle-click support)
-- Deep-link all stateful UI (if uses `useState`, consider URL sync via nuqs or similar)
+- Deep-link all stateful UI (if uses `useState`, sync URL via nuqs or similar)
 - Destructive actions: confirmation modal or undo window — never immediate
 
 ### Touch & Interaction
@@ -134,7 +134,7 @@ Audit files for compliance. Output terse, high signal. Group by file.
 - Title Case for headings/buttons (Chicago style)
 - Numerals for counts: "8 deployments" not "eight"
 - Specific button labels: "Save API Key" not "Continue"
-- Error messages include fix/next step, not just problem
+- Error messages include fix/next step, not only problem
 - Second person; no first person
 - `&` over "and" where space-constrained
 

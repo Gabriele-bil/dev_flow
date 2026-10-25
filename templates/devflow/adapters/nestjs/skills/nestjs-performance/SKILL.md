@@ -43,7 +43,7 @@ Full code examples: `references/performance-patterns.md`.
 
 ## 5) Graceful Shutdown (MEDIUM-HIGH)
 
-`app.enableShutdownHooks()` in `main.ts` is mandatory — without it `OnApplicationShutdown` never fires. Handle `SIGTERM`/`SIGINT`: stop accepting new connections (`server.close()`), let in-flight requests finish (track active-request count, resolve when it hits zero, with a timeout ceiling), close DB pools/queue connections in `onApplicationShutdown`, then exit. Readiness probe should return `503` once shutdown starts so Kubernetes stops routing new traffic before the process exits.
+`app.enableShutdownHooks()` in `main.ts` is mandatory — without it `OnApplicationShutdown` never fires. Handle `SIGTERM`/`SIGINT`: stop accepting new connections (`server.close()`), let in-flight requests finish (track active-request count, resolve when it hits zero, with a timeout ceiling), close DB pools/queue connections in `onApplicationShutdown`, then exit. Readiness probe returns `503` once shutdown starts so Kubernetes stops routing new traffic before the process exits.
 
 ## Performance Review Checklist
 

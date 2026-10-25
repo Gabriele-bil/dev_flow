@@ -84,7 +84,7 @@ Identify if the feature includes visual/UI changes:
 
 ## Step 2 - Commit
 
-Delete the feature checkpoint, leftover handoffs, and any stray image artifacts from working tree first — pipeline complete, session context never committed (`@devflow/references/state-machine.md` → **Checkpoint file**, **Handoff file**). Then stage and commit all changes in a single commit:
+Delete `.checkpoint.json`, `handoff.md`, and stray image artifacts from the working tree first — session context is never committed (`@devflow/references/state-machine.md` → **Checkpoint file**, **Handoff file**). Stage and commit all changes in a single commit:
 
 ```bash
 rm -f devflow/features/[NNN]_[feature-name]/.checkpoint.json devflow/features/[NNN]_[feature-name]/handoff.md
@@ -144,7 +144,9 @@ Use `gh` CLI to open the PR toward `$BASE_BRANCH` (resolved in Step 0). Wrap exe
 )
 ```
 
-Extract decision flags and discrepancies: inspect `plan.md` (`## Decision flags`, `## Deviations`, `## Open questions`) and `task.md` (`## Assumptions & Risks`, `## Notes`). When running under `devflow.auto` or when autonomous decisions/flags exist, populate the `## Autonomous Decisions & Discrepancies` section in the PR body so human reviewers have full visibility of all non-critical discrepancies, assumptions, and choices made autonomously.
+Extract decision flags and discrepancies from `plan.md` (`## Decision flags`, `## Deviations`, `## Open questions`) and `task.md` (`## Assumptions & Risks`, `## Notes`). Under `devflow.auto` or whenever autonomous decisions/flags exist, populate `## Autonomous Decisions & Discrepancies` in the PR body so reviewers see every assumption, default, and non-critical exception.
+
+**PR prose fidelity:** Write concrete mechanisms, touched layers, and verified command outputs. Never use AI-slop boosters (`seamless`, `robust`, `comprehensive`, `transformative`, `in conclusion`) or claim checks passed unless they were executed in Step 3.
 
 ### PR title format
 

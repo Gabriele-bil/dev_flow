@@ -32,7 +32,8 @@ Compress response into caveman-speak. Drop fluff. Keep substance. ~75% token red
 - Commands exact
 - Code blocks unchanged
 - Error messages quoted exact
-- All negations, conditions, verbs
+- All negations, conditions, verbs, and attribution
+- Genuine epistemic uncertainty (`~`, `unverified`) when citing unmeasured estimates — never invent facts or strip real caveats for brevity
 
 **Patterns:** fragments OK. Short synonyms: fix/"big"/"use" over "implement a solution for"/"extensive"/"make use of". Structure: `[thing] [action] [reason]. [next step].` Arrows: `X → Y`
 

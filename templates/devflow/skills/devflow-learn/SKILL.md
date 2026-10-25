@@ -51,8 +51,8 @@ Record a manual instinct in `.devflow-instincts.yaml` (local store).
 
 Ask:
 
-1. Trigger: "When should this instinct fire?" (e.g. "when choosing a state management library")
-2. Action: "What should Claude do?" (one imperative sentence)
+1. Trigger: "When does this instinct fire?" (e.g. "when choosing a state management library")
+2. Action: "Action to take" (one imperative sentence; state concrete mechanism, never generic advice)
 3. Domain: file type or area (e.g. `flutter`, `typescript`, `devflow`, `general`)
 4. Confidence: 0.0–1.0 (default `0.75` for manual entries)
 
@@ -132,7 +132,7 @@ jq -r --argjson shared "$SHARED_JSON" --argjson local "$LOCAL_JSON" '
 
 If both files missing or empty: "No instincts recorded yet for this project."
 
-`⚠` marks a **contested** instinct (churn signal followed by revert/reset; confidence decayed automatically). Re-verify before boosting or promoting.
+`⚠` indicates a **contested** instinct (churn signal followed by revert/reset; confidence decayed automatically). Re-verify before boosting or promoting.
 
 ---
 

@@ -22,7 +22,7 @@ Interactive architectural discovery for greenfield applications or complex featu
 - Architecture already decided and documented in `constitution.md` or existing ADR — go to `devflow.task` or `devflow.plan`
 - Feature is small or standard extension following established codebase patterns without architectural unknowns — go to `devflow.task`
 - Fixing a bug or regression in existing code — use `devflow.backprop` or `devflow.hotfix`
-- Task is written and needs clarification on user requirements rather than architecture — use `devflow.clarify`
+- Task is written and needs clarification on user requirements, not architecture — use `devflow.clarify`
 
 ## Input contract
 
@@ -58,27 +58,27 @@ Read existing project context (`docs/product.md`, `constitution.md`, `registry.m
 
 ### Step 3 — Interactive context-gathering Q&A loop
 
-Formulate prioritized, high-leverage questions targeting the most critical or ambiguous axes identified in Step 2:
+Formulate prioritized, high-impact questions targeting the most critical or ambiguous axes identified in Step 2:
 
 1. Cap question queue at **≤5 questions** — keep only high-impact architectural forks.
 2. Ask questions one at a time using `AskQuestion` / `ask_question` tool:
-   - State the architectural axis and why the decision matters.
+   - State the architectural axis and concrete operational consequence.
    - Provide a **recommended answer** with concise technical rationale.
    - Offer bounded, distinct multiple-choice options when possible.
-3. Synthesize user answers into confirmed **Decision Drivers & Constraints** before drafting options.
+3. Synthesize user answers into confirmed **Decision Drivers & Constraints** (preserving user-stated constraints vs inferred assumptions) before drafting options.
 
 ### Step 4 — Formulate 2–3 architectural options
 
-Generate 2–3 distinct, viable architectural options grounded in the confirmed decision drivers:
+Generate 2–3 distinct, viable architectural options grounded in the confirmed decision drivers (never include strawman options):
 
-1. **Architecture approach:** Component structure, communication pattern, state ownership, data flow.
+1. **Architecture approach:** Component structure, communication pattern, state ownership, data flow — state concrete mechanisms, never empty buzzwords (`scalable`, `modern`, `seamless`).
 2. **Key technologies / libraries:** Specific tools, protocols, storage mechanisms.
 3. **Trade-off matrix:**
    - Complexity (low / medium / high)
    - Performance & scalability impact
    - Maintenance & cognitive load
    - Blast radius & migration risk
-4. **Pros and Cons:** Concrete bullet points, no hand-waving.
+4. **Pros, Cons, and Real Ceiling:** Concrete bullet points. Every option — including the recommended one — must state its strongest real limitation, operational cost, or failure mode (`Bad, because` / `Risks`).
 
 ### Step 5 — Interactive architecture selection
 

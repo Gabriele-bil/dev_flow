@@ -140,7 +140,7 @@ Options: (1) approve all remaining, (2) skip all remaining, (3) continue one by 
 
 Wait for user choice before continuing.
 
-**Chesterton + incrementality:** for structural or simplification proposals, state briefly why the code might exist as-is, then the proposed change. If tests exist for the feature, run adapter test commands relevant to touched scope after substantive refactors when feasible.
+**Chesterton + incrementality:** for structural or simplification proposals, state briefly why the code exists as-is, then the proposed change. If tests exist for the feature, run adapter test commands relevant to touched scope after substantive refactors when feasible.
 
 Use this format and wait for user response before each grouped proposal round:
 
@@ -154,9 +154,9 @@ Apply? [yes / no]
 
 After edits, check **only** implement-touched files for unused imports, unreachable branches, or clearly orphaned symbols.
 
-- Remove directly when obviously safe (unused import, dead branch after a certain refactor you just made)
-- If removal might affect callers outside the summary, list explicitly and ask: `Dead code candidates: … — remove now?`
-- **Barrel file exception:** never remove an import from a barrel/re-export file (`index.ts`, `_domain.dart`, `_data.dart`, or files matching `*_*.dart` / `*.barrel.ts`) based on local scope analysis alone — barrel imports serve external consumers that are outside the implement summary. If a barrel import looks unused locally, list it as a candidate and ask; do not remove directly.
+- Remove directly when obviously safe (unused import, dead branch after a deterministic refactor)
+- If removal affects callers outside the summary, list explicitly and ask: `Dead code candidates: … — remove now?`
+- **Barrel file exception:** never remove an import from a barrel/re-export file (`index.ts`, `_domain.dart`, `_data.dart`, or files matching `*_*.dart` / `*.barrel.ts`) based on local scope analysis alone — barrel imports serve external consumers outside the implement summary. List locally unused barrel imports as candidates and ask; never remove directly.
 
 ### Step 5 - Run commands
 

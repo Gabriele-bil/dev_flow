@@ -73,7 +73,7 @@ A service that must notify 3+ unrelated consumers on one action (inventory, emai
 
 ## 8) Provider Scopes (CRITICAL)
 
-Three scopes: `DEFAULT` (singleton — default, use for almost everything), `REQUEST` (new instance per HTTP request — bubbles up the whole injection chain, real performance cost), `TRANSIENT` (new instance per injection point). Never store per-request mutable state (e.g. current user id) on a singleton — it leaks across concurrent requests. Prefer `REQUEST`-scoped `@Inject(REQUEST)` or an async-context library (`nestjs-cls`) over ad hoc singleton state.
+Three scopes: `DEFAULT` (singleton — default for stateless services), `REQUEST` (new instance per HTTP request — bubbles up the whole injection chain, real performance cost), `TRANSIENT` (new instance per injection point). Never store per-request mutable state (e.g. current user id) on a singleton — it leaks across concurrent requests. Prefer `REQUEST`-scoped `@Inject(REQUEST)` or an async-context library (`nestjs-cls`) over ad hoc singleton state.
 
 ## 9) Configuration (`@nestjs/config`)
 

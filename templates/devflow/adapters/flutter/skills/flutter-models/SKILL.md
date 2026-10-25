@@ -19,7 +19,7 @@ Full code examples: `references/models-patterns.md`.
 
 ## Why Not Abstract Entities?
 
-Entities/DTOs should usually be concrete immutable value types, not abstract classes.
+Make entities/DTOs concrete immutable value types, not abstract classes.
 Use abstraction for behavior contracts (`abstract interface class PetRepository`), not data containers.
 
 ## Required Setup
@@ -28,7 +28,7 @@ Generate code with `dart run build_runner build --delete-conflicting-outputs` (o
 
 ## Entity (Domain)
 
-Lives in `domain/`. Represents business meaning only, no JSON methods. Add private constructor (`const Pet._()`) when the entity has custom getters/methods or `mock()`. Full code → `references/models-patterns.md`.
+Lives in `domain/`. Holds business meaning only, no JSON methods. Add private constructor (`const Pet._()`) when the entity has custom getters/methods or `mock()`. Full code → `references/models-patterns.md`.
 
 ## Skeleton `mock()` (domain)
 

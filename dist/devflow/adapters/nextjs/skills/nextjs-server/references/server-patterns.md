@@ -75,19 +75,19 @@ revalidateTag('products')
 **Constraint:** `cookies()`, `headers()`, `searchParams` are NOT accessible inside `'use cache'`. Extract outside and pass as arguments:
 
 ```ts
-// ❌ — errore a runtime
+// ❌ — runtime error
 'use cache'
 export async function getData() {
-  const store = await cookies() // vietato dentro 'use cache'
+  const store = await cookies() // forbidden inside 'use cache'
 }
 
-// ✅ — pattern corretto
+// ✅ — extract dynamic values outside 'use cache'
 async function getCachedUser(userId: string) {
   'use cache'
   cacheLife('minutes')
   return db.user.findUnique({ where: { id: userId } })
 }
-// chiama dove cookies() è disponibile:
+// call where cookies() is allowed:
 const store = await cookies()
 const userId = store.get('userId')?.value
 const user = await getCachedUser(userId)
@@ -96,14 +96,14 @@ const user = await getCachedUser(userId)
 Migration from `unstable_cache`:
 
 ```ts
-// PRIMA
+// BEFORE
 const getCachedUser = unstable_cache(
   async (id: string) => db.user.findUnique({ where: { id } }),
   ['user'],
   { revalidate: 300, tags: ['users'] }
 )
 
-// DOPO
+// AFTER
 async function getCachedUser(id: string) {
   'use cache'
   cacheLife('minutes') // 300s ≈ 'minutes'
@@ -116,9 +116,9 @@ async function getCachedUser(id: string) {
 
 `fetch()` calls with identical URL + options are deduplicated automatically within the same request lifecycle. Safe to call the same endpoint in multiple Server Components — only one network request fires.
 
-## Preload pattern — evitare data waterfalls
+## Preload pattern — avoiding data waterfalls
 
-Usa `React.cache()` per iniziare il fetch il prima possibile ed evitare fetch sequenziali:
+Use `React.cache()` to start fetching early and avoid sequential waterfalls:
 
 ```ts
 // lib/user.ts
@@ -130,22 +130,22 @@ export const getUser = cache(async (id: string) => {
 ```
 
 ```tsx
-// page.tsx — avvia il fetch prima di renderizzare il componente figlio
+// page.tsx — start fetch before rendering child component
 import { getUser } from '@/lib/user'
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  // Preload: avvia il fetch prima che UserProfile lo richieda
-  getUser(id) // fire-and-forget — React deduplica la chiamata
+  // Preload: kick off fetch before UserProfile requests it
+  getUser(id) // fire-and-forget — React deduplicates the call
 
   return <UserProfile userId={id} />
 }
 ```
 
-Per fetch paralleli multipli:
+For multiple parallel fetches:
 
 ```tsx
-// ✅ — parallelo con Promise.all
+// ✅ — parallel with Promise.all
 const [user, posts] = await Promise.all([getUser(id), getUserPosts(id)])
 ```
 
@@ -347,9 +347,9 @@ export async function updateUser(id: string, formData: FormData) {
 }
 ```
 
-### `unstable_rethrow` — evitare swallowing di Next.js errors
+### `unstable_rethrow` — avoid swallowing Next.js internal errors
 
-`redirect()`, `notFound()`, `unauthorized()` lanciano errori speciali internamente. Un try/catch generico li cattura e li sopprime. Usa `unstable_rethrow` per rilanciarli:
+`redirect()`, `notFound()`, and `unauthorized()` throw internal control-flow errors. A generic `try/catch` catches and suppresses them. Call `unstable_rethrow` first inside `catch`:
 
 ```ts
 import { unstable_rethrow } from 'next/navigation'
@@ -359,8 +359,8 @@ async function maybeRedirect() {
     await doSomething()
     redirect('/dashboard')
   } catch (err) {
-    unstable_rethrow(err) // rilancia se è un errore Next.js (redirect, notFound, ecc.)
-    return { success: false, error: 'Operazione fallita' }
+    unstable_rethrow(err) // rethrows Next.js internal errors (redirect, notFound, etc.)
+    return { success: false, error: 'Operation failed' }
   }
 }
 ```
@@ -395,14 +395,14 @@ export async function GET(request: NextRequest) {
 }
 ```
 
-## `after()` — codice post-response
+## `after()` — post-response work
 
-Esegui operazioni secondarie (analytics, logging, cleanup) dopo che la response ha finito di streammare, senza bloccare il tempo di risposta:
+Run secondary side effects (analytics, logging, cleanup) after the response finishes streaming without blocking response time:
 
 ```ts
 import { after } from 'next/server'
 
-// In una Server Action
+// Inside a Server Action
 export async function createOrder(formData: FormData) {
   const order = await db.order.create({ data: parseOrder(formData) })
 
@@ -414,7 +414,7 @@ export async function createOrder(formData: FormData) {
   return { success: true, orderId: order.id }
 }
 
-// In un Route Handler
+// Inside a Route Handler
 export async function POST(request: Request) {
   const data = await processRequest(request)
 
@@ -426,33 +426,33 @@ export async function POST(request: Request) {
 }
 ```
 
-`after()` è garantito a completarsi anche se il client si disconnette.
+`after()` runs to completion even if the client disconnects.
 
 ## Debug — MCP Endpoint
 
-Next.js espone `/_next/mcp` in development per il debug assistito da AI:
+Next.js exposes `/_next/mcp` in development for AI-assisted debugging:
 
-- **Next.js 16+**: abilitato di default, usa `next-devtools-mcp`
-- **Next.js < 16**: aggiungi `experimental.mcpServer: true` in `next.config.ts`
+- **Next.js 16+**: enabled by default, use `next-devtools-mcp`
+- **Next.js < 16**: set `experimental.mcpServer: true` in `next.config.ts`
 
 ```bash
-# Verifica la porta del dev server (non assumere 3000)
+# Check active dev server port (do not assume 3000)
 curl -X POST http://localhost:<PORT>/_next/mcp \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_errors","arguments":{}}}'
 ```
 
-Tool disponibili via MCP:
+Available MCP tools:
 
-| Tool | Cosa ritorna |
+| Tool | Output |
 | --- | --- |
-| `get_errors` | Errori correnti (build + runtime con source maps) |
-| `get_routes` | Tutte le route scansionando il filesystem |
-| `get_project_metadata` | Path del progetto e URL del dev server |
-| `get_logs` | Path al log file `<distDir>/logs/next-development.log` |
-| `get_server_action_by_id` | Trova una Server Action per `actionId` |
+| `get_errors` | Current build + runtime errors with source maps |
+| `get_routes` | All routes discovered by filesystem scan |
+| `get_project_metadata` | Project path and dev server URL |
+| `get_logs` | Path to `<distDir>/logs/next-development.log` |
+| `get_server_action_by_id` | Locates a Server Action by `actionId` |
 
-Per rebuilding di route specifiche (Next.js 16+):
+Rebuild specific routes only (Next.js 16+):
 
 ```bash
 next build --debug-build-paths "/dashboard,/product/[id]"

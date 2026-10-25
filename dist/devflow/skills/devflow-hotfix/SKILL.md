@@ -15,10 +15,12 @@ Provides a streamlined, token-efficient pipeline for critical bugs, regressions,
 
 ## Core Principles
 
-- **spec-light-not-spec-free** — even a 1-line hotfix requires a problem statement, root cause, and acceptance criteria in `task.md`
-- **regression-tested** — every hotfix must include at least one test proving the bug is resolved
-- **safe-acceleration** — skips `beautify` and multi-agent fan-out, but maintains linter/compiler checks, single-agent review, and PR traceability
+- **spec-first** — no code before `task.md` + `plan.md` approved (compact spec for hotfixes: problem statement, root cause, ACs)
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
 - **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+- **regression-tested** — every hotfix includes at least one test proving the defect is resolved
+- **safe-acceleration** — skips `beautify` and multi-agent fan-out, while keeping linter/compiler checks, single-agent review, and PR traceability
 
 ## When NOT to Use
 

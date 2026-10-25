@@ -27,10 +27,10 @@ Deliverable: `plan.md` only.
 
 ## Vertical slicing (mandatory for plans with > 5 files)
 
-For plans >5 files: define ≥2 vertical slice increments in **Architecture decisions** — each slice is one end-to-end user-visible increment (not a layer). Group **File List** entries under slice headings. Optionally annotate each slice heading `(deps: ...)` with the slice numbers it builds on (format: `references/plan-template.md` → **Slice dependency annotations**) — enables ordered resume, re-implementation scoped to affected slices after `devflow.backprop`, and parallel slice execution. Omit when slices are strictly sequential.
+For plans >5 files: define ≥2 vertical slice increments in **Architecture decisions** — each slice is one end-to-end user-visible increment (not a layer). Group **File List** entries under slice headings. Optionally annotate each slice heading `(deps: ...)` with prerequisite slice numbers (`references/plan-template.md` → **Slice dependency annotations**) to support ordered resume, scoped re-implementation after `devflow.backprop`, and parallel slice execution; omit when strictly sequential.
 Example: Slice 1 (data contract + shell) → Slice 2 (state + data flow) → Slice 3 (full UI + i18n).
 
-For plans with 5 or fewer files, slicing is optional — note in Overview if sequential layer ordering is clearer. Do **not** rewrite subtask/use case wording. The **Traceability** table must still map **each original use case / subtask** to file path(s).
+For plans with ≤5 files, slicing is optional — note in Overview if sequential layer ordering is clearer. Do **not** rewrite subtask/use case wording; **Traceability** must map **each original use case / subtask** to file path(s).
 
 ## Dependency ordering (reflect in File List)
 
@@ -133,14 +133,14 @@ Analyze:
 - Seed **Risks and mitigations** table directly from `task.md` `## Assumptions & Risks` (convert into concrete boundary checks)
 - Bullets in active adapter plan step file (`steps/plan.md`) applying to this feature (state, UI, DB, i18n, responsive layout)
 - Edge cases, error states, and required DB/external-system edits
-- Architectural trade-offs: when multiple designs exist, trigger `AskQuestion` checkpoint; recommend `/grill-me` for deep review
+- Architectural trade-offs: state the concrete mechanism and strongest real limitation/trade-off for each decision (never empty boosters like `scalable` or `seamless`); when multiple viable designs exist, trigger `AskQuestion` checkpoint and recommend `/grill-me` for deep review
 - ADR alignment: verify architecture complies with decisions in `docs/adr/`; record in Architecture decisions
 
 ### Step 4b - Dependency pass
 
 Verify **File list** order per Dependency ordering. Migrations and shared contracts before consumers; shared components before their consumers. Exceptions → **Architecture decisions**.
 
-**Scope fidelity check:** every **File List** entry must map to ≥1 **Traceability** row (use case / subtask + acceptance criterion). Entry with no mapped use case or subtask = gold-plating — remove it, or return the scope to `devflow.task`. Reject speculative entries ("might need later", configurable options no AC requires); one concern per file entry.
+**Scope fidelity check:** every **File List** entry must map to ≥1 **Traceability** row (use case / subtask + acceptance criterion). Entry with no mapped use case or subtask = gold-plating — remove it, or return the scope to `devflow.task`. Reject speculative entries (unrequested future hooks or configurable options no AC requires); one concern per file entry.
 
 ### Step 4c - Data model extraction
 

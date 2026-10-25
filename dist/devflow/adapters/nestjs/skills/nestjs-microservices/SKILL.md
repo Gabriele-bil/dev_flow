@@ -32,7 +32,7 @@ Full code examples: `references/microservices-patterns.md`.
 
 `@nestjs/terminus`, split into two distinct endpoints — conflating them causes bad orchestrator behavior:
 
-- **Liveness** (`/health/live`) — "is the process alive/should Kubernetes restart it": cheap, local checks only (memory heap), no calls to a downstream DB/API. Reflects the process, not its dependencies.
+- **Liveness** (`/health/live`) — "is the process alive / needs Kubernetes restart": cheap, local checks only (memory heap), no calls to a downstream DB/API. Reflects the process, not its dependencies.
 - **Readiness** (`/health/ready`) — "can this instance accept traffic right now": checks real dependencies (`TypeOrmHealthIndicator.pingCheck`, Redis ping, critical downstream API), each with a short timeout so a slow dependency doesn't itself become a health-check timeout. Return `503` immediately once graceful shutdown starts (pairs with `nestjs-performance` §5) so the orchestrator stops routing new traffic before the process exits.
 
 Custom `HealthIndicator` subclasses for business-specific health (queue backlog, circuit-breaker state) — `throw new HealthCheckError(...)` on failure, otherwise return `this.getStatus(key, true, {...details})`.

@@ -91,7 +91,7 @@ Read `task.md` **Acceptance criteria** section first — derive at least one tes
    - Web: write/execute Playwright specs or drive browser runner.
    - Mobile: write/execute Maestro flows (`.maestro/`) or Flutter `integration_test` on emulator/device.
    - Verify clean state transitions, absence of crashes or unhandled runtime errors, and report results.
-4. **Execute** — run the exact commands from the adapter test step file; paste raw stdout/stderr in the Step 7 report. If `.devflow-test-summary.json` exists after the run (written by `post-bash-output-filter.sh` for recognized test-runner commands), read its `passed`/`failed`/`skipped` counts as a structured cross-check against the raw output instead of re-deriving them by eye — stale runs (from a command that isn't the one just executed) are still possible, so raw stdout/stderr stays the evidence of record in the Step 7 report.
+4. **Execute** — run exact commands from the adapter test step file; paste raw stdout/stderr in the Step 7 report. When `.devflow-test-summary.json` exists (written by `post-bash-output-filter.sh`), cross-check its `passed`/`failed`/`skipped` counts against raw output; raw stdout/stderr remains the evidence of record in Step 7.
 
 **Output discipline (intermediate runs):** retry loops and analysis runs follow `@devflow/references/token-economy.md` → **Derive, don't dump** — filter at source, quote decisive failure lines, report delta on re-runs. Step 7 report still pastes mandated raw evidence.
 

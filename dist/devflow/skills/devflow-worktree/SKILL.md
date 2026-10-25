@@ -27,7 +27,7 @@ Create, list, or remove isolated git worktrees for parallel feature development.
 
 - Only one feature in flight — a normal branch checkout is enough, worktree adds overhead with no benefit
 - Uncommitted changes must move into the new worktree unchanged — worktrees check out refs, not working-tree state; commit or stash first
-- Adapter has no dev-server command (e.g. a library with no `dev`/`serve` script) — worktree creation still works, just skip the port-offset step
+- Adapter has no dev-server command (e.g. a library with no `dev`/`serve` script) — worktree creation still works; skip the port-offset step
 
 ## Input contract
 

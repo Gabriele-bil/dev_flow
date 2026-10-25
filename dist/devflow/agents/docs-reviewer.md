@@ -38,12 +38,14 @@ Before reviewing:
 - New UI components document their inputs/outputs/properties
 - No silent public additions — if it's exported, it's documented
 
-### 2. Accuracy
+### 2. Accuracy & Prose Clarity
 
 - Doc descriptions match actual signatures, return types, and behavior
 - Parameter names and types in docs match current code
 - No docs that describe removed or renamed parameters
 - Async behavior, nullable returns, and thrown errors documented where non-obvious
+- Zero empty boosters (`seamless`, `robust`, `comprehensive`, `crucial`, `leverage`) without a concrete mechanism, constraint, or failure mode
+- Opening sentences under headings state behavior or constraints directly instead of restating the heading title
 
 ### 3. Examples
 
@@ -57,6 +59,7 @@ Before reviewing:
 - `CHANGELOG.md` (or equivalent) updated with the new feature or fix
 - Breaking changes explicitly documented as such
 - Removed or deprecated APIs noted with migration path
+- Zero fabricated benchmarks, SLAs, or capabilities not verified in code/tests
 
 ### 5. Plan Traceability
 
