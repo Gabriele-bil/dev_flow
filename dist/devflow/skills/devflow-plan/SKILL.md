@@ -136,11 +136,11 @@ Analyze:
 - Architectural trade-offs: state the concrete mechanism and strongest real limitation/trade-off for each decision (never empty boosters like `scalable` or `seamless`); when multiple viable designs exist, trigger `AskQuestion` checkpoint and recommend `/grill-me` for deep review
 - ADR alignment: verify architecture complies with decisions in `docs/adr/`; record in Architecture decisions
 
-### Step 4b - Dependency pass
+### Step 4b - Dependency pass & Contracts First
 
-Verify **File list** order per Dependency ordering. Migrations and shared contracts before consumers; shared components before their consumers. Exceptions → **Architecture decisions**.
+Verify **File list** order per Dependency ordering. **Contracts First:** migrations and shared contracts (types, schemas, state interfaces shared by ≥2 slices or `[P]` files) MUST sit in the first blocking slice (`deps: none`) before consumers; shared components before consumers. Never copy contracts across parallel slices. Never plan or cite `task.md` rows marked `[wont]` or `[retired]`.
 
-**Scope fidelity check:** every **File List** entry must map to ≥1 **Traceability** row (use case / subtask + acceptance criterion). Entry with no mapped use case or subtask = gold-plating — remove it, or return the scope to `devflow.task`. Reject speculative entries (unrequested future hooks or configurable options no AC requires); one concern per file entry.
+**Scope fidelity & 4-Part Brief:** every **File List** entry must map to ≥1 **Traceability** row (no gold-plating, one concern per entry) and include the 4-part brief (`Change`, `Contract`, `Test`, `Out of scope`) per `references/plan-template.md`. Optionally tag slices/entries with `[route: light|mid|strong]` per `@devflow/references/model-selection.md` (`light` requires a complete 4-part brief and exact test target).
 
 ### Step 4c - Data model extraction
 

@@ -71,10 +71,12 @@ Propose, then apply after approval:
 
 Name it before writing: `[test file path] :: [test name referencing the AC]`. Test must fail on current code (Prove-It), pass after fix. Write it per the adapter test step file (`@devflow/adapters/<adapter>/steps/test.md`; legacy: `ADAPTER.md` → **Test**) conventions. Code fix itself: trivial → apply now; non-trivial → re-enter `devflow.implement` for affected File List entries (status transition per `@devflow/references/state-machine.md`, user-confirmed). Slice `deps:` annotations present in **File List** → scope re-entry to the affected slice plus downstream slices listing it in `deps`; untouched independent slices stay `[done]`.
 
-### Step 6 — Log the gap (systemic rule)
+### Step 6 — Log the gap (Rigor systemic rule)
 
-1. Log instinct via `devflow.learn log`: trigger = gap family, action = the tightened-criterion pattern, domain = `backprop-[family]`.
-2. Count existing instincts with same `backprop-[family]` domain. **3+ entries** → propose a standard clarify question: "This project hit [family] gaps [N] times. Add standing question '[proposed question]' to the `devflow.clarify` scan for future features?" Log accepted question as high-confidence instinct (`domain: clarify`).
+1. Derive a structured `cause_key` (`gap:<family>:<short-slug>` or `test:<file>::<title>`). Log instinct via `devflow.learn log`: trigger = gap family + `cause_key`, action = the tightened-criterion pattern, domain = `backprop-[family]`.
+2. **Rigor repeat check (2+ occurrences or `--never-again`):** Count existing instincts with the same `cause_key` or `backprop-[family]` domain. On **2+ entries** (or immediately if user says "never again"):
+   - Propose an executable `check_cmd` (with optional `ratchet_max` count for legacy code) that fails on the pre-fix state (*Red*) and passes on the fixed state (*Green*), OR a standing `devflow.clarify` question if not statically checkable.
+   - Once approved by user, promote to `.devflow-instincts.shared.yaml` (`devflow.learn promote`).
 
 ### Step 7 — Notify
 

@@ -115,6 +115,7 @@ Apply directly without asking:
 - Imports violating repo import conventions
 - Naming violations against project conventions
 - Obvious logic leaking into the presentation layer
+- **Silent catch (`silent-catch`):** empty/swallowed `catch` or `.catch()` blocks without rethrow, typed error return, or subject-specific log
 - **Critical** issues uncovered in correctness or security (fix immediately)
 
 #### Opinable improvements

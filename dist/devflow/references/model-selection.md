@@ -48,6 +48,18 @@ Depth profile from `plan.md` `**Complexity:**` tag (see `references/complexity-s
 
 Never downgrade ship security review below the Decision Table for cost — profile floor in `complexity-scoring.md` keeps security-touching features at `standard`+.
 
+## Subtask & Slice Routing Tiers (`[route: light | mid | strong]`)
+
+In `plan.md` and `devflow.blueprint`, individual slices or File List entries can declare a routing tier so expensive models only build what requires judgment:
+
+| Tier | Target Model | When to Use | Mandatory Brief Gate |
+| --- | --- | --- | --- |
+| `light` | Haiku / Flash | Mechanical work: wiring a field across 2–3 files, adding a CLI/switch case next to an existing one, writing a test for a stated case, renaming | Must have all 4 brief parts (`Change`, `Contract`, `Test`, `Out of scope`) + exact test command; refuse `light` routing if brief requires design judgment |
+| `mid` | Sonnet | Standard feature slice, UI component with state, bug fix with known cause | Standard `plan.md` File List entry + mapped AC |
+| `strong` | Opus / Sonnet-high | Shared contracts (`Slice 1`), DB migrations, auth/security boundaries, subtle concurrency or edge trade-offs | Full architectural context + ADR alignment |
+
+**Auto-escalation rule:** When a subagent or slice running on `light` or `mid` hits Level 1 retry exhaustion (`escalation-ladder.md`), escalate the slice one tier up (`light → mid → strong`) before entering Level 3/4 re-planning.
+
 ## Anti-Patterns
 
 | Anti-Pattern | Problem |

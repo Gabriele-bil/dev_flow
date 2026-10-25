@@ -37,9 +37,10 @@ Options:
   3. Waive this step with documented exception
 ```
 
-## Cross-model rescue (optional variant)
+## Cross-model rescue & Subtask Tier Auto-Escalation
 
-Hosts supporting per-agent model switching: at Level 2, one hypothesis may come from a fresh agent on a different model (fresh perspective, no accumulated bias). Counts against the 2-hypothesis budget. Skip on hosts without model routing.
+- **Subtask route escalation (`[route: light | mid | strong]`):** When a slice or file entry tagged `[route: light]` or `[route: mid]` in `plan.md` exhausts Level 1 (3 failed attempts), automatically escalate execution one tier up (`light → mid`, `mid → strong` per `@devflow/references/model-selection.md`) before entering Level 3/4 re-planning.
+- **Cross-model rescue (optional variant):** Hosts supporting per-agent model switching: at Level 2, one hypothesis may come from a fresh agent on a different model family (fresh perspective, zero shared context blind spots). Counts against the 2-hypothesis budget. Skip on hosts without model routing.
 
 ## Anti-Patterns
 

@@ -65,8 +65,16 @@ When reviewing bug fix tests:
 - AAA structure (Arrange-Act-Assert) per test
 - Names describe behavior, not implementation (`returns error when title empty`, not `test_createTask_2`)
 - Mocks only at system boundaries — not between internal functions
-- No shared mutable state between tests
+- No shared mutable state between tests; file/env checks contained to temp directories
 - Async tests properly awaited
+
+### 7. Hostile Check on Green ACs & Clause Pinning
+
+Treat every `PASS` in `verification.md` skeptically ("a green suite is not proof"):
+
+- **Clause pinning:** verify each clause of every AC in `task.md` is pinned by a specific assertion (`file:line`). Flag any AC clause where breaking the production branch would still leave the test green (**Required**).
+- **Method fidelity:** if an AC specifies an integration boundary (e.g. persistence across restart, real validation pipe), flag tests that substitute a trivial in-memory mock (**Required**).
+- **Canonical edges:** check that tests probe `0, 1, limit` for numbers, `today, yesterday, timezone` for dates, and `empty, 1, first/last` for lists.
 
 ## Output Format
 

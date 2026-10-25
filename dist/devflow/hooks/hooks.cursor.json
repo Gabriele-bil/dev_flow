@@ -28,6 +28,11 @@
             "type": "command",
             "command": "bash ${cursorPluginRoot}/hooks/pre-config-protect.sh",
             "timeout": 15
+          },
+          {
+            "type": "command",
+            "command": "bash ${cursorPluginRoot}/hooks/pre-scope-guard.sh",
+            "timeout": 5
           }
         ]
       },

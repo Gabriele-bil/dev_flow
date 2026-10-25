@@ -51,10 +51,22 @@ Applicable when the adapter is Web/UI (`nextjs`, `angular`) or Mobile (`flutter`
 
 ## Procedure (per AC)
 
-1. Locate implementing file(s) via `plan.md` → **Traceability** table (mandatory — makes this lookup free).
+1. Locate implementing file(s) via `plan.md` → **Traceability** table (mandatory — makes this lookup free). Skip rows marked `[wont]` or `[retired]`.
 2. Run levels in order; first failing level stops the chain for that AC.
-3. Record verdict: **PASS** (all applicable levels pass) · **FAIL** (any of 1–3 fails, or 4a/4b executes and fails) · **PARTIAL** (1–3 pass, 4a/4b is `N/A`).
-4. AC with no Traceability row → **FAIL** (missing requirement — candidate for `devflow.backprop`).
+3. **Clause Pinning & Break-It-to-Prove-It (`standard` / `thorough` profiles):**
+   - Trace each clause of the AC to the exact test assertion (`test_file:line`) that pins it. "N tests cite this AC" or a green test suite alone is not proof.
+   - **Break-it probe:** if a test assertion looks tautological or overly broad, mentally or temporarily invert the guard/return in the implementation file and confirm the test would fail. A test that passes either way proves nothing → **FAIL**.
+   - **Canonical edges check:** verify tests cover the applicable edge from the table below:
+
+| Domain | Canonical Edges to Test |
+| --- | --- |
+| **Numbers / Counts** | `0`, `1`, boundary `limit`, `limit + 1`, negative (`-1`) |
+| **Dates / Times** | `today`, `yesterday`, timezone/day-boundary crossing |
+| **Lists / Collections** | `empty ([])`, single element, `first` and `last` item |
+| **Missing vs Zero** | Missing/unavailable input vs genuine `0` value |
+
+4. Record verdict: **PASS** (all applicable levels pass + assertion pinned) · **FAIL** (any of 1–3 fails, 4a/4b executes and fails, or no assertion pins the AC) · **PARTIAL** (1–3 pass + pinned, 4a/4b is `N/A`).
+5. AC with no Traceability row → **FAIL** (missing requirement — candidate for `devflow.backprop`).
 
 ## Report template — `verification.md`
 
@@ -67,13 +79,13 @@ Write to `devflow/features/[NNN]_[feature-name]/verification.md`:
 **Date:** [YYYY-MM-DD]
 **Result:** PASS | FAIL   (FAIL if any AC verdict is FAIL)
 
-| # | Acceptance criterion | Files (Traceability) | L1 | L2 | L3 | L4a | L4b | Verdict |
-|---|---------------------|----------------------|----|----|----|-----|-----|---------|
-| 1 | [criterion] | `path/file.ext` | ✅ | ✅ | ✅ | ✅ | ✅ | PASS |
+| # | Acceptance criterion | Files (Traceability) | Pinned Assertion (`file:line`) | L1 | L2 | L3 | L4a | L4b | Verdict |
+|---|---------------------|----------------------|-------------------------------|----|----|----|-----|-----|---------|
+| 1 | [criterion] | `path/file.ext` | `path/file.test.ext:42` | ✅ | ✅ | ✅ | ✅ | ✅ | PASS |
 
 ## Failures
 (only if any FAIL)
-- **AC [#]** failed **L[N]**: [evidence — file:line, stub signal, console error, missing registration] → [fix pointer]
+- **AC [#]** failed **L[N]**: [evidence — file:line, stub signal, unpinned clause, console error, missing registration] → [fix pointer]
 ```
 
 ## Gate rule

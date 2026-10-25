@@ -76,6 +76,7 @@ Stop and ask before writing task if:
 Structured elicitation rules (per `@devflow/skills/devflow-clarify/references/interactive-interview.md`):
 
 - Max 5 questions, asked sequentially one at a time
+- **High-stakes filter:** ask ONLY when the answer changes user-visible behavior, scope, safety, or data/cost boundaries. If a sensible, cheap-to-reverse default exists, record it in `## Assumptions & Risks` instead of asking
 - Use **`AskQuestion`** / **`ask_question`**: offer 2–4 options with first option marked `(Recommended)` and a 1-sentence rationale; fallback to chat prompt if tool unavailable
 - Skip entirely if idea is already clear enough
 
@@ -89,6 +90,7 @@ Read **`refinement-hints.md`**, run pass:
 2. **Vertical slice check:** isolate Read/View flows from Action/Mutation flows. Ensure Alien Test passes (atomic value; strictly NO Ghost UI).
 3. **Async lifecycle check:** verify loading indicators, double-submit protection, error recovery, and empty states.
 4. **BDD formulation check:** verify single `When` rule and intent over mechanics.
+5. **Blind-spot scan:** check for contradictory constraints, missing thresholds, first-run vs empty filter, date/timezone boundaries, and missing-vs-zero display (`refinement-hints.md` §5).
 
 ### Step 6 - Resolve feature name & branch automatically (NEVER ask user)
 

@@ -98,7 +98,7 @@ Read `task.md` **Acceptance criteria** section first — derive at least one tes
 Failure handling:
 
 - Max 3 attempts per failing test
-- Attempt 1: analyze failure output and fix the test or implementation
+- Attempt 1: analyze failure output and fix the test or implementation (if failure is in an untouched module or intermittent, run the **Paired Control** isolation check per `@devflow/references/testing-patterns.md` before patching)
 - Attempt 2: verify mocks and dependencies are correctly set up
 - Attempt 3: isolate and fix root cause
 - After each failed attempt: append error + what was tried to `.checkpoint.json` `errors_tried` per `@devflow/references/state-machine.md` → **Checkpoint file** — resume/recovery skip already-tried fixes
@@ -116,8 +116,8 @@ After all tests pass, verify **backwards from the spec** per `@devflow/reference
    - **Level 3 (Wired)**: reachable in app flow, registered route/provider, not dead code.
    - **Level 4a (Runtime CLI/API)**: execute adapter `Verify (runtime)` target or integration spec.
    - **Level 4b (UI / Browser & Mobile Workflow)**: Web/UI adapters (`nextjs`, `angular`) and Mobile (`flutter`): run Playwright/e2e target, Maestro flow, or browser/device agent flow to verify mounting, DOM/widget presence, critical interactions, clean state transitions, and zero unhandled crash or console errors.
-   - Depth per profile: `quick` → L1–L3; `standard` → L1–L3 + L4 targets when defined; `thorough` → L4 mandatory (missing target → PARTIAL).
-3. Write `devflow/features/[NNN]_[feature-name]/verification.md` using the template in `verification-levels.md`.
+   - Depth per profile: `quick` → L1–L3; `standard` → L1–L3 + L4 targets when defined + clause pinning (`file:line`); `thorough` → L4 mandatory (missing target → PARTIAL) + break-it probe & canonical edges (`verification-levels.md`).
+3. Write `devflow/features/[NNN]_[feature-name]/verification.md` using the template in `verification-levels.md` (including `Pinned Assertion (file:line)` per AC).
 4. Any **FAIL** verdict → do NOT set status `tested`. Implementation gap → fix (re-enter escalation ladder at Level 1) or report. Spec gap (AC missing/too weak) → suggest `devflow.backprop`.
 
 Passing tests do not skip this step — tests prove behavior forward; verification proves every AC satisfied, wired, reachable.

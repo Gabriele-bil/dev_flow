@@ -51,7 +51,8 @@ If any item fails → stop and report which check failed.
    - Extract every `[NEEDS CLARIFICATION: ...]` marker in `task.md` → one candidate question per marker.
    - Run the 8D scan on the full task content; generate additional candidate questions for dimensions with open ambiguities not already covered by a marker.
 4. Deduplicate and prioritize the backlog by plan-invalidation risk (highest-risk dimension first).
-5. Cap the queue at **≤5 questions** — keep only the highest-priority ones.
+5. **High-stakes filter:** drop candidate questions where a sensible, cheap-to-flip default exists and internal mechanics are unaffected — record those directly in `## Assumptions & Risks`. Keep only questions that alter user-visible behavior, scope, data safety, or mandatory ACs.
+6. Cap the queue at **≤5 questions** — keep only the highest-priority ones.
 
 ### Step 2 — Interactive Q&A loop
 
@@ -85,6 +86,7 @@ For each question in the prioritized queue, one at a time:
 | Missing or vague acceptance criterion | `## Acceptance criteria` — add or sharpen the criterion |
 | High-risk Key assumption | `## Notes` (or `## Key assumptions`) — mark validated or replace with concrete statement |
 | Scope boundary unclear | `## Scope boundaries` — move item from vague phrasing to explicit In/Out entry |
+| Cut / descoped AC or Use Case | `## Acceptance criteria` / `## Use Cases & Scenarios` — never delete or renumber `AC-N` / `UC-N`; mark `- [~] **AC-N [wont]:** [text] — Reason: [why]` (or `[retired]`) |
 | Integration dependency unnamed | `## Notes` — add named dependency; remove marker |
 | Terminology divergence | `## Goal & Value` / `## Summary` — normalize to chosen term; update `## Use Cases & Scenarios` / `## Acceptance criteria` for consistency |
 | Edge case unaddressed | `## Use Cases & Scenarios` (add or sharpen UC) or `## Acceptance criteria` — add the edge case path explicitly |

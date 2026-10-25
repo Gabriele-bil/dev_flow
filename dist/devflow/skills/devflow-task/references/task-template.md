@@ -98,6 +98,7 @@ Format rules:
 - **User Story**: strictly Connextra format. Real persona (never tech role); intent-based action (no compound conjunctions); true value (no tautology).
 - **Use Cases**: at least 1 Happy Path (`UC-1`) and 1-2 Alternative/Error/Edge Case scenarios (`UC-2`, `UC-3`). Isolate Read/View from Action/Write.
 - **Acceptance criteria**: strict BDD Gherkin (`GIVEN ... WHEN ... THEN ...`), exactly one `When` per scenario. Mapped directly to Use Cases (e.g. `AC-1 (UC-1)`). Observable, falsifiable, binary pass/fail. Explicit async coverage (loading, disabled controls to prevent double submit, error recovery).
+- **Permanent IDs (`[wont]` / `[retired]`)**: once `UC-N` or `AC-N` is written, never delete, renumber, or reuse its ID. If the user cuts a criterion or use case later, keep its ID in place and mark it `- [~] **AC-N (UC-M) [wont]:** [original text] — Reason: [why cut]` (or `[retired]` when superseded). Prevents broken traceability links and stops downstream agents from re-proposing cut scope.
 - **Scope boundaries**: In-scope defines functional commitments; Out-of-scope marks explicit trade-offs and non-goals.
 - **Assumptions & Risks**: structured bullets feed directly into `plan.md` architecture decisions and risks/mitigations table.
 - **Language**: English. All written documents must be in English regardless of conversation language.

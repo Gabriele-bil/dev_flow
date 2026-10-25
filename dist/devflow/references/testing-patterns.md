@@ -88,6 +88,24 @@ Before writing tests:
 
 In `devflow-test`: target **pass^k ≥ 1** for all written tests. A test that passes only sometimes is a flaky test — fix or remove.
 
+## Paired Control Protocol (Flake vs Regression Isolation)
+
+Before blaming current feature changes for an unexpected failure or dismissing a red test as a flake:
+
+1. **Isolation run:** run the failing test file alone. If it passes alone but fails in the suite → shared state or ordering pollution between tests; fix test setup/teardown.
+2. **Paired control (candidate vs baseline):** if an untouched test fails in isolation, run the exact same command on the pre-feature baseline (`devflow-checkpoint/<branch>/implement` or `main`) and on the candidate branch:
+   - Control **passes** + candidate **fails** → genuine regression caused by this feature; fix before proceeding.
+   - Control **fails** + candidate **fails** → pre-existing broken test on baseline; document both command outputs as evidence in the test report and log via `devflow.learn`. Never silently skip without paired evidence.
+
+## Canonical Edge Matrix
+
+Most bugs live at an edge the happy-path test skipped. When writing edge tests (`standard` / `thorough`), probe:
+
+- **Numbers:** `0`, `1`, exact max limit, `limit + 1`, negative values
+- **Dates/Times:** `today`, `yesterday`, timezone offset / midnight boundary
+- **Lists:** empty `[]`, single item, first and last item, duplicates
+- **Containment:** tests that write files or state must use temporary directories/sandboxes and never mutate global home or tracked repo files
+
 ## Verification Checkpoints (Multi-Step Features)
 
 Set explicit checkpoints during `devflow-implement`:

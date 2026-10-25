@@ -47,9 +47,9 @@ Read in order:
 
 If no path is provided, resolve the highest `NNN_` prefix under `devflow/features/`.
 
-### Step 2 — Run 6 detection passes
+### Step 2 — Run 7 detection passes
 
-Run all passes independently and collect findings. Do not stop after the first failing pass — produce a complete report.
+Run all passes independently and collect findings. Do not stop after the first failing pass — produce a complete report. Skip `task.md` rows explicitly marked `[wont]` or `[retired]` (verify they are not cited in `plan.md` Traceability).
 
 ---
 
@@ -123,6 +123,17 @@ For each entry in `plan.md` File List:
 - Scan referenced ADRs (or active ADRs in `docs/adr/`) for Accepted decisions, rejected alternatives, and scope boundaries.
 - Flag if `plan.md` re-introduces a rejected alternative or violates an accepted ADR constraint without an explicit override/waiver.
 - Severity: **Critical** if direct contradiction to an accepted ADR; **Required** if planned approach deviates without an explicit ADR waiver in Architecture decisions.
+
+---
+
+#### Pass G — Client & product fidelity (`spec-review`)
+
+**Goal:** verify `task.md` + `plan.md` serve user intent as the client experiences the product, not merely literal mechanics.
+
+- **Literal vs intent gap:** flag rows where planned behavior satisfies the AC phrasing to the letter while missing the stated problem in `## Goal & Value` (**Required**).
+- **Deleted or renumbered IDs:** flag any gap in `UC-1..N` or `AC-1..N` numbering or any `[wont]` / `[retired]` row still wired into `plan.md` Traceability (**Required**).
+- **Missing vs Zero display:** flag user-facing counters, totals, or metrics that lack an explicit empty/unavailable state when inputs are missing (showing `0`, `NaN`, or blank instead of a labeled fallback) (**Required**).
+- **Internal jargon / ID leak:** flag user-facing copy, alerts, or error messages in `task.md` or `plan.md` that expose raw database IDs, field names, stack traces, or internal codes (**Required**).
 
 ---
 

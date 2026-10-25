@@ -41,6 +41,7 @@ Before dispatching, verify all of the following. Stop and report which check fai
 - [ ] `plan.md` exists at `devflow/features/[NNN]_[feature-name]/plan.md`
 - [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md`
 - [ ] Depth profile resolved from `plan.md` `**Complexity:**` per `@devflow/references/complexity-scoring.md` (missing → `standard`)
+- [ ] **Rigor Ratchet Checks (conditional):** if `.devflow-instincts.shared.yaml` contains entries with `check_cmd`, execute them (`devflow.learn check`). Any check exceeding its `ratchet_max` (or exiting non-zero when no ratchet is set) is recorded as a **Required** finding in Step 3.
 
 ---
 

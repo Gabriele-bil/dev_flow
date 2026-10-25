@@ -5,13 +5,15 @@ Full per-axis checklist for `devflow.beautify` Step 3. Stack-agnostic defaults; 
 ## Correctness
 
 - ACs from `task.md` met (not only `plan.md` behavior)
-- Edge cases and error paths handled (null, empty, loading/error UI, async failure)
+- Edge cases and error paths handled (null, empty, loading/error UI, async failure, missing-data vs `0` display)
+- **No silent catch (`silent-catch`):** no bare/empty `catch` clause or `.catch()` handler swallows a failure silently; every catch must rethrow, return a typed failure, or log a specific line naming its subject (**Required**)
 - State updates consistent (no races or stale UI assumptions)
 
 ## Readability and simplification
 
 - Names follow conventions; carry intent (no `data`, `result`, `temp` without context)
 - No unnecessary nesting, long methods, or nested ternaries (prefer early return)
+- **File & change size budget (`size-budget`):** flag any changed source file that exceeds 1,500 lines or grows by >400 net non-test lines in a single change; propose splitting cohesive responsibilities
 - Domain/data logic not in presentation components
 - **Preserve behavior:** simplifications must not change outputs, errors, side effects, or ordering. If unsure, treat as opinionated and propose first
 - **Chesterton's fence:** before removing or inlining code, understand why it exists (performance, platform constraint, history). If unclear, propose instead of deleting
