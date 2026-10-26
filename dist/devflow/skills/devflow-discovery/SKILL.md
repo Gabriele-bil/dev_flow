@@ -80,6 +80,7 @@ Tests passing, ready to merge?
 | "Chain the middle steps unattended", "implement through test without stopping" | `/devflow.run` (explicit command — opt-in autonomy) |
 | "Build this idea end to end automatically", "go from idea to PR in total autonomy", "run entire pipeline unattended" | `/devflow.auto` (explicit command — opt-in autonomy) |
 | "Bug slipped through", "Failing test exposed spec gap" | `devflow.backprop` |
+| "Open project board", "Show Kanban / task DAG / command timings", "Generate visual HTML board" | `devflow.board` |
 | "Set up project", "Initialize" | `devflow.setup` |
 
 ## Adapter Resolution (every step except task and setup)

@@ -1,0 +1,14 @@
+{
+  "skill_name": "devflow-board",
+  "trigger": {
+    "positive": [
+      { "prompt": "Generate the static read-only HTML project board in devflow/board/index.html to inspect Kanban columns, dependency DAG, and command timings", "top_k": 3 },
+      { "prompt": "Run devflow.board to open the visual kanban board and check task lead times and formatted Markdown specs", "top_k": 3 },
+      { "prompt": "Sync board-data.js and view the read-only HTML project board with inter-task blockers and command execution durations", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "Show terminal bash filter token savings and pass@1 rate with devflow.metrics", "owner": "devflow-metrics" },
+      { "prompt": "Create a new product task specification for this feature idea", "owner": "devflow-task" }
+    ]
+  }
+}

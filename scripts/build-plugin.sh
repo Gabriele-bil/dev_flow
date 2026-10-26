@@ -35,6 +35,15 @@ step "Build plugin: $NAME v$VERSION"
 
 bash "$BUILDERS_DIR/build-claude.sh"
 
+# Ship runtime utility scripts (board.sh, metrics.sh, doctor.sh) in dist/devflow/scripts/
+mkdir -p "$DIST_DIR/scripts"
+for RUNTIME_SH in board.sh metrics.sh doctor.sh validate-skills.sh; do
+  if [ -f "$TEMPLATE_DIR/scripts/$RUNTIME_SH" ]; then
+    cp "$TEMPLATE_DIR/scripts/$RUNTIME_SH" "$DIST_DIR/scripts/$RUNTIME_SH"
+    chmod +x "$DIST_DIR/scripts/$RUNTIME_SH" 2>/dev/null || true
+  fi
+done
+
 if [ "$CURSOR_SUPPORT" = "true" ]; then
   bash "$BUILDERS_DIR/build-cursor.sh"
 fi
@@ -57,7 +66,7 @@ echo ""
 echo "  Catalog: ${SKILLS_COUNT} skill(s)  ${AGENTS_COUNT} agent(s)  ${REFS_COUNT} reference(s)"
 
 # Fail if skills drop below baseline (updated after adding new skills)
-SKILLS_MIN=44
+SKILLS_MIN=45
 if [ "$SKILLS_COUNT" -lt "$SKILLS_MIN" ]; then
   echo "  ERROR: skill count ($SKILLS_COUNT) below minimum ($SKILLS_MIN) — possible build regression"
   exit 1

@@ -47,7 +47,7 @@ STEP=""
 FEATURE=""
 if [ -f "$STATE_FILE" ]; then
   STEP=$(jq -r '.next_step // empty' "$STATE_FILE" 2>/dev/null) || true
-  FEATURE=$(jq -r '.feature // empty' "$STATE_FILE" 2>/dev/null) || true
+  FEATURE=$(jq -r '.active_feature // .feature // empty' "$STATE_FILE" 2>/dev/null) || true
 fi
 
 # ------------------------------------------------------------------
@@ -64,10 +64,10 @@ fi
 # Build and append JSONL entry
 # ------------------------------------------------------------------
 if [ "$EVENT" = "pre" ]; then
-  # For pre events: include optional file (only for Write/Edit tools)
+  # For pre events: include optional file (only for Write/Edit/Read tools)
   FILE_PATH=""
-  if [ "$TOOL" = "Write" ] || [ "$TOOL" = "Edit" ]; then
-    FILE_PATH=$(printf '%s' "$RAW" | jq -r '.tool_use.input.file_path // empty' 2>/dev/null) || true
+  if [ "$TOOL" = "Write" ] || [ "$TOOL" = "Edit" ] || [ "$TOOL" = "MultiEdit" ] || [ "$TOOL" = "Read" ]; then
+    FILE_PATH=$(printf '%s' "$RAW" | jq -r '.tool_use.input.file_path // .tool_use.input.path // empty' 2>/dev/null) || true
   fi
 
   # For Bash tool: capture the command (truncated) so downstream analysis
@@ -75,6 +75,60 @@ if [ "$EVENT" = "pre" ]; then
   CMD=""
   if [ "$TOOL" = "Bash" ]; then
     CMD=$(printf '%s' "$RAW" | jq -r '.tool_use.input.command // empty' 2>/dev/null | cut -c1-300) || true
+  fi
+
+  # ------------------------------------------------------------------
+  # Command timing tracker: record turn/command start in .devflow-state.json
+  # ------------------------------------------------------------------
+  if [ -f "$STATE_FILE" ]; then
+    NOW_EPOCH=$(date +%s 2>/dev/null || echo 0)
+    INFERRED_CMD=""
+    # Detect explicit skill/command read or feature artifact write
+    if echo "$FILE_PATH" | grep -qE 'skills/devflow-(task|clarify|plan|analyze|implement|beautify|test|ship|pr|hotfix)/SKILL\.md'; then
+      INFERRED_CMD=$(echo "$FILE_PATH" | sed -E 's|.*skills/devflow-([a-z]+)/SKILL\.md.*|\1|')
+    elif echo "$FILE_PATH" | grep -qE 'commands/devflow\.(task|clarify|plan|analyze|implement|beautify|test|ship|pr|hotfix)\.md'; then
+      INFERRED_CMD=$(echo "$FILE_PATH" | sed -E 's|.*commands/devflow\.([a-z]+)\.md.*|\1|')
+    elif echo "$FILE_PATH" | grep -qE 'devflow/features/[0-9]{3}_[^/]+/task\.md$' && [ "$TOOL" != "Read" ]; then
+      INFERRED_CMD="task"
+    elif echo "$FILE_PATH" | grep -qE 'devflow/features/[0-9]{3}_[^/]+/plan\.md$' && [ "$TOOL" != "Read" ]; then
+      CUR_AC=$(jq -r '.active_command // empty' "$STATE_FILE" 2>/dev/null) || true
+      [ -z "$CUR_AC" ] && INFERRED_CMD="plan"
+    elif echo "$FILE_PATH" | grep -qE 'devflow/features/[0-9]{3}_[^/]+/verification\.md$' && [ "$TOOL" != "Read" ]; then
+      INFERRED_CMD="test"
+    fi
+
+    CUR_STARTED=$(jq -r '.turn_started_at // empty' "$STATE_FILE" 2>/dev/null) || true
+    CUR_CMD=$(jq -r '.active_command // empty' "$STATE_FILE" 2>/dev/null) || true
+    if [ -z "$CUR_CMD" ] && [ -n "$STEP" ]; then
+      case "$STEP" in
+        devflow.task|devflow.clarify|devflow.plan|devflow.analyze|devflow.implement|devflow.beautify|devflow.test|devflow.ship|devflow.pr|devflow.hotfix)
+          CUR_CMD="${STEP#devflow.}"
+          ;;
+        task|clarify|plan|analyze|implement|beautify|test|ship|pr|hotfix)
+          CUR_CMD="$STEP"
+          ;;
+      esac
+    fi
+    [ -n "$INFERRED_CMD" ] && CUR_CMD="$INFERRED_CMD"
+
+    if [ -z "$CUR_STARTED" ] || [ -n "$INFERRED_CMD" ]; then
+      STATE_TMP="${STATE_FILE}.pre.tmp"
+      jq \
+        --arg started_at "${CUR_STARTED:-$TS}" \
+        --argjson started_epoch "$NOW_EPOCH" \
+        --arg cmd "$CUR_CMD" \
+        '. + {
+          turn_started_at: (if (.turn_started_at // "") != "" then .turn_started_at else $started_at end),
+          turn_started_epoch: (if (.turn_started_epoch // 0) > 0 then .turn_started_epoch else $started_epoch end)
+        } + (if $cmd != "" then {active_command: $cmd} else {} end)' \
+        "$STATE_FILE" > "$STATE_TMP" 2>/dev/null \
+        && mv "$STATE_TMP" "$STATE_FILE" 2>/dev/null || rm -f "$STATE_TMP" 2>/dev/null || true
+    fi
+  fi
+
+  # Don't pollute file churn log with Read paths
+  if [ "$TOOL" = "Read" ]; then
+    FILE_PATH=""
   fi
 
   # Build JSON incrementally using jq to ensure proper escaping

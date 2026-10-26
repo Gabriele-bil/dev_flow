@@ -38,6 +38,11 @@ if ! bash "$SCRIPT_DIR/test-metrics.sh"; then
 fi
 
 echo ""
+if ! bash "$SCRIPT_DIR/test-board.sh"; then
+  FAILED=1
+fi
+
+echo ""
 if [ "$FAILED" -eq 0 ]; then
   echo "✅ All hook tests passed"
 else
