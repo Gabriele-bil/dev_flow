@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.18.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.17.0...devflow-v1.18.0) (2026-10-26)
+
+
+### Features
+
+* Add AI E2E testing conventions and ephemeral PR screenshots ([fdc2cf4](https://github.com/Gabriele-bil/dev_flow/commit/fdc2cf4ec3521200beed2d95d1bac74a4a272f3f))
+* Add Clarity skill ([214c799](https://github.com/Gabriele-bil/dev_flow/commit/214c799217ca2c5fd0f0c58df33a92468190e29c))
+* AI E2E Testing & Ephemeral PR UI Screenshots ([d7e165b](https://github.com/Gabriele-bil/dev_flow/commit/d7e165b126533365c379412af0849d9b25f50452))
+* Autonomous end-to-end PR flow, E2E/UI screenshots, Agile BDD tasks, and scope/verification guards ([c76f794](https://github.com/Gabriele-bil/dev_flow/commit/c76f79457573edf5057ac57cab5d7450329dc79d))
+* Enable end-to-end autonomous delivery to PR in devflow.auto ([6bb0411](https://github.com/Gabriele-bil/dev_flow/commit/6bb0411aac662ad5f15e3e6f1786ce6bb96db2c3))
+* Enable End-to-End Autonomous Delivery to PR in devflow.auto ([b62e58f](https://github.com/Gabriele-bil/dev_flow/commit/b62e58f21925f3fff49e0ed1f75994c8320d22ef))
+* Enhance DevFlow task templates and guidelines ([b623f45](https://github.com/Gabriele-bil/dev_flow/commit/b623f45307250df9e7198a91e02a08c12322235f))
+* Enhance DevFlow templates and skills with new checks and guidelines ([deaf414](https://github.com/Gabriele-bil/dev_flow/commit/deaf414393572cde5ffaed490072b53d03eddbd5))
+* Refine documentation across multiple skills in DevFlow ([5c95d8e](https://github.com/Gabriele-bil/dev_flow/commit/5c95d8e88aa8159b828bd1f2176da345f9671899))
+* **task:** Restructure devflow-task with agile use cases and product-only format ([7167a89](https://github.com/Gabriele-bil/dev_flow/commit/7167a895853e6a7c3be21c44df031d2d50dacc54))
+
+
+### Bug Fixes
+
+* Improve clarity and correctness in documentation and scripts ([3a60ad7](https://github.com/Gabriele-bil/dev_flow/commit/3a60ad7eab6608789e9c8e0cb26fcfae88018e69))
+* Refactor SKILL.md files to standardize argument hints and descriptions ([c9a8bd2](https://github.com/Gabriele-bil/dev_flow/commit/c9a8bd2717fc196b015df5171fbfff49d798c9a9))
+
 ## [1.17.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.16.0...devflow-v1.17.0) (2026-09-27)
 
 ### Features
