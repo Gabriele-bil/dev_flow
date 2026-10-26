@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.19.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.18.0...devflow-v1.19.0) (2026-10-26)
+
+
+### Features
+
+* Add devflow.board read-only board and command timing telemetry ([13e6514](https://github.com/Gabriele-bil/dev_flow/commit/13e65148545356fbf03a3d7589163221ee3d8a06))
+* Add devflow.init for greenfield bootstrap and multi-task roadmaps ([bc0adec](https://github.com/Gabriele-bil/dev_flow/commit/bc0adec9544ada759028924e79de5a84e9c9af9e))
+* Greenfield project bootstrap (devflow.init) & static read-only project board with timing telemetry (devflow.board) ([208c3cf](https://github.com/Gabriele-bil/dev_flow/commit/208c3cf727898657b67b6b6d36099bd7cc93baee))
+* Greenfield Project Bootstrap & Multi-Task Roadmap Initialization (devflow.init) ([9cbd7e3](https://github.com/Gabriele-bil/dev_flow/commit/9cbd7e3def07b26fd254c39249aad5698535e79f))
+* Static Read-Only Auto-Updating DevFlow Project Board & Command Timing Telemetry (devflow.board) ([35b06d6](https://github.com/Gabriele-bil/dev_flow/commit/35b06d6c1977a3e511af258553d3457dd87d5e8f))
+
 ## [1.18.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.17.0...devflow-v1.18.0) (2026-10-26)
 
 
