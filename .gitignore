@@ -91,5 +91,11 @@ node_modules/
 # devflow token/cost metrics (estimate)
 .devflow-metrics.jsonl
 
+# devflow command timing telemetry
+.devflow-timings.jsonl
+
+# devflow generated local HTML board
+devflow/board/
+
 # devflow fetch cache
 .devflow-fetch-cache/

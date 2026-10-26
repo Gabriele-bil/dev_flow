@@ -114,6 +114,7 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 | `devflow.backprop` | Backpropagate escaped bug into spec — classify gap, tighten AC, add regression test |
 | `devflow.learn` | Manage instincts — log / search / list / prune / boost / promote to team store |
 | `devflow.metrics` | Telemetry dashboard — bash filter savings, estimated cost, pass@1, step duration |
+| `devflow.board` | Static, read-only, auto-updating HTML project board (`devflow/board/index.html`) — Kanban pipeline, dependency DAG critical path, Markdown viewer, and command timings |
 | `devflow.recovery` | Diagnose + recover a stuck or corrupted pipeline |
 
 ## Hooks

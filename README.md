@@ -50,6 +50,7 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 | `devflow.rollback` | [`templates/devflow/skills/devflow-rollback/SKILL.md`](templates/devflow/skills/devflow-rollback/SKILL.md) | — → revert active step (implement/beautify) to pre-step checkpoint |
 | `devflow.learn` | [`templates/devflow/skills/devflow-learn/SKILL.md`](templates/devflow/skills/devflow-learn/SKILL.md) | — → manage instincts (local vs shared team gotchas, promote to REGISTRY.md) |
 | `devflow.metrics` | [`templates/devflow/skills/devflow-metrics/SKILL.md`](templates/devflow/skills/devflow-metrics/SKILL.md) | — → telemetry dashboard (bash filter savings, cost est., pass@1, step duration) |
+| `devflow.board` | [`templates/devflow/skills/devflow-board/SKILL.md`](templates/devflow/skills/devflow-board/SKILL.md) | — → static, read-only, auto-updating HTML project board (`devflow/board/index.html`) with Kanban, Dependency DAG, Markdown viewer, and command timings |
 | `devflow.recovery` | [`templates/devflow/skills/devflow-recovery/SKILL.md`](templates/devflow/skills/devflow-recovery/SKILL.md) | Stuck pipeline → diagnosis + targeted recovery path |
 
 Command wrappers live in [`templates/devflow/commands/`](templates/devflow/commands/).
@@ -90,6 +91,7 @@ dev_flow/
 │       │   ├── devflow-beautify/
 │       │   ├── devflow-clarify/
 │       │   ├── devflow-blueprint/
+│       │   ├── devflow-board/
 │       │   ├── devflow-discover/
 │       │   ├── devflow-discovery/
 │       │   ├── devflow-implement/

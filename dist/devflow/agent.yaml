@@ -104,6 +104,9 @@ pipeline:
     - command: /devflow.metrics
       skill: devflow-metrics
       description: "Display token savings dashboard, estimated cost per feature, pass@1 success rate, and step durations"
+    - command: /devflow.board
+      skill: devflow-board
+      description: "Generate and auto-sync a deterministic, static, read-only HTML project board in devflow/board/index.html showing tasks, Kanban pipeline, dependency DAG, Markdown docs, and command timings"
 
 agents:
   - id: code-reviewer
@@ -207,6 +210,9 @@ skills:
     - id: devflow-metrics
       path: skills/devflow-metrics/SKILL.md
       description: "Display token savings dashboard, estimated cost per feature, pass@k success rate, and step durations. Use when user runs devflow.metrics or inspects token efficiency"
+    - id: devflow-board
+      path: skills/devflow-board/SKILL.md
+      description: "Generates and auto-syncs a deterministic, static, read-only HTML project board in devflow/board/index.html visualizing Kanban task stages, dependency DAG critical path, formatted Markdown specs, and per-command execution timings. Use when user runs devflow.board, opens the visual project kanban board, or inspects task lead times"
 
   adapters:
     flutter:
