@@ -12,7 +12,7 @@ disable-model-invocation: true
 Run `/devflow.plan [optional task path]`.
 
 - If an argument is passed, use it as the `task.md` path
-- If no argument is passed, resolve the latest `devflow/features/*/task.md`
+- If no argument is passed, check `.devflow-state.json` (`active_feature` / `feature_path` if un-planned) or select the first `devflow/features/[NNN]_*/task.md` in ascending numerical order without a `plan.md` whose `**Blockers:**` are satisfied (`done`)
 - Produce `plan.md` in the same feature directory
 
 ## Purpose
@@ -62,7 +62,7 @@ If any item fails → stop, report which check failed, do not write `plan.md`.
 
 ## Input
 
-Path: `devflow/features/[NNN]_[feature-name]/task.md` — if no arg, resolve latest.
+Path: `devflow/features/[NNN]_[feature-name]/task.md` — if no arg, resolve via `.devflow-state.json` (`active_feature` / `feature_path` lacking `plan.md`) or select the lowest-numbered `devflow/features/[NNN]_*/task.md` without a `plan.md` whose declared `**Blockers:**` are `done` (never blindly pick highest `NNN` when pre-generated roadmap tasks exist).
 
 Feature numbering: IDs strictly incremental; never reuse prefix. Next = highest existing + 1.
 

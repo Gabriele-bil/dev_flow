@@ -67,6 +67,7 @@ node_modules/
 
 # devflow runtime state
 .devflow-state.json
+.devflow-run.json
 .devflow-fanout-state.json
 .devflow-worktrees.json
 
