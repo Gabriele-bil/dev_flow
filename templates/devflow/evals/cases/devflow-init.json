@@ -1,0 +1,14 @@
+{
+  "skill_name": "devflow-init",
+  "trigger": {
+    "positive": [
+      { "prompt": "Bootstrap a brand-new greenfield project from scratch with Nx, Next.js, NestJS, DevFlow context files, and the full ordered task roadmap", "top_k": 3 },
+      { "prompt": "Run devflow.init to interview me, scaffold a new Flutter or Angular workspace, generate ADR-001, and create all project tasks in dependency order", "top_k": 3 },
+      { "prompt": "Start a new software project from zero with live technology scaffolding and multi-task roadmap generation", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "Regenerate AGENTS.md and REGISTRY.md in this existing repo after changing adapter settings", "owner": "devflow-setup" },
+      { "prompt": "Create a single DevFlow task specification for this new feature idea", "owner": "devflow-task" }
+    ]
+  }
+}

@@ -31,6 +31,7 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 
 | Command | Skill | Input → Output |
 | -------- | -------- | ---------------- |
+| `devflow.init` | [`templates/devflow/skills/devflow-init/SKILL.md`](templates/devflow/skills/devflow-init/SKILL.md) | Project brief + interview → greenfield repo + live tech scaffold (Nx, Angular, Next.js, Flutter, NestJS) + `AGENTS.md` + `REGISTRY.md` + `constitution.md` + `ADR-001` + `project-blueprint.md` + ordered `001..NNN` `task.md` files |
 | `devflow.setup` | [`templates/devflow/skills/devflow-setup/SKILL.md`](templates/devflow/skills/devflow-setup/SKILL.md) | Consumer repo context + adapter templates → root `AGENTS.md` + `REGISTRY.md` |
 | `devflow.task` | [`templates/devflow/skills/devflow-task/SKILL.md`](templates/devflow/skills/devflow-task/SKILL.md) | Idea → `devflow/features/[NNN]_[name]/task.md` |
 | `devflow.plan` | [`templates/devflow/skills/devflow-plan/SKILL.md`](templates/devflow/skills/devflow-plan/SKILL.md) | `task.md` → `plan.md` |
@@ -92,6 +93,7 @@ dev_flow/
 │       │   ├── devflow-discover/
 │       │   ├── devflow-discovery/
 │       │   ├── devflow-implement/
+│       │   ├── devflow-init/
 │       │   ├── devflow-learn/
 │       │   ├── devflow-plan/
 │       │   ├── devflow-pr/
