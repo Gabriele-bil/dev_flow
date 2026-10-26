@@ -10,6 +10,10 @@ description: "Spec-driven development pipeline: task → plan → implement → 
 
 pipeline:
   steps:
+    - id: init
+      command: /devflow.init
+      skill: devflow-init
+      description: "End-to-end greenfield project bootstrap: upfront long-process notice, multi-phase interview, evergreen technology scaffolding (Nx, Angular, Next.js, Flutter, NestJS), DevFlow context + ADR-001 generation, and topological multi-task roadmap (001..NNN)"
     - id: discover
       command: /devflow.discover
       skill: devflow-discover
@@ -100,6 +104,9 @@ pipeline:
     - command: /devflow.metrics
       skill: devflow-metrics
       description: "Display token savings dashboard, estimated cost per feature, pass@1 success rate, and step durations"
+    - command: /devflow.board
+      skill: devflow-board
+      description: "Generate and auto-sync a deterministic, static, read-only HTML project board in devflow/board/index.html showing tasks, Kanban pipeline, dependency DAG, Markdown docs, and command timings"
 
 agents:
   - id: code-reviewer
@@ -125,6 +132,9 @@ agents:
 
 skills:
   core:
+    - id: devflow-init
+      path: skills/devflow-init/SKILL.md
+      description: "Bootstraps greenfield projects end-to-end: conducts a multi-phase interview, scaffolds evergreen workspaces (Nx, Angular, Next.js, Flutter, NestJS), generates plugin context and ADR-001, and writes an ordered multi-task roadmap with inter-task dependencies. Use when user runs devflow.init or starts a brand-new project from scratch"
     - id: devflow-discover
       path: skills/devflow-discover/SKILL.md
       description: "Guides architectural discovery for greenfield applications or complex features, compares technical options, and records decisions in ADRs. Use when exploring architecture choices, evaluating trade-offs, or before devflow.setup or devflow.task"
@@ -200,6 +210,9 @@ skills:
     - id: devflow-metrics
       path: skills/devflow-metrics/SKILL.md
       description: "Display token savings dashboard, estimated cost per feature, pass@k success rate, and step durations. Use when user runs devflow.metrics or inspects token efficiency"
+    - id: devflow-board
+      path: skills/devflow-board/SKILL.md
+      description: "Generates and auto-syncs a deterministic, static, read-only HTML project board in devflow/board/index.html visualizing Kanban task stages, dependency DAG critical path, formatted Markdown specs, and per-command execution timings. Use when user runs devflow.board, opens the visual project kanban board, or inspects task lead times"
 
   adapters:
     flutter:
@@ -475,4 +488,4 @@ contexts:
     suggested_for: [devflow.ship]
   - id: research
     path: contexts/research.md
-    suggested_for: [devflow.discover, devflow.task, devflow.plan]
+    suggested_for: [devflow.init, devflow.discover, devflow.task, devflow.plan]

@@ -90,6 +90,37 @@ COST=$(jq -r '.estimated_cost_usd // "absent"' "$d/.devflow-metrics.jsonl" 2>/de
   || assert "T4: unknown model omits cost field (got $COST)" fail
 rm -rf "$d"
 
+# ── T5: command timing telemetry (.devflow-timings.jsonl) + active_feature ──
+d=$(tmpdir)
+write_transcript "$d/transcript.jsonl"
+cat > "$d/.devflow-state.json" <<'EOF'
+{
+  "active_feature": "003_devflow-board",
+  "next_step": "devflow.implement",
+  "active_command": "implement",
+  "turn_started_at": "2026-10-26T08:00:00Z",
+  "turn_started_epoch": 1000
+}
+EOF
+run_hook "$d" "{\"transcript_path\":\"$d/transcript.jsonl\",\"session_id\":\"s-timing\"}"
+TLOG="$d/.devflow-timings.jsonl"
+[ -f "$TLOG" ] \
+  && assert "T5a: timings file written" pass \
+  || assert "T5a: timings file written" fail
+T_FEAT=$(jq -r '.active_feature // empty' "$TLOG" 2>/dev/null || echo "")
+[ "$T_FEAT" = "003_devflow-board" ] \
+  && assert "T5b: active_feature recorded in timings" pass \
+  || assert "T5b: active_feature recorded in timings (got '$T_FEAT')" fail
+T_CMD=$(jq -r '.command // empty' "$TLOG" 2>/dev/null || echo "")
+[ "$T_CMD" = "implement" ] \
+  && assert "T5c: command recorded in timings" pass \
+  || assert "T5c: command recorded in timings (got '$T_CMD')" fail
+T_DUR=$(jq -r '.duration_sec // 0' "$TLOG" 2>/dev/null || echo "0")
+[ "$T_DUR" -gt 0 ] \
+  && assert "T5d: duration_sec computed (>0)" pass \
+  || assert "T5d: duration_sec computed (>0, got '$T_DUR')" fail
+rm -rf "$d"
+
 echo ""
 echo "── test-stop-metrics.sh: $PASS passed, $FAIL failed ──"
 [ "$FAIL" -eq 0 ] && exit 0 || exit 1

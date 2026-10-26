@@ -11,8 +11,9 @@ Pipeline orientation. Use at session start or when unsure which step to run.
 ## Pipeline Overview
 
 ```text
-devflow.discover (optional) → devflow.setup → devflow.task → devflow.plan → devflow.implement → devflow.beautify → devflow.test → devflow.ship → devflow.pr
-                                            ↘ devflow.blueprint (3+ PRs / multi-session)
+devflow.init (greenfield end-to-end bootstrap + full roadmap) ──────────────┐
+devflow.discover (optional) → devflow.setup → devflow.task ─────────────────┼→ devflow.plan → devflow.implement → devflow.beautify → devflow.test → devflow.ship → devflow.pr
+                                            ↘ devflow.blueprint (3+ PRs) ───┘
                                               → devflow.plan (per step) → devflow.implement → ...
 ```
 
@@ -21,6 +22,9 @@ Each step has an input contract. Each step verifies its own preconditions. User 
 ## Entry Point Decision Tree
 
 ```text
+Starting a brand-new greenfield project from scratch (scaffold stack + context + full ordered task roadmap)?
+  └─ YES → devflow.init (produces live stack scaffold, AGENTS.md, constitution.md, ADR-001, project-blueprint.md, and 001..NNN task.md files)
+
 Unsure about stack, high-level architecture, or feature technical design?
   └─ YES → devflow.discover (produces docs/adr/ADR-NNN-[title].md)
 
@@ -61,6 +65,7 @@ Tests passing, ready to merge?
 
 | What user said | Entry point |
 | ---------------- | ------------- |
+| "Bootstrap a new project from scratch", "Initialize greenfield app + full task roadmap", "Create new Nx / Angular / Next.js / Flutter / NestJS project with DevFlow" | `devflow.init` |
 | "Architect this", "Choose stack", "Compare technical approaches", "Discovery" | `devflow.discover` |
 | "Build X", "Add X", "I want X" | `devflow.task` |
 | "Plan this large objective", "3+ PRs", "multi-session" | `devflow.blueprint` |
@@ -75,6 +80,7 @@ Tests passing, ready to merge?
 | "Chain the middle steps unattended", "implement through test without stopping" | `/devflow.run` (explicit command — opt-in autonomy) |
 | "Build this idea end to end automatically", "go from idea to PR in total autonomy", "run entire pipeline unattended" | `/devflow.auto` (explicit command — opt-in autonomy) |
 | "Bug slipped through", "Failing test exposed spec gap" | `devflow.backprop` |
+| "Open project board", "Show Kanban / task DAG / command timings", "Generate visual HTML board" | `devflow.board` |
 | "Set up project", "Initialize" | `devflow.setup` |
 
 ## Adapter Resolution (every step except task and setup)

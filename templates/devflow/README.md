@@ -92,6 +92,7 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 
 | Command | What it does |
 | --- | --- |
+| `devflow.init` | Bootstrap a greenfield project end-to-end: multi-phase interview → evergreen tech scaffolding (Nx, Angular, Next.js, Flutter, NestJS) → DevFlow context + `ADR-001` → `project-blueprint.md` + ordered `001..NNN` `task.md` roadmap |
 | `devflow.discover` | Explore architectural choices for app creation or complex features → comparative trade-offs + formal ADR |
 | `devflow.setup` | Generate `AGENTS.md`, `REGISTRY.md`, and `docs/product.md` from adapter templates |
 | `devflow.task` | Raw idea → structured task with HMW framing and verifiable subtasks |
@@ -113,6 +114,7 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 | `devflow.backprop` | Backpropagate escaped bug into spec — classify gap, tighten AC, add regression test |
 | `devflow.learn` | Manage instincts — log / search / list / prune / boost / promote to team store |
 | `devflow.metrics` | Telemetry dashboard — bash filter savings, estimated cost, pass@1, step duration |
+| `devflow.board` | Static, read-only, auto-updating HTML project board (`devflow/board/index.html`) — Kanban pipeline, dependency DAG critical path, Markdown viewer, and command timings |
 | `devflow.recovery` | Diagnose + recover a stuck or corrupted pipeline |
 
 ## Hooks

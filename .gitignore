@@ -67,6 +67,7 @@ node_modules/
 
 # devflow runtime state
 .devflow-state.json
+.devflow-run.json
 .devflow-fanout-state.json
 .devflow-worktrees.json
 
@@ -89,6 +90,12 @@ node_modules/
 
 # devflow token/cost metrics (estimate)
 .devflow-metrics.jsonl
+
+# devflow command timing telemetry
+.devflow-timings.jsonl
+
+# devflow generated local HTML board
+devflow/board/
 
 # devflow fetch cache
 .devflow-fetch-cache/
