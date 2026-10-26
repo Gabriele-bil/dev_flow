@@ -1,7 +1,7 @@
 ---
 name: devflow-rollback
-description: Roll back the active DevFlow step (implement or beautify) to its pre-step checkpoint without corrupting pipeline state. Use when user runs devflow.rollback, wants to undo an implementation or beautification, or revert an agent hallucination.
-argument-hint: [--to <step>] [--force]
+description: "Roll back the active DevFlow step (implement or beautify) to its pre-step checkpoint without corrupting pipeline state. Use when user runs devflow.rollback, wants to undo an implementation or beautification, or revert an agent hallucination."
+argument-hint: "[--to <step>] [--force]"
 disable-model-invocation: true
 ---
 
@@ -15,10 +15,12 @@ Safely discard unwanted changes made during `devflow.implement` or `devflow.beau
 
 ## Core Principles
 
-- **state-safety** — git reset alone corrupts pipeline state; rollback atomically updates git files, `plan.md` status, and `.devflow-state.json`
-- **preservation-of-spec** — never delete `task.md` or `plan.md`; only reset file markers and code files
-- **explicit-confirmation** — destructive operations warn before discarding edits unless `--force` is provided
+- **spec-first** — no code before `task.md` + `plan.md` approved; rollback preserves `task.md` and `plan.md` intact
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
 - **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+- **state-safety** — git reset alone corrupts pipeline state; rollback atomically updates git files, `plan.md` status, and `.devflow-state.json`
+- **explicit-confirmation** — destructive operations warn before discarding edits unless `--force` is provided
 
 ## When NOT to Use
 

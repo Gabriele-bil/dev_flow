@@ -28,13 +28,15 @@
 
 ## Considered Options
 
+<!-- Every option must be viable (no strawmen) and name concrete mechanisms rather than buzzwords. State each option's strongest real limitation and failure mode. -->
+
 ### Option 1: [Name of Option 1]
 
-- **Description:** [Brief architectural approach, component boundaries, patterns used]
-- **Good, because:** [Key benefit 1]
-- **Good, because:** [Key benefit 2]
-- **Bad, because:** [Key drawback / limitation]
-- **Risks:** [Associated failure mode or operational risk]
+- **Description:** [Brief architectural approach, component boundaries, concrete mechanism]
+- **Good, because:** [Specific mechanism and benefit 1]
+- **Good, because:** [Specific mechanism and benefit 2]
+- **Bad, because:** [Strongest real limitation, operational cost, or trade-off]
+- **Risks:** [Concrete failure mode or migration risk]
 
 ### Option 2: [Name of Option 2]
 

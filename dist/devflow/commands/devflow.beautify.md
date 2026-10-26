@@ -1,7 +1,7 @@
 ---
 name: devflow.beautify
 description: Review and improve devflow.implement output using the devflow-beautify skill workflow.
-argument-hint: [optional-plan-path]
+argument-hint: "[optional-plan-path]"
 disable-model-invocation: true
 model: haiku
 effort: medium

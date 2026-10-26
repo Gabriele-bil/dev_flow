@@ -1,7 +1,7 @@
 ---
 name: devflow.lint-skills
 description: Validate all SKILL.md files for required structure (frontmatter, sections, style). Use to check plugin quality before releasing.
-argument-hint: [--strict]
+argument-hint: "[--strict]"
 ---
 
 Run `bash @devflow/scripts/validate-skills.sh${ $ARGUMENTS ? " " + $ARGUMENTS : "" }` and show the full output to the user.

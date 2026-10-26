@@ -1,7 +1,7 @@
 ---
 name: devflow-run
-description: Middle pipeline batch executor: chains implement → beautify → test for an approved plan in one unattended session with a consolidated report; stops before ship. Use when user runs devflow.run or asks to execute the middle pipeline autonomously without pausing at each step gate, or take plan through review and tests.
-argument-hint: [--from implement|beautify|test] [--until beautify|test|ship]
+description: "Middle pipeline batch executor: chains implement → beautify → test for an approved plan in one unattended session with a consolidated report; stops before ship. Use when user runs devflow.run or asks to execute the middle pipeline autonomously without pausing at each step gate, or take plan through review and tests."
+argument-hint: "[--from implement|beautify|test] [--until beautify|test|ship]"
 disable-model-invocation: true
 context: fork
 agent: general-purpose
@@ -38,7 +38,7 @@ Opt-in gated autonomy. Execute middle pipeline (implement → beautify → test)
 | Update `plan.md` status/`[done]`/deviations/flags, `.checkpoint.json`, `.devflow-state.json` | Route to `devflow.pr` |
 | Pick defensible default on ambiguity + log decision flag | Apply beautify **opinable** improvements (proposal-class changes) |
 | Stop on `escalation-ladder.md` Level 5 block | Proceed past ship Critical/Required findings |
-| Create feature branch per `devflow.implement` Step 3 | Install dependencies not in plan; delete files outside plan scope |
+| Switch to or create feature branch per `devflow.implement` Step 3 | Install dependencies not in plan; delete files outside plan scope |
 
 ## When NOT to Use
 

@@ -1,7 +1,7 @@
 ---
 name: devflow-test
 description: Writes/runs unit+integration tests via adapter targets, bounded retries. Use when user runs devflow.test, validates feature after beautify, or fifth pipeline step.
-argument-hint: [optional-plan-path]
+argument-hint: "[optional-plan-path]"
 disable-model-invocation: true
 allowed-tools: "Bash(pnpm lint) Bash(pnpm run lint) Bash(pnpm test*) Bash(pnpm run test*) Bash(pnpm build) Bash(pnpm run build) Bash(npm run lint) Bash(npm run test*) Bash(npm run build) Bash(ng generate*) Bash(ng g *) Bash(ng lint*) Bash(ng test*) Bash(ng build*) Bash(flutter analyze*) Bash(flutter test*) Bash(flutter build*) Bash(dart format*) Bash(dart analyze*) Bash(dart run build_runner*) Bash(git status*) Bash(git diff*) Bash(git log*)"
 ---
@@ -86,15 +86,19 @@ Read `task.md` **Acceptance criteria** section first — derive at least one tes
 
 1. **Placement** — mirror source layout and integration paths per the adapter test step file.
 2. **Unit tests** — cover models, state, domain rules, and UI assertions per the adapter test step file (load any technology skills it references).
-3. **Integration tests** — target user flows from `task.md` per the adapter test step file (targets/environments and execution order).
-4. **Execute** — run the exact commands from the adapter test step file; paste raw stdout/stderr in the Step 7 report. If `.devflow-test-summary.json` exists after the run (written by `post-bash-output-filter.sh` for recognized test-runner commands), read its `passed`/`failed`/`skipped` counts as a structured cross-check against the raw output instead of re-deriving them by eye — stale runs (from a command that isn't the one just executed) are still possible, so raw stdout/stderr stays the evidence of record in the Step 7 report.
+3. **Integration & E2E tests** — target user flows from `task.md` per the adapter test step file:
+   - Detect platform: Web (`nextjs`, `angular`) vs Mobile (`flutter`).
+   - Web: write/execute Playwright specs or drive browser runner.
+   - Mobile: write/execute Maestro flows (`.maestro/`) or Flutter `integration_test` on emulator/device.
+   - Verify clean state transitions, absence of crashes or unhandled runtime errors, and report results.
+4. **Execute** — run exact commands from the adapter test step file; paste raw stdout/stderr in the Step 7 report. When `.devflow-test-summary.json` exists (written by `post-bash-output-filter.sh`), cross-check its `passed`/`failed`/`skipped` counts against raw output; raw stdout/stderr remains the evidence of record in Step 7.
 
 **Output discipline (intermediate runs):** retry loops and analysis runs follow `@devflow/references/token-economy.md` → **Derive, don't dump** — filter at source, quote decisive failure lines, report delta on re-runs. Step 7 report still pastes mandated raw evidence.
 
 Failure handling:
 
 - Max 3 attempts per failing test
-- Attempt 1: analyze failure output and fix the test or implementation
+- Attempt 1: analyze failure output and fix the test or implementation (if failure is in an untouched module or intermittent, run the **Paired Control** isolation check per `@devflow/references/testing-patterns.md` before patching)
 - Attempt 2: verify mocks and dependencies are correctly set up
 - Attempt 3: isolate and fix root cause
 - After each failed attempt: append error + what was tried to `.checkpoint.json` `errors_tried` per `@devflow/references/state-machine.md` → **Checkpoint file** — resume/recovery skip already-tried fixes
@@ -111,9 +115,9 @@ After all tests pass, verify **backwards from the spec** per `@devflow/reference
    - **Level 2 (Substantive)**: no stubs, placeholder comments, or hardcoded returns.
    - **Level 3 (Wired)**: reachable in app flow, registered route/provider, not dead code.
    - **Level 4a (Runtime CLI/API)**: execute adapter `Verify (runtime)` target or integration spec.
-   - **Level 4b (Browser/UI Workflow)**: Web/UI adapters (`nextjs`, `angular`, `flutter`): run Playwright/e2e target or browser agent flow to verify mounting, DOM presence, critical interactions, and zero console errors.
-   - Depth per profile: `quick` → L1–L3; `standard` → L1–L3 + L4 targets when defined; `thorough` → L4 mandatory (missing target → PARTIAL).
-3. Write `devflow/features/[NNN]_[feature-name]/verification.md` using the template in `verification-levels.md`.
+   - **Level 4b (UI / Browser & Mobile Workflow)**: Web/UI adapters (`nextjs`, `angular`) and Mobile (`flutter`): run Playwright/e2e target, Maestro flow, or browser/device agent flow to verify mounting, DOM/widget presence, critical interactions, clean state transitions, and zero unhandled crash or console errors.
+   - Depth per profile: `quick` → L1–L3; `standard` → L1–L3 + L4 targets when defined + clause pinning (`file:line`); `thorough` → L4 mandatory (missing target → PARTIAL) + break-it probe & canonical edges (`verification-levels.md`).
+3. Write `devflow/features/[NNN]_[feature-name]/verification.md` using the template in `verification-levels.md` (including `Pinned Assertion (file:line)` per AC).
 4. Any **FAIL** verdict → do NOT set status `tested`. Implementation gap → fix (re-enter escalation ladder at Level 1) or report. Spec gap (AC missing/too weak) → suggest `devflow.backprop`.
 
 Passing tests do not skip this step — tests prove behavior forward; verification proves every AC satisfied, wired, reachable.
@@ -125,7 +129,7 @@ If tests pass AND `verification.md` **Result** is not FAIL: set `plan.md` `**Sta
 Include actual command output. Do NOT report "all tests passed" without raw evidence.
 
 ```text
-✅ Tests complete: [type]/[NNN]-[feature-name]
+✅ Tests complete: [type]/[NNN]_[feature-name]
 
 ### Unit tests
 [N] passed · [N] failed · [N] skipped
@@ -179,7 +183,7 @@ All tests passing and verification clean? Choose how to continue:
 3. Skip full suite and open PR directly -> devflow.pr
 ```
 
-Wait for user choice before continuing. **Run mode** (`.devflow-run.json` present): emit the block but do not wait — control returns to `devflow.run` (ship stays human).
+Wait for user choice before continuing. **Run mode** (`.devflow-run.json` present): emit the block but do not wait — control returns to the orchestrator (`devflow.run` stops at its `--until` boundary, or `devflow.auto` continues to `devflow.ship`).
 
 ## Anti-Patterns
 

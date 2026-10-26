@@ -118,22 +118,22 @@ export const proxyConfig = {
 }
 ```
 
-## 9) Parallel Routes e Intercepting Routes
+## 9) Parallel Routes and Intercepting Routes
 
-### Parallel Routes — slot `@name`
+### Parallel Routes — `@name` slots
 
-Rendono più pagine nello stesso layout simultaneamente (es. modale su sfondo):
+Render multiple pages simultaneously inside the same layout (e.g. modal overlay on background page):
 
 ```text
 app/
-  @modal/                    # slot parallelo
-    (.)product/[id]/         # intercepting route — cattura /product/[id]
-      page.tsx               # contenuto modale
+  @modal/                    # parallel slot
+    (.)product/[id]/         # intercepting route — intercepts /product/[id]
+      page.tsx               # modal content
   product/
     [id]/
-      page.tsx               # pagina completa (navigazione diretta / refresh)
-  layout.tsx                 # riceve { children, modal }
-  default.tsx                # ritorna null — slot fallback quando @modal inattivo
+      page.tsx               # full page (direct navigation / refresh)
+  layout.tsx                 # receives { children, modal }
+  default.tsx                # returns null — fallback slot when @modal is inactive
 ```
 
 ```tsx
@@ -157,7 +157,7 @@ export default function RootLayout({
 ```
 
 ```tsx
-// app/default.tsx — obbligatorio per evitare 404 al refresh
+// app/default.tsx — required to prevent 404 on hard refresh
 export default function Default() {
   return null
 }
@@ -175,15 +175,15 @@ export default function ProductModal({ params }: { params: Promise<{ id: string 
 
   return (
     <dialog open className="backdrop:bg-black/50 p-6 rounded-lg">
-      <button onClick={() => router.back()} className="text-sm font-semibold">Chiudi</button>
+      <button onClick={() => router.back()} className="text-sm font-semibold">Close</button>
       <p>Product ID: {id}</p>
     </dialog>
   )
 }
 ```
 
-**Regole:**
+**Rules:**
 
-- `default.tsx` obbligatorio in ogni slot parallelo — evita 404 al refresh diretto.
-- Chiudi il modale con `router.back()`, non `router.push('/')`.
-- Notazione intercepting: `(.)` = stesso livello, `(..)` = un livello su, `(...)` = root.
+- `default.tsx` required in every parallel slot — prevents 404 on hard refresh.
+- Close modal via `router.back()`, not `router.push('/')`.
+- Intercepting conventions: `(.)` = same level, `(..)` = one level up, `(...)` = root `app/`.

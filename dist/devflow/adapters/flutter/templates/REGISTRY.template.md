@@ -9,7 +9,7 @@
 
 <!-- devflow-managed:start:conventions -->
 **Naming:** feature folders `snake_case`; page entry `pages/page.dart`
-**Branches:** `feat/[NNN]-<name>`, `fix/[NNN]-<name>`
+**Branches:** `feat/[NNN]_<name>`, `fix/[NNN]_<name>`
 **Commits:** `<type>: <desc>` (`feat|fix|chore|docs|perf`)
 **Format:** `dart format .`
 **Analyze:** `flutter analyze`

@@ -1,7 +1,7 @@
 ---
 name: devflow-hotfix
 description: Fast-track pipeline for critical bugfixes, targeted patches, or hotfixes. Chains compact task+plan, implement, targeted test, and quick single-agent ship gate directly into PR. Use when user runs devflow.hotfix, provides an urgent bug fix, or asks for a quick patch without full 8-step overhead.
-argument-hint: <bug-or-issue-description>
+argument-hint: "<bug-or-issue-description>"
 disable-model-invocation: true
 ---
 
@@ -15,10 +15,12 @@ Provides a streamlined, token-efficient pipeline for critical bugs, regressions,
 
 ## Core Principles
 
-- **spec-light-not-spec-free** — even a 1-line hotfix requires a problem statement, root cause, and acceptance criteria in `task.md`
-- **regression-tested** — every hotfix must include at least one test proving the bug is resolved
-- **safe-acceleration** — skips `beautify` and multi-agent fan-out, but maintains linter/compiler checks, single-agent review, and PR traceability
+- **spec-first** — no code before `task.md` + `plan.md` approved (compact spec for hotfixes: problem statement, root cause, ACs)
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
 - **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+- **regression-tested** — every hotfix includes at least one test proving the defect is resolved
+- **safe-acceleration** — skips `beautify` and multi-agent fan-out, while keeping linter/compiler checks, single-agent review, and PR traceability
 
 ## When NOT to Use
 
@@ -40,7 +42,7 @@ Provides a streamlined, token-efficient pipeline for critical bugs, regressions,
    - `**Complexity:** quick`
    - `**Status:** ready`
    - File list with bottom-up dependency ordering (typically 1–3 files).
-5. Create and switch to git branch `fix/[NNN]-[name]`.
+5. Create and switch to git branch `fix/[NNN]_[name]`.
 6. Update `.devflow-state.json` to mark active feature and `plan_status: ready`.
 
 ### Step 2 - Implement the Fix
@@ -71,7 +73,7 @@ Provides a streamlined, token-efficient pipeline for critical bugs, regressions,
 ### Step 5 - Open Pull Request
 
 1. Commit changes with conventional commit prefix (`fix: [description]`).
-2. Push branch `fix/[NNN]-[name]` to remote.
+2. Push branch `fix/[NNN]_[name]` to remote.
 3. Open PR toward default branch (`main`) with hotfix summary and checklist.
 4. Set `plan.md` `**Status:** pr-opened` and `task.md` `**Status:** done`.
 

@@ -1,7 +1,7 @@
 ---
 name: devflow.plan
 description: Create a DevFlow implementation plan from a task using the devflow-plan skill workflow.
-argument-hint: [optional-task-path]
+argument-hint: "[optional-task-path]"
 disable-model-invocation: true
 model: sonnet
 effort: high

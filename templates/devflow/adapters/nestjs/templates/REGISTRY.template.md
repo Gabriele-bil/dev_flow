@@ -19,7 +19,7 @@
 **Validation:** DTO + `class-validator` on every input; global `ValidationPipe({ whitelist: true, forbidNonWhitelisted: true })`
 **Errors:** throw built-in `HttpException` subclasses; centralize response shape in one global exception filter
 **Database:** TypeORM; migrations only, never `synchronize: true` in any shared environment
-**Branches:** `feat/[NNN]-<name>`, `fix/[NNN]-<name>`
+**Branches:** `feat/[NNN]_<name>`, `fix/[NNN]_<name>`
 **Commits:** `<type>: <desc>` (`feat|fix|chore|docs|perf`)
 **Lint:** `npm run lint`
 **Test:** `npm test -- --passWithNoTests`

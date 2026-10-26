@@ -52,6 +52,19 @@ for FILE in "${SKILL_FILES[@]}"; do
     # Extract frontmatter block (between first and second ---)
     FRONTMATTER=$(awk '/^---/{count++; if(count==2) exit; next} count==1' "$FILE")
 
+    # Validate YAML syntax with real parser
+    if command -v ruby >/dev/null 2>&1; then
+      if ! echo "$FRONTMATTER" | ruby -ryaml -e 'YAML.safe_load(STDIN.read)' >/dev/null 2>&1; then
+        YAML_ERR=$(echo "$FRONTMATTER" | ruby -ryaml -e 'YAML.safe_load(STDIN.read)' 2>&1 | head -1)
+        FILE_ERRORS+=("invalid YAML syntax in frontmatter: $YAML_ERR")
+      fi
+    elif python3 -c "import yaml" >/dev/null 2>&1; then
+      if ! echo "$FRONTMATTER" | python3 -c "import sys, yaml; yaml.safe_load(sys.stdin)" >/dev/null 2>&1; then
+        YAML_ERR=$(echo "$FRONTMATTER" | python3 -c "import sys, yaml; yaml.safe_load(sys.stdin)" 2>&1 | head -1)
+        FILE_ERRORS+=("invalid YAML syntax in frontmatter: $YAML_ERR")
+      fi
+    fi
+
     # name: must be present and non-empty
     NAME_LINE=$(echo "$FRONTMATTER" | grep -E '^name:')
     if [[ -z "$NAME_LINE" ]]; then
@@ -167,6 +180,29 @@ for FILE in "${SKILL_FILES[@]}"; do
     # Hardcoded-secret check (heuristic, warning only — avoid false-positive CI breaks)
     if grep -qEn "AKIA[0-9A-Z]{16}|sk-[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|(api[_-]?key|secret|password)[[:space:]]*[:=][[:space:]]*['\"][A-Za-z0-9_/+.=-]{16,}['\"]" "$FILE"; then
       FILE_WARNINGS+=("security: possible hardcoded secret — review before committing")
+    fi
+
+    # Clarity & Markdown checks: trailing empty table column on separator row (e.g. "|---|---| |")
+    if grep -qE '^\|([[:space:]]*:?-+:[[:space:]]*\|)+[[:space:]]*\|[[:space:]]*$' "$FILE"; then
+      FILE_WARNINGS+=("style: malformed markdown table (trailing empty column '| |' on separator row)")
+    fi
+
+    # Clarity & Language check: non-English (Italian) prose tokens in SKILL.md
+    if grep -qiE '\b(solo i|vietato|avvolgili|causati|sposta|invece|per siti|genera più|dividi|dove sono nel|non fare così|intera page|invalido|non funziona|genitore|tabella tipi|silenzioso|istanza|definisci|correggi|estensioni|obbligatorio)\b' "$FILE"; then
+      FILE_WARNINGS+=("style: non-English (Italian) text detected — all SKILL.md prose must be in English")
+    fi
+
+    # Clarity check: AI-slop model_lexis / stock closers (excluding lines that explicitly ban/flag them)
+    SLOP_HITS=$(grep -inE '\b(delve|delves|delving|tapestry|testament|synergy|pivotal|transformative|seamlessly|leverages|leveraging|underscores|underscoring|in conclusion|to summarize|at the end of the day|it is worth noting|it goes without saying)\b' "$FILE" \
+      | grep -ivE '(never|zero|no |avoid|forbid|flag|ban|booster|slop|anti-pattern|vague)' || true)
+    if [[ -n "$SLOP_HITS" ]]; then
+      FIRST_HIT=$(echo "$SLOP_HITS" | head -1)
+      FILE_WARNINGS+=("clarity: model_lexis / stock phrase detected ($FIRST_HIT) — state concrete mechanism instead")
+    fi
+
+    # Clarity check: chatbot send-offs / assistant residue (Rule 16: Stop where the thought stops)
+    if grep -qiE '\b(I hope this helps|let me know if you|feel free to|happy to help|Review the PR link above!)\b' "$FILE"; then
+      FILE_WARNINGS+=("clarity: chatbot send-off / residue detected — stop where the thought stops")
     fi
   fi
 

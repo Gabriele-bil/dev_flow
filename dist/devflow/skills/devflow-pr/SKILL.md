@@ -51,7 +51,7 @@ Use `$BASE_BRANCH` in Step 5 and Step 6 below — never a hardcoded `main`.
 
 ## Input
 
-- Current feature branch `feat|fix|chore|doc|perf/[NNN]-[feature-name]`
+- Current feature branch `feat|fix|chore|doc|perf/[NNN]_[feature-name]`
 - `devflow/features/[NNN]_[feature-name]/task.md`
 - `devflow/features/[NNN]_[feature-name]/plan.md`
 
@@ -71,12 +71,24 @@ Select type by feature nature:
 
 ---
 
+## Step 1b - Ephemeral UI screenshot capture (UI features only)
+
+Identify if the feature includes visual/UI changes:
+
+1. **Detect UI changes:** Inspect `plan.md` for `[ui]` markers or check git diff for frontend/UI paths (`.tsx`, `.jsx`, `.vue`, `.html`, `lib/ui/`, `src/app/`, Flutter widgets).
+2. **Headless / non-UI bypass:** If feature touches only backend/data contracts, or environment lacks display/emulator/browser runner (`$DISPLAY` unset and no headless browser/emulator available), skip capture cleanly without failing.
+3. **Capture to `/tmp/`:** If UI changes exist and graphical runtime is available, capture visual preview to `/tmp/devflow-ui-preview-[NNN]-[feature-name].png` (via Playwright screenshot, browser agent, or emulator `adb exec-out screencap -p` / `xcrun simctl io booted screenshot`).
+4. **Zero-clutter guarantee:** Never save screenshots in repo working directory. Ensure temporary files are isolated to `/tmp/` or gitignored paths.
+
+---
+
 ## Step 2 - Commit
 
-Delete the feature checkpoint and any leftover handoff first — pipeline complete, session context never committed (`@devflow/references/state-machine.md` → **Checkpoint file**, **Handoff file**). Then stage and commit all changes in a single commit:
+Delete `.checkpoint.json`, `handoff.md`, and stray image artifacts from the working tree first — session context is never committed (`@devflow/references/state-machine.md` → **Checkpoint file**, **Handoff file**). Stage and commit all changes in a single commit:
 
 ```bash
 rm -f devflow/features/[NNN]_[feature-name]/.checkpoint.json devflow/features/[NNN]_[feature-name]/handoff.md
+rm -f *.png *.jpg *.jpeg *.webp
 git add .
 git commit -m "[type]: [short description of the feature]"
 ```
@@ -101,23 +113,40 @@ If either command fails, stop and fix the issue before continuing to Step 4.
 ## Step 4 - Push branch
 
 ```bash
-git push origin [type]/[NNN]-[feature-name]
+git push origin [type]/[NNN]_[feature-name]
 ```
 
-Where `[type]` is the same prefix used when the branch was created in `devflow.implement` (`feat`, `fix`, `chore`, `perf`, or `doc`).
+Where `[type]/[number-of-task-is-present]_[feature-name]` is the branch set in `devflow.task` (recorded in `task.md` `**Branch:**` and active git branch).
 
 ---
 
 ## Step 5 - Open pull request
 
-Use `gh` CLI to open the PR toward `$BASE_BRANCH` (resolved in Step 0):
+Use `gh` CLI to open the PR toward `$BASE_BRANCH` (resolved in Step 0). Wrap execution in a bash subshell with a cleanup `trap` to guarantee deletion of `/tmp/` preview files on success, failure, or cancellation:
 
 ```bash
-gh pr create \
-  --base "$BASE_BRANCH" \
-  --title "[type]: [Feature Name]" \
-  --body "[PR description - see format below]"
+(
+  TEMP_IMG="/tmp/devflow-ui-preview-[NNN]_[feature-name].png"
+  trap 'rm -f "$TEMP_IMG"' EXIT INT TERM
+
+  if [ -f "$TEMP_IMG" ]; then
+    gh pr create \
+      --base "$BASE_BRANCH" \
+      --title "[type]: [Feature Name]" \
+      --body "[PR description - see format below]" \
+      --attach "$TEMP_IMG#UI Preview"
+  else
+    gh pr create \
+      --base "$BASE_BRANCH" \
+      --title "[type]: [Feature Name]" \
+      --body "[PR description - see format below]"
+  fi
+)
 ```
+
+Extract decision flags and discrepancies from `plan.md` (`## Decision flags`, `## Deviations`, `## Open questions`) and `task.md` (`## Assumptions & Risks`, `## Notes`). Under `devflow.auto` or whenever autonomous decisions/flags exist, populate `## Autonomous Decisions & Discrepancies` in the PR body so reviewers see every assumption, default, and non-critical exception.
+
+**PR prose fidelity:** Write concrete mechanisms, touched layers, and verified command outputs. Never use AI-slop boosters (`seamless`, `robust`, `comprehensive`, `transformative`, `in conclusion`) or claim checks passed unless they were executed in Step 3.
 
 ### PR title format
 
@@ -141,16 +170,25 @@ and how it fits into the product.]
 [Brief description of the technical approach:
 layers touched, key abstractions, notable patterns used.]
 
+## Autonomous Decisions & Discrepancies
+<!-- Included when running under devflow.auto or when decision flags / discrepancies exist in plan.md / task.md -->
+[List any discrepancies between idea/spec and implementation, defensible defaults picked, decision flags from plan.md ## Decision flags, assumptions from task.md ## Notes, and non-critical exceptions documented during review.]
+
 ## Testing
 [How the feature was tested — mirror what the adapter PR step file requires:
 - Unit tests: what was covered
 - Integration / e2e: which flows and targets
 - Analyze/typecheck and format: outcome]
 
+## Visual Preview
+<!-- Included when UI changes exist -->
+![UI Preview](/tmp/devflow-ui-preview-[NNN]_[feature-name].png#UI Preview)
+
 ## Checklist
 [Use the checklist bullets from the adapter PR step file; add repo-wide items below if not already covered]
 - [ ] No hardcoded TODO or placeholder comments
 - [ ] `registry.md` updated if new patterns were introduced
+- [ ] UI screenshots attached for visual changes (or bypassed if non-UI/headless)
 ```
 
 ---
@@ -160,7 +198,7 @@ layers touched, key abstractions, notable patterns used.]
 After successful `gh pr create`: set `plan.md` `**Status:** pr-opened` and `task.md` `**Status:** done`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
 
 ```text
-✅ Pull request opened: [type]/[NNN]-[feature-name] -> $BASE_BRANCH
+✅ Pull request opened: [type]/[NNN]_[feature-name] -> $BASE_BRANCH
 
 Title: [PR title]
 Link: [PR URL returned by gh CLI]
@@ -178,6 +216,9 @@ DevFlow pipeline complete for TASK-[NNN].
 | Ticking checklist without running commands | Every item must reflect actual command output |
 | Skipping `registry.md` update for new patterns | Undocumented patterns → inconsistency |
 | `git add .` without reviewing staged files | Run `git status` + `git diff --cached` first |
+| Committing screenshot files to repo working tree | Store in `/tmp/` and clean with shell `trap` |
+| Failing PR creation on headless CI | Skip screenshot capture cleanly when no display available |
+| Leaving orphan temp files on error/interrupt | Use shell `trap 'rm -f ...' EXIT INT TERM` |
 | Using `fix` for all commit types | `feat` new behavior, `fix` bugs, `chore` tooling |
 | PR body without task reference | Include `Closes TASK-NNN` |
 | Force-pushing an open PR | Creates follow-up commit instead |
@@ -188,7 +229,7 @@ DevFlow pipeline complete for TASK-[NNN].
 | | |
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/pr.md` |
-| Runs | `git add .` · `git commit` · `git push` · `gh pr create` |
-| Deletes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json`, `devflow/features/[NNN]_[feature-name]/handoff.md` (before staging) |
+| Runs | `git add .` · `git commit` · `git push` · `gh pr create` (with optional `--attach`) |
+| Deletes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json`, `devflow/features/[NNN]_[feature-name]/handoff.md`, `/tmp/devflow-ui-preview-*` (via `trap`) |
 | Writes | `plan.md` `**Status:** pr-opened`, `task.md` `**Status:** done` |
 | Next step | - (end of pipeline) |

@@ -1,7 +1,7 @@
 ---
 name: devflow-learn
-description: Manage local and team instincts (.devflow-instincts.yaml, .devflow-instincts.shared.yaml) — log, search, list, prune, boost, or promote instincts to team store and REGISTRY.md. Use when user asks to log a finding, search learnings, manage instincts, or promote team patterns.
-argument-hint: [log, search <query>, list, prune, boost <id>, promote <id>]
+description: Manage local and team instincts (.devflow-instincts.yaml, .devflow-instincts.shared.yaml) — log, search, list, check, prune, boost, or promote instincts (with optional Rigor check_cmd + ratchet_max) to team store and REGISTRY.md. Use when user asks to log a finding, search learnings, run rigor checks, manage instincts, or promote team patterns.
+argument-hint: "[log, search <query>, list, check, prune, boost <id>, promote <id>]"
 ---
 
 # Skill: devflow.learn
@@ -51,10 +51,11 @@ Record a manual instinct in `.devflow-instincts.yaml` (local store).
 
 Ask:
 
-1. Trigger: "When should this instinct fire?" (e.g. "when choosing a state management library")
-2. Action: "What should Claude do?" (one imperative sentence)
+1. Trigger: "When does this instinct fire?" (e.g. "when choosing a state management library")
+2. Action: "Action to take" (one imperative sentence; state concrete mechanism, never generic advice)
 3. Domain: file type or area (e.g. `flutter`, `typescript`, `devflow`, `general`)
 4. Confidence: 0.0–1.0 (default `0.75` for manual entries)
+5. Optional Rigor fields (when turning a repeated failure into a checkable rule): `cause_key` (`test:<file>`, `rule:<id>`, `layer:<name>`), `check_cmd` (shell command returning violation count or exit status), and `ratchet_max` (integer cap; `0` = zero tolerance, `N` = existing count that can only fall).
 
 #### Step 2 — Derive id from trigger
 
@@ -132,7 +133,7 @@ jq -r --argjson shared "$SHARED_JSON" --argjson local "$LOCAL_JSON" '
 
 If both files missing or empty: "No instincts recorded yet for this project."
 
-`⚠` marks a **contested** instinct (churn signal followed by revert/reset; confidence decayed automatically). Re-verify before boosting or promoting.
+`⚠` indicates a **contested** instinct (churn signal followed by revert/reset; confidence decayed automatically). Re-verify before boosting or promoting.
 
 ---
 
@@ -216,6 +217,12 @@ NEW=$(awk "BEGIN {v=$CURRENT+0.1; if(v>0.95) v=0.95; printf \"%.2f\", v}")
 yq -i "(.instincts[] | select(.id == \"<ID>\") | .confidence) = $NEW" "$TARGET"
 echo "Instinct <ID> confidence: $CURRENT → $NEW ($TARGET)."
 ```
+
+---
+
+### Sub-command: check (Rigor Ratchet Gate)
+
+Run executable `check_cmd` rules defined in `.devflow-instincts.shared.yaml`. For entries with `ratchet_max`, compare numeric violation count against `ratchet_max` (existing excess can only fall: if `count > ratchet_max` → FAIL; if `count < ratchet_max` → PASS and suggest tightening `ratchet_max` to `count`).
 
 ---
 

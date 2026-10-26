@@ -30,8 +30,9 @@ Read tests first — they reveal intent and coverage.
 
 ### 1. Correctness
 
-- Code satisfies every acceptance criterion in `task.md`
-- Edge cases handled: null, empty, loading, error, async failure
+- Code satisfies every acceptance criterion in `task.md` (both literal wording and user intent in `## Goal & Value`)
+- Edge cases handled: null, empty, loading, error, async failure, missing-data vs `0` display
+- **No silent catch (`silent-catch`):** no bare/empty `catch` or `.catch()` swallows an error without rethrowing, returning a typed error, or logging a specific subject line (**Required**)
 - Tests verify behavior (not implementation detail)
 - No race conditions, off-by-one errors, stale state
 
@@ -70,6 +71,7 @@ Read tests first — they reveal intent and coverage.
 - No gold-plating: code no AC requires (extra options, states, endpoints) — flag as Required
 - No speculative generality: unused parameters, config flags, premature abstractions "for later"
 - No silent assumptions where spec is ambiguous — flag; guessed behavior is a defect
+- **Zero internal leak:** user-facing copy, alerts, and UI never expose raw internal IDs, database column names, or technical jargon (**Required**)
 - "While I'm here" refactors outside plan scope — flag; belongs in `devflow.learn` or a new task
 
 ### 7. Simplicity
@@ -79,7 +81,7 @@ Scope fidelity catches out-of-scope code; this axis catches over-engineering **i
 - Helper duplicating stdlib, platform feature, or installed dependency — name the replacement
 - Abstraction with one caller — inline it
 - New dependency where few lines suffice
-- 200 lines where 50 do — flag rewrite
+- **Size budget (`size-budget`):** source file growing past 1,500 lines or single change adding >400 net non-test lines to one file where 50–150 suffice — flag for split/simplification
 - Bug fix patching symptom while shared root-cause path stays broken — check callers of touched function
 - `ceiling:` comments: verify each names its ceiling + upgrade path
 

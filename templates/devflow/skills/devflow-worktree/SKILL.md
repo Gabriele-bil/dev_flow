@@ -1,7 +1,7 @@
 ---
 name: devflow-worktree
-description: Creates, lists, or removes isolated git worktrees for parallel feature development, with automatic dev-server port-offset assignment and overlap detection. Use when the user asks to work on a feature in a separate worktree, run two features in parallel, or run devflow.worktree.
-argument-hint: [create|remove|list] [feature-name]
+description: "Creates, lists, or removes isolated git worktrees for parallel feature development, with automatic dev-server port-offset assignment and overlap detection. Use when the user asks to work on a feature in a separate worktree, run two features in parallel, or run devflow.worktree."
+argument-hint: "[create|remove|list] [feature-name]"
 disable-model-invocation: true
 model: haiku
 effort: low
@@ -27,7 +27,7 @@ Create, list, or remove isolated git worktrees for parallel feature development.
 
 - Only one feature in flight — a normal branch checkout is enough, worktree adds overhead with no benefit
 - Uncommitted changes must move into the new worktree unchanged — worktrees check out refs, not working-tree state; commit or stash first
-- Adapter has no dev-server command (e.g. a library with no `dev`/`serve` script) — worktree creation still works, just skip the port-offset step
+- Adapter has no dev-server command (e.g. a library with no `dev`/`serve` script) — worktree creation still works; skip the port-offset step
 
 ## Input contract
 
@@ -68,7 +68,7 @@ Remove the matching entry from `.devflow-worktrees.json`. Report success.
 Read `.devflow-worktrees.json` (create with `{"worktrees":[]}` if missing). Reject if:
 
 - An entry already exists for `feature-name` (same feature already has a worktree — route user to it instead of creating a duplicate)
-- The target branch (`[type]/[NNN]-[feature-name]`, same convention as `devflow.implement` Step 3) already has a worktree checked out elsewhere (`git worktree list --porcelain | grep "$BRANCH"`)
+- The target branch (`[type]/[NNN]_[feature-name]`, same convention as `devflow.task` / `devflow.implement` Step 3) already has a worktree checked out elsewhere (`git worktree list --porcelain | grep "$BRANCH"`)
 
 ### Step 5 - Assign port offset
 
@@ -96,7 +96,7 @@ Resolve the adapter's base dev port (read `@devflow/adapters/<adapter>/ADAPTER.m
 ### Step 6 - Create worktree
 
 ```bash
-git worktree add "../$(basename "$(git rev-parse --show-toplevel)")-worktrees/[feature-name]" -b "[type]/[NNN]-[feature-name]"
+git worktree add "../$(basename "$(git rev-parse --show-toplevel)")-worktrees/[feature-name]" -b "[type]/[NNN]_[feature-name]"
 ```
 
 Path convention: sibling directory `<repo-name>-worktrees/<feature-name>`, keeps worktrees out of the main tree without polluting `.gitignore`.
@@ -108,7 +108,7 @@ Append to `.devflow-worktrees.json`:
 ```json
 {
   "feature": "[NNN]_[feature-name]",
-  "branch": "[type]/[NNN]-[feature-name]",
+  "branch": "[type]/[NNN]_[feature-name]",
   "path": "../[repo-name]-worktrees/[feature-name]",
   "port_offset": 0,
   "assigned_port": 3000,
@@ -118,7 +118,7 @@ Append to `.devflow-worktrees.json`:
 
 ```text
 ✅ Worktree created: ../[repo-name]-worktrees/[feature-name]
-Branch: [type]/[NNN]-[feature-name]
+Branch: [type]/[NNN]_[feature-name]
 Dev-server port: [ASSIGNED_PORT] (base [BASE_PORT] + offset [OFFSET])
 
 cd ../[repo-name]-worktrees/[feature-name]

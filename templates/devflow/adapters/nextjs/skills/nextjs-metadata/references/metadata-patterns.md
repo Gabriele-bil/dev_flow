@@ -191,19 +191,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
 ## 6) Viewport — `generateViewport`
 
-Separa viewport da metadata per migliore tree-shaking. Esporta `generateViewport` (dinamico) o `viewport` (statico):
+Separate viewport from metadata for better tree-shaking. Export `generateViewport` (dynamic) or `viewport` (static):
 
 ```tsx
 import type { Viewport } from 'next'
 
-// Statico
+// Static
 export const viewport: Viewport = {
   themeColor: '#ffffff',
   width: 'device-width',
   initialScale: 1,
 }
 
-// Dinamico (es. basato su params)
+// Dynamic (e.g. based on params)
 export async function generateViewport({ params }: Props): Promise<Viewport> {
   const { id } = await params
   const product = await getProduct(id)
@@ -211,16 +211,16 @@ export async function generateViewport({ params }: Props): Promise<Viewport> {
 }
 ```
 
-## 7) Sitemap multipla — `generateSitemaps`
+## 7) Multiple Sitemaps — `generateSitemaps`
 
-Per siti con molte pagine (>50k URL), dividi in più sitemap:
+For large sites (>50k URLs), split into multiple sitemaps:
 
 ```ts
 // app/sitemap.ts
 import type { MetadataRoute } from 'next'
 
 export async function generateSitemaps() {
-  // Ritorna un array di oggetti con id — Next.js genera /sitemap/0.xml, /sitemap/1.xml, ecc.
+  // Returns array of objects with id — Next.js generates /sitemap/0.xml, /sitemap/1.xml, etc.
   const count = await db.product.count()
   return Array.from({ length: Math.ceil(count / 50000) }, (_, i) => ({ id: i }))
 }
@@ -238,9 +238,9 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
 }
 ```
 
-## 8) OG Images multiple — `generateImageMetadata`
+## 8) Multiple OG Images — `generateImageMetadata`
 
-Genera più varianti di OG image per una stessa route (es. dark/light, locale):
+Generate multiple OG image variants for the same route (e.g. dark/light, locale):
 
 ```tsx
 // app/product/[id]/opengraph-image.tsx

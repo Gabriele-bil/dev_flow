@@ -147,7 +147,7 @@ Always use token utility names in markup: `bg-background`, `text-primary`, `bord
 
 - [ ] Semantic design tokens used for colors and borders
 - [ ] Variants managed with `cva(...)` and merged with `cn(...)`
-- [ ] Dark mode supported seamlessly via tokens
+- [ ] Dark mode handled via semantic tokens
 - [ ] Responsive layouts mobile-first (`sm:`, `md:`, `lg:`)
 - [ ] Accessible focus states (`focus-visible:ring-*`) on interactive elements
 - [ ] `suppressHydrationWarning` on root `<html>`

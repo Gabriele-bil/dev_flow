@@ -1,6 +1,6 @@
 ---
 name: nextjs-components
-description: 'use client' components — React hooks, interactivity, context providers. Load when touching files with 'use client' directive.
+description: "'use client' components — React hooks, interactivity, context providers. Load when touching files with 'use client' directive."
 ---
 
 # Next.js Client Components
@@ -53,16 +53,16 @@ All from `next/navigation` — NOT `next/router` (legacy Pages Router):
 - `useSearchParams()` — query string (**requires Suspense boundary**)
 - `useParams()` — dynamic route params
 
-### Suspense boundary — quale hook lo richiede
+### Suspense boundary requirements by hook
 
-| Hook | Suspense richiesto |
+| Hook | Suspense required |
 | --- | --- |
-| `useSearchParams()` | Sempre |
-| `usePathname()` | Solo in route dinamiche (`[slug]`, `[id]`) |
+| `useSearchParams()` | Always |
+| `usePathname()` | Dynamic routes only (`[slug]`, `[id]`) |
 | `useParams()` | No |
 | `useRouter()` | No |
 
-Senza `<Suspense>` dove richiesto, Next.js degrada tutta la pagina a CSR bailout. Isola i componenti con `useSearchParams` in foglie separate e avvolgili con `<Suspense>`. Full code → `references/components-patterns.md`.
+Without `<Suspense>` where required, Next.js triggers a full-page CSR bailout. Isolate `useSearchParams` components in leaf nodes wrapped in `<Suspense>`. Full code → `references/components-patterns.md`.
 
 ## Optimistic Updates
 
@@ -75,18 +75,18 @@ Use `useOptimistic` for reactive UI before server confirmation. Full code → `r
 
 Full code → `references/components-patterns.md`.
 
-## RSC Boundaries — Errori comuni Server→Client
+## RSC Boundaries — Common Server→Client Errors
 
-1. **Client Component async — vietato.** Solo i Server Component possono essere `async`. Fetch nel Server Component genitore, passa il risultato come prop.
-2. **Props non-serializzabili.** Devono essere JSON-serializzabili: `Date` va convertito con `.toISOString()`, `Map`/`Set` convertiti in oggetti/array plain, istanze di classe passate come oggetto plain, funzioni non-Server-Action definite nel client component.
+1. **Async Client Component — forbidden.** Only Server Components can be `async`. Fetch in parent Server Component, pass result via props.
+2. **Non-serializable props.** Must be JSON-serializable: convert `Date` with `.toISOString()`, convert `Map`/`Set` to plain objects/arrays, pass class instances as plain objects, define non-Server-Action functions inside Client Component.
 
-Full code + tabella tipi → `references/components-patterns.md`.
+Full code + type table → `references/components-patterns.md`.
 
 ## Hydration Errors
 
-Causati da mismatch HTML server vs client. Cause comuni: `Date.now()`/`Math.random()` nel render, accesso a `window`/`localStorage` nel render, HTML non valido, estensioni browser, theme applicato lato server. Fix: sposta logica in `useEffect`, usa `suppressHydrationWarning` dove appropriato, usa `useId()` invece di `Math.random()` per ID stabili.
+Caused by server vs client HTML mismatch. Common triggers: `Date.now()`/`Math.random()` during render, accessing `window`/`localStorage` during render, invalid HTML nesting, browser extensions, server-applied theme class. Fix: move browser/time logic to `useEffect`, add `suppressHydrationWarning` on root `<html>` when appropriate, use `useId()` instead of `Math.random()` for stable IDs.
 
-Debug: l'overlay di Next.js mostra l'elemento HTML che ha causato il mismatch. Cerca "Expected server HTML to contain a matching...". Full code → `references/components-patterns.md`.
+Debug: Next.js overlay highlights the mismatched HTML element. Look for "Expected server HTML to contain a matching...". Full code → `references/components-patterns.md`.
 
 ## Anti-patterns
 
@@ -95,9 +95,9 @@ Debug: l'overlay di Next.js mostra l'elemento HTML che ha causato il mismatch. C
 - No `'use client'` wrapping entire `page.tsx` — isolate interactive part only
 - No importing Server Components inside Client Components — invert: Server wraps Client
 - No `useEffect` for initial data fetch — use Server Components
-- No `async` Client Components — solo i Server Component possono essere async
-- No `Date`, `Map`, `Set`, class instances come props Server→Client — serializza prima
-- No `Math.random()` per IDs — usa `useId()`
+- No `async` Client Components — only Server Components can be `async`
+- No `Date`, `Map`, `Set`, or class instances as Server→Client props — serialize first
+- No `Math.random()` for IDs — use `useId()`
 
 ## Review Checklist
 

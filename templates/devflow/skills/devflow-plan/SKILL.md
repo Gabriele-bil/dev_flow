@@ -1,7 +1,7 @@
 ---
 name: devflow-plan
 description: Transforms DevFlow task into file-oriented implementation plan. Use when user runs devflow.plan, creates planning artifact from task, or plan.md for feature.
-argument-hint: [optional-task-path]
+argument-hint: "[optional-task-path]"
 disable-model-invocation: true
 ---
 
@@ -27,10 +27,10 @@ Deliverable: `plan.md` only.
 
 ## Vertical slicing (mandatory for plans with > 5 files)
 
-For plans >5 files: define ≥2 vertical slice increments in **Architecture decisions** — each slice is one end-to-end user-visible increment (not a layer). Group **File List** entries under slice headings. Optionally annotate each slice heading `(deps: ...)` with the slice numbers it builds on (format: `references/plan-template.md` → **Slice dependency annotations**) — enables ordered resume, re-implementation scoped to affected slices after `devflow.backprop`, and parallel slice execution. Omit when slices are strictly sequential.
+For plans >5 files: define ≥2 vertical slice increments in **Architecture decisions** — each slice is one end-to-end user-visible increment (not a layer). Group **File List** entries under slice headings. Optionally annotate each slice heading `(deps: ...)` with prerequisite slice numbers (`references/plan-template.md` → **Slice dependency annotations**) to support ordered resume, scoped re-implementation after `devflow.backprop`, and parallel slice execution; omit when strictly sequential.
 Example: Slice 1 (data contract + shell) → Slice 2 (state + data flow) → Slice 3 (full UI + i18n).
 
-For plans with 5 or fewer files, slicing is optional — note in Overview if sequential layer ordering is clearer. Do **not** rewrite subtask wording. The **Traceability** table must still map **each original subtask** to file path(s).
+For plans with ≤5 files, slicing is optional — note in Overview if sequential layer ordering is clearer. Do **not** rewrite subtask/use case wording; **Traceability** must map **each original use case / subtask** to file path(s).
 
 ## Dependency ordering (reflect in File List)
 
@@ -55,7 +55,7 @@ Order **File list** bottom-up per `constitution.md` and the adapter plan step fi
 Before proceeding, verify:
 
 - [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md`
-- [ ] `task.md` has non-empty `## Summary` and `## Subtasks` sections
+- [ ] `task.md` has non-empty goal section (`## Goal & Value` or `## Summary`) and functional requirements (`## Use Cases & Scenarios` or `## Subtasks`)
 - [ ] `task.md` Status is `draft` (no `[NEEDS CLARIFICATION: ...]` markers) or `clarified` — if unresolved markers exist → stop, suggest `devflow.clarify`
 
 If any item fails → stop, report which check failed, do not write `plan.md`.
@@ -126,18 +126,21 @@ Before planning any file:
 
 Analyze:
 
-- Which subtasks in `task.md` require new files vs existing file changes
-- All bullets in the adapter plan step file (`steps/plan.md`) that apply to this feature — and, only when the feature touches those areas (state management, UI, DB, i18n, responsive layout), the relevant bullets from `steps/implement.md` / `steps/test.md` — use `registry.md` and `constitution.md` to ground them
-- Edge cases and error states that must be handled
-- Any required database or external-system edits called out by the adapter
-- Architectural alternatives & trade-offs: when multiple valid designs exist, trigger an interactive interview checkpoint (`AskQuestion` / `ask_question`) with bounded choices; recommend `/grill-me` if the user desires deep design interrogation before writing `plan.md`
-- ADR alignment: verify proposed architecture complies with decisions in `docs/adr/`; record alignment in Architecture decisions
+- Which use cases (`UC-N`) in `task.md` require new files vs existing file changes
+- BDD Gherkin scenarios (`AC-N (UC-N)`): map Given (setup/contracts), When (handlers/controllers), and Then (UI updates/assertions)
+- Explicit async states: map loading skeletons, disabled inputs (anti-double-submit), and error boundaries to planned files
+- Read vs Write isolation: preserve separation from `task.md` — plan query/view components independently from mutation handlers
+- Seed **Risks and mitigations** table directly from `task.md` `## Assumptions & Risks` (convert into concrete boundary checks)
+- Bullets in active adapter plan step file (`steps/plan.md`) applying to this feature (state, UI, DB, i18n, responsive layout)
+- Edge cases, error states, and required DB/external-system edits
+- Architectural trade-offs: state the concrete mechanism and strongest real limitation/trade-off for each decision (never empty boosters like `scalable` or `seamless`); when multiple viable designs exist, trigger `AskQuestion` checkpoint and recommend `/grill-me` for deep review
+- ADR alignment: verify architecture complies with decisions in `docs/adr/`; record in Architecture decisions
 
-### Step 4b - Dependency pass
+### Step 4b - Dependency pass & Contracts First
 
-Verify **File list** order per Dependency ordering. Migrations and shared contracts before consumers; shared components before their consumers. Exceptions → **Architecture decisions**.
+Verify **File list** order per Dependency ordering. **Contracts First:** migrations and shared contracts (types, schemas, state interfaces shared by ≥2 slices or `[P]` files) MUST sit in the first blocking slice (`deps: none`) before consumers; shared components before consumers. Never copy contracts across parallel slices. Never plan or cite `task.md` rows marked `[wont]` or `[retired]`.
 
-**Scope fidelity check:** every **File List** entry must map to ≥1 **Traceability** row (subtask + acceptance criterion). Entry with no subtask = gold-plating — remove it, or return the scope to `devflow.task`. Reject speculative entries ("might need later", configurable options no AC requires); one concern per file entry.
+**Scope fidelity & 4-Part Brief:** every **File List** entry must map to ≥1 **Traceability** row (no gold-plating, one concern per entry) and include the 4-part brief (`Change`, `Contract`, `Test`, `Out of scope`) per `references/plan-template.md`. Optionally tag slices/entries with `[route: light|mid|strong]` per `@devflow/references/model-selection.md` (`light` requires a complete 4-part brief and exact test target).
 
 ### Step 4c - Data model extraction
 
@@ -190,9 +193,8 @@ Header: copy `**App:**` from `task.md` verbatim when present; omit the line enti
 
 Format rules:
 
-- Adapter-specific sections: follow the adapter plan step file layout exactly (optional/required blocks, localization/data rules).
-- Language: English.
-- Compression: caveman-compress — drop articles/filler/hedging; keep technical terms/paths/commands exact.
+- Adapter-specific sections: follow adapter plan step file layout exactly.
+- Language: English (all docs). Compression: caveman-compress (drop filler, keep precision).
 
 **Run mode** (`.devflow-run.json` present): a genuine **Open questions** entry (plan-level ambiguity, not a constitution violation) does not escalate to the user — pick defensible default (repo precedent > `constitution.md` > adapter convention), append it to `plan.md` **`## Decision flags`** (create on first flag; format per `@devflow/skills/devflow-run/SKILL.md` Step 2), and keep Status `ready`. Constitution Gate Critical/Required violations above are the one exception — those stop regardless of mode.
 

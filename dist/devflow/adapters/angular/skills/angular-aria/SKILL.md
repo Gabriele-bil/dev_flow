@@ -33,15 +33,15 @@ Common targets: `[aria-expanded]`, `[aria-selected]`, `[aria-disabled]`, `[aria-
 ## Directive Families
 
 | Widget | Import path | Directives | Use for |
-|---|---|---|---| |
-| Accordion | `@angular/aria/accordion` | `ngAccordionGroup`, `ngAccordionTrigger`, `ngAccordionPanel`, `ngAccordionContent` | FAQs, progressive disclosure | |
-| Listbox | `@angular/aria/listbox` | `ngListbox`, `ngOption` | Visible single/multi-select lists | |
-| Combobox | `@angular/aria/combobox` | `ngCombobox`, `ngComboboxPopup`, `ngComboboxWidget` | Autocomplete, Select, Multiselect (paired w/ `ngListbox`) | |
-| Menu | `@angular/aria/menu` | `ngMenuBar`, `ngMenu`, `ngMenuItem`, `ngMenuTrigger`, `ngMenuContent` | Command bars, context menus | |
-| Tabs | `@angular/aria/tabs` | `ngTabs`, `ngTabList`, `ngTab`, `ngTabPanel`, `ngTabContent` | Layered content sections | |
-| Toolbar | `@angular/aria/toolbar` | `ngToolbar`, `ngToolbarWidget`, `ngToolbarWidgetGroup` | Grouped related controls | |
-| Tree | `@angular/aria/tree` | `ngTree`, `ngTreeItem`, `ngTreeItemGroup` | Hierarchical/nested data | |
-| Grid | `@angular/aria/grid` | `ngGrid`, `ngGridRow`, `ngGridCell`, `ngGridCellWidget` | 2D interactive collections (tables, calendars) | |
+|---|---|---|---|
+| Accordion | `@angular/aria/accordion` | `ngAccordionGroup`, `ngAccordionTrigger`, `ngAccordionPanel`, `ngAccordionContent` | FAQs, progressive disclosure |
+| Listbox | `@angular/aria/listbox` | `ngListbox`, `ngOption` | Visible single/multi-select lists |
+| Combobox | `@angular/aria/combobox` | `ngCombobox`, `ngComboboxPopup`, `ngComboboxWidget` | Autocomplete, Select, Multiselect (paired w/ `ngListbox`) |
+| Menu | `@angular/aria/menu` | `ngMenuBar`, `ngMenu`, `ngMenuItem`, `ngMenuTrigger`, `ngMenuContent` | Command bars, context menus |
+| Tabs | `@angular/aria/tabs` | `ngTabs`, `ngTabList`, `ngTab`, `ngTabPanel`, `ngTabContent` | Layered content sections |
+| Toolbar | `@angular/aria/toolbar` | `ngToolbar`, `ngToolbarWidget`, `ngToolbarWidgetGroup` | Grouped related controls |
+| Tree | `@angular/aria/tree` | `ngTree`, `ngTreeItem`, `ngTreeItemGroup` | Hierarchical/nested data |
+| Grid | `@angular/aria/grid` | `ngGrid`, `ngGridRow`, `ngGridCell`, `ngGridCellWidget` | 2D interactive collections (tables, calendars) |
 
 Full HTML/CSS examples per widget: [references/aria-patterns.md](references/aria-patterns.md).
 
@@ -107,14 +107,14 @@ See `angular-testing` for harness setup conventions shared across the codebase.
 ## Hard Rules
 
 - Never use native `<select>`/`<input list>`/`<details>` for these patterns — use `ng*` directives. Native elements can't express these interaction models accessibly.
-- Always provide CSS for ARIA-state selectors — directives apply attributes, not styles. Unstyled = visually broken, not just unstyled.
+- Always provide CSS for ARIA-state selectors — directives apply attributes, not styles. Unstyled = visually broken.
 - Lazy-load heavy panel content via the `ng*Content`/`ng*Group` structural directives in `<ng-template>`.
 - Style via `angular-theme` conventions (`@apply` against ARIA-attribute selectors) — keep widget CSS colocated with the component.
 
 ## I/O Reference
 
-|            |                                                                   | |
-| ---------- | ----------------------------------------------------------------- | |
-| Reads      | Active component/template files, `@devflow/adapters/angular/ADAPTER.md` | |
-| Writes     | New or refactored accessible widget components, styles, harness tests | |
-| Invoked by | `devflow.implement`, `devflow.beautify`                           | |
+|            |                                                                   |
+| ---------- | ----------------------------------------------------------------- |
+| Reads      | Active component/template files, `@devflow/adapters/angular/ADAPTER.md` |
+| Writes     | New or refactored accessible widget components, styles, harness tests |
+| Invoked by | `devflow.implement`, `devflow.beautify`                           |

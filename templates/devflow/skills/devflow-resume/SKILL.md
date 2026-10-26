@@ -1,7 +1,7 @@
 ---
 name: devflow-resume
 description: Resumes an interrupted DevFlow session — reads saved state, cross-checks plan.md markers, confirms resume position, re-enters correct pipeline skill. Use when returning after session restart, compaction, or break to continue work where it left off.
-argument-hint: []
+argument-hint: "[]"
 ---
 
 # Skill: devflow.resume

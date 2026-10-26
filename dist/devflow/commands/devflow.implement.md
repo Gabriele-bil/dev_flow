@@ -1,7 +1,7 @@
 ---
 name: devflow.implement
 description: Implement all files from a DevFlow plan using the devflow-implement skill workflow. Use when running the implementation step of the DevFlow pipeline.
-argument-hint: [optional-plan-path]
+argument-hint: "[optional-plan-path]"
 disable-model-invocation: true
 model: sonnet
 effort: medium

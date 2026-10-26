@@ -27,7 +27,7 @@ Full code: `references/riverpod-patterns.md`.
 4. Use `AsyncValue.value` instead of deprecated `valueOrNull` (returns null during loading/error).
 5. Keep a single source of truth in providers (avoid duplicated mutable widget state).
 6. In UI, use `ref.watch` for rendering, `ref.read` for actions, `ref.listen` for side effects.
-7. Use `select`/`selectAsync` when only a sub-field should trigger rebuilds.
+7. Use `select`/`selectAsync` when only a sub-field triggers rebuilds.
 8. Make invalidation strategy explicit (`invalidate`, `refresh`, `invalidateSelf`).
 9. **Loading UI must use the `skeleton` extension** on `AsyncValue` (never `when(loading: …)` spinners/shimmers for content).
 10. **Skeleton mock lives on the entity** — pass `Entity.mock()` (or `Entity.mockList()`) as `mock:`; never inline ad-hoc fake data in widgets.

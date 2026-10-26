@@ -45,7 +45,7 @@ Never: `src/controllers/`, `src/services/`, `src/entities/` at the top level —
 
 Modules are singletons. Providing the same service in two modules creates **two separate instances** with diverging state — memory waste, sync bugs. Always: provide in one dedicated module, `export`, import that module elsewhere. Reserve `@Global()` for true cross-cutting concerns (config, logging, DB connection) — overuse hides dependencies and hurts testability.
 
-In NestJS 11+, dynamic modules use object reference comparison instead of hash generation. When sharing a configured dynamic module across modules, assign it to a constant (`export const configuredModule = FeatureModule.register(...)`) and import that variable rather than calling `register(...)` repeatedly.
+In NestJS 11+, dynamic modules use object reference comparison instead of hash generation. When sharing a configured dynamic module across modules, assign it to a constant (`export const configuredModule = FeatureModule.register(...)`) and import that variable instead of calling `register(...)` repeatedly.
 
 ## 3) Avoid Circular Dependencies (CRITICAL)
 
@@ -73,7 +73,7 @@ A service that must notify 3+ unrelated consumers on one action (inventory, emai
 
 ## 8) Provider Scopes (CRITICAL)
 
-Three scopes: `DEFAULT` (singleton — default, use for almost everything), `REQUEST` (new instance per HTTP request — bubbles up the whole injection chain, real performance cost), `TRANSIENT` (new instance per injection point). Never store per-request mutable state (e.g. current user id) on a singleton — it leaks across concurrent requests. Prefer `REQUEST`-scoped `@Inject(REQUEST)` or an async-context library (`nestjs-cls`) over ad hoc singleton state.
+Three scopes: `DEFAULT` (singleton — default for stateless services), `REQUEST` (new instance per HTTP request — bubbles up the whole injection chain, real performance cost), `TRANSIENT` (new instance per injection point). Never store per-request mutable state (e.g. current user id) on a singleton — it leaks across concurrent requests. Prefer `REQUEST`-scoped `@Inject(REQUEST)` or an async-context library (`nestjs-cls`) over ad hoc singleton state.
 
 ## 9) Configuration (`@nestjs/config`)
 

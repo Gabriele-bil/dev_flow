@@ -1,6 +1,6 @@
 ---
 name: devflow-analyze
-description: Read-only check: task.md+plan.md+constitution.md+ADRs consistency. Flags traceability gaps, untestable ACs, terminology drift, layer violations, ADR misalignment. Use when user runs devflow.analyze — after devflow.plan (ready), before devflow.implement.
+description: "Read-only check: task.md+plan.md+constitution.md+ADRs consistency. Flags traceability gaps, untestable ACs, terminology drift, layer violations, ADR misalignment. Use when user runs devflow.analyze — after devflow.plan (ready), before devflow.implement."
 model: haiku
 effort: low
 ---
@@ -40,28 +40,28 @@ If any item fails → stop, report which check failed, do not run analysis passe
 
 Read in order:
 
-1. `devflow/features/[NNN]_[feature-name]/task.md` — extract: subtask list, acceptance criteria list
-2. `devflow/features/[NNN]_[feature-name]/plan.md` — extract: Traceability table (subtask → AC → file(s)), File List (paths + status), Architecture decisions
+1. `devflow/features/[NNN]_[feature-name]/task.md` — extract: use case / subtask list, acceptance criteria list
+2. `devflow/features/[NNN]_[feature-name]/plan.md` — extract: Traceability table (use case / subtask → AC → file(s)), File List (paths + status), Architecture decisions
 3. `constitution.md` — extract: layer ordering rules and naming conventions
 4. `docs/adr/` (if referenced in `task.md`/`plan.md` or `docs/adr/README.md` exists) — extract accepted architectural decisions, rejected alternatives, and boundaries
 
 If no path is provided, resolve the highest `NNN_` prefix under `devflow/features/`.
 
-### Step 2 — Run 6 detection passes
+### Step 2 — Run 7 detection passes
 
-Run all passes independently and collect findings. Do not stop after the first failing pass — produce a complete report.
+Run all passes independently and collect findings. Do not stop after the first failing pass — produce a complete report. Skip `task.md` rows explicitly marked `[wont]` or `[retired]` (verify they are not cited in `plan.md` Traceability).
 
 ---
 
 #### Pass A — Traceability completeness
 
-**Goal:** every `task.md` subtask has at least one row in the Traceability table with a non-empty file path.
+**Goal:** every `task.md` use case / subtask has at least one row in the Traceability table with a non-empty file path.
 
-For each subtask in `task.md`:
+For each use case / subtask in `task.md`:
 
-- Find corresponding rows in `plan.md` Traceability table (match by subtask description).
-- No row found → **Critical**: subtask not covered in Traceability.
-- Row found but file path is empty or `—` → **Critical**: subtask row has no file mapping.
+- Find corresponding rows in `plan.md` Traceability table (match by UC title or subtask description).
+- No row found → **Critical**: use case / subtask not covered in Traceability.
+- Row found but file path is empty or `—` → **Critical**: use case / subtask row has no file mapping.
 
 ---
 
@@ -71,10 +71,12 @@ For each subtask in `task.md`:
 
 For each acceptance criterion in `task.md`:
 
-- Flag if it uses untestable language: "works correctly", "looks good", "behaves as expected", "is user-friendly", "performs well", "is fast", "is clean", "is easy to use".
-- Flag if it describes internal implementation state rather than externally observable behavior (e.g. "the class exposes a method…", "the provider is initialized…").
-- Severity: **Required** — untestable AC blocks `devflow.test` from writing meaningful assertions.
-- Suggested fix for flagged criteria with a trigger/precondition: EARS phrasing (`WHEN [trigger] THE SYSTEM SHALL [response]` / `IF [precondition] THEN THE SYSTEM SHALL [response]`) per `devflow-task/refinement-hints.md` dimension 4 — forces actor/condition into the open instead of a vague declarative sentence.
+- Flag if it uses untestable language or *importance without mechanism*: "works correctly", "looks good", "behaves as expected", "is user-friendly", "performs well", "is fast", "is clean", "is easy to use", "is robust", "is seamless", "is comprehensive", "handles edge cases".
+- Flag if it relies on *specific-looking vagueness* (ungrounded claims without a concrete trigger, actor, or threshold).
+- Flag if it describes internal implementation state instead of externally observable behavior (e.g. "the class exposes a method…", "writes to table X", "returns 401").
+- Flag if scenario bundles multiple actions (`When ... And ...` chained triggers) — must follow the single `When` rule.
+- Severity: **Required** — untestable or compound AC blocks `devflow.test` from writing meaningful assertions.
+- Suggested format: BDD Gherkin phrasing (`GIVEN [context] WHEN [single action] THEN [observable outcome]`) per `devflow-task/references/bdd-acceptance-criteria.md`, or EARS phrasing (`WHEN [trigger] THE SYSTEM SHALL [response]`).
 
 ---
 
@@ -84,9 +86,9 @@ For each acceptance criterion in `task.md`:
 
 Build a term inventory from both documents. For each conceptual entity (feature name, actor, module, entity, field name), check whether multiple synonyms appear across the two documents.
 
-Flag pairs such as "user profile" / "profile page" / "account page" when they appear to refer to the same thing.
+Flag pairs such as "user profile" / "profile page" / "account page" when they refer to the same concept.
 
-- Severity: **Nit** for minor style divergence; **Required** when divergence crosses a domain boundary (e.g. the same database entity is named differently in Summary vs Architecture decisions).
+- Severity: **Nit** for minor style divergence; **Required** when divergence crosses a domain boundary (e.g. the same database entity is named differently across `task.md` and `plan.md` Architecture decisions).
 
 ---
 
@@ -99,7 +101,7 @@ For each entry in `plan.md` File List:
 - Extract the directory segment of the path.
 - Check it against the layer hierarchy and naming conventions declared in `constitution.md`.
 - Flag paths that place a file in a layer that violates declared ordering or naming conventions.
-- Severity: **Critical** — layer violations will be flagged by `devflow.beautify` and may cause compile or lint failures.
+- Severity: **Critical** — layer violations are flagged by `devflow.beautify` and cause compile or lint failures.
 
 ---
 
@@ -121,6 +123,17 @@ For each entry in `plan.md` File List:
 - Scan referenced ADRs (or active ADRs in `docs/adr/`) for Accepted decisions, rejected alternatives, and scope boundaries.
 - Flag if `plan.md` re-introduces a rejected alternative or violates an accepted ADR constraint without an explicit override/waiver.
 - Severity: **Critical** if direct contradiction to an accepted ADR; **Required** if planned approach deviates without an explicit ADR waiver in Architecture decisions.
+
+---
+
+#### Pass G — Client & product fidelity (`spec-review`)
+
+**Goal:** verify `task.md` + `plan.md` serve user intent as the client experiences the product, not merely literal mechanics.
+
+- **Literal vs intent gap:** flag rows where planned behavior satisfies the AC phrasing to the letter while missing the stated problem in `## Goal & Value` (**Required**).
+- **Deleted or renumbered IDs:** flag any gap in `UC-1..N` or `AC-1..N` numbering or any `[wont]` / `[retired]` row still wired into `plan.md` Traceability (**Required**).
+- **Missing vs Zero display:** flag user-facing counters, totals, or metrics that lack an explicit empty/unavailable state when inputs are missing (showing `0`, `NaN`, or blank instead of a labeled fallback) (**Required**).
+- **Internal jargon / ID leak:** flag user-facing copy, alerts, or error messages in `task.md` or `plan.md` that expose raw database IDs, field names, stack traces, or internal codes (**Required**).
 
 ---
 

@@ -2,9 +2,9 @@
   "skill_name": "devflow-auto",
   "trigger": {
     "positive": [
-      { "prompt": "Take this feature idea and build it end to end automatically without stopping me for questions", "top_k": 3 },
-      { "prompt": "Go from this raw idea straight to implemented code, unattended, all the way to implement", "top_k": 3 },
-      { "prompt": "Analyze this feature, analyze the implementation approach, and implement it automatically", "top_k": 3 }
+      { "prompt": "Take this feature idea and build it end to end into a pull request automatically without stopping me for questions", "top_k": 3 },
+      { "prompt": "Go from this raw idea straight to an opened pull request in total autonomy", "top_k": 3 },
+      { "prompt": "Execute the full devflow pipeline from idea to PR automatically and note any minor discrepancies in the pull request", "top_k": 3 }
     ],
     "negative": [
       { "prompt": "Chain the implement, beautify and test steps in one unattended session and give me a consolidated report", "owner": "devflow-run" },

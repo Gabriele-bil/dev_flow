@@ -1,7 +1,7 @@
 ---
 name: devflow-beautify
-description: Reviews devflow.implement output: correctness, readability, security, performance, architecture, UI. Use when user runs devflow.beautify, reviews implementation output, or fourth pipeline step.
-argument-hint: [optional-plan-path]
+description: "Reviews devflow.implement output: correctness, readability, security, performance, architecture, UI. Use when user runs devflow.beautify, reviews implementation output, or fourth pipeline step."
+argument-hint: "[optional-plan-path]"
 disable-model-invocation: true
 allowed-tools: "Bash(pnpm lint) Bash(pnpm run lint) Bash(pnpm test*) Bash(pnpm run test*) Bash(pnpm build) Bash(pnpm run build) Bash(npm run lint) Bash(npm run test*) Bash(npm run build) Bash(ng generate*) Bash(ng g *) Bash(ng lint*) Bash(ng test*) Bash(ng build*) Bash(flutter analyze*) Bash(flutter test*) Bash(flutter build*) Bash(dart format*) Bash(dart analyze*) Bash(dart run build_runner*) Bash(git status*) Bash(git diff*) Bash(git log*)"
 ---
@@ -115,6 +115,7 @@ Apply directly without asking:
 - Imports violating repo import conventions
 - Naming violations against project conventions
 - Obvious logic leaking into the presentation layer
+- **Silent catch (`silent-catch`):** empty/swallowed `catch` or `.catch()` blocks without rethrow, typed error return, or subject-specific log
 - **Critical** issues uncovered in correctness or security (fix immediately)
 
 #### Opinable improvements
@@ -140,7 +141,7 @@ Options: (1) approve all remaining, (2) skip all remaining, (3) continue one by 
 
 Wait for user choice before continuing.
 
-**Chesterton + incrementality:** for structural or simplification proposals, state briefly why the code might exist as-is, then the proposed change. If tests exist for the feature, run adapter test commands relevant to touched scope after substantive refactors when feasible.
+**Chesterton + incrementality:** for structural or simplification proposals, state briefly why the code exists as-is, then the proposed change. If tests exist for the feature, run adapter test commands relevant to touched scope after substantive refactors when feasible.
 
 Use this format and wait for user response before each grouped proposal round:
 
@@ -154,9 +155,9 @@ Apply? [yes / no]
 
 After edits, check **only** implement-touched files for unused imports, unreachable branches, or clearly orphaned symbols.
 
-- Remove directly when obviously safe (unused import, dead branch after a certain refactor you just made)
-- If removal might affect callers outside the summary, list explicitly and ask: `Dead code candidates: … — remove now?`
-- **Barrel file exception:** never remove an import from a barrel/re-export file (`index.ts`, `_domain.dart`, `_data.dart`, or files matching `*_*.dart` / `*.barrel.ts`) based on local scope analysis alone — barrel imports serve external consumers that are outside the implement summary. If a barrel import looks unused locally, list it as a candidate and ask; do not remove directly.
+- Remove directly when obviously safe (unused import, dead branch after a deterministic refactor)
+- If removal affects callers outside the summary, list explicitly and ask: `Dead code candidates: … — remove now?`
+- **Barrel file exception:** never remove an import from a barrel/re-export file (`index.ts`, `_domain.dart`, `_data.dart`, or files matching `*_*.dart` / `*.barrel.ts`) based on local scope analysis alone — barrel imports serve external consumers outside the implement summary. List locally unused barrel imports as candidates and ask; never remove directly.
 
 ### Step 5 - Run commands
 
@@ -173,7 +174,7 @@ Set `plan.md` `**Status:** beautified`; refresh `.devflow-state.json` per `@devf
 Respond with:
 
 ```text
-✅ Beautify complete: feature/[NNN]-[feature-name]
+✅ Beautify complete: [type]/[NNN]_[feature-name]
 
 ### Files modified
 - `path/to/file.ext`
@@ -203,6 +204,8 @@ Respond with:
 
 Continue to testing? -> devflow.test
 ```
+
+**Run mode** (`.devflow-run.json` present): emit the notify block but do not wait for user — control returns to the orchestrator (`devflow.run` or `devflow.auto`).
 
 ## Anti-Patterns
 

@@ -22,7 +22,7 @@ Full code examples: `references/architecture-patterns.md`.
 - Next.js 16+ App Router. No Pages Router.
 - TypeScript strict mode (`"strict": true` in `tsconfig.json`).
 - Default component = Server Component. No directive needed.
-- `'use client'` only when absolutely required (see section 5).
+- `'use client'` only when required (see section 5).
 - Output: caveman-style, no hedging, precise.
 
 ## 2) Route Segment Files
@@ -59,7 +59,7 @@ Rules:
 - Each group can have its own `layout.tsx`.
 - Use to split authenticated vs public layout.
 
-**Private folders** — underscore: `_folder-name/`
+**Private folders** — `_` prefix: `_folder-name/`
 
 - Excluded from routing system entirely.
 - Use for components, hooks, lib co-located with a route but not routes themselves.

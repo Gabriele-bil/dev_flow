@@ -1,7 +1,7 @@
 ---
 name: devflow.ship
 description: Pre-merge gate before devflow.pr. Dispatches code-reviewer, security-auditor, and test-engineer in parallel, synthesizes reports, and routes to devflow.pr if no blockers. Use when devflow.test is complete and the feature is ready for final review before PR.
-argument-hint: [optional notes for reviewers]
+argument-hint: "[optional notes for reviewers]"
 disable-model-invocation: true
 model: sonnet
 effort: high

@@ -1,7 +1,7 @@
 ---
 name: devflow-status
 description: Shows current DevFlow pipeline state — active feature, progress, next step, and adapter. Supports --json for machine-readable output with stable exit codes. Use when the user asks where they are in the pipeline or what to do next.
-argument-hint: [--json]
+argument-hint: "[--json]"
 disable-model-invocation: true
 ---
 
@@ -11,7 +11,7 @@ Pipeline dashboard. Shows current state without advancing the pipeline. `--json`
 
 ## Purpose
 
-Emit compact status dashboard. Answers "dove sono nel pipeline?" — no step execution, no code changes.
+Emit compact status dashboard. Answers "where am I in the pipeline?" — no step execution, no code changes.
 
 ## Core Principles
 

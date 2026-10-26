@@ -1,7 +1,7 @@
 ---
 name: devflow-setup
-description: Generates AGENTS.md, REGISTRY.md, docs/product.md via adapter templates + questionnaire. Use when running devflow.setup post-install, or adapter/stack/product context changes.
-argument-hint: [--force] [--mcp]
+description: "Generates AGENTS.md, REGISTRY.md, docs/product.md via adapter templates + questionnaire. Use when running devflow.setup post-install, or adapter/stack/product context changes."
+argument-hint: "[--force] [--mcp]"
 disable-model-invocation: true
 ---
 
@@ -57,12 +57,12 @@ Never edit user content outside managed blocks unless `--force` is set.
 
 **Monorepo:**
 
-1. Loop: ask for one app's name (kebab-case) + path (relative, e.g. `apps/web/`) at a time; after each, ask "add another app?" — repeat until the user stops. Require at least 2 declared apps (exactly one declared app is a contradiction — tell the user and fall back to the single-app flow above for that one path). Apps are **declared explicitly by the user** — never auto-scan the repo tree or infer apps from folder conventions.
-2. For each declared app, run the identical detection heuristic from the single-app path above, scoped to that app's own directory (e.g. `<path>/pubspec.yaml` instead of `./pubspec.yaml`). Undetectable → ask the user directly for that specific app, same fallback question as single-app.
+1. Loop: ask for one app's name (kebab-case) + path (relative, e.g. `apps/web/`) at a time; after each, ask "add another app?" — repeat until user stops. Require ≥2 declared apps (1 app → fall back to single-app flow). Apps are **declared explicitly by the user** — never auto-scan the repo tree or infer apps from folder names.
+2. For each declared app, run the single-app detection heuristic scoped to that app's directory (e.g. `<path>/pubspec.yaml`); if undetectable, ask the user for that app's stack.
 3. Overwrite `@devflow/config.md` with the Apps table — template: `references/config-template.md` § Monorepo.
 
 **Both modes — build adapter contract paths:**
-`@devflow/adapters/<adapter>/ADAPTER.md` (core) and `@devflow/adapters/<adapter>/steps/setup.md` (setup templates + dependencies). Legacy adapters without `steps/`: all sections live in `ADAPTER.md`. Monorepo: this is a **list** of `(app, adapter, adapter_root)` tuples, one per declared app — Steps 2 through 7c below repeat once per app unless a step says otherwise.
+`@devflow/adapters/<adapter>/ADAPTER.md` (core) and `@devflow/adapters/<adapter>/steps/setup.md` (setup templates + dependencies; legacy adapters keep all sections in `ADAPTER.md`). Monorepo builds a list of `(app, adapter, adapter_root)` tuples and repeats Steps 2–7c per app unless noted.
 
 ### Step 2 - Load contract and templates
 
@@ -113,7 +113,7 @@ After collecting questionnaire answers, scan the live repo to ground REGISTRY.md
 
 Use these observations to pre-fill `pattern-1`, `pattern-2` (and optionally `pattern-3`) in the placeholder map before rendering — replacing any questionnaire `[TODO: fill]` values for patterns with real examples from the repo.
 
-Additionally, sample 5-10 existing source files under the scan root to infer `naming-conventions`:
+Sample 5-10 existing source files under the scan root to infer `naming-conventions`:
 
 - Extract file naming pattern (snake_case.dart, kebab-case.ts, PascalCase.tsx, etc.)
 - Extract class and top-level function naming from file headers
@@ -154,11 +154,11 @@ Monorepo-specific rendering (single-app: skip this block, render exactly as befo
 - **`constitution.md`**: render one `<!-- devflow-managed:start:constitution-shared -->` block for cross-app rules (branch/commit conventions, engineering principles that don't vary by stack), then render the template **once per declared app** into its own `<!-- devflow-managed:start:constitution-<app-name> -->` block, headed `## App: <name> (<adapter>)`, using that app's placeholder values (layer table, naming, import conventions, key decisions). Do not merge apps into one block.
 - **`docs/product.md`**: Feature status table header gains an **App** column (left blank — see Step 5).
 
-Token-efficiency rules:
+Token-efficiency & source-fidelity rules:
 
-- imperative short lines, no filler
-- preserve commands/paths/symbols as-is
-- avoid long explanations
+- imperative short lines; no filler or empty emphasis (`crucial`, `robust`, `seamless`)
+- preserve exact commands, paths, and symbols from codebase scan; use `[TODO: fill]` over invented conventions
+- never restate section headings in opening sentences
 - keep section count fixed to template structure
 
 Budget targets:

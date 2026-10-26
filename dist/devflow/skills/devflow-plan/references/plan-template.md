@@ -35,7 +35,7 @@ state the vertical-slice execution order here.]
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| [Risk] | High / Med / Low | [Concrete mitigation] |
+| [Risk — seeded from task.md ## Assumptions & Risks] | High / Med / Low | [Concrete mitigation] |
 
 [Use 2-4 rows for non-trivial work; one row acceptable for small plans.]
 
@@ -51,10 +51,11 @@ state the vertical-slice execution order here.]
 
 ## Traceability
 
-| Subtask | Acceptance criteria | File(s) |
-|---------|---------------------|---------|
-| [Subtask description from task.md] | [acceptance criterion from task.md] | [file path(s)] |
+| Use Case / Subtask | Acceptance criteria | File(s) |
+|---------------------|---------------------|---------|
+| [UC-N title from task.md] | [AC-N: GIVEN ... WHEN ... THEN ... from task.md] | [file path(s)] |
 | ... | ... | ... |
+
 
 ---
 
@@ -70,7 +71,7 @@ in this order to respect dependencies.
 
 **Slice dependency annotations (optional):** When file entries are grouped
 under vertical slices, head each group with a bold slice line:
-`**Slice N — [name]** (deps: none | N, M)`. `deps:` lists slice numbers that
+`**Slice N — [name]** (deps: none | N, M) [route: light | mid | strong]`. `deps:` lists slice numbers that
 must be fully `[done]` before this slice starts; omit the annotation when
 slices are strictly sequential (each depends on the previous). Same notation
 as the `devflow.blueprint` dependency graph, one level down. Read by
@@ -78,13 +79,30 @@ as the `devflow.blueprint` dependency graph, one level down. Read by
 scoped to affected slice + dependents), and any future parallel slice
 execution.
 
-**Slice 1 — [name]** (deps: none)
+**Contracts First rule:** Shared contracts (types, interfaces, DTOs, DB schemas, state contracts) shared across ≥2 slices or `[P]` files MUST sit in `Slice 1` (`deps: none`). Parallel slices/files consume contracts via `--after` / `deps:` and never copy or redeclare another slice's contract.
+
+**Subtask model routing (`[route: light | mid | strong]`, optional):** Tag slices or individual file entries with the cheapest model tier capable of building them (`@devflow/references/model-selection.md`). Entries tagged `[route: light]` MUST include all 4 brief lines below (`Change`, `Contract`, `Test`, `Out of scope`); omit `[route: ...]` to use the default step model.
+
+**4-Part File Brief (recommended for `standard`/`thorough` and mandatory for `[route: light]`):**
+Under each `### [NNN].` heading, write four compact bullets so a cold agent can implement and verify the file without guessing:
+- **Change:** concrete behavior added/modified (1-2 lines)
+- **Contract:** exported symbols/signatures or consumed shared types
+- **Test:** exact test file + assertion that proves this file's change
+- **Out of scope:** files, layers, or dependencies this entry must not touch
+
+**Slice 1 — [name]** (deps: none) [route: strong]
 
 ### [NNN]. `[path/to/file.ext]` - [create | modify] [pending]
-[1-2 sentences on what this file contains and why it exists.]
+- **Change:** [what this file does and why it exists]
+- **Contract:** [exported/consumed types or signatures]
+- **Test:** [`path/to/test.ext` — what assertion pins this change]
+- **Out of scope:** [every other file; no new dependencies]
 
-### [NNN]. [P] `[path/to/file.ext]` - [create | modify] [pending]
-[`[P]` present: file is eligible for parallel implementation by a separate agent or session.]
+### [NNN]. [P] `[path/to/file.ext]` - [create | modify] [pending] [route: light]
+- **Change:** [`[P]` eligible for parallel implementation; mechanical wiring]
+- **Contract:** [consumes Slice 1 contract]
+- **Test:** [`path/to/test.ext` — expected output]
+- **Out of scope:** [shared contracts, unrelated modules]
 ...
 
 ---
@@ -114,7 +132,7 @@ After **Implementation checkpoints**, append **every extra plan section** requir
 ## Pre-implement checklist
 
 - [ ] Constitution Gate passed (Step 0b) — no Critical violations
-- [ ] Every `task.md` subtask appears in **Traceability** with its acceptance criterion
+- [ ] Every `task.md` use case / subtask appears in **Traceability** with its acceptance criterion
 - [ ] Every **File List** entry maps to ≥1 **Traceability** row — no orphan/gold-plated files
 - [ ] **File list** order respects **Dependency ordering** (and any stated exceptions)
 - [ ] All **adapter-specific sections** from `ADAPTER.md` are present or correctly omitted per adapter rules (e.g. i18n keys for UI)
@@ -130,5 +148,5 @@ After **Implementation checkpoints**, append **every extra plan section** requir
 Format rules:
 
 - Adapter-specific sections: follow `ADAPTER.md` layout exactly (optional/required blocks, localization/data rules).
-- Language: English.
+- Language: English. All written documents must be in English regardless of conversation language.
 - Compression: caveman-compress — drop articles/filler/hedging; keep technical terms/paths/commands exact.

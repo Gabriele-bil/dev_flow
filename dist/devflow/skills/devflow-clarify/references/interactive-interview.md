@@ -24,7 +24,8 @@ DevFlow runs in multiple agentic hosts. Use the appropriate interactive question
 4. **Direct user response phrasing:** Phrase options from the user's perspective (e.g. `"Use optimistic UI with rollback on error"` instead of `"The agent should use optimistic UI..."`).
 5. **No redundant 'Other' option:** Do not add a manual "Other" or "None of the above" option. Host tools provide automatic write-in fallbacks.
 6. **Single vs multi-select:** Default to `is_multi_select: false`. Enable multi-select only when choices represent independent, non-exclusive features or settings.
-7. **Maximum 5 questions per session:** Keep elicitation token-lean and high-leverage. Focus on architectural forks, scope boundaries, and critical acceptance criteria.
+7. **Maximum 5 questions per session:** Keep elicitation token-lean and high-impact. Focus on architectural forks, scope boundaries, concrete failure modes, and falsifiable acceptance criteria.
+8. **Source-grounded elicitation:** Ask about concrete triggers, actors, boundaries, and failure paths ("What happens when X fails?", "Which role can trigger Y?") — never substitute invented metrics or generic filler for missing domain truth. Preserve the user's domain terminology when updating artifacts.
 
 ## Automated / Run Mode (`.devflow-run.json`)
 

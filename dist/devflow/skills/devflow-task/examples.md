@@ -1,6 +1,6 @@
 # Examples: devflow-task
 
-Study structure/tone, not fictional product details.
+Study structure, INVEST rigor, BDD Gherkin formatting, and token economy.
 
 ---
 
@@ -8,105 +8,209 @@ Study structure/tone, not fictional product details.
 
 **User:** “We should make notifications smarter.”
 
-**Agent (after reading `docs/product.md`, constitution/registry as needed):** Restate as HMW problem. Ask with `AskQuestion` or numbered list: (1) actor (owner vs co-owner), (2) "smarter" dimension (priority/grouping/quiet hours/other), (3) success signal.
+**Agent (after reading `docs/product.md`, constitution/registry as needed):** Identify problem & actor. Ask with `AskQuestion`: (1) actor (owner vs co-owner), (2) "smarter" dimension (priority/grouping/quiet hours/other), (3) success signal.
 
 **User:** “Owners. Group by pet and don’t spam when two co-owners edit the same thing. Success is fewer taps to see what matters.”
 
-**Agent:** Run quick stress-test from `refinement-hints.md`. Propose three `kebab-case` names via `AskQuestion` (for example `notification-grouping`, `pet-notification-feed`, `smart-notification-inbox`). User picks one. Allocate next `NNN_`, run verification checklist, write `task.md`.
+**Agent:** Run quick stress-test from `refinement-hints.md` (INVEST check, isolate read feed from actions, async dedup). Automatically determine commit type (`feat`), feature name (`pet-notification-grouping`), allocate next `NNN_` (`001`), and set/switch git branch to `feat/001_pet-notification-grouping` without prompting the user. Run verification checklist, write `task.md`.
 
 **Excerpt of resulting `task.md`:**
 
 ```markdown
-## Summary
+# Task - Pet Notification Grouping
 
-Owners receive many notifications. Surface them per pet in scannable form. Reduce duplicate noise from co-owner actions on same event.
+**ID:** TASK-001
+**Date:** 2026-10-06
+**Status:** draft
+**Branch:** feat/001_pet-notification-grouping
 
-## Problem framing (HMW)
+---
 
-How might we help pet owners see the notifications that matter for each pet without repeated alerts when co-owners perform overlapping actions?
+## Goal & Value
 
-## Scope boundaries
+- **Problem:** Pet owners with multiple pets receive an unorganized stream of alerts, cluttered by duplicate notifications when co-owners perform overlapping actions.
+- **Objective:** Surface notifications clustered by pet with duplicate suppression, allowing owners to triage updates with fewer taps.
 
-**In scope**
-
-- Group or label notifications by pet for the owner’s primary notification list or hub.
-- De-duplicate or collapse notifications that represent the same underlying event across co-owner activity (behavior TBD in plan).
-
-**Out of scope (Not doing)**
-
-- Push notification delivery mechanics or new notification types not already in the product.
-- Email or SMS digests.
-
-## Key assumptions
-
-- [ ] Existing notification types and payloads are sufficient to infer “same event” for de-duplication — validate against current backend/event model.
-- [ ] Owners are the primary audience for this hub; co-owner needs are unchanged unless product says otherwise.
+---
 
 ## User Story
 
 **As a** pet owner  
-**I want to** see notifications organized by pet with less duplicate noise from co-owner activity  
-**So that** I can understand what happened quickly with fewer taps  
+**I want to** review notifications organized by pet with duplicate co-owner updates collapsed  
+**So that** I can track pet health events quickly without alert fatigue  
 
-## Subtasks
+---
 
-- [ ] Define grouping rules and duplicate-detection rules at the product level (no implementation detail here).
-- [ ] Specify owner-facing UX for grouped vs single notifications, including edge cases (single pet, many pets).
-- [ ] Align with responsive/navigation patterns from registry for where this surface lives.
+## Use Cases & Scenarios
+
+### UC-1: Grouped Feed Review (Happy Path)
+- **Preconditions:** Owner is logged in with at least one registered pet and unread alerts.
+- **User Flow:**
+  1. User opens Notification Center.
+  2. System renders notifications grouped under pet sections with unread badges.
+  3. User expands a pet group and selects an alert.
+- **Outcome:** Selected alert marks as read; feed remains organized by pet.
+
+### UC-2: Co-Owner Action De-duplication
+- **Preconditions:** Multiple co-owners edit the same pet event within 5 minutes.
+- **User Flow:**
+  1. Second co-owner completes action.
+  2. System collapses overlapping alerts into one combined item ("Updated by co-owners").
+- **Outcome:** Feed displays single de-duplicated entry instead of repetitive alerts.
+
+### UC-3: Single Pet or Zero Notification State
+- **Trigger:** Owner has zero notifications or only one registered pet.
+- **Expected Behavior:** Renders clean flat list for single pet, or illustrated empty state when no alerts exist.
+
+---
+
+## Acceptance Criteria
+
+- [ ] **AC-1 (UC-1) — Grouped Feed Rendering:** GIVEN logged-in owner with multiple pets WHEN opening notifications THEN system displays alerts grouped by pet identifier with unread count badges
+- [ ] **AC-2 (UC-1) — Async Feed Refresh:** GIVEN notification center active WHEN user pulls to refresh THEN loading indicator displays AND previous list remains interactive until new data arrives
+- [ ] **AC-3 (UC-2) — Co-Owner De-duplication:** GIVEN two co-owners update same event within 5 minutes WHEN feed generates alerts THEN system collapses updates into a single "Updated by co-owners" alert
+- [ ] **AC-4 (UC-3) — Empty State Display:** GIVEN owner has zero notifications WHEN opening notification center THEN system shows friendly empty state with no empty section headers
+
+---
+
+## Scope Boundaries
+
+**In scope**
+
+- Pet-level grouping in primary notification list.
+- 5-minute time-window de-duplication for overlapping co-owner actions.
+- Empty and single-pet responsive layout states.
+
+**Out of scope (Not doing)**
+
+- Push notification delivery pipeline (handled in separate push service task).
+- Weekly digest emails or SMS summaries.
+
+---
+
+## Assumptions & Risks
+
+### Assumptions
+
+- Pet identifier is present on all incoming notification event payloads.
+- 5-minute de-duplication window is sufficient to prevent co-owner alert noise.
+
+### Risks
+
+- High volume of historical alerts could delay grouping render; mitigation: paginate feed at 20 alerts per pet.
+
+---
+
+## Notes
+
+None.
 ```
 
 ---
 
-## Example B — Clear feature → compact task
+## Example B — Interactive Mutation Feature (Read vs Write Separation + Async Lifecycle)
 
-**User:** “Add a dark mode toggle in settings; persist choice locally and respect system default when unset.”
+**User:** “Add bookmarking to article view with offline persistence.”
 
-**Agent:** Skips long clarification; confirms no duplicate in `docs/product.md`; quick stress-test; `AskQuestion` for name choice (`theme-toggle`, `appearance-settings`, `dark-mode-preference`); writes task.
+**Agent:** Confirms actor (Reader) and scope. Distinguishes Reading state from Toggling mutation. Verifies async states (in-flight spinner, disabled button to prevent double-tap, error roll-back). Writes `task.md`.
 
 **Excerpt:**
 
 ```markdown
-## Summary
+# Task - Article Bookmark Offline
 
-Users choose light, dark, or system mode. Choice persists across sessions.
+**ID:** TASK-002
+**Date:** 2026-10-06
+**Status:** draft
 
-## Problem framing (HMW)
+---
 
-How might we let users control visual theme in line with platform expectations while defaulting to the OS when they have not chosen?
+## Goal & Value
 
-## Scope boundaries
+- **Problem:** Readers lose articles of interest when switching devices or losing connectivity.
+- **Objective:** Enable instant article bookmarking with immediate local persistence and offline access.
 
-**In scope**
-
-- Settings entry for theme: light / dark / system.
-- Persist user choice; apply on app start and when changed.
-
-**Out of scope (Not doing)**
-
-- Per-screen theme overrides or scheduling (e.g. auto dark at night only).
-
-## Key assumptions
-
-- [ ] Material 3 / app theme pipeline supports the three modes without a full redesign — confirm against `constitution.md` / theme docs.
+---
 
 ## User Story
 
-**As a** user  
-**I want to** set appearance to light, dark, or system default  
-**So that** the app matches my preference or device setting  
+**As a** reader  
+**I want to** bookmark articles with instant offline access  
+**So that** I can read saved articles later even without internet connectivity  
 
-## Subtasks
+---
 
-- [ ] Define user-visible labels and behavior for the three modes (localized).
-- [ ] Specify persistence and fallback when preference is “system.”
-- [ ] Specify where the control lives in settings and accessibility expectations.
+## Use Cases & Scenarios
+
+### UC-1: Bookmark State Display (Read / View)
+- **Preconditions:** Reader navigates to an article view.
+- **User Flow:**
+  1. System checks stored bookmark status.
+  2. System renders active or inactive bookmark icon accordingly.
+- **Outcome:** Reader sees accurate current bookmark status immediately.
+
+### UC-2: Toggle Bookmark (Action / Mutation)
+- **Preconditions:** Article view open.
+- **User Flow:**
+  1. Reader taps bookmark icon.
+  2. System immediately toggles visual state and initiates local save.
+  3. System disables toggle button briefly to prevent rapid double-clicks.
+- **Outcome:** Article is added to saved list and persisted for offline retrieval.
+
+### UC-3: Storage Error & Recovery
+- **Trigger:** Local storage failure or quota exceeded during save.
+- **Expected Behavior:** System reverts icon state, re-enables button, and displays non-intrusive warning notification with retry option.
+
+---
+
+## Acceptance Criteria
+
+- [ ] **AC-1 (UC-1) — Initial Icon State:** GIVEN saved article WHEN reader opens article view THEN bookmark icon renders in filled active state
+- [ ] **AC-2 (UC-2) — Optimistic Toggle & Double-Submit Protection:** GIVEN unbookmarked article WHEN reader taps bookmark THEN icon toggles immediately AND tap input is disabled until save completes
+- [ ] **AC-3 (UC-2) — Offline Persistence:** GIVEN article bookmarked WHEN device is offline THEN article content remains accessible in saved list
+- [ ] **AC-4 (UC-3) — Save Failure Reversion:** GIVEN storage error occurs during bookmark save WHEN save fails THEN icon reverts to original state AND toast notification offers retry
+
+---
+
+## Scope Boundaries
+
+**In scope**
+
+- Bookmark icon toggle on article screen.
+- Local offline persistence and retrieval.
+- Optimistic UI with failure reversion.
+
+**Out of scope (Not doing)**
+
+- Cloud synchronization across multiple devices (deferred to multi-device sync task).
+- Custom bookmark folders or tags.
+
+---
+
+## Assumptions & Risks
+
+### Assumptions
+
+- Article content size fits within local device storage limits.
+
+### Risks
+
+- Rapid toggle spam could corrupt local state; mitigated by temporary button disable during mutation.
+
+---
+
+## Notes
+
+None.
 ```
 
 ---
 
 ## What to notice
 
-1. **Summary** is never a paste of the user’s words.
-2. **HMW** is one sharp line, not a brainstorm doc.
-3. **Out of scope** prevents plan creep; it is not a second subtask list.
-4. **Subtasks** stay verifiable and free of class names, files, or APIs.
+1. **Goal & Value**: concise problem context and clear, outcome-oriented objective.
+2. **User Story**: strictly Connextra format; human persona; no compound "and"/"or" verbs; true value without tautology.
+3. **Vertical Slicing**: isolates Read/View flows (`UC-1`) from Action/Mutation flows (`UC-2`), avoiding cognitive overload.
+4. **Acceptance Criteria**: strict BDD Gherkin (`GIVEN ... WHEN ... THEN ...`) with exactly one `When` per scenario; covers async loading, double-submit protection, and error recovery.
+5. **Assumptions & Risks**: structured bullets feed directly into `plan.md` risks table and architecture decisions.
+6. **Product-only discipline**: zero leaks of class names, database tables, or framework internals.

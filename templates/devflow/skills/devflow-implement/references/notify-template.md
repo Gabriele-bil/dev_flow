@@ -3,7 +3,7 @@
 Used by `devflow.implement` Step 8 — respond with this format after implementation completes.
 
 ```text
-✅ Implementation complete: feature/[NNN]-[feature-name]
+✅ Implementation complete: [type]/[NNN]_[feature-name]
 
 ### Files created
 - `path/to/file.ext`

@@ -46,6 +46,12 @@ Used by `devflow.analyze` Step 3 — produce report directly in response. Do not
 - **[SEVERITY]** F: [description]
   → Suggested fix: [one-line resolution]
 
+### Pass G — Client & product fidelity
+[PASS — no literal-vs-intent gaps, deleted IDs, missing-vs-zero ambiguities, or internal jargon leaks]
+— or —
+- **[SEVERITY]** G: [description]
+  → Suggested fix: [one-line resolution]
+
 ---
 
 ### Summary

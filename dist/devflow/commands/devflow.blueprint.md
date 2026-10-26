@@ -1,7 +1,7 @@
 ---
 name: devflow.blueprint
 description: Transform a large objective into a multi-PR blueprint with dependency graph, parallel-step detection, and adversarial review gate.
-argument-hint: [objective or path-to-brief]
+argument-hint: "[objective or path-to-brief]"
 disable-model-invocation: true
 model: opus
 effort: high

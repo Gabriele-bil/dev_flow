@@ -1,7 +1,7 @@
 ---
 name: devflow-blueprint
 description: Transforms large objective into multi-PR blueprint with dependency graph and parallel-step detection. Use when feature requires 3+ PRs, spans sessions, or needs parallel workstreams.
-argument-hint: [objective or path-to-brief]
+argument-hint: "[objective or path-to-brief]"
 ---
 
 # Skill: devflow.blueprint
@@ -40,7 +40,7 @@ Transform a large objective into a multi-PR blueprint. Output: dependency graph,
 
 Before proceeding, verify:
 
-- [ ] Objective is concrete enough to decompose into steps (not just "improve performance")
+- [ ] Objective is concrete enough to decompose into steps (not vague like "improve performance")
 - [ ] `constitution.md` and `docs/product.md` are readable (or at least one of them)
 
 If objective is too vague → stop, ask one clarifying question, wait for answer.
@@ -70,8 +70,9 @@ Rules:
 
 - Minimum granularity: one logical unit of work (not one file)
 - Maximum granularity: one PR reviewable in < 2 hours
-- Infrastructure/contracts steps must precede consumers (never parallelizable)
-- A step that only changes tests or docs is valid and should be named as such
+- **Contracts first:** shared contracts (data shapes, DB schemas, exported API interfaces shared by ≥2 steps) get their own dedicated blocking step before any consumer step; nobody copies another lane's contract
+- **Lane ownership:** assign each step a named **Lane** (`lane: <name>`) owning a bounded set of directories/files; concurrent steps must never own overlapping directories
+- A step that only changes tests or docs is valid; name it explicitly as such
 
 ### Step 3 — Build dependency graph
 
@@ -104,10 +105,11 @@ For **each step**, produce a self-contained context brief with:
 | **Objective** | One sentence: what this step achieves |
 | **Why now** | Why this step comes before/after its neighbors |
 | **State of codebase at start** | What already exists (from prior steps + current baseline); enough for a fresh agent |
+| **Lane & Owned paths** | Named lane + directory/file globs this step owns; `Out of scope:` paths forbidden to touch |
 | **Files to touch** | Paths with `create` / `modify` / `delete` labels |
-| **Acceptance criteria** | 2-5 observable, falsifiable conditions |
+| **Acceptance criteria** | 2-5 observable, falsifiable conditions + exact verification command |
 | **Blockers** | Step IDs that must be merged first (empty = none) |
-| **Parallel-safe** | `yes` / `no` + brief reason |
+| **Parallel-safe & Route** | `yes` / `no` + brief reason · `[route: light \| mid \| strong]` |
 
 The brief must be self-contained: a new agent handed only this section and the project codebase must be able to execute the step without reading prior steps.
 

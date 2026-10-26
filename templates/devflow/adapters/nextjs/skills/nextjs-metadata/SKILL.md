@@ -45,13 +45,13 @@ Dynamic versions use `.ts` extension (`robots.ts`, `sitemap.ts`). Full code → 
 
 Separate viewport from metadata for better tree-shaking. Export `generateViewport` (dynamic, e.g. based on `params`) or `viewport` (static). Full code → `references/metadata-patterns.md`.
 
-## 7) Sitemap multipla — `generateSitemaps`
+## 7) Multiple Sitemaps — `generateSitemaps`
 
-Per siti con molte pagine (>50k URL), dividi in più sitemap con `generateSitemaps` — Next.js genera `/sitemap/0.xml`, `/sitemap/1.xml`, ecc. Full code → `references/metadata-patterns.md`.
+For large sites (>50k URLs), split into multiple sitemaps with `generateSitemaps` — Next.js generates `/sitemap/0.xml`, `/sitemap/1.xml`, etc. Full code → `references/metadata-patterns.md`.
 
-## 8) OG Images multiple — `generateImageMetadata`
+## 8) Multiple OG Images — `generateImageMetadata`
 
-Genera più varianti di OG image per una stessa route (es. dark/light, locale). Full code → `references/metadata-patterns.md`.
+Generate multiple OG image variants for a single route (e.g. dark/light, locale). Full code → `references/metadata-patterns.md`.
 
 ## 9) Anti-Patterns
 
@@ -59,7 +59,7 @@ Genera più varianti di OG image per una stessa route (es. dark/light, locale). 
 - Do NOT fetch the same data twice in `generateMetadata` and `page.tsx` — use `cache()` for dedup.
 - Do NOT put `metadata` export in Client Components — only Server Components export metadata.
 - Do NOT forget `title.template` in root layout — causes repeated site name in every page title.
-- Do NOT mix `viewport` inside `metadata` export — usa `generateViewport` separato.
+- Do NOT mix `viewport` inside `metadata` export — use separate `generateViewport` or `viewport` export.
 
 ## I/O Reference
 

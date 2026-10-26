@@ -15,7 +15,7 @@ Full code: `references/testing-patterns.md`.
 
 ## Required Test Focus
 
-- **Components:** conditional rendering, prop contract, critical accessibility states
+- **Components:** conditional rendering, prop contract, accessibility states
 - **Forms:** validator behavior, submit disable/enable transitions, server-side error display
 - **State (Zustand):** state transitions per action, correct selector output
 - **Server Actions:** success/error return for valid/invalid input

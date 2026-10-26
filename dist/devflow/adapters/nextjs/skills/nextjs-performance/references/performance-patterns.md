@@ -171,7 +171,7 @@ export default function RootLayout({ children }) {
 }
 ```
 
-### Inline scripts — `id` obbligatorio
+### Inline scripts — `id` required
 
 ```tsx
 <Script id="analytics-init" strategy="afterInteractive">
@@ -179,7 +179,7 @@ export default function RootLayout({ children }) {
 </Script>
 ```
 
-### Google Analytics — usa `@next/third-parties`
+### Google Analytics — use `@next/third-parties`
 
 ```bash
 npm install @next/third-parties
@@ -215,18 +215,18 @@ const nextConfig = {
 ### CSS imports — no `<link>` tags
 
 ```tsx
-// ❌ — non funziona in Next.js
+// ❌ — unsupported in Next.js App Router
 <link rel="stylesheet" href="/styles/vendor.css" />
 
-// ✅ — importa come modulo
+// ✅ — import as module
 import '@/styles/vendor.css'
-// oppure nel layout/page:
+// or in layout/page:
 import 'some-package/dist/style.css'
 ```
 
 ### ESM/CommonJS conflicts
 
-Se un pacchetto non viene bundlato correttamente:
+When a package fails to bundle properly:
 
 ```ts
 // next.config.ts

@@ -1,6 +1,6 @@
 ---
 name: devflow-clarify
-description: Resolves [NEEDS CLARIFICATION: ...] markers in task.md via incremental Q&A. 8D scan → up to 5 questions → updates task.md → sets Status clarified. Use when task.md has open markers or high-risk assumptions before devflow.plan.
+description: "Resolves [NEEDS CLARIFICATION: ...] markers in task.md via incremental Q&A. 8D scan → up to 5 questions → updates task.md → sets Status clarified. Use when task.md has open markers or high-risk assumptions before devflow.plan."
 model: haiku
 effort: low
 ---
@@ -22,7 +22,7 @@ Optional interactive session between `devflow.task` and `devflow.plan`. Validate
 
 - `task.md` Status is `done` — clarification has no effect on a completed task
 - `task.md` has no `[NEEDS CLARIFICATION: ...]` markers and all Key assumptions are low-risk — proceed directly to `devflow.plan`
-- The user wants to change the feature scope rather than resolve ambiguity — edit `task.md` directly or re-run `devflow.task`
+- The user wants to change the feature scope instead of resolving ambiguity — edit `task.md` directly or re-run `devflow.task`
 - `devflow.plan` is already written — clarify before planning, not after; patch `plan.md` directly for post-plan changes
 
 ## Recommended triggers
@@ -51,7 +51,8 @@ If any item fails → stop and report which check failed.
    - Extract every `[NEEDS CLARIFICATION: ...]` marker in `task.md` → one candidate question per marker.
    - Run the 8D scan on the full task content; generate additional candidate questions for dimensions with open ambiguities not already covered by a marker.
 4. Deduplicate and prioritize the backlog by plan-invalidation risk (highest-risk dimension first).
-5. Cap the queue at **≤5 questions** — keep only the highest-priority ones.
+5. **High-stakes filter:** drop candidate questions where a sensible, cheap-to-flip default exists and internal mechanics are unaffected — record those directly in `## Assumptions & Risks`. Keep only questions that alter user-visible behavior, scope, data safety, or mandatory ACs.
+6. Cap the queue at **≤5 questions** — keep only the highest-priority ones.
 
 ### Step 2 — Interactive Q&A loop
 
@@ -60,8 +61,8 @@ Follow structured interview standards in `@devflow/skills/devflow-clarify/refere
 For each question in the prioritized queue, one at a time:
 
 1. Formulate structured elicitation:
-   - State the specific ambiguity or marker being resolved
-   - Provide 2–4 distinct, mutually exclusive options phrased as direct user choices
+   - State the specific ambiguity, trigger, or failure boundary being resolved
+   - Provide 2–4 distinct, mutually exclusive options phrased as direct user choices (grounded in concrete behavior, never abstract buzzwords)
    - Mark the first choice with `(Recommended)` and a 1-sentence technical rationale
    - Do not include an "Other" option (handled automatically by host tool write-in)
    - Invoke **`AskQuestion`** (Claude Code) or **`ask_question`** (Antigravity); fallback to formatted markdown choices in chat
@@ -81,22 +82,23 @@ For each question in the prioritized queue, one at a time:
 
 | Ambiguity source | Target section |
 | ------------------ | ---------------- |
-| Undefined actor or user type | `## User Story` — update actor; `## Summary` only if actor is missing there |
+| Undefined actor or user type | `## User Story` — update actor; `## Goal & Value` / `## Summary` only if actor is missing there |
 | Missing or vague acceptance criterion | `## Acceptance criteria` — add or sharpen the criterion |
-| High-risk Key assumption | `## Key assumptions` — mark validated or replace with concrete statement |
+| High-risk Key assumption | `## Notes` (or `## Key assumptions`) — mark validated or replace with concrete statement |
 | Scope boundary unclear | `## Scope boundaries` — move item from vague phrasing to explicit In/Out entry |
-| Integration dependency unnamed | `## Key assumptions` — add named dependency; remove marker |
-| Terminology divergence | `## Summary` — normalize to chosen term; update `## Subtasks` / `## Acceptance criteria` for consistency |
-| Edge case unaddressed | `## Acceptance criteria` or `## Notes` — add the edge case path explicitly |
+| Cut / descoped AC or Use Case | `## Acceptance criteria` / `## Use Cases & Scenarios` — never delete or renumber `AC-N` / `UC-N`; mark `- [~] **AC-N [wont]:** [text] — Reason: [why]` (or `[retired]`) |
+| Integration dependency unnamed | `## Notes` — add named dependency; remove marker |
+| Terminology divergence | `## Goal & Value` / `## Summary` — normalize to chosen term; update `## Use Cases & Scenarios` / `## Acceptance criteria` for consistency |
+| Edge case unaddressed | `## Use Cases & Scenarios` (add or sharpen UC) or `## Acceptance criteria` — add the edge case path explicitly |
 
-**Do not rewrite the `## Summary` body** to incorporate the full answer verbatim — preserve the original wording. Minimal targeted edits (term normalization, actor name) are allowed. The answer itself belongs in `## Clarifications`.
+**Do not rewrite the `## Goal & Value` / `## Summary` body** to incorporate the full answer verbatim — preserve the original wording. Minimal targeted edits (term normalization, actor name) are allowed. The answer itself belongs in `## Clarifications`.
 
 ### Step 3 — Finalize
 
 After the Q&A loop completes:
 
 1. Scan `task.md` for remaining `[NEEDS CLARIFICATION: ...]` markers.
-   - Resolved markers: should already be removed.
+   - Resolved markers: already removed inline during Step 2.
    - Skipped markers: leave in place — they represent accepted risk.
 2. Update `task.md` header: set `**Status:** clarified`.
 3. Output a **Clarification Summary** in the response:

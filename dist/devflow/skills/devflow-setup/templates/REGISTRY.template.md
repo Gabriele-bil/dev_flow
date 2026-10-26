@@ -7,7 +7,7 @@
 
 <!-- devflow-managed:start:conventions -->
 **Naming:** {{naming-rule}}
-**Branches:** `feat/[NNN]-<name>`, `fix/[NNN]-<name>`
+**Branches:** `feat/[NNN]_<name>`, `fix/[NNN]_<name>`
 **Commits:** `<type>: <desc>` (`feat|fix|chore|docs|perf`, imperative)
 **Format:** `{{format-cmd}}`
 **Analyze:** `{{analyze-cmd}}`
