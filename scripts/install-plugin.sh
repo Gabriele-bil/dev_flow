@@ -216,7 +216,7 @@ install_antigravity() {
     run_cmd mkdir -p "$TARGET_DIR"
 
     # Link all component directories and top-level files
-    for ITEM in skills agents commands adapters references contexts hooks; do
+    for ITEM in skills agents commands adapters references contexts hooks scripts; do
       if [ -d "$DIST_DIR/$ITEM" ]; then
         run_cmd ln -sfn "$DIST_DIR/$ITEM" "$TARGET_DIR/$ITEM"
       fi
