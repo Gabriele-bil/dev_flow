@@ -4,4 +4,6 @@ description: Show current DevFlow pipeline state — active feature, progress, n
 argument-hint: "[--json]"
 ---
 
-Use `@devflow/skills/devflow-status/SKILL.md` and execute it exactly.
+Use `@devflow/skills/devflow-status/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
+
+If `$ARGUMENTS` is empty, show the dashboard (not `--json`).

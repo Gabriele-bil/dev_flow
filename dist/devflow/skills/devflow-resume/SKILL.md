@@ -1,7 +1,7 @@
 ---
 name: devflow-resume
 description: Resumes an interrupted DevFlow session — reads saved state, cross-checks plan.md markers, confirms resume position, re-enters correct pipeline skill. Use when returning after session restart, compaction, or break to continue work where it left off.
-argument-hint: "[]"
+argument-hint: "[optional-feature]"
 ---
 
 # Skill: devflow.resume
@@ -37,13 +37,7 @@ Both absent → stop: "Nothing to resume. Start with `/devflow.task` (or `/devfl
 
 ### Step 1 — Read saved state
 
-```bash
-cat .devflow-state.json 2>/dev/null || echo "STATE_MISSING"
-```
-
-Extract `feature`, `plan_status`, `next_step`, `pending_files`.
-
-If `STATE_MISSING`: derive from files — latest `devflow/features/*/plan.md` (highest `NNN_` prefix), read its `**Status:**`, map to `next_step` via `@devflow/references/state-machine.md` status table. Continue with derived values.
+Resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution** (explicit argument → state `.feature // .active_feature` → lowest open feature → ask). Read its `plan.md` `**Status:**`, map to `next_step` via the status table. State file (`plan_status`, `next_step`, `pending_files`) = hint only — Step 2 cross-checks it.
 
 Also read the feature checkpoint when present — restores working context lost at compaction (`slice`, `decisions`, `constraints`, `errors_tried`; schema: `state-machine.md` → **Checkpoint file**):
 
@@ -100,7 +94,7 @@ Continue with [next_step]? (yes / no / different step)
 
 On confirmation, execute the skill for `next_step` honoring its input contract:
 
-- `devflow.implement` mid-run: enter at first `[pending]` File List entry. When slice headings carry `deps:` annotations (`plan-template.md` → **Slice dependency annotations**): enter at the first `[pending]` entry of a slice whose dep slices are all `[done]`; note any blocked slice skipped. Never re-implement a `[done]` file unless explicitly asked.
+- `devflow.implement` mid-run (Status `implementing` — accepted by its input contract): enter at first `[pending]` File List entry; no `[pending]` left (interrupted `--fix` re-entry) → ask user for the findings list, re-enter with `--fix`. When slice headings carry `deps:` annotations (`plan-template.md` → **Slice dependency annotations**): enter at the first `[pending]` entry of a slice whose dep slices are all `[done]`; note any blocked slice skipped. Never re-implement a `[done]` file unless explicitly asked.
 - All other steps: run from their Step 0.
 
 After position confirmed: delete consumed `handoff.md` (`rm -f devflow/features/[NNN]_[feature-name]/handoff.md`); delete stale `.devflow-run.json` unless user chose to re-arm via `devflow.run` or `devflow.auto`.

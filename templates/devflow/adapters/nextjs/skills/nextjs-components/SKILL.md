@@ -53,16 +53,9 @@ All from `next/navigation` — NOT `next/router` (legacy Pages Router):
 - `useSearchParams()` — query string (**requires Suspense boundary**)
 - `useParams()` — dynamic route params
 
-### Suspense boundary requirements by hook
+## Reference detail
 
-| Hook | Suspense required |
-| --- | --- |
-| `useSearchParams()` | Always |
-| `usePathname()` | Dynamic routes only (`[slug]`, `[id]`) |
-| `useParams()` | No |
-| `useRouter()` | No |
-
-Without `<Suspense>` where required, Next.js triggers a full-page CSR bailout. Isolate `useSearchParams` components in leaf nodes wrapped in `<Suspense>`. Full code → `references/components-patterns.md`.
+Detail for Suspense boundary requirements by hook, RSC Boundaries — Common Server→Client Errors, Hydration Errors: [references/components-patterns.md](references/components-patterns.md) — load when touching those areas.
 
 ## Optimistic Updates
 
@@ -74,19 +67,6 @@ Use `useOptimistic` for reactive UI before server confirmation. Full code → `r
 - `useActionState` — manage Server Action state, errors, and `isPending` natively with progressive enhancement
 
 Full code → `references/components-patterns.md`.
-
-## RSC Boundaries — Common Server→Client Errors
-
-1. **Async Client Component — forbidden.** Only Server Components can be `async`. Fetch in parent Server Component, pass result via props.
-2. **Non-serializable props.** Must be JSON-serializable: convert `Date` with `.toISOString()`, convert `Map`/`Set` to plain objects/arrays, pass class instances as plain objects, define non-Server-Action functions inside Client Component.
-
-Full code + type table → `references/components-patterns.md`.
-
-## Hydration Errors
-
-Caused by server vs client HTML mismatch. Common triggers: `Date.now()`/`Math.random()` during render, accessing `window`/`localStorage` during render, invalid HTML nesting, browser extensions, server-applied theme class. Fix: move browser/time logic to `useEffect`, add `suppressHydrationWarning` on root `<html>` when appropriate, use `useId()` instead of `Math.random()` for stable IDs.
-
-Debug: Next.js overlay highlights the mismatched HTML element. Look for "Expected server HTML to contain a matching...". Full code → `references/components-patterns.md`.
 
 ## Anti-patterns
 

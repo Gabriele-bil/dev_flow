@@ -187,3 +187,69 @@ export default function ProductModal({ params }: { params: Promise<{ id: string 
 - `default.tsx` required in every parallel slot — prevents 404 on hard refresh.
 - Close modal via `router.back()`, not `router.push('/')`.
 - Intercepting conventions: `(.)` = same level, `(..)` = one level up, `(...)` = root `app/`.
+
+## 2) Route Segment Files
+
+Each route folder can contain these reserved filenames:
+
+| File | Purpose |
+| --- | --- |
+| `page.tsx` | Route leaf — makes URL publicly accessible |
+| `layout.tsx` | Persistent wrapper — wraps page and children, does NOT re-mount on navigation |
+| `loading.tsx` | Automatic Suspense boundary — shows while page/children stream |
+| `error.tsx` | Error boundary with `reset` prop — catches runtime errors in subtree |
+| `global-error.tsx` | Error boundary for root layout — must include `<html>` and `<body>` tags |
+| `not-found.tsx` | Renders when `notFound()` is called within subtree |
+| `template.tsx` | Like layout but re-mounts on every navigation — use when fresh state per nav is required |
+| `default.tsx` | Fallback for parallel route slots — return `null` when slot is inactive |
+| `route.ts` | API Route handler — no UI, named exports only (`GET`, `POST`, etc.) |
+| `opengraph-image.tsx` | Auto-generated OG image for route — runs on Edge runtime |
+| `twitter-image.tsx` | Auto-generated Twitter card image — runs on Edge runtime |
+
+Rules:
+
+- `layout.tsx` receives `children: React.ReactNode` — never fetch data that changes per-page inside root layout.
+- `error.tsx` MUST be a Client Component (`'use client'`). Receives `error` and `reset` props.
+- `global-error.tsx` MUST be a Client Component AND include `<html><body>` tags — replaces root layout on error.
+- `loading.tsx` wraps `page.tsx` in `<Suspense>` automatically — no manual wrapping needed.
+- `template.tsx` use case: tabs with per-tab animation, forms that must reset, auth-check per navigation.
+
+## 3) Route Groups and Private Folders
+
+**Route groups** — parentheses: `(group-name)/`
+
+- Organize routes without adding URL segment.
+- Each group can have its own `layout.tsx`.
+- Use to split authenticated vs public layout.
+
+**Private folders** — `_` prefix: `_folder-name/`
+
+- Excluded from routing system entirely.
+- Use for components, hooks, lib co-located with a route but not routes themselves.
+
+## 7) Middleware / Proxy
+
+File at **project root** (sibling to `app/`, `lib/`, `components/`). Never inside `app/`.
+
+Next.js 16+ renamed `middleware.ts` → `proxy.ts` (codemod: `npx @next/codemod@latest upgrade`):
+
+| Version | File | Export | Matcher config |
+| --- | --- | --- | --- |
+| 14–15 | `middleware.ts` | `middleware()` | `config` |
+| 16+ | `proxy.ts` | `proxy()` | `proxyConfig` |
+
+Full code for both versions → `references/architecture-patterns.md`.
+
+## 8) Naming Conventions
+
+| Target | Convention | Example |
+| --- | --- | --- |
+| Folders / files | kebab-case | `user-profile/`, `user-card.tsx` |
+| React components | PascalCase (function name) | `export function UserCard()` |
+| Utility functions | camelCase | `formatDate()`, `parseSlug()` |
+| Server Actions files | `actions.ts` | `app/dashboard/actions.ts` |
+| API route handlers | `route.ts` | `app/api/users/route.ts` |
+| Private folders | `_` prefix | `_components/`, `_lib/`, `_hooks/` |
+| Route groups | `()` wrapping | `(marketing)/`, `(app)/` |
+| Dynamic segments | `[]` wrapping | `[slug]/`, `[id]/` |
+| Catch-all segments | `[...]` wrapping | `[...slug]/` |

@@ -109,7 +109,7 @@ Goal: lock in `constitution.md` rules, `REGISTRY.md` baseline patterns, test thr
 ### QC.3 — MCP Client Configuration (Asked if `--mcp` passed or user opts in)
 - **Question:** Which AI coding host should receive generated MCP configuration?
 - **Options:**
-  - `(Recommended) All detected / Project-local (.mcp.json for Claude Code + Cursor + Antigravity snippet)`
+  - `(Recommended) All detected / Project-local (.mcp.json for Claude Code + Antigravity snippet)`
   - `Claude Code (.mcp.json)`
   - `Antigravity (~/.gemini/config/mcp_config.json snippet)`
   - `Skip MCP config generation`

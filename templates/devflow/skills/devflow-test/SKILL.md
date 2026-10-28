@@ -3,7 +3,8 @@ name: devflow-test
 description: Writes/runs unit+integration tests via adapter targets, bounded retries. Use when user runs devflow.test, validates feature after beautify, or fifth pipeline step.
 argument-hint: "[optional-plan-path]"
 disable-model-invocation: true
-allowed-tools: "Bash(pnpm lint) Bash(pnpm run lint) Bash(pnpm test*) Bash(pnpm run test*) Bash(pnpm build) Bash(pnpm run build) Bash(npm run lint) Bash(npm run test*) Bash(npm run build) Bash(ng generate*) Bash(ng g *) Bash(ng lint*) Bash(ng test*) Bash(ng build*) Bash(flutter analyze*) Bash(flutter test*) Bash(flutter build*) Bash(dart format*) Bash(dart analyze*) Bash(dart run build_runner*) Bash(git status*) Bash(git diff*) Bash(git log*)"
+model: sonnet
+effort: medium
 ---
 
 # Skill: devflow.test
@@ -13,7 +14,7 @@ allowed-tools: "Bash(pnpm lint) Bash(pnpm run lint) Bash(pnpm test*) Bash(pnpm r
 Run `/devflow.test [optional plan path]`.
 
 - If an argument is passed, use it as the `plan.md` path
-- If no argument is passed, resolve the latest `devflow/features/*/plan.md`
+- If no argument is passed, resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**
 
 ## Purpose
 
@@ -44,7 +45,7 @@ If any item fails → stop, report which check failed, do not write test files.
 
 ## Input
 
-Files from `devflow.implement` + `devflow.beautify` + `devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, resolve latest `devflow/features/*/plan.md`.
+Files from `devflow.implement` + `devflow.beautify` + `devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**.
 
 ## Workflow
 

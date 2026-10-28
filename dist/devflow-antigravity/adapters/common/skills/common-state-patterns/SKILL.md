@@ -1,0 +1,72 @@
+---
+name: common-state-patterns
+description: Cross-adapter state management guide — Riverpod (Flutter), Signal Store (Angular), Zustand (Next.js). Use when choosing a state solution, designing state architecture, or diagnosing state-related bugs.
+---
+
+# Skill: Common State Patterns
+
+Cross-adapter. Use alongside adapter-specific state skill (flutter-riverpod, angular-state, nextjs-state).
+
+## Purpose
+
+Provide a unified mental model for state management across all DevFlow adapters. Prevent over-engineering and under-engineering state. Guide the when-to-choose decision.
+
+## When NOT to Use
+
+- Already in implementation — consult adapter-specific state skill directly
+- Single-component local state — use component-local state; no global store needed
+- Form state — use adapter-specific form skill (angular-forms, nextjs-forms, flutter-form)
+
+## Choosing a State Scope
+
+Apply this decision tree before writing any state code:
+
+```text
+Is the state used by only one component?
+  Yes → component-local state (useState, StatefulWidget, local signal)
+  No  → Is it shared across sibling components only?
+          Yes → lift to parent; prop drilling acceptable for ≤2 levels
+          No  → Is it shared across distant/unrelated components?
+                  Yes → global/feature store (Riverpod, Signal Store, Zustand)
+```
+
+**Rule**: use the smallest scope that satisfies the requirement. Over-scoping state creates coupling.
+
+## Adapter Comparison
+
+Per-adapter code (Riverpod for Flutter, Signal Store for Angular, Zustand for Next.js): [references/adapter-comparison.md](references/adapter-comparison.md) — load the active adapter's section only.
+
+## Shared Mental Model
+
+All three solutions share the same conceptual structure:
+
+| Concept | Riverpod | Signal Store | Zustand |
+| --------- | ---------- | -------------- | --------- |
+| State container | `@riverpod` Notifier | `signalStore` | `create` |
+| Read state | `ref.watch` | `store.field` (signal) | `useStore(sel)` |
+| Mutate state | notifier method | store method | set / action |
+| Derived state | `.select` / `@riverpod` fn | `withComputed` | slice selector / `useShallow` |
+| Async state | `AsyncNotifier` (`AsyncValue`) | `withMethods` + RxJS / `resource()` | devtools + middleware |
+| Feature scope | `ProviderScope` | component `providers` | `createStore` / context |
+| Test isolation | `ProviderContainer` | `TestBed` overrides | mock store / `setState` |
+
+## Anti-Patterns
+
+| Anti-Pattern | Fix |
+| --- | --- |
+| Global store for all state | Scope to smallest container that satisfies the requirement |
+| Mutating state outside store methods | Always mutate through store-provided methods |
+| Deriving state in components | Define derived state in store (`withComputed`, selectors, `.select`) |
+| One store for entire application | Feature stores with clear ownership per domain |
+| Async state without loading/error/empty | Handle all async states (`AsyncValue`, loading signal, Zustand middleware) |
+| Server state in client store (Next.js) | Server state → Server Components + Next.js cache; UI state only in Zustand |
+| Testing with real store | Inject mock store / `ProviderContainer` per test |
+
+## I/O Reference
+
+| | |
+| --- | --- |
+| Reads | Adapter-specific state skill (`flutter-riverpod`, `angular-state`, `nextjs-state`) |
+| Reads | Active `ADAPTER.md` → **Technology skills → state** |
+| Related | `common-clean-code` (SOLID principles applied to state design) |
+| Next step | Implement state layer per adapter skill; link back to `plan.md` subtask |

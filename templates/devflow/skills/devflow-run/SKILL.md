@@ -3,9 +3,6 @@ name: devflow-run
 description: "Middle pipeline batch executor: chains implement → beautify → test for an approved plan in one unattended session with a consolidated report; stops before ship. Use when user runs devflow.run or asks to execute the middle pipeline autonomously without pausing at each step gate, or take plan through review and tests."
 argument-hint: "[--from implement|beautify|test] [--until beautify|test|ship]"
 disable-model-invocation: true
-context: fork
-agent: general-purpose
-background: true
 ---
 
 # Skill: devflow.run
@@ -31,14 +28,7 @@ Opt-in gated autonomy. Execute middle pipeline (implement → beautify → test)
 
 ## Autonomy policy
 
-| Allowed unattended | Never unattended |
-| --- | --- |
-| Write/edit files in `plan.md` **File List** scope | `git commit`, `git push`, open PR |
-| Run adapter format/analyze/codegen/test commands | Edit `devflow/config.md`, CI/config files (`pre-config-protect` hook enforces) |
-| Update `plan.md` status/`[done]`/deviations/flags, `.checkpoint.json`, `.devflow-state.json` | Route to `devflow.pr` |
-| Pick defensible default on ambiguity + log decision flag | Apply beautify **opinable** improvements (proposal-class changes) |
-| Stop on `escalation-ladder.md` Level 5 block | Proceed past ship Critical/Required findings |
-| Switch to or create feature branch per `devflow.implement` Step 3 | Install dependencies not in plan; delete files outside plan scope |
+Run-mode contract (marker, autonomy table `run` column, decision flags, discrepancy classes, disarm): `@devflow/references/run-mode.md`. Commit/push/PR and config edits never unattended here.
 
 ## When NOT to Use
 
@@ -50,6 +40,7 @@ Opt-in gated autonomy. Execute middle pipeline (implement → beautify → test)
 
 ## Input contract
 
+- [ ] Feature resolved — explicit `NNN_name` argument, else `@devflow/references/state-machine.md` → **Active feature resolution**
 - [ ] `task.md` + `plan.md` exist at `devflow/features/[NNN]_[feature-name]/`
 - [ ] `plan.md` **Status** satisfies the `--from` step's input contract (`implement` → `ready`; `beautify` → `implemented`; `test` → `beautified` or `implemented`)
 - [ ] No active `.devflow-run.json` (stale marker from crashed run → confirm deletion with user, or route `devflow.recovery`)
@@ -72,7 +63,7 @@ Ambiguity → defensible default + flag in plan.md ## Decision flags (you review
 Proceed? (yes / no)
 ```
 
-On yes: write `.devflow-run.json` per `@devflow/references/state-machine.md` → **Run marker**; append `.devflow-run.json` to `.gitignore` when `.gitignore` exists and entry missing. Marker presence switches step skills to run mode (decision flags, no intermediate waits).
+On yes: arm per `@devflow/references/run-mode.md` → **Marker** (`orchestrator: "devflow.run"`, `from`/`until` from flags; schema `state-machine.md` → **Run marker**).
 
 ### Step 1 - Chain steps
 
@@ -92,24 +83,11 @@ Chain rules:
 
 ### Step 2 - Decision flags (forward-motion)
 
-Never block on ambiguity while run mode active. Where a step would normally pause (ambiguity, conflict with code/registry, opinable improvement):
-
-1. Pick most defensible default: repo precedent > `constitution.md` > adapter convention.
-2. Append to `plan.md` under `## Decision flags` (create section on first flag):
-
-   ```markdown
-   ## Decision flags
-
-   - **F1** — decision: [chosen]; alternatives: [rejected options]; rationale: [why defensible]; files: `path/a`, `path/b`
-   ```
-
-3. Continue.
-
-Product rules are never invented: missing product behavior with no repo precedent → most conservative behavior (fail closed / no-op) + flag, highlighted in report. Flags read by `devflow.ship` report (**Open decision flags**) — user reviews every autonomous decision before PR.
+Never block on ambiguity while armed — defensible default + `plan.md` `## Decision flags` entry, format and precedence per `@devflow/references/run-mode.md` → **Decision flags**. Major discrepancies stop the run per its **Discrepancy classes**.
 
 ### Step 3 - Disarm + consolidated report
 
-Delete `.devflow-run.json` on **every** exit path (complete, contract failure, block, handoff). Report:
+Disarm per `@devflow/references/run-mode.md` → **Disarm** (every exit path). Report:
 
 ```text
 🤖 devflow.run complete: [from] → [last step executed]
@@ -153,7 +131,7 @@ Next (human): devflow.ship — reviews code AND open flags
 | | |
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `plan.md`, `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
-| Reads | `@devflow/references/state-machine.md` (run marker + handoff schemas), `@devflow/references/escalation-ladder.md` (failure bounds) |
+| Reads | `@devflow/references/run-mode.md` (run-mode contract), `@devflow/references/state-machine.md` (run marker + handoff schemas), `@devflow/references/escalation-ladder.md` (failure bounds) |
 | Writes | `.devflow-run.json` — armed Step 0, deleted Step 3 (every exit path) |
 | Writes | `plan.md` — `## Decision flags` entries |
 | Executes | `devflow-implement`, `devflow-beautify`, `devflow-test` skills in order (+ `devflow-ship` with `--until ship`) |

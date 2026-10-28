@@ -27,69 +27,11 @@ Use when changing application structure, creating new page domains, or reviewing
   - Signal Store in page domains (`state.ts`) for feature state.
   - Signal Store in `core/states` for global cross-page state.
 
-## 2) Repository layout (`src/`)
+## Reference detail
 
-```text
-src/
-  app/
-  styles/
-    buttons.css
-    components.css
-    forms.css
-    theme.css
-    typography.css
-    utilities.css
-  styles.css
-```
+Detail for Repository layout (`src/`), App layer architecture (`src/app`), Naming and placement rules, Migration guidance (when refactoring legacy code): [references/architecture-patterns.md](references/architecture-patterns.md) — load when touching those areas.
 
-Rules:
-
-- `src/styles.css` is global style entrypoint.
-- `src/styles.css` imports Tailwind and every file in `src/styles/`.
-- CSS is split by concern. Do not collapse all styles into one file.
-
-## 3) App layer architecture (`src/app`)
-
-```text
-src/app/
-  core/
-    guards/
-    interceptors/
-    services/
-    states/
-  pages/
-    [page-name]/
-      [sub-page-name]/          # optional, same structure as parent page
-      components/
-      constants/
-      directives/
-      models/
-      pipes/
-      utils/
-      validators/
-      page.ts
-      service.ts
-      state.ts
-  shared/
-    components/
-    constants/
-    directives/
-    models/
-    pipes/
-    utils/
-    validators/
-  app.config.ts
-  app.routes.ts
-  app.ts
-```
-
-### Layer intent
-
-- `core/`: singleton app infrastructure. Instantiate once.
-- `pages/`: feature/page domains. Own UI, state, and service boundary.
-- `shared/`: reusable cross-feature building blocks with no page-specific coupling.
-
-## 4) Dependency and communication flow
+## 2) Dependency and communication flow
 
 Mandatory data/control flow:
 
@@ -108,17 +50,7 @@ flowchart TD
   coreInterceptors["core/interceptors"] --> appConfig["app.config.ts"]
 ```
 
-## 5) Naming and placement rules
-
-- One page domain = one folder in `pages/[page-name]/`.
-- Main page component file is always `page.ts`.
-- Main feature service file is always `service.ts`.
-- Main feature state file is always `state.ts`.
-- New feature-specific model/validator/util stays inside its page folder.
-- Move code to `shared/` only after confirmed reuse across multiple pages.
-- Keep `core/services` for app-wide infrastructure services, not page business services.
-
-## 6) Mandatory rules and anti-patterns
+## 3) Mandatory rules and anti-patterns
 
 Do:
 
@@ -135,7 +67,7 @@ Do not:
 - Leave unmanaged manual `subscribe()` in components.
 - Add NgRx artifacts (`actions`, `reducers`, `effects`, `selectors`).
 
-## 7) Architecture review checklist
+## 4) Architecture review checklist
 
 Before merge, confirm:
 
@@ -147,14 +79,6 @@ Before merge, confirm:
 - [ ] Signal Store is used for both global and local state
 - [ ] no NgRx files/patterns introduced
 - [ ] reusable artifacts promoted to `shared` only when actually cross-page
-
-## 8) Migration guidance (when refactoring legacy code)
-
-- Move HTTP logic out of components into `service.ts`.
-- Move ad-hoc component state into `state.ts` Signal Store.
-- Extract global mutable state into `core/states`.
-- Split oversized page folders into `components`, `models`, `utils`, `validators`.
-- Keep refactor incremental by page domain to reduce blast radius.
 
 ## I/O Reference
 

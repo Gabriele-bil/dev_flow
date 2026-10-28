@@ -93,7 +93,6 @@ dev_flow/
 │       │   ├── devflow-blueprint/
 │       │   ├── devflow-board/
 │       │   ├── devflow-discover/
-│       │   ├── devflow-discovery/
 │       │   ├── devflow-implement/
 │       │   ├── devflow-init/
 │       │   ├── devflow-learn/
@@ -128,18 +127,20 @@ dev_flow/
 │           ├── validate-adapters.sh
 │           └── validate-skills.sh
 ├── dist/
-│   └── devflow/                     # Build output — do not edit directly
-│       ├── .claude-plugin/          # Claude Code plugin manifest (generated)
-│       ├── .cursor-plugin/          # Cursor plugin manifest (generated)
-│       ├── .antigravity-plugin/     # Antigravity CLI plugin manifest (generated, plugin.json confined here — never at dist root)
-│       └── ...                      # Mirror of templates/devflow/ (minus dev-only files)
+│   ├── devflow/                     # Claude Code build — do not edit directly
+│   │   ├── .claude-plugin/          # Claude Code plugin manifest (generated)
+│   │   └── ...                      # Mirror of templates/devflow/ (minus dev-only files)
+│   └── devflow-antigravity/         # Antigravity CLI build — do not edit directly
+│       ├── .antigravity-plugin/     # plugin.json (generated)
+│       ├── hooks.json               # hooks/hooks.json translated to agy events/tools
+│       ├── rules/                   # devflow-orientation.md (static routing rule)
+│       └── ...                      # skills/agents with Claude-only frontmatter removed; no commands/
 ├── scripts/
 │   ├── build-plugin.sh              # Orchestrator: reads manifest.json, calls builders
 │   └── builders/
 │       ├── common.sh                # Shared helpers (ok/warn/fail/step)
-│       ├── build-claude.sh          # Generates dist/ for Claude Code
-│       ├── build-cursor.sh          # Adds Cursor layer on dist/
-│       └── build-antigravity.sh     # Adds Antigravity CLI layer on dist/
+│       ├── build-claude.sh          # Generates dist/devflow/ for Claude Code
+│       └── build-antigravity.sh     # Generates dist/devflow-antigravity/ from dist/devflow/
 ├── .github/
 │   └── workflows/
 │       ├── build-verify.yml         # CI: verify dist/ is in sync on every PR
@@ -155,7 +156,7 @@ Feature folders (in the consumer project) use zero-padded ids (`001`, `002`, …
 
 ## Build system
 
-The plugin uses a manifest-driven build: source lives in `templates/devflow/`, built output in `dist/devflow/` (committed). Run the build after any change to skills, adapters, or hooks:
+The plugin uses a manifest-driven build: source lives in `templates/devflow/`, built output in `dist/devflow/` (Claude Code) and `dist/devflow-antigravity/` (Antigravity CLI), both committed. Run the build after any change to skills, adapters, or hooks:
 
 ```bash
 # Rebuild dist/ after any source change
@@ -168,25 +169,40 @@ bash templates/devflow/scripts/validate-skills.sh
 bash templates/devflow/scripts/validate-adapters.sh
 ```
 
-The build is **idempotent** — it recreates `dist/devflow/` from scratch on every run. Requires `jq` (`brew install jq`).
+The build is **idempotent** — it recreates both `dist/` trees from scratch on every run. Requires `jq` (`brew install jq`); runs `agy plugin validate` on the Antigravity tree when `agy` is installed.
 
 ---
 
-## Plugins (Claude Code, Cursor & Antigravity CLI)
+## Plugins (Claude Code & Antigravity CLI)
 
-The [`dist/devflow/`](dist/devflow/) folder is a **multi-platform plugin**: same tree loads in Claude Code, Cursor, and Antigravity CLI (`agy`).
+DevFlow ships one build per host, generated from the same source: [`dist/devflow/`](dist/devflow/) for Claude Code and [`dist/devflow-antigravity/`](dist/devflow-antigravity/) for Antigravity CLI (`agy`). Cursor is no longer supported (removed in 2.0.0).
+
+### What works on each host
+
+| Feature | Claude Code | Antigravity CLI |
+| --- | --- | --- |
+| Pipeline skills, adapters, references | ✅ | ✅ (skills are slash commands; `commands/` not shipped) |
+| Review subagents (`agents/`) | ✅ read-only tools, `model: sonnet` | ✅ host default tools/model (read-only rule in prompt) |
+| Destructive-command / config-protect / scope guards | ✅ | ✅ (`run_command`, file-write tools) |
+| Observe log, instincts, churn learning | ✅ | ✅ |
+| Format + typecheck on Stop, debug-print check | ✅ (shown as `systemMessage`) | ✅ (results in the agy log only) |
+| Token/cost metrics | ✅ tokens + cost | ✅ tokens (no price table for Gemini) |
+| Session-start orientation + instincts | ✅ injected as context | ⚠️ static `dist/devflow-antigravity/rules/devflow-orientation.md`; dynamic state not injected |
+| Pre-compaction state snapshot | ✅ | ❌ no PreCompact event |
+| Model-switch guard + audit | ✅ | ❌ no model-switch events |
+| Retry-loop detection on failed tools | ✅ (`PostToolUseFailure`) | ✅ (`error` field) |
+| Bash output filtering, WebFetch cache | ✅ | ❌ no output rewrite / no tool output in payload |
 
 ### Unified Installer (Recommended)
 
-Install or link DevFlow across all detected platforms (Antigravity, Cursor, Claude Code) with a single command:
+Install or link DevFlow across all detected platforms (Antigravity, Claude Code) with a single command:
 
 ```bash
-# Install to all detected platforms (auto-detects ~/.gemini, ~/.cursor, ~/.claude)
+# Install to all detected platforms (auto-detects ~/.gemini, ~/.claude)
 bash scripts/install-plugin.sh
 
 # Or install to a specific platform:
 bash scripts/install-plugin.sh antigravity
-bash scripts/install-plugin.sh cursor
 bash scripts/install-plugin.sh claude
 ```
 
@@ -205,28 +221,26 @@ Skills are namespaced — use them as `/devflow:task`, `/devflow:plan`, etc.
 claude --plugin-dir ./dist/devflow
 ```
 
-### Install locally (Cursor)
-
-Symlink `~/.cursor/plugins/local/devflow` → this repo's `dist/devflow` directory, then reload the window — see [Plugins](https://cursor.com/docs/plugins).
-
 ### Install locally (Antigravity CLI / agy)
 
 ```bash
 # Validate the plugin files first
-agy plugin validate ./dist/devflow
+agy plugin validate ./dist/devflow-antigravity
 
 # Install the plugin locally
-agy plugin install ./dist/devflow
+agy plugin install ./dist/devflow-antigravity
 ```
+
+Check the hooks with `/hooks` inside `agy`. Hook payload fixtures and capture notes: [`templates/devflow/hooks/tests/fixtures/antigravity/README.md`](templates/devflow/hooks/tests/fixtures/antigravity/README.md).
 
 More detail: [`templates/devflow/README.md`](templates/devflow/README.md).
 
 ### Recommended companion plugin: code-review-graph
 
-Use `code-review-graph` for blast-radius aware reviews in both Cursor and Claude with one setup:
+Use `code-review-graph` for blast-radius aware reviews with one setup:
 
 - `pipx install code-review-graph` (or `pip install code-review-graph`)
-- `code-review-graph install` (auto-detects configured platforms including Cursor and Claude Code)
+- `code-review-graph install` (auto-detects configured platforms, including Claude Code)
 - `code-review-graph build` (initial graph indexing per repository)
 
 ### Required MCP baseline

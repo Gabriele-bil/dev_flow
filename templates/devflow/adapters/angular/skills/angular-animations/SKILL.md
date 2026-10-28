@@ -68,31 +68,9 @@ Auto-height via CSS grid trick:
 
 Stagger list items with `animation-delay`/`transition-delay` per index. Run animations in parallel via shorthand: `animation: rotate 3s, fade-in 2s;`. Programmatic control: `element.getAnimations()`.
 
-## Legacy DSL (`@angular/animations`) — Pre-v20.2 / Heavy Existing Usage Only
+## Reference detail
 
-```typescript
-bootstrapApplication(App, { providers: [provideAnimationsAsync()] });
-```
-
-```typescript
-import { trigger, state, style, animate, transition } from "@angular/animations";
-
-@Component({
-  animations: [
-    trigger("openClose", [
-      state("open", style({ opacity: 1 })),
-      state("closed", style({ opacity: 0 })),
-      transition("open <=> closed", [animate("0.5s")]),
-    ]),
-  ],
-  template: `<div [@openClose]="isOpen() ? 'open' : 'closed'">...</div>`,
-})
-export class OpenClose {
-  protected readonly isOpen = signal(true);
-}
-```
-
-**Never mix legacy DSL and `animate.enter`/`animate.leave` in the same component** — conflicting animation systems produce undefined timing behavior.
+Detail for Legacy DSL (`@angular/animations`) — Pre-v20.2 / Heavy Existing Usage Only: [references/animation-patterns.md](references/animation-patterns.md) — load when touching those areas.
 
 ## Route Transitions
 

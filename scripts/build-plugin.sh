@@ -6,7 +6,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BUILDERS_DIR="$SCRIPT_DIR/builders"
-export ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+export ROOT_DIR
 
 source "$BUILDERS_DIR/common.sh"
 
@@ -18,18 +19,18 @@ export DIST_DIR="$ROOT_DIR/dist/devflow"
 
 [ -f "$MANIFEST" ] || fail "manifest.json non trovato in $TEMPLATE_DIR/"
 
-export NAME=$(jq -r '.name'           "$MANIFEST")
-export DESCRIPTION=$(jq -r '.description' "$MANIFEST")
-export VERSION=$(jq -r '.version'     "$MANIFEST")
-export AUTHOR=$(jq -r '.author'       "$MANIFEST")
-export REPOSITORY=$(jq -r '.repository // empty' "$MANIFEST")
-export HOMEPAGE=$(jq -r '.homepage // empty'     "$MANIFEST")
-export KEYWORDS_JSON=$(jq -c '.keywords // []'   "$MANIFEST")
-CURSOR_SUPPORT=$(jq -r '.cursor_support // false' "$MANIFEST")
+# Campi obbligatori: jq -e fallisce su chiave mancante/null (niente "null" nei manifest)
+NAME=$(jq -er '.name' "$MANIFEST")               || fail "manifest.json: name mancante"
+DESCRIPTION=$(jq -er '.description' "$MANIFEST") || fail "manifest.json: description mancante"
+VERSION=$(jq -er '.version' "$MANIFEST")         || fail "manifest.json: version mancante"
+AUTHOR=$(jq -er '.author' "$MANIFEST")           || fail "manifest.json: author mancante"
+LICENSE_ID=$(jq -er '.license' "$MANIFEST")      || fail "manifest.json: license mancante"
+[[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-+][0-9A-Za-z.-]+)?$ ]] || fail "manifest.json: version '$VERSION' non è semver"
+REPOSITORY=$(jq -r '.repository // empty' "$MANIFEST")
+HOMEPAGE=$(jq -r '.homepage // empty' "$MANIFEST")
+KEYWORDS_JSON=$(jq -c '.keywords // []' "$MANIFEST")
 ANTIGRAVITY_SUPPORT=$(jq -r '.antigravity_support // false' "$MANIFEST")
-
-# Sanifica template da artefatti di runtime temporanei
-find "$TEMPLATE_DIR" \( -name ".devflow-*" ! -name ".devflow-instincts.shared.yaml" -o -name ".DS_Store" -o -name "*.tmp" \) -exec rm -rf {} + 2>/dev/null || true
+export NAME DESCRIPTION VERSION AUTHOR LICENSE_ID REPOSITORY HOMEPAGE KEYWORDS_JSON
 
 step "Build plugin: $NAME v$VERSION"
 
@@ -37,16 +38,12 @@ bash "$BUILDERS_DIR/build-claude.sh"
 
 # Ship runtime utility scripts (board.sh, metrics.sh, doctor.sh) in dist/devflow/scripts/
 mkdir -p "$DIST_DIR/scripts"
-for RUNTIME_SH in board.sh metrics.sh doctor.sh validate-skills.sh; do
+for RUNTIME_SH in board.sh metrics.sh doctor.sh; do
   if [ -f "$TEMPLATE_DIR/scripts/$RUNTIME_SH" ]; then
     cp "$TEMPLATE_DIR/scripts/$RUNTIME_SH" "$DIST_DIR/scripts/$RUNTIME_SH"
     chmod +x "$DIST_DIR/scripts/$RUNTIME_SH" 2>/dev/null || true
   fi
 done
-
-if [ "$CURSOR_SUPPORT" = "true" ]; then
-  bash "$BUILDERS_DIR/build-cursor.sh"
-fi
 
 if [ "$ANTIGRAVITY_SUPPORT" = "true" ]; then
   bash "$BUILDERS_DIR/build-antigravity.sh"
@@ -54,7 +51,6 @@ fi
 
 echo ""
 TARGETS="Claude Code"
-[ "$CURSOR_SUPPORT" = "true" ] && TARGETS="$TARGETS + Cursor"
 [ "$ANTIGRAVITY_SUPPORT" = "true" ] && TARGETS="$TARGETS + Antigravity CLI"
 ok "Build completato → dist/ ($TARGETS)"
 

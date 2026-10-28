@@ -45,7 +45,7 @@ Read in order:
 3. `constitution.md` — extract: layer ordering rules and naming conventions
 4. `docs/adr/` (if referenced in `task.md`/`plan.md` or `docs/adr/README.md` exists) — extract accepted architectural decisions, rejected alternatives, and boundaries
 
-If no path is provided, resolve the highest `NNN_` prefix under `devflow/features/`.
+If no path is provided, resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**.
 
 ### Step 2 — Run 7 detection passes
 

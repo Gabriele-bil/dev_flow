@@ -279,3 +279,35 @@ protected readonly myForm = form(this.citySignal, schema((f) => {
 ```
 
 Always pair `[formField]` with `schema()` validation rules (`required`, etc.) — see `angular-forms`.
+
+## Lazy-Loaded Content
+
+Use structural content directives inside `<ng-template>` for heavy panels — defers rendering until needed:
+
+```html
+<div ngAccordionPanel #panel="ngAccordionPanel">
+  <ng-template ngAccordionContent>
+    <p>Lazy-loaded content here.</p>
+  </ng-template>
+</div>
+```
+
+Applies to `ngAccordionContent`, `ngTabContent`, `ngMenuContent`, `ngComboboxPopup`, `ngTreeItemGroup`.
+
+## Testing with Harnesses
+
+Built on `@angular/cdk/testing` — assert behavior, not DOM structure.
+
+```typescript
+import { TestbedHarnessEnvironment } from "@angular/cdk/testing/testbed";
+import { AccordionHarness } from "@angular/aria/accordion/testing";
+
+const loader = TestbedHarnessEnvironment.loader(fixture);
+const accordion = await loader.getHarness(AccordionHarness.with({ title: "Section 1" }));
+
+expect(await accordion.isExpanded()).toBeFalse();
+await accordion.expand();
+expect(await accordion.isExpanded()).toBeTrue();
+```
+
+See `angular-testing` for harness setup conventions shared across the codebase.

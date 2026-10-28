@@ -9,27 +9,26 @@
 # file's extension) or by an exact "when editing <file>" trigger, same
 # domain-inference table as session-start-learnings.sh.
 #
-# Triggered by: Write|Edit|MultiEdit
-# Input (stdin): JSON { "tool_use": { "name": "Edit", "input": { "file_path": "..." } } }
-# Output: { "hookSpecificOutput": { "hookEventName": "PostToolUse", "additionalContext": "..." } }
+# Triggered by: file write/edit tools (both hosts)
+# Input: host payload, parsed by lib/payload.sh (DF_FILE)
+# Output: lib/emit.sh df_context (additionalContext on Claude Code)
 # Silent (exit 0, no stdout) when nothing matches or tooling is missing.
 
-set -euo pipefail
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOK_DIR/lib/payload.sh"
+. "$HOOK_DIR/lib/emit.sh"
 
-command -v jq >/dev/null 2>&1 || exit 0
+df_read_input || exit 0
 command -v yq >/dev/null 2>&1 || exit 0
 
-WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-INSTINCTS_FILE="${CLAUDE_PROJECT_DIR:-${DEVFLOW_INSTINCTS_FILE:-$WORKSPACE_ROOT}}/.devflow-instincts.yaml"
+WORKSPACE_ROOT="$DF_WORKSPACE"
+INSTINCTS_FILE="${DEVFLOW_INSTINCTS_FILE:-$WORKSPACE_ROOT/.devflow-instincts.yaml}"
 MIN_CONFIDENCE="${DEVFLOW_INSTINCT_MIN_CONFIDENCE:-0.4}"
 MAX_SHOW=3
 
 [[ -f "$INSTINCTS_FILE" && -s "$INSTINCTS_FILE" ]] || exit 0
 
-INPUT="$(cat 2>/dev/null || true)"
-[[ -z "$INPUT" ]] && exit 0
-
-FILE_PATH="$(echo "$INPUT" | jq -r '.tool_use.input.file_path // empty' 2>/dev/null || true)"
+FILE_PATH="$DF_FILE"
 [[ -z "$FILE_PATH" ]] && exit 0
 
 DOMAIN="general"
@@ -41,10 +40,23 @@ case "$FILE_PATH" in *devflow*)  DOMAIN="devflow"    ;; esac
 
 BASENAME="$(basename "$FILE_PATH")"
 
+instinct_filter() {
+  jq -r --arg domain "$DOMAIN" --arg file "$FILE_PATH" --arg base "$BASENAME" \
+    --argjson min "$MIN_CONFIDENCE" --argjson max "$MAX_SHOW" '
+    map(select((.confidence // 0) >= $min))
+    | map(select(
+        ((.domain // "general") == $domain)
+        or ((.trigger // "") == ("when editing " + $file))
+        or ((.trigger // "") | contains($base))))
+    | sort_by(.confidence) | reverse | .[0:$max]
+    | .[]
+    | "• [" + (.confidence | tostring) + " " + (.domain // "general") + "] " + (.trigger // "") + " → " + (.action // "")'
+}
+
+# YAML → JSON once (yq), then filter in jq with values passed as --arg, so
+# file names like "[id].tsx" or quotes can't break the expression.
 ENTRIES=$(
-  yq -r \
-    ".instincts // [] | map(select(.confidence >= ${MIN_CONFIDENCE})) | map(select((.domain // \"general\") == \"${DOMAIN}\" or (.trigger // \"\") == \"when editing ${FILE_PATH}\" or (.trigger // \"\") | test(\"${BASENAME}\"))) | sort_by(.confidence) | reverse | .[0:${MAX_SHOW}] | .[] | \"• [\" + (.confidence | tostring) + \" \" + (.domain // \"general\") + \"] \" + .trigger + \" → \" + .action" \
-    "$INSTINCTS_FILE" 2>/dev/null
+  yq -o=json '.instincts // []' "$INSTINCTS_FILE" 2>/dev/null | instinct_filter
 ) || true
 
 [[ -z "$ENTRIES" ]] && exit 0
@@ -53,5 +65,5 @@ CONTEXT="🧠 Instincts relevant to $BASENAME:
 
 $ENTRIES"
 
-jq -cn --arg ctx "$CONTEXT" '{hookSpecificOutput:{hookEventName:"PostToolUse", additionalContext:$ctx}}'
+df_context "$CONTEXT"
 exit 0

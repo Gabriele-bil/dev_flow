@@ -3,6 +3,8 @@ name: devflow-setup
 description: "Generates AGENTS.md, REGISTRY.md, docs/product.md via adapter templates + questionnaire. Use when running devflow.setup post-install, or adapter/stack/product context changes."
 argument-hint: "[--force] [--mcp]"
 disable-model-invocation: true
+model: sonnet
+effort: medium
 ---
 
 # Skill: devflow.setup
@@ -206,7 +208,7 @@ After successful file writes, install dependencies declared in the active adapte
 
 ### Step 8 - Notify user
 
-Respond using the template in `references/notify-template.md`. If `--mcp` in `$ARGUMENTS`: emit ready-to-copy client MCP config JSON (Antigravity `mcp_config.json`, Claude Code `.mcp.json`, or Cursor) and offer to write it.
+Respond using the template in `references/notify-template.md`. If `--mcp` in `$ARGUMENTS`: emit ready-to-copy client MCP config JSON (Antigravity `mcp_config.json` or Claude Code `.mcp.json`) and offer to write it.
 
 ## Output quality checklist
 

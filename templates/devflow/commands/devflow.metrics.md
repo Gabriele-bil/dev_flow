@@ -5,11 +5,6 @@ argument-hint: "[--json] [--feature <name>]"
 disable-model-invocation: true
 ---
 
-Use `@devflow/skills/devflow-metrics/SKILL.md` and execute it exactly.
+Use `@devflow/skills/devflow-metrics/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
 
-**Anchors (do not skip):**
-
-- Execute `@devflow/scripts/metrics.sh` with supplied flags (`--json`, `--feature`).
-- Display token savings from bash output filter (`.devflow-filter-stats.jsonl`).
-- Display estimated cost breakdown by feature and session (`.devflow-metrics.jsonl`).
-- Report pass@1 stability rate and retry loop count (`.devflow-observe.jsonl`).
+If `$ARGUMENTS` is empty, show the dashboard for all features.

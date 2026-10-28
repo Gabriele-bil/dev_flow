@@ -76,17 +76,11 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 - Local run: `claude --plugin-dir /path/to/devflow`
 - Docs: [Create plugins](https://code.claude.com/docs/en/plugins)
 
-## Cursor
-
-- Manifest: [`.cursor-plugin/plugin.json`](.cursor-plugin/plugin.json)
-- Local install: `ln -s /path/to/devflow ~/.cursor/plugins/local/devflow` then reload the window.
-- Docs: [Plugins](https://cursor.com/docs/plugins)
-
 ## Antigravity CLI (agy)
 
-- Manifest: [`.antigravity-plugin/plugin.json`](.antigravity-plugin/plugin.json)
-- Local install: `agy plugin install /path/to/devflow`
-- Validate: `agy plugin validate /path/to/devflow`
+- Build: `dist/devflow-antigravity/` in the DevFlow repo (manifest under .antigravity-plugin/, hooks in the root hooks.json)
+- Local install: `agy plugin install /path/to/dev_flow/dist/devflow-antigravity`
+- Validate: `agy plugin validate /path/to/dev_flow/dist/devflow-antigravity`
 
 ## Commands
 

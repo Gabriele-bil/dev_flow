@@ -64,7 +64,7 @@ setup() {
 
 teardown() {
   local tmp="$T"
-  cd "$ORIG_DIR"
+  cd "$ORIG_DIR" || exit 1
   rm -rf "$tmp"
   T=""
 }

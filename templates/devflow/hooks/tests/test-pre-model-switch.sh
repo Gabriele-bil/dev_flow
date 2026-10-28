@@ -26,9 +26,12 @@ assert() {
   fi
 }
 
+# write_state <dir> <step> — the command running this turn (observe.sh's
+# active_command); next_step alone never means the step is running.
 write_state() {
   local dir="$1" step="$2"
-  printf '{"next_step":"%s"}\n' "$step" > "$dir/.devflow-state.json"
+  printf '{"next_step":"%s","plan_status":"tested"}\n' "$step" > "$dir/.devflow-state.json"
+  printf '{"active_command":"%s"}\n' "${step#devflow.}" > "$dir/.devflow-observe-state.json"
 }
 
 run_hook() {
@@ -78,6 +81,26 @@ out=$(run_hook "$d" '{}')
 [ -z "$out" ] \
   && assert "T5: fail-open with no to_model field" pass \
   || assert "T5: fail-open with no to_model field" fail
+rm -rf "$d"
+
+# ── T6: next_step=ship alone (ship not run yet) → allow ────────────────────
+d=$(tmpdir)
+printf '{"next_step":"devflow.ship","plan_status":"tested"}\n' > "$d/.devflow-state.json"
+printf '{"last_command":"test"}\n' > "$d/.devflow-observe-state.json"
+out=$(run_hook "$d" '{"to_model":"claude-haiku-4-5","from_model":"claude-sonnet-5"}')
+[ -z "$out" ] \
+  && assert "T6: allows switch when ship is only the next step" pass \
+  || assert "T6: allows switch when ship is only the next step" fail
+rm -rf "$d"
+
+# ── T7: ship ran last turn, plan not shipped yet → block ───────────────────
+d=$(tmpdir)
+printf '{"next_step":"devflow.ship","plan_status":"tested"}\n' > "$d/.devflow-state.json"
+printf '{"last_command":"ship"}\n' > "$d/.devflow-observe-state.json"
+out=$(run_hook "$d" '{"to_model":"claude-haiku-4-5","from_model":"claude-sonnet-5"}')
+[ "$(printf '%s' "$out" | jq -r '.decision // empty' 2>/dev/null)" = "block" ] \
+  && assert "T7: blocks between ship turns" pass \
+  || assert "T7: blocks between ship turns" fail
 rm -rf "$d"
 
 echo ""

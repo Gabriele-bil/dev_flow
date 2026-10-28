@@ -3,23 +3,8 @@ name: devflow.setup
 description: Generate or update AGENTS.md, REGISTRY.md, and docs/product.md in the consumer project root from adapter templates with a mandatory full questionnaire.
 argument-hint: "[--force] [--mcp]"
 disable-model-invocation: true
-model: sonnet
-effort: medium
 ---
 
-Use `@devflow/skills/devflow-setup/SKILL.md` and execute it exactly.
+Use `@devflow/skills/devflow-setup/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
 
-**Anchors (do not skip):**
-
-- Read `@devflow/config.md` if present; ask single-app vs monorepo (monorepo: explicit app name+path declarations only, never auto-scanned), then resolve adapter(s) and read `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/setup.md` — once per declared app in monorepo mode.
-- Load adapter templates from `adapters/<adapter>/templates/`; if missing, fall back to `@devflow/skills/devflow-setup/templates/`.
-- Read `AGENTS.template.md`, `REGISTRY.template.md`, and `PRODUCT.template.md` from the resolved template source.
-- Run mandatory full questionnaire to collect all placeholder values before rendering (monorepo: global fields once, adapter-scoped fields once per app).
-- Preserve `code-review-graph` skill references from templates in the generated `AGENTS.md`.
-- Write `AGENTS.md`, `REGISTRY.md`, and `docs/product.md` in the consumer project root using `devflow-managed` block markers.
-- After file writes, install adapter setup dependencies declared in `@devflow/adapters/<adapter>/steps/setup.md` under `Setup dependencies` — once per app in monorepo mode.
-- If `$ARGUMENTS` contains `--force`, overwrite full files; otherwise only replace `devflow-managed` sections.
-- If `$ARGUMENTS` contains `--mcp`, generate client-ready MCP configuration JSON (for Antigravity `mcp_config.json`, Claude Code `.mcp.json`, or Cursor) resolving universal baseline + stack core + conditional servers per `@devflow/references/mcp-catalog.md`.
-
-Optional flag:
-`$ARGUMENTS`
+If `$ARGUMENTS` is empty, run without `--force`/`--mcp` (managed sections only).

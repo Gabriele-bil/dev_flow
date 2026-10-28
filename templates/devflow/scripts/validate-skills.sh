@@ -22,8 +22,8 @@ OK=0
 ERRORS=0
 WARNINGS=0
 
-# Valid devflow.<verb> targets: every command, plus core skills without a
-# matching command (e.g. devflow-discovery, invoked internally as devflow.discovery)
+# Valid devflow.<verb> targets: every command, plus every core skill dir
+# (devflow-<name> -> devflow.<name>), even one without a matching command
 VALID_VERBS=$( { ls "$PLUGIN_ROOT/commands" 2>/dev/null | sed 's/\.md$//'; \
   ls "$PLUGIN_ROOT/skills" 2>/dev/null | sed -E 's/^devflow-/devflow./'; } | sort -u)
 
@@ -129,8 +129,8 @@ for FILE in "${SKILL_FILES[@]}"; do
   if [[ "$STRICT" == true ]]; then
     # Lines starting with "This section..." or "Note that..."
     if grep -qiE '^(This section|Note that)' "$FILE"; then
-      MATCHES=$(grep -inE '^(This section|Note that)' "$FILE" | head -3 | sed 's/^/      /')
-      FILE_WARNINGS+=("style: line(s) starting with 'This section...' or 'Note that...' (caveman-compress violation)")
+      MATCHES=$(grep -inE '^(This section|Note that)' "$FILE" | head -3 | cut -d: -f1 | paste -sd, -)
+      FILE_WARNINGS+=("style: line(s) $MATCHES start with 'This section...' or 'Note that...' (caveman-compress violation)")
     fi
 
     # Empty sections: a ## heading followed immediately by another ## heading or EOF
@@ -153,6 +153,11 @@ for FILE in "${SKILL_FILES[@]}"; do
         fi
       fi
     done < <(grep -nE '^## ' "$FILE")
+
+    # Line-count check: adapter skills hard cap 100 lines (CONTRIBUTING.md rule)
+    if echo "$REL" | grep -q "^adapters/" && [[ $LINES -gt 100 ]]; then
+      FILE_ERRORS+=("adapter SKILL.md is $LINES lines (>100) — move detail to references/<topic>.md in the skill dir and link it from SKILL.md")
+    fi
 
     # Line-count check: core skills over budget should extract to references/
     if ! echo "$REL" | grep -q "^adapters/" && [[ $LINES -gt 250 ]]; then

@@ -1,0 +1,95 @@
+---
+name: nextjs-components
+description: "'use client' components — React hooks, interactivity, context providers. Load when touching files with 'use client' directive."
+---
+
+# Next.js Client Components
+
+Build interactive UI with `'use client'`. Keep boundary minimal. Server fetches, Client renders.
+
+Full code examples: `references/components-patterns.md`.
+
+## Baseline
+
+Next.js 16+, React 19, TypeScript strict.
+
+## React 19 Primitives
+
+- **`ref` as prop**: In React 19, `ref` is a standard prop on function components (`function MyInput({ ref, ...props })`). Do NOT use `forwardRef`.
+- **`use()` hook**: In Client Components, unwrap Promises passed as props (e.g. `const params = use(props.params)`) and read context conditionally.
+- **`useActionState`**: React 19 native hook (`const [state, formAction, isPending] = useActionState(serverAction, initialState)`). Replaces `useFormState` and includes built-in `isPending`.
+- **`useOptimistic`**: For immediate optimistic UI updates during async transitions.
+
+## When to Use `'use client'`
+
+Add directive ONLY if component uses:
+
+- `useState`, `useEffect`, `useRef`, `useCallback`, `useMemo`
+- Event handlers: `onClick`, `onChange`, `onSubmit`, etc.
+- Browser-only APIs: `window`, `document`, `localStorage`
+- Next.js client hooks: `useRouter`, `usePathname`, `useSearchParams`, `useParams`
+
+**Rule:** place `'use client'` at the lowest leaf in the tree — not in parent. One `'use client'` file makes its entire import subtree client-side. Full correct/wrong examples → `references/components-patterns.md`.
+
+## Passing Data Server → Client
+
+- Server Component fetches → passes as props to Client Component
+- Never re-fetch in Client Component
+- Props must be serializable: no functions, no class instances, no raw `Date` (use ISO string)
+- When passing Promise props (like Next.js 16 dynamic `params`), unwrap in the Client Component using React 19 `use(props.params)`.
+
+Full code → `references/components-patterns.md`.
+
+## Context Providers
+
+Wrap in dedicated Client Component (`providers.tsx`). Import in root `layout.tsx` as single entry point. Full code → `references/components-patterns.md`.
+
+## Next.js Hooks in Client Components
+
+All from `next/navigation` — NOT `next/router` (legacy Pages Router):
+
+- `useRouter()` — programmatic navigation
+- `usePathname()` — current pathname
+- `useSearchParams()` — query string (**requires Suspense boundary**)
+- `useParams()` — dynamic route params
+
+## Reference detail
+
+Detail for Suspense boundary requirements by hook, RSC Boundaries — Common Server→Client Errors, Hydration Errors: [references/components-patterns.md](references/components-patterns.md) — load when touching those areas.
+
+## Optimistic Updates
+
+Use `useOptimistic` for reactive UI before server confirmation. Full code → `references/components-patterns.md`.
+
+## useFormStatus and useActionState
+
+- `useFormStatus` — access parent form state (`pending`, `data`, `method`, `action`) inside child submit buttons
+- `useActionState` — manage Server Action state, errors, and `isPending` natively with progressive enhancement
+
+Full code → `references/components-patterns.md`.
+
+## Anti-patterns
+
+- No `'use client'` on root `layout.tsx`
+- No data fetching in Client Components — receive from Server Component via props
+- No `'use client'` wrapping entire `page.tsx` — isolate interactive part only
+- No importing Server Components inside Client Components — invert: Server wraps Client
+- No `useEffect` for initial data fetch — use Server Components
+- No `async` Client Components — only Server Components can be `async`
+- No `Date`, `Map`, `Set`, or class instances as Server→Client props — serialize first
+- No `Math.random()` for IDs — use `useId()`
+
+## Review Checklist
+
+- [ ] `'use client'` only where necessary
+- [ ] Boundary at lowest possible level in tree
+- [ ] Server data passed as props, not re-fetched
+- [ ] Context providers centralized in `providers.tsx`
+- [ ] No `useEffect` for initial data fetch
+
+## I/O Reference
+
+|            |                                                                        |
+| ---------- | ---------------------------------------------------------------------- |
+| Invoked by | `devflow-implement` for files containing `'use client'` directive      |
+| Related    | `nextjs-architecture`, `nextjs-server`, `nextjs-state`, `nextjs-forms` |

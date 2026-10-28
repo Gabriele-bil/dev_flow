@@ -67,7 +67,7 @@ Emit the human-readable dashboard with severity indicators:
 If any warnings or errors are found:
 
 - Display specific copy-paste terminal commands to install missing binaries.
-- Output ready-to-copy MCP configuration blocks for the detected client (Antigravity `mcp_config.json`, Claude Code `.mcp.json`, or Cursor).
+- Output ready-to-copy MCP configuration blocks for the detected client (Antigravity `mcp_config.json` or Claude Code `.mcp.json`).
 - Suggest running `devflow.setup --mcp` to automatically configure MCP servers for the project.
 
 ## Anti-Patterns

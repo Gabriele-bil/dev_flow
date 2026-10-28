@@ -1,6 +1,6 @@
 # Pipeline State Machine
 
-Single source of truth for DevFlow statuses and transitions. Cited by `devflow-discovery`, `devflow-status`, `devflow-resume`, `devflow-recovery`, and `hooks/pre-compact.sh`. Do not invent statuses outside this file.
+Single source of truth for DevFlow statuses and transitions. Cited by `references/orientation.md`, `devflow-status`, `devflow-resume`, `devflow-recovery`, and `hooks/pre-compact.sh`. Do not invent statuses outside this file.
 
 ## Where state lives
 
@@ -9,12 +9,89 @@ Single source of truth for DevFlow statuses and transitions. Cited by `devflow-d
 | `task.md` | `**Status:**` | `devflow.task`, `devflow.clarify`, `devflow.pr` |
 | `plan.md` | `**Status:**` + `[done]`/`[pending]` markers | pipeline skills at step boundaries |
 | `docs/adr/ADR-NNN-[title].md` | `**Status:**` (Accepted/Proposed) | `devflow.discover` |
-| `.devflow-state.json` | snapshot (feature, plan_status, next_step, progress) | `hooks/pre-compact.sh`, `hooks/post-task-create.sh`, skills via State update snippet |
+| `.devflow-state.json` | derived cache — schema in **State file schema** below | `hooks/pre-compact.sh`, `hooks/post-task-create.sh`, skills via **State update snippet** |
+| `.devflow-observe-state.json` | hook counters (tool calls, session id, turn timing) | hooks only — skills never read or write it |
 | `devflow/features/[NNN]_[name]/.checkpoint.json` | working context (step, slice, decisions, errors_tried) | `devflow.implement` (slice boundaries), `devflow.test` (retry loops); deleted by `devflow.pr` |
 | `.devflow-run.json` | autonomous-run marker (feature, from, until) | `devflow.run` Step 0 or `devflow.auto` Step 0; deleted at every run exit |
 | `devflow/features/[NNN]_[name]/handoff.md` | context-pressure handoff (current slice, next action, open decisions, errors tried) | `devflow.implement` / `devflow.test` on pressure signal; consumed + deleted by `devflow.resume`; leftover deleted by `devflow.pr` |
 
 `plan.md` is authoritative; `.devflow-state.json` is a derived cache. On conflict → trust `plan.md`, resync via `devflow.recovery`.
+
+## State file schema
+
+`.devflow-state.json` at project root. Canonical keys:
+
+```json
+{
+  "feature": "003_user-profile",
+  "feature_path": "devflow/features/003_user-profile",
+  "app": "web",
+  "branch": "feat/003_user-profile",
+  "task_status": "clarified",
+  "plan_status": "implementing",
+  "next_step": "devflow.implement",
+  "progress": { "done": 4, "pending": 6, "total": 10 },
+  "saved_at": "2026-07-17T10:00:00Z",
+  "next_feature_number": 4
+}
+```
+
+| Key | Type | Notes |
+| --- | --- | --- |
+| `feature` | string | feature dir name `NNN_name` — canonical key |
+| `feature_path` | string | `devflow/features/NNN_name` |
+| `app` | string | monorepo only (`**App:**` of the feature); omit in single-app repos |
+| `branch` | string | `task.md` `**Branch:**` |
+| `task_status` | string | `task.md` `**Status:**` (task statuses below) |
+| `plan_status` | string | `plan.md` `**Status:**` (plan statuses below); absent before plan |
+| `next_step` | string | `devflow.<step>` per status table |
+| `progress` | object | `{done, pending, total}` File List markers |
+| `saved_at` | string | ISO-8601 UTC of last write |
+| `next_feature_number` | int | next free `NNN`; readers also accept legacy string form (`"004"`) |
+| `plan_path` | string | snapshot by `hooks/pre-compact.sh` — workspace-relative `plan.md` |
+| `done_files` / `pending_files` | string[] | snapshot by `hooks/pre-compact.sh` — File List paths per marker; read by `devflow.resume` |
+
+Rules:
+
+- `active_feature` = legacy alias of `feature`. Read `.feature // .active_feature`; never write it (snippet below deletes it on write).
+- Merge, never overwrite: each writer sets only keys it owns; unknown keys preserved.
+- Hook counters (tool-call count, session id, turn timing) live in `.devflow-observe-state.json`, owned by hooks — skills never read or write it.
+
+## Active feature resolution
+
+Every skill/command needing "the active feature" without explicit argument uses this order — never "highest `NNN`", "latest", or "most recently modified":
+
+1. **Explicit argument** — feature dir (`NNN_name`), `NNN`, or path to its `task.md`/`plan.md`.
+2. **State file** — `.feature // .active_feature` from `.devflow-state.json`, when `devflow/features/<feature>/` exists and feature not terminal.
+3. **Lowest-numbered open feature** — ascending `devflow/features/[NNN]_*/`, first one that is:
+   - not terminal (terminal = `plan.md` Status `pr-opened`, or no `plan.md` and `task.md` Status `done`)
+   - not `blocked` (`plan.md` Status)
+   - unblocked (every `TASK-NNN` in `task.md` `**Blockers:**` is terminal; `none`/absent = unblocked)
+4. **Ask user** — nothing resolves, or user intent contradicts the result. List open features (`NNN_name` + status).
+
+Resolved feature must still pass the calling skill's input contract (e.g. `devflow.implement` needs `plan.md` Status `ready`/`implementing`). Contract fails → stop, report feature + status, suggest the step it needs — never hop silently to another feature. Status always read from `plan.md` (then `task.md`), never from the state file.
+
+Shell form (steps 2–3; prints `NNN_name` or nothing → step 4):
+
+```bash
+_st() { grep -m1 '^\*\*Status:\*\*' "$1" 2>/dev/null | sed 's/^\*\*Status:\*\*[[:space:]]*//; s/[[:space:]]*$//' | tr -d '\r'; }
+_terminal() { if [ -f "$1/plan.md" ]; then [ "$(_st "$1/plan.md")" = "pr-opened" ]; else [ "$(_st "$1/task.md")" = "done" ]; fi; }
+_open() {
+  _terminal "$1" && return 1
+  [ "$(_st "$1/plan.md")" = "blocked" ] && return 1
+  for id in $(grep -m1 '^\*\*Blockers:\*\*' "$1/task.md" 2>/dev/null | grep -oE '[0-9]{3}'); do
+    b=$(ls -d devflow/features/"${id}"_* 2>/dev/null | head -1)
+    [ -n "$b" ] && ! _terminal "$b" && return 1
+  done; return 0; }
+FEATURE=$(jq -r '.feature // .active_feature // empty' .devflow-state.json 2>/dev/null)
+{ [ -n "$FEATURE" ] && [ -d "devflow/features/$FEATURE" ] && ! _terminal "devflow/features/$FEATURE"; } || FEATURE=""
+if [ -z "$FEATURE" ]; then
+  for d in $(ls -d devflow/features/[0-9][0-9][0-9]_*/ 2>/dev/null | sort); do
+    d=${d%/}; _open "$d" && { FEATURE=${d##*/}; break; }
+  done
+fi
+echo "$FEATURE"
+```
 
 ## task.md statuses
 
@@ -28,7 +105,7 @@ draft → done          (clarify skipped)
 | Status | Meaning | Set by | next_step |
 | --- | --- | --- | --- |
 | `ready` | Plan approved, not started | `devflow.plan` Step 5 | `devflow.implement` |
-| `implementing` | Implement in progress | `devflow.implement` entry (Step 4) | `devflow.implement` (resume) |
+| `implementing` | Implement in progress (first pass or `--fix` re-entry) | `devflow.implement` entry (Step 4) / re-entry mode | `devflow.implement` (resume) |
 | `implemented` | All File List entries `[done]` | `devflow.implement` exit (Step 8) | `devflow.beautify` |
 | `beautified` | Multi-axis review applied | `devflow.beautify` exit (Step 6) | `devflow.test` |
 | `tested` | Tests pass + `verification.md` has no FAIL | `devflow.test` exit (Step 7) | `devflow.ship` |
@@ -42,25 +119,32 @@ draft → done          (clarify skipped)
 ready → implementing → implemented → beautified → tested → shipped → pr-opened
 hotfix fast-track: ready → implementing → implemented → tested → shipped → pr-opened (beautify skipped, quick gate)
 any active status → blocked          (escalation ladder Level 5)
-blocked → [status recovery resolves] (devflow.recovery, user-confirmed)
+blocked → <pre-block status> | ready  (devflow.recovery, user-confirmed plan.md reset)
+implemented | beautified | tested | shipped → implementing   (devflow.implement --fix re-entry)
 tested → shipped requires verification.md with zero FAIL verdicts
 ```
 
-Backward transitions (`beautified` → `implemented` or `implementing` → `ready` via `devflow.rollback`, `implemented` → `implementing` after backprop re-work) allowed via `devflow.rollback`, `devflow.recovery`, or `devflow.backprop` with explicit user confirmation — never silently.
+Backward transitions — always written to `plan.md`, never silent:
+
+- `implementing`/`implemented` → `ready`, `beautified` → `implemented` — `devflow.rollback`, user-confirmed
+- `implemented`+ → `implementing` — `devflow.implement --fix` re-entry. Callers: `devflow.ship` fix loop (user chose fix, or run-mode grader loop), `devflow.backprop` Step 5 (user-confirmed), `devflow.recovery` (user-confirmed). Re-entry then walks forward again: `implemented → beautified → tested` — no step skipped, `verification.md` regenerated
+- `blocked` → resume status — `devflow.recovery` Category G, user-confirmed
 
 ## State update snippet
 
-Run after editing `plan.md` `**Status:**` at any step boundary. Skips silently when `jq` missing:
+Run after editing `plan.md` / `task.md` `**Status:**` at any step boundary. Merges into existing file (never overwrites), writes atomically, skips silently when `jq` missing:
 
 ```bash
-command -v jq >/dev/null 2>&1 && { [ -f .devflow-state.json ] || echo '{}' > .devflow-state.json; } && \
-  jq --arg s "<status>" --arg n "<next_step>" \
-     '.plan_status = $s | .next_step = $n | .saved_at = (now | todate)' \
-     .devflow-state.json > .devflow-state.json.tmp && \
-  mv .devflow-state.json.tmp .devflow-state.json
+command -v jq >/dev/null 2>&1 && {
+  tmp=$(mktemp .devflow-state.json.XXXXXX) &&
+  { [ -s .devflow-state.json ] && cat .devflow-state.json || echo '{}'; } |
+    jq --arg f "<NNN_name>" --arg s "<status>" --arg n "<next_step>" \
+       '. + {feature: $f, feature_path: ("devflow/features/" + $f), plan_status: $s, next_step: $n, saved_at: (now | todate)} | del(.active_feature)' \
+       > "$tmp" && mv "$tmp" .devflow-state.json || rm -f "$tmp"
+}
 ```
 
-Replace `<status>` and `<next_step>` per the table above. Full snapshot (file lists, counts) still refreshed by `hooks/pre-compact.sh` at compaction.
+Replace `<NNN_name>`, `<status>`, `<next_step>` per the table above. Task-level writers (`devflow.task`, `devflow.clarify`, `devflow.pr` for task `done`) set `task_status` instead of / besides `plan_status`. Other owned keys (`branch`, `task_status`, `app`, `progress`) → add `--arg` + key inside the same object; never drop keys you do not own. Corrupt JSON → jq fails, file untouched → `devflow.recovery`. Full snapshot (progress, file lists) still refreshed by `hooks/pre-compact.sh` at compaction.
 
 ## Checkpoint file (per feature)
 
@@ -101,7 +185,7 @@ Append to existing arrays instead of overwriting: read current file with `jq '.d
 
 ## Run marker (autonomous mode)
 
-`.devflow-run.json` at project root — presence switches pipeline skills to **run mode**: ambiguity → decision flag in `plan.md` `## Decision flags` (see `devflow-run` skill → Step 2, `devflow-auto` skill → Step 2), intermediate notify gates do not wait for user.
+`.devflow-run.json` at project root — presence switches pipeline skills to **run mode**: behavior contract (autonomy policy, decision flags, discrepancy classes, disarm) in `@devflow/references/run-mode.md`. This section owns the file schema only.
 
 Shared by two orchestrators, distinguished by `from`/`until` vocabulary:
 

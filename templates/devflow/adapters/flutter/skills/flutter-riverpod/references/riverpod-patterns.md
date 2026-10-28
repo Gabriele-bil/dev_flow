@@ -135,3 +135,24 @@ final container = ProviderContainer.test(
   ],
 );
 ```
+
+## `watch` / `read` / `listen` / `select`
+
+- **`watch`**: reactive read for rendering/derived logic.
+- **`read`**: one-shot read for callbacks/commands.
+- **`listen`**: side effects on transitions (snackbar, navigation).
+- **`select`**: rebuild only on selected field changes.
+
+`ref.read` inside `build` is an anti-pattern — UI won't react to updates. Use `ref.watch(provider.select(...))` instead.
+
+## Invalidation Semantics
+
+- **`ref.invalidate(provider)`**: mark stale; recompute when read next.
+- **`ref.refresh(provider)`**: invalidate + immediate read.
+- **`ref.invalidateSelf()`**: invalidate current provider/notifier.
+
+Use:
+
+- After a mutation in the same notifier: `invalidateSelf`.
+- Pull-to-refresh action: `refresh`.
+- External cache dependency changed: `invalidate(targetProvider)`.

@@ -1,8 +1,7 @@
 ---
 name: devflow-status
-description: Shows current DevFlow pipeline state — active feature, progress, next step, and adapter. Supports --json for machine-readable output with stable exit codes. Use when the user asks where they are in the pipeline or what to do next.
+description: Shows current DevFlow pipeline state (read-only) — active feature, plan status, progress, next step, adapter. Supports --json with stable exit codes. Use when the user asks where they are in the pipeline, what to run next, or to show the current state.
 argument-hint: "[--json]"
-disable-model-invocation: true
 ---
 
 # Skill: devflow-status
@@ -34,11 +33,12 @@ Emit compact status dashboard. Answers "where am I in the pipeline?" — no step
 
 ### Step 1 — Read pipeline state
 
-Priority order:
+Order (plan.md authoritative, state file = derived cache):
 
-1. `.devflow-state.json` in CWD — most recent state, saved by pre-compact hook
-2. `devflow/config.md` — active adapter (single-app) or `## Apps` table (monorepo)
-3. `devflow/features/*/plan.md` — find most recent via `ls -t`; parse progress from plan if `.devflow-state.json` absent
+1. `devflow/config.md` — absent → Case C. Active adapter (single-app) or `## Apps` table (monorepo)
+2. Active feature — resolve per `@devflow/references/state-machine.md` → **Active feature resolution**
+3. Resolved feature's `plan.md` — `**Status:**`, `**App:**`, File List `[done]`/`[pending]` progress; no `plan.md` → `task.md` `**Status:**` (next step `devflow.plan`, or `devflow.clarify` when markers open)
+4. `.devflow-state.json` — drift check only: its `plan_status` ≠ `plan.md` Status → add `Drift:` line (plan.md wins; `devflow.recovery` resyncs)
 
 Status semantics and next-step mapping: `@devflow/references/state-machine.md` (authoritative). Adapter/app resolution: `@devflow/references/adapter-resolution.md`.
 
@@ -52,7 +52,7 @@ Scan `devflow/features/`. For each directory found:
 
 ### Step 3 — Emit dashboard
 
-**Case A — `.devflow-state.json` present:**
+**Case A — active feature resolved:**
 
 ```text
 DevFlow Status
@@ -60,11 +60,11 @@ DevFlow Status
 Adapter:     <adapter>
 App:         <app>   <!-- monorepo only, omit line in single-app -->
 Feature:     <feature>
-Plan:        <plan_path>
+Plan:        devflow/features/<feature>/plan.md
 Status:      <plan_status>  →  next: <next_step>
+Drift:       state file says <state_plan_status> — plan.md wins   <!-- only on drift -->
 Progress:    <done>/<total> files done (<pending> remaining)
-Savings:     output filter kept <kept_chars> of <raw_chars> chars over <n> cmds (~<pct>% saved)
-Cost:        ~<total_tokens> tokens · ~$<total_cost_usd> est. over <n> turns (this session's runs — see Cost line below)
+Metrics:     token savings, est. cost, pass@1 → devflow.metrics   <!-- only when .devflow-filter-stats.jsonl or .devflow-metrics.jsonl exists -->
 Learnings:   <n> auto-detected (retry loops etc.) · <m> contested instincts — see devflow.learn list
 
 Pending files:
@@ -81,15 +81,15 @@ Commands:
   devflow.plan  — start planning <next_unstarted_feature>
 ```
 
-**Case B — no `.devflow-state.json`, but `devflow/config.md` present:**
+**Case B — no active feature resolved, `devflow/config.md` present:**
 
 ```text
 DevFlow Status
 
 Adapter: <adapter>   <!-- monorepo: "Apps: <N> configured (web→nextjs, mobile→flutter, …)" instead -->
-No active pipeline session found.
+No open feature (all terminal, blocked, or none yet).
 
-Start a feature: devflow.task
+Start a feature: devflow.task   <!-- blocked features listed → devflow.recovery -->
 ```
 
 **Case C — no `devflow/config.md`:**
@@ -98,25 +98,9 @@ Start a feature: devflow.task
 DevFlow not configured. Run: /devflow.setup
 ```
 
-## Filter savings line (optional)
+## Metrics pointer (optional)
 
-`Savings:` line only when `.devflow-filter-stats.jsonl` exists in consumer root (written by `post-bash-output-filter.sh`, one JSONL entry per filtered command). Compute:
-
-```bash
-jq -s '{n:length, raw:(map(.raw_chars)|add), kept:(map(.kept_chars)|add)}' .devflow-filter-stats.jsonl
-```
-
-`pct = 100 * (1 - kept/raw)`, rounded. File absent → omit line, zero behavior change. Measured local data — use to accept/reject filter tuning (thresholds, command classes) instead of upstream claims.
-
-## Cost line (optional)
-
-`Cost:` line only when `.devflow-metrics.jsonl` exists (written by `stop-metrics.sh`, one JSONL entry per Stop event). Compute:
-
-```bash
-jq -s '{n:length, tokens:(map(.input_tokens+.output_tokens+(.cache_creation_tokens//0)+(.cache_read_tokens//0))|add), cost:(map(.estimated_cost_usd // 0)|add)}' .devflow-metrics.jsonl
-```
-
-File absent → omit line, zero behavior change. Token counts are exact (from transcript usage fields); `estimated_cost_usd` is an approximation from a local pricing table (`stop-metrics.sh` header) — label it "est." in the dashboard, never present as billed cost.
+Savings/cost/pass@1 are owned by `devflow.metrics` — status never recomputes them. `Metrics:` line only when `.devflow-filter-stats.jsonl` or `.devflow-metrics.jsonl` exists; both absent → omit line.
 
 ## Learnings line (optional)
 
@@ -135,16 +119,16 @@ Both files absent → omit line, zero behavior change. Turns raw JSONL/YAML into
 | --- | --- |
 | Editing `.devflow-state.json` directly | Use `devflow-recovery`; never hand-edit state |
 | Prose or dashboard around `--json` output | Single JSON object on stdout — consumers parse it (see `status-schema.md`) |
-| Reporting status from memory | Always read state file at invocation time |
-| Using status instead of discovery at session start | Discovery = full orientation + routing; status = snapshot only |
+| Reporting status from memory | Always read `plan.md` at invocation time |
+| Reporting state-file status over `plan.md` | `plan.md` authoritative; state file only feeds the Drift line |
+| Using status as full routing guide | `references/orientation.md` = routing tree; status = snapshot of active feature |
 
 ## I/O Reference
 
 | | |
 | --- | --- |
 | Reads | `.devflow-state.json`, `devflow/config.md`, `devflow/features/*/plan.md`, `@devflow/references/adapter-resolution.md`, `@devflow/references/state-machine.md`, `@devflow/references/status-schema.md` (`--json` mode) |
-| Reads (optional) | `.devflow-filter-stats.jsonl` — filter savings telemetry (Savings line) |
-| Reads (optional) | `.devflow-metrics.jsonl` — token/cost estimate telemetry (Cost line) |
+| Reads (optional) | `.devflow-filter-stats.jsonl`, `.devflow-metrics.jsonl` — existence only (Metrics pointer line) |
 | Reads (optional) | `.devflow-learnings.jsonl`, `.devflow-instincts.yaml` — auto-detected/contested learnings count (Learnings line) |
 | Writes | nothing |
-| Related | `devflow-discovery` (full pipeline orientation), `devflow-resume` (session re-entry), `devflow-recovery` (corrupted state), `devflow-learn` (full learnings detail) |
+| Related | `@devflow/references/orientation.md` (full routing tree), `devflow-resume` (session re-entry), `devflow-recovery` (corrupted state), `devflow-learn` (full learnings detail), `devflow-metrics` (savings, cost, pass@1) |

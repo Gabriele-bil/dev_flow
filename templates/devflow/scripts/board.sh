@@ -183,7 +183,7 @@ if [[ -f "$STATE_FILE" ]] && jq -e . "$STATE_FILE" >/dev/null 2>&1; then
   STATE_JSON=$(cat "$STATE_FILE")
 fi
 
-ACTIVE_FEATURE=$(printf '%s' "$STATE_JSON" | jq -r '.active_feature // .feature // empty' 2>/dev/null || true)
+ACTIVE_FEATURE=$(printf '%s' "$STATE_JSON" | jq -r '.feature // .active_feature // empty' 2>/dev/null || true)
 NEXT_STEP=$(printf '%s' "$STATE_JSON" | jq -r '.next_step // empty' 2>/dev/null || true)
 
 # Load all metrics & timings entries into JSON arrays

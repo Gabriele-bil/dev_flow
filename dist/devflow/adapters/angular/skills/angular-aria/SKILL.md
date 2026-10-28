@@ -59,19 +59,9 @@ Full HTML/CSS examples per widget: [references/aria-patterns.md](references/aria
 .option:focus-visible { outline: 2px solid blue; }
 ```
 
-## Lazy-Loaded Content
+## Reference detail
 
-Use structural content directives inside `<ng-template>` for heavy panels — defers rendering until needed:
-
-```html
-<div ngAccordionPanel #panel="ngAccordionPanel">
-  <ng-template ngAccordionContent>
-    <p>Lazy-loaded content here.</p>
-  </ng-template>
-</div>
-```
-
-Applies to `ngAccordionContent`, `ngTabContent`, `ngMenuContent`, `ngComboboxPopup`, `ngTreeItemGroup`.
+Detail for Lazy-Loaded Content, Testing with Harnesses: [references/aria-patterns.md](references/aria-patterns.md) — load when touching those areas.
 
 ## Signal Forms Integration
 
@@ -85,24 +75,6 @@ Aria directives expose `model()`-based `value` — `[formField]` binds them as c
 ```
 
 See `angular-forms` for schema/model conventions. See [references/aria-patterns.md](references/aria-patterns.md) for Combobox/Select form-binding examples.
-
-## Testing with Harnesses
-
-Built on `@angular/cdk/testing` — assert behavior, not DOM structure.
-
-```typescript
-import { TestbedHarnessEnvironment } from "@angular/cdk/testing/testbed";
-import { AccordionHarness } from "@angular/aria/accordion/testing";
-
-const loader = TestbedHarnessEnvironment.loader(fixture);
-const accordion = await loader.getHarness(AccordionHarness.with({ title: "Section 1" }));
-
-expect(await accordion.isExpanded()).toBeFalse();
-await accordion.expand();
-expect(await accordion.isExpanded()).toBeTrue();
-```
-
-See `angular-testing` for harness setup conventions shared across the codebase.
 
 ## Hard Rules
 
