@@ -3,9 +3,6 @@ name: devflow-auto
 description: "Full-cycle autonomous delivery: turns a raw feature idea directly into an opened pull request via task, plan, analyze, implement, beautify, test, ship, and pr. Operates in total autonomy, choosing defensible defaults and documenting minor discrepancies in the pull request; halts only on major discrepancies (Critical blockers). Use when user runs devflow.auto or asks to deliver end to end from idea to PR automatically without pausing for questions."
 argument-hint: "[idea-or-attached-context] [--app <name>]"
 disable-model-invocation: true
-context: fork
-agent: general-purpose
-background: true
 ---
 
 # Skill: devflow.auto

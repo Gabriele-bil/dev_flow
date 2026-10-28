@@ -143,6 +143,11 @@ After **Implementation checkpoints**, append **every extra plan section** requir
 - [ ] `devflow.analyze` run (or explicitly waived) — no Critical findings
 - [ ] If feature touches persistent entities → `data-model.md` exists and is non-empty
 - [ ] `**Complexity:**` recorded per `references/complexity-scoring.md` — profile floor applied (auth/migrations/input → minimum `standard`)
+
+<!-- Sections below are appended later by pipeline skills — never written by devflow.plan:
+## Deviations        — devflow.implement Step 7b / escalation Level 3: `[file]`: [planned] → [actual] — [reason]
+## Decision flags    — run mode only, format per @devflow/skills/devflow-run/SKILL.md Step 2
+-->
 ```
 
 Format rules:

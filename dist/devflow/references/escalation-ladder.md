@@ -9,7 +9,7 @@ Replaces per-skill "retry 3× then stop" clauses. Bounded at every level — no 
 | --- | --- | --- |
 | **1 — Bounded retry** | Command or test fails | Max **3 attempts**. Each attempt must change something material (fix, mock setup, root cause) — never rerun unchanged |
 | **2 — Debug mode** | 3 failed attempts | Stop patching. Read **full** error output. Form ONE explicit hypothesis. Design minimal probe (log line, isolated run, single-file test). Max **2 hypotheses** |
-| **3 — Re-approach** | 2 failed hypotheses | Reread `task.md` + `plan.md`. Question the plan step itself — wrong file order, missing dependency, flawed decision. Propose plan deviation; log in `plan.md` → `## Implementation deviations` |
+| **3 — Re-approach** | 2 failed hypotheses | Reread `task.md` + `plan.md`. Question the plan step itself — wrong file order, missing dependency, flawed decision. Propose plan deviation; log in `plan.md` → `## Deviations` |
 | **4 — Decompose** | Re-approach fails | Split current slice into smaller sub-steps in `plan.md` **File List** (user approves). Retry smallest step first |
 | **5 — Block** | Identical error text across 2 consecutive rounds, or Level 4 exhausted | Set `plan.md` `**Status:** blocked`. Emit stuck-report (below). Hand to user. Never falsify progress |
 

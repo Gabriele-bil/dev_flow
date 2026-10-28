@@ -94,7 +94,7 @@ Continue with [next_step]? (yes / no / different step)
 
 On confirmation, execute the skill for `next_step` honoring its input contract:
 
-- `devflow.implement` mid-run: enter at first `[pending]` File List entry. When slice headings carry `deps:` annotations (`plan-template.md` → **Slice dependency annotations**): enter at the first `[pending]` entry of a slice whose dep slices are all `[done]`; note any blocked slice skipped. Never re-implement a `[done]` file unless explicitly asked.
+- `devflow.implement` mid-run (Status `implementing` — accepted by its input contract): enter at first `[pending]` File List entry; no `[pending]` left (interrupted `--fix` re-entry) → ask user for the findings list, re-enter with `--fix`. When slice headings carry `deps:` annotations (`plan-template.md` → **Slice dependency annotations**): enter at the first `[pending]` entry of a slice whose dep slices are all `[done]`; note any blocked slice skipped. Never re-implement a `[done]` file unless explicitly asked.
 - All other steps: run from their Step 0.
 
 After position confirmed: delete consumed `handoff.md` (`rm -f devflow/features/[NNN]_[feature-name]/handoff.md`); delete stale `.devflow-run.json` unless user chose to re-arm via `devflow.run` or `devflow.auto`.

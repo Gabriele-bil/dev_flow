@@ -28,68 +28,75 @@ Provides a streamlined, token-efficient pipeline for critical bugs, regressions,
 - Multi-PR features or migrations — use `devflow.blueprint`
 - When you are already in the middle of a standard feature pipeline — continue with normal steps
 
+## Input contract
+
+- [ ] Bug description in `$ARGUMENTS` (symptom, error, or broken behavior) — empty → ask
+- [ ] `devflow/config.md` present; monorepo → target **App** known (ask — never guess)
+- [ ] Working tree has no unrelated source/config changes (stash or commit first)
+
+Any item fails → stop, report check, touch nothing.
+
 ## Workflow
 
-### Step 1 - Generate Compact Task and Plan
+Fast-track transitions per `@devflow/references/state-machine.md`: `ready → implementing → implemented → tested → shipped → pr-opened` (beautify skipped). Every boundary: set `plan.md` `**Status:**` + **State update snippet**.
 
-1. Resolve next feature number from `.devflow-state.json` `next_feature_number`, else highest `devflow/features/` prefix + 1 (numbering only — never reuse a prefix).
-2. Name feature `hotfix-[kebab-name]` (e.g. `005_hotfix-auth-token-expiry`).
-3. Scaffold `task.md` with:
-   - **Problem Statement**: Symptom, error message, or broken behavior.
-   - **Root Cause**: Identified file/function causing the defect.
-   - **Acceptance Criteria**: AC1 (fix behavior), AC2 (regression test added).
-4. Scaffold `plan.md`:
-   - `**Complexity:** quick`
-   - `**Status:** ready`
-   - File list with bottom-up dependency ordering (typically 1–3 files).
-5. Create and switch to git branch `fix/[NNN]_[name]`.
-6. Merge into `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet** (`feature`, `branch`, `plan_status: ready`, `next_step: devflow.implement`).
+### Step 1 - Compact task + plan from real templates
 
-### Step 2 - Implement the Fix
+1. `NNN` = `.devflow-state.json` `next_feature_number`, else highest `devflow/features/` prefix + 1 (never reuse). Dir `[NNN]_hotfix-[kebab-name]`; branch `fix/[NNN]_hotfix-[kebab-name]`.
+2. Diagnose root cause (file/function) before writing anything — read-only.
+3. `task.md` from `@devflow/skills/devflow-task/references/task-template.md`: full header (`**ID:**`, `**Date:**`, `**Status:** draft`, `**Branch:**`, `**App:**` monorepo only); Goal & Value (Problem = symptom, Objective = fixed behavior); `UC-1` fixed path; `AC-1 (UC-1)` fixed behavior (Gherkin); `AC-2 (UC-1)` regression test fails before fix, passes after; root cause in `## Notes`. Other template sections: one line or `none`.
+4. `plan.md` from `@devflow/skills/devflow-plan/references/plan-template.md`: header (`**Task:**`, `**App:**` copied, `**Status:** ready`, `**Complexity:** N (quick)`); Overview = root cause; **Traceability** row per AC → file(s); **File List** 1–3 entries `[pending]`, regression test file first; Implementation checkpoints = adapter test + analyze commands.
+5. Branch from up-to-date default branch — base detection per `@devflow/skills/devflow-pr/SKILL.md` Step 0, then `git fetch origin "$BASE_BRANCH" && git switch -c fix/[NNN]_hotfix-[name] "origin/$BASE_BRANCH"`.
 
-1. Resolve active adapter per `@devflow/references/adapter-resolution.md`.
-2. Apply targeted code changes strictly necessary to resolve the root cause.
-3. Save pre-step checkpoint tag: `git tag -f "devflow-checkpoint/$(git branch --show-current)/implement" HEAD`.
-4. Run adapter format and lint commands (`dart format`/`flutter analyze` or `pnpm lint`).
-5. Update `plan.md` File List entries to `[done]` and set `**Status:** implemented`.
+### Step 2 - Checkpoint, then failing test first
 
-### Step 3 - Regression Testing & Verification
+1. Resolve adapter + app per `@devflow/references/adapter-resolution.md`; read `steps/test.md`, `steps/implement.md`.
+2. **Before any code edit:** `git tag -f "devflow-checkpoint/$(git branch --show-current)/implement" HEAD`; Status `implementing`.
+3. Write regression test (AC-2) per adapter test conventions; run it. Must FAIL for the reported reason (Prove-It). Passes → root cause wrong → back to Step 1.2; never fix against a green test.
 
-1. Write a targeted regression test covering the defect in the appropriate test suite.
-2. Run adapter test commands (`flutter test` or `pnpm test`).
-3. If test fails: apply bounded retry (up to 3 attempts).
-4. Generate `verification.md` confirming:
-   - Regression test passes
-   - Full test suite passes with zero regressions
-5. Set `plan.md` `**Status:** tested`.
+### Step 3 - Fix
 
-### Step 4 - Fast-Track Ship Gate
+1. Minimal change at root cause; only File List files. Scope grows beyond 3 files or needs design → stop, route `devflow.task`.
+2. Regression test passes; adapter format + analyze clean (monorepo: `(cd "<app-path>" && …)`).
+3. Mark entries `[done]`; Status `implemented`.
 
-1. Run single-agent review (`quick` complexity profile):
-   - Dispatch `@devflow/agents/code-reviewer.md` to evaluate touched files across correctness, security, and scope fidelity.
-2. If review flags Critical or Required findings: resolve them immediately.
-3. Once clean, set `plan.md` `**Status:** shipped`.
+### Step 4 - Verify
 
-### Step 5 - Open Pull Request
+1. Full adapter test suite; failures per `@devflow/references/escalation-ladder.md` (max 3 bounded attempts → block).
+2. Write `verification.md` per `@devflow/references/verification-levels.md` — AC-1, AC-2 with evidence; zero FAIL.
+3. Status `tested`.
 
-1. Commit changes with conventional commit prefix (`fix: [description]`).
-2. Push branch `fix/[NNN]_[name]` to remote.
-3. Open PR toward default branch (`main`) with hotfix summary and checklist.
-4. Set `plan.md` `**Status:** pr-opened` and `task.md` `**Status:** done`.
+### Step 5 - Quick ship gate
+
+Dispatch `@devflow/agents/code-reviewer.md` (= `devflow.ship` `quick` profile) on touched files. Critical/Required → fix → back to Step 3 (tests + `verification.md` regenerated). Clean → Status `shipped`.
+
+### Step 6 - PR
+
+Execute `@devflow/skills/devflow-pr/SKILL.md` exactly — base-branch detection, artifact cleanup, commit, push, PR body, `pr-opened` + task `done`. Never hand-roll `gh pr create`.
+
+## Common Rationalizations
+
+| Thought | Reality |
+| --- | --- |
+| "Tag after fix — same commit anyway" | Tag before first edit is the rollback point; after-fix tag restores the fix |
+| "Write test after fix, it passes, done" | Test never seen failing proves nothing — Prove-It |
+| "Hotfix spec can skip Traceability/Branch" | `devflow.backprop`, `devflow.analyze`, `devflow.rollback`, `devflow.pr` read them |
 
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Committing code without `task.md` or `plan.md` | Hotfix writes compact specs first; never bypass specification entirely. |
-| Skipping regression tests | Every bugfix must prove the defect is resolved with an automated test. |
-| Expanding hotfix scope to unrelated refactors | Keep hotfix strictly scoped to the defect; file separate tasks for cleanups. |
+| Committing code without `task.md` or `plan.md` | Compact specs from real templates first |
+| Skipping regression test or writing it green-first | Failing test before fix, every time |
+| Expanding hotfix scope to unrelated refactors | Strictly scoped; separate tasks for cleanups |
+| Hardcoded `main` / own `gh pr create` | Hand off to `devflow-pr` (base detection, cleanup) |
 
 ## I/O Reference
 
 | | |
 | --- | --- |
-| Reads | Bug report from `$ARGUMENTS`, existing codebase, active adapter contract |
-| Writes | `devflow/features/[NNN]_hotfix-[name]/task.md`, `plan.md`, `verification.md`, application fix files, test file |
-| Side effects | Creates branch `fix/*`, commits changes, pushes, opens GitHub PR |
-| Next step | Pipeline complete (PR open for review) |
+| Reads | Bug report from `$ARGUMENTS`, codebase, `@devflow/references/adapter-resolution.md`, adapter `steps/test.md` + `steps/implement.md` |
+| Reads | `@devflow/skills/devflow-task/references/task-template.md`, `@devflow/skills/devflow-plan/references/plan-template.md`, `@devflow/references/state-machine.md`, `@devflow/references/verification-levels.md` |
+| Writes | `devflow/features/[NNN]_hotfix-[name]/task.md`, `plan.md`, `verification.md`, fix files, regression test, `.devflow-state.json` (merge) |
+| Side effects | Branch `fix/*` from `origin/<default>`, tag `devflow-checkpoint/<branch>/implement` |
+| Next step | `devflow-pr` (executed in Step 6) |

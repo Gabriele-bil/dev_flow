@@ -5,8 +5,8 @@
 # filesystem (skills, adapters, agents, references, commands) and fails on mismatch.
 
 name: devflow
-version: "1.0.0"
-description: "Spec-driven development pipeline: task → plan → implement → beautify → test → PR"
+version: "1.19.0"
+description: "Spec-driven development pipeline: task → [clarify] → plan → [analyze] → implement → beautify → test → ship → pr"
 
 pipeline:
   steps:

@@ -103,7 +103,7 @@ draft → done          (clarify skipped)
 | Status | Meaning | Set by | next_step |
 | --- | --- | --- | --- |
 | `ready` | Plan approved, not started | `devflow.plan` Step 5 | `devflow.implement` |
-| `implementing` | Implement in progress | `devflow.implement` entry (Step 4) | `devflow.implement` (resume) |
+| `implementing` | Implement in progress (first pass or `--fix` re-entry) | `devflow.implement` entry (Step 4) / re-entry mode | `devflow.implement` (resume) |
 | `implemented` | All File List entries `[done]` | `devflow.implement` exit (Step 8) | `devflow.beautify` |
 | `beautified` | Multi-axis review applied | `devflow.beautify` exit (Step 6) | `devflow.test` |
 | `tested` | Tests pass + `verification.md` has no FAIL | `devflow.test` exit (Step 7) | `devflow.ship` |
@@ -117,11 +117,16 @@ draft → done          (clarify skipped)
 ready → implementing → implemented → beautified → tested → shipped → pr-opened
 hotfix fast-track: ready → implementing → implemented → tested → shipped → pr-opened (beautify skipped, quick gate)
 any active status → blocked          (escalation ladder Level 5)
-blocked → [status recovery resolves] (devflow.recovery, user-confirmed)
+blocked → <pre-block status> | ready  (devflow.recovery, user-confirmed plan.md reset)
+implemented | beautified | tested | shipped → implementing   (devflow.implement --fix re-entry)
 tested → shipped requires verification.md with zero FAIL verdicts
 ```
 
-Backward transitions (`beautified` → `implemented` or `implementing` → `ready` via `devflow.rollback`, `implemented` → `implementing` after backprop re-work) allowed via `devflow.rollback`, `devflow.recovery`, or `devflow.backprop` with explicit user confirmation — never silently.
+Backward transitions — always written to `plan.md`, never silent:
+
+- `implementing`/`implemented` → `ready`, `beautified` → `implemented` — `devflow.rollback`, user-confirmed
+- `implemented`+ → `implementing` — `devflow.implement --fix` re-entry. Callers: `devflow.ship` fix loop (user chose fix, or run-mode grader loop), `devflow.backprop` Step 5 (user-confirmed), `devflow.recovery` (user-confirmed). Re-entry then walks forward again: `implemented → beautified → tested` — no step skipped, `verification.md` regenerated
+- `blocked` → resume status — `devflow.recovery` Category G, user-confirmed
 
 ## State update snippet
 

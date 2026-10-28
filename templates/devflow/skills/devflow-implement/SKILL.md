@@ -1,7 +1,7 @@
 ---
 name: devflow-implement
 description: Implements DevFlow plan files per architecture conventions, MCP-assisted validation. Use when user runs devflow.implement, executes plan.md, or third pipeline step.
-argument-hint: "[optional-plan-path]"
+argument-hint: "[optional-plan-path] [--fix <findings|files>]"
 disable-model-invocation: true
 allowed-tools: "Bash(pnpm lint) Bash(pnpm run lint) Bash(pnpm test*) Bash(pnpm run test*) Bash(pnpm build) Bash(pnpm run build) Bash(npm run lint) Bash(npm run test*) Bash(npm run build) Bash(ng generate*) Bash(ng g *) Bash(ng lint*) Bash(ng test*) Bash(ng build*) Bash(flutter analyze*) Bash(flutter test*) Bash(flutter build*) Bash(dart format*) Bash(dart analyze*) Bash(dart run build_runner*) Bash(git status*) Bash(git diff*) Bash(git log*)"
 ---
@@ -10,9 +10,10 @@ allowed-tools: "Bash(pnpm lint) Bash(pnpm run lint) Bash(pnpm test*) Bash(pnpm r
 
 ## Quick Start
 
-Run `/devflow.implement [optional plan path]`.
+Run `/devflow.implement [optional plan path] [--fix <findings|files>]`.
 
 - If an argument is passed, use it as the `plan.md` path
+- `--fix` → **re-entry mode** (see below): targeted fixes only
 - If no argument is passed, resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**
 
 ## Purpose
@@ -41,7 +42,7 @@ DevFlow artifacts (e.g. `devflow/features/*/task.md`, `devflow/features/*/plan.m
 Before proceeding, verify:
 
 - [ ] `plan.md` exists at `devflow/features/[NNN]_[feature-name]/plan.md`
-- [ ] `plan.md` **Status** == `ready`
+- [ ] `plan.md` **Status** ∈ `ready` | `implementing` (`implementing` = resume at first `[pending]` entry) — or any of `implemented` | `beautified` | `tested` | `shipped` **with** `--fix` (re-entry mode)
 - [ ] `plan.md` has a non-empty `## File List` section (at least one `###` file entry)
 - [ ] `plan.md` has a non-empty `## Traceability` table (every `task.md` subtask mapped to a file)
 
@@ -50,6 +51,16 @@ If any item fails → stop, report which check failed, do not touch application 
 ## Input
 
 `devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**.
+
+## Re-entry mode (`--fix`)
+
+Targeted rework after the plan was already implemented. Callers: `devflow.ship` fix loop, `devflow.backprop` Step 5, `devflow.recovery`, user with explicit findings.
+
+- Input: list of findings (`file:line` + description) or File List paths. Empty list → stop.
+- Entry: set `plan.md` `**Status:** implementing` (documented backward transition — `@devflow/references/state-machine.md` → **Legal transitions**); refresh state per **State update snippet**.
+- Scope: edit only files named by the findings (+ their direct callers when the fix changes a contract). Never touch other `[done]` markers; never re-implement untouched files; new file needed → add File List entry `[done]` + **Traceability** row + `## Deviations` entry.
+- Skip Step 3 branch creation (verify only) and Step 7 registry unless a shared element changed.
+- Run Steps 5–6 (codegen, format, analyze) on touched files; exit via Step 8 (`**Status:** implemented`). Next step stays `devflow.beautify` → `devflow.test` — re-entry never skips them.
 
 ## Workflow
 
@@ -112,7 +123,7 @@ Verify git branch against `task.md` `**Branch:**` or `.devflow-state.json` (conv
 
 ### Step 4 - Implement files
 
-Before the first file: save git checkpoint tag (`git tag -f "devflow-checkpoint/$(git branch --show-current 2>/dev/null)/implement" HEAD 2>/dev/null || true`); set `plan.md` `**Status:** implementing`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
+Before the first file (Status `ready` only — skip on `implementing` resume and re-entry): save git checkpoint tag (`git tag -f "devflow-checkpoint/$(git branch --show-current 2>/dev/null)/implement" HEAD 2>/dev/null || true`); set `plan.md` `**Status:** implementing`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
 
 Implement all files from the plan in the exact order defined in the **File List**. Slice headings carrying `deps:` annotations: enter a slice only when every listed dep slice is fully `[done]` — File List order already satisfies this on sequential plans; the annotation matters when slices were reordered or a dep slice still has `[pending]` entries.
 
@@ -180,10 +191,10 @@ After all files implemented, update `registry.md` for every element written to s
 
 ### Step 7b - Write deviations to plan.md
 
-If any file differs from `plan.md` (structure, dependency, behavior), add to `plan.md`:
+If any file differs from `plan.md` (structure, dependency, behavior), append to `plan.md` (single heading for all skills — create on first entry):
 
 ```markdown
-## Implementation deviations
+## Deviations
 
 - `[file path]`: [planned behavior] → [actual behavior] — [reason]
 ```
@@ -225,7 +236,7 @@ Respond using template in `references/notify-template.md`. **Run mode** (`.devfl
 | Reads | `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status transitions), `@devflow/references/token-economy.md` (index-first + derive-don't-dump) |
 | Reads (conditional) | `DESIGN.md` / `docs/design.md` — UI constraints for `[ui]`-tagged batches; `.devflow-run.json` (existence — run-mode switch) |
 | Writes | all files defined in `plan.md` |
-| Writes | `plan.md` — `[done]` markers, `**Status:** implementing → implemented`, `## Implementation deviations`, `## Decision flags` (run mode) |
+| Writes | `plan.md` — `[done]` markers, `**Status:** implementing → implemented`, `## Deviations`, `## Decision flags` (run mode) |
 | Writes (conditional) | `devflow/features/[NNN]_[feature-name]/handoff.md` — on context pressure (state-machine.md → Handoff file) |
 | Writes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json` — slice-boundary working context (state-machine.md → Checkpoint file) |
 | Writes | `registry.md` (mandatory for shared-folder elements; proposed for architectural patterns) |
