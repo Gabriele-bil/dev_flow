@@ -1,9 +1,13 @@
 #!/bin/bash
 # stop-debug-check.sh — Stop hook: scan modified files for debug output statements.
-# Reads stdin (passthrough), warns via stderr if debug prints are found, echoes stdin to stdout.
+# Warns the user via systemMessage (lib/emit.sh df_notify) when debug prints are
+# found in modified files.
 
-# Read stdin for passthrough
-RAW=$(cat)
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOK_DIR/lib/payload.sh"
+. "$HOOK_DIR/lib/emit.sh"
+
+df_read_input || exit 0
 
 WARNINGS=""
 
@@ -16,10 +20,7 @@ MODIFIED_FILES=$(
 ) || true
 
 # Bail early if no modified files
-if [ -z "$MODIFIED_FILES" ]; then
-  printf '%s' "$RAW"
-  exit 0
-fi
+[ -z "$MODIFIED_FILES" ] && exit 0
 
 # Determine active adapter from devflow/config.md in CWD
 ADAPTER=""
@@ -108,12 +109,9 @@ if [ "$SCAN_TS" -eq 1 ]; then
   fi
 fi
 
-# Emit warning to stderr if any debug output was found
 if [ -n "$WARNINGS" ]; then
-  printf '\n⚠️  DEBUG OUTPUT DETECTED in modified files:\n%s\nConsider removing debug statements before committing.\n\n' "$WARNINGS" >&2
+  df_notify "⚠️  DEBUG OUTPUT DETECTED in modified files:
+${WARNINGS}Consider removing debug statements before committing."
 fi
-
-# Passthrough: always emit raw stdin to stdout unchanged
-printf '%s' "$RAW"
 
 exit 0

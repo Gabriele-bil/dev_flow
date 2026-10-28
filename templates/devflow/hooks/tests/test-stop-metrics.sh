@@ -96,7 +96,11 @@ write_transcript "$d/transcript.jsonl"
 cat > "$d/.devflow-state.json" <<'EOF'
 {
   "active_feature": "003_devflow-board",
-  "next_step": "devflow.implement",
+  "next_step": "devflow.implement"
+}
+EOF
+cat > "$d/.devflow-observe-state.json" <<'EOF'
+{
   "active_command": "implement",
   "turn_started_at": "2026-10-26T08:00:00Z",
   "turn_started_epoch": 1000
@@ -119,6 +123,37 @@ T_DUR=$(jq -r '.duration_sec // 0' "$TLOG" 2>/dev/null || echo "0")
 [ "$T_DUR" -gt 0 ] \
   && assert "T5d: duration_sec computed (>0)" pass \
   || assert "T5d: duration_sec computed (>0, got '$T_DUR')" fail
+rm -rf "$d"
+
+# ── T6: per-turn usage — a second Stop with no new transcript lines adds 0 ──
+d=$(tmpdir)
+write_transcript "$d/transcript.jsonl"
+run_hook "$d" "{\"transcript_path\":\"$d/transcript.jsonl\",\"session_id\":\"s-turn\"}"
+run_hook "$d" "{\"transcript_path\":\"$d/transcript.jsonl\",\"session_id\":\"s-turn\"}"
+ROWS=$(wc -l < "$d/.devflow-metrics.jsonl" 2>/dev/null | tr -d ' ')
+[ "$ROWS" = "1" ] \
+  && assert "T6: no double-count when transcript did not grow" pass \
+  || assert "T6: no double-count when transcript did not grow (rows=$ROWS)" fail
+rm -rf "$d"
+
+# ── T7: cache reads priced at the cache_read rate, not the input rate ──────
+d=$(tmpdir)
+printf '%s\n' '{"type":"assistant","message":{"id":"m1","model":"claude-opus-5-5","usage":{"input_tokens":0,"output_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":1000000}}}' > "$d/transcript.jsonl"
+run_hook "$d" "{\"transcript_path\":\"$d/transcript.jsonl\",\"session_id\":\"s-cache\"}"
+C=$(jq -r '.estimated_cost_usd' "$d/.devflow-metrics.jsonl" 2>/dev/null)
+[ "$C" = "0.2" ] \
+  && assert "T7: 1M cache-read tokens on Opus 5.5 cost 0.20 USD" pass \
+  || assert "T7: 1M cache-read tokens on Opus 5.5 cost 0.20 USD (got $C)" fail
+rm -rf "$d"
+
+# ── T8: Antigravity transcript (PLANNER_RESPONSE token fields) ──────────────
+d=$(tmpdir)
+printf '%s\n' '{"step_index":1,"type":"PLANNER_RESPONSE","input_tokens":6884,"cache_read_tokens":0,"output_tokens":582}' > "$d/transcript_full.jsonl"
+run_hook "$d" "{\"conversationId\":\"c1\",\"workspacePaths\":[\"$d\"],\"transcriptPath\":\"$d/transcript_full.jsonl\",\"modelName\":\"gemini-3.8-flash-high\"}"
+IN=$(jq -r '.input_tokens' "$d/.devflow-metrics.jsonl" 2>/dev/null)
+[ "$IN" = "6884" ] \
+  && assert "T8: Antigravity tokens recorded" pass \
+  || assert "T8: Antigravity tokens recorded (got $IN)" fail
 rm -rf "$d"
 
 echo ""

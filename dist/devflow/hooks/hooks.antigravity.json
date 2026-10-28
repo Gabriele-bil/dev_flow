@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/session-start.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/session-start.sh\"",
             "timeout": 15
           }
         ]
@@ -14,7 +14,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/session-start-learnings.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/session-start-learnings.sh\"",
             "timeout": 15
           }
         ]
@@ -26,12 +26,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/pre-config-protect.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/pre-config-protect.sh\"",
             "timeout": 15
           },
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/pre-scope-guard.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/pre-scope-guard.sh\"",
             "timeout": 5
           }
         ]
@@ -41,7 +41,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/pre-bash-destructive-guard.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/pre-bash-destructive-guard.sh\"",
             "timeout": 15
           }
         ]
@@ -51,7 +51,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/pre-fetch-cache.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/pre-fetch-cache.sh\"",
             "timeout": 10
           }
         ]
@@ -61,7 +61,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/pre-agent-fanout-cap.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/pre-agent-fanout-cap.sh\"",
             "timeout": 5
           }
         ]
@@ -71,7 +71,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/observe.sh pre",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/observe.sh\" pre",
             "async": true,
             "timeout": 5
           }
@@ -84,7 +84,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/observe.sh post",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/observe.sh\" post",
             "async": true,
             "timeout": 5
           }
@@ -95,7 +95,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/post-bash-output-filter.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/post-bash-output-filter.sh\"",
             "timeout": 10
           }
         ]
@@ -105,13 +105,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/post-edit-accumulate.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/post-edit-accumulate.sh\"",
             "async": true,
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/post-edit-instinct-context.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/post-edit-instinct-context.sh\"",
             "timeout": 5
           }
         ]
@@ -121,7 +121,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/post-task-create.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/post-task-create.sh\"",
             "async": true,
             "timeout": 5
           }
@@ -132,8 +132,21 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/post-fetch-cache.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/post-fetch-cache.sh\"",
             "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/observe.sh\" post",
+            "async": true,
+            "timeout": 5
           }
         ]
       }
@@ -143,7 +156,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/pre-model-switch.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/pre-model-switch.sh\"",
             "timeout": 5
           }
         ]
@@ -154,7 +167,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/post-model-switch.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/post-model-switch.sh\"",
             "async": true,
             "timeout": 5
           }
@@ -166,7 +179,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/pre-compact.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/pre-compact.sh\"",
             "timeout": 15
           }
         ]
@@ -177,7 +190,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/stop-format-typecheck.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/stop-format-typecheck.sh\"",
             "timeout": 90
           }
         ]
@@ -186,7 +199,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/stop-notify.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/stop-notify.sh\"",
             "async": true,
             "timeout": 10
           }
@@ -196,7 +209,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/stop-debug-check.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/stop-debug-check.sh\"",
             "timeout": 15
           }
         ]
@@ -205,7 +218,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/stop-learn-distill.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/stop-learn-distill.sh\"",
             "timeout": 15
           }
         ]
@@ -214,8 +227,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/observe.sh stop",
-            "async": true,
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/observe.sh\" stop",
             "timeout": 5
           }
         ]
@@ -224,7 +236,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${ANTIGRAVITY_PLUGIN_ROOT}/hooks/stop-metrics.sh",
+            "command": "bash \"${ANTIGRAVITY_PLUGIN_ROOT}/hooks/stop-metrics.sh\"",
             "async": true,
             "timeout": 10
           }

@@ -3,32 +3,19 @@
 # PreToolUse hook for Claude Code: blocks modifications to linter/formatter/analyzer
 # config files to prevent weakening rules instead of fixing code.
 #
-# Triggered by: Write, Edit, MultiEdit tools
-# Input (stdin): JSON { "session_id": "...", "tool_use": { "id": "...", "name": "...", "input": { "file_path": "..." } } }
-# Block output:  { "decision": "block", "reason": "..." }  → stdout, exit 0
-# Allow output:  (silent) → exit 0
+# Triggered by: Write|Edit|MultiEdit (Claude Code), file-write tools (Antigravity CLI)
+# Input: host payload, parsed by lib/payload.sh (DF_FILE)
+# Block output: lib/emit.sh df_deny → stdout, exit 0
+# Allow output: (silent) → exit 0
+# Fail-open: missing jq or unparseable input never blocks.
 
-set -euo pipefail
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOK_DIR/lib/payload.sh"
+. "$HOOK_DIR/lib/emit.sh"
 
-# Require jq — if not available, allow silently (never block for missing tooling)
-if ! command -v jq &>/dev/null; then
-  exit 0
-fi
-
-# Read all stdin
-INPUT="$(cat 2>/dev/null || true)"
-
-# If stdin is empty or not parseable, allow silently
-if [[ -z "$INPUT" ]]; then
-  exit 0
-fi
-
-# Extract file_path; on any jq error allow silently
-FILE_PATH="$(echo "$INPUT" | jq -r '.tool_use.input.file_path // empty' 2>/dev/null || true)"
-
-if [[ -z "$FILE_PATH" ]] || [[ "$FILE_PATH" == "null" ]]; then
-  exit 0
-fi
+df_read_input || exit 0
+FILE_PATH="$DF_FILE"
+[[ -z "$FILE_PATH" ]] && exit 0
 
 BASENAME="$(basename "$FILE_PATH")"
 
@@ -84,7 +71,7 @@ Fix the code to satisfy the rules instead of weakening them.
 
 To override: rename the file temporarily or ask the user to edit manually."
 
-  printf '%s' "$(jq -n --arg reason "$REASON" '{"decision":"block","reason":$reason}')"
+  df_deny "$REASON"
   exit 0
 fi
 

@@ -2,23 +2,25 @@
 # stop-learn-distill.sh — Stop hook: distill churn signals into project instincts.
 # Detects file churn (≥4 edits in session) and upserts instinct stubs to
 # .devflow-instincts.yaml in the consumer project root.
-# Passthrough: reads stdin and writes it back to stdout unchanged.
+# No stdout: Stop hooks must not echo their input (Claude Code parses stdout
+# as hook output).
 
-RAW=$(cat)
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOK_DIR/lib/payload.sh"
 
-WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+df_read_input || exit 0
+
+WORKSPACE_ROOT="$DF_WORKSPACE"
 OBSERVE_LOG="${DEVFLOW_OBSERVE_LOG:-$WORKSPACE_ROOT/.devflow-observe.jsonl}"
 INSTINCTS_FILE="${DEVFLOW_INSTINCTS_FILE:-$WORKSPACE_ROOT/.devflow-instincts.yaml}"
 CHURN_THRESHOLD=4
 WINDOW_LINES=200
 
 # Guards: jq and yq both required
-if ! command -v jq >/dev/null 2>&1; then printf '%s' "$RAW"; exit 0; fi
-if ! command -v yq >/dev/null 2>&1; then  printf '%s' "$RAW"; exit 0; fi
+command -v yq >/dev/null 2>&1 || exit 0
 
 # Guard: nothing to analyse
 if [ ! -f "$OBSERVE_LOG" ] || [ ! -s "$OBSERVE_LOG" ]; then
-  printf '%s' "$RAW"
   exit 0
 fi
 
@@ -27,12 +29,11 @@ TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ") || true
 # ── Detect churn: files written/edited ≥ CHURN_THRESHOLD times ───────────────
 CHURNED_FILES=$(
   tail -n "$WINDOW_LINES" "$OBSERVE_LOG" 2>/dev/null \
-  | jq -r 'select(.event=="pre" and (.tool=="Write" or .tool=="Edit" or .tool=="MultiEdit") and (.file != null and .file != "")) | .file' 2>/dev/null \
+  | jq -r 'select(.event=="pre" and ((.kind // "") == "write" or (.kind // "") == "edit" or .tool=="Write" or .tool=="Edit" or .tool=="MultiEdit") and (.file != null and .file != "")) | .file' 2>/dev/null \
   | sort | uniq -c | awk -v thr="$CHURN_THRESHOLD" '$1 >= thr { print $2 }'
 ) || true
 
 if [ -z "$CHURNED_FILES" ]; then
-  printf '%s' "$RAW"
   exit 0
 fi
 
@@ -42,7 +43,7 @@ fi
 # instead of reinforcing it. Reverts are remembered, not silently dropped.
 REVERT_CMD=$(
   tail -n "$WINDOW_LINES" "$OBSERVE_LOG" 2>/dev/null \
-  | jq -r 'select(.event=="pre" and .tool=="Bash" and ((.cmd // "") != "") and
+  | jq -r 'select(.event=="pre" and ((.kind // "") == "shell" or .tool=="Bash") and ((.cmd // "") != "") and
       ((.cmd | test("git\\s+revert")) or
        (.cmd | test("git\\s+reset\\s+.*--hard")) or
        (.cmd | test("git\\s+(checkout|restore)\\s+(--\\s+)?\\.")))) | .cmd' 2>/dev/null \
@@ -118,5 +119,4 @@ if [ -f "$WORKSPACE_ROOT/.gitignore" ]; then
   fi
 fi
 
-printf '%s' "$RAW"
 exit 0

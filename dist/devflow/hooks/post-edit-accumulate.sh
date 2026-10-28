@@ -1,36 +1,20 @@
 #!/bin/bash
 # PostToolUse hook: accumulates modified file paths into .devflow-changed-files.tmp
-# Triggered after Write, Edit, MultiEdit tool calls.
+# Triggered after file write/edit tools (both hosts; see lib/payload.sh DF_TOOL).
 # Also triggers board.sh --sync --quiet when a DevFlow artifact or state file
 # is modified and devflow/board/index.html exists.
 
-RAW=$(cat) || true  # consume stdin (not a passthrough hook)
-[ -z "$RAW" ] && exit 0
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOK_DIR/lib/payload.sh"
+SCRIPT_DIR="$HOOK_DIR"
 
-# Require jq
-if ! command -v jq &>/dev/null; then
-  exit 0
-fi
+df_read_input || exit 0
+df_is_edit || exit 0
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+FILE_PATH="$DF_FILE"
+[[ -z "$FILE_PATH" ]] && exit 0
 
-# Extract tool name
-TOOL_NAME=$(printf '%s' "$RAW" | jq -r '.tool_use.name // empty' 2>/dev/null)
-
-# Only act on Write, Edit, or MultiEdit
-if [[ "$TOOL_NAME" != "Write" && "$TOOL_NAME" != "Edit" && "$TOOL_NAME" != "MultiEdit" ]]; then
-  exit 0
-fi
-
-# Extract file_path
-FILE_PATH=$(printf '%s' "$RAW" | jq -r '.tool_use.input.file_path // empty' 2>/dev/null)
-
-# Skip if empty
-if [[ -z "$FILE_PATH" ]]; then
-  exit 0
-fi
-
-WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+WORKSPACE_ROOT="$DF_WORKSPACE"
 TMP_FILE="${DEVFLOW_CHANGED_FILES_TMP:-$WORKSPACE_ROOT/.devflow-changed-files.tmp}"
 
 if [[ ! -f "$TMP_FILE" ]] || ! grep -qF "$FILE_PATH" "$TMP_FILE" 2>/dev/null; then

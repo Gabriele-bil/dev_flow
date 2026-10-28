@@ -126,28 +126,42 @@ Keep: technical terms exact, file paths exact, commands exact, all verbs, negati
 
 Hook vs skill vs command — see **Choosing a Mechanism** above.
 
-**Available events:**
+**Two hosts, one script.** `hooks/hooks.json` (Claude Code format) is the single source; `scripts/builders/build-antigravity.sh` translates it into the root `hooks.json` Antigravity CLI reads (event and tool-name mapping, events Antigravity lacks dropped). Never parse stdin or print control JSON by hand — source the shared library:
 
-| Event | Notes |
-| --- | --- |
-| `SessionStart` | Fires once at session start; use for context injection |
-| `PreToolUse` | Fires before a tool call; block with `{"decision":"block","reason":"..."}` on stdout |
-| `PostToolUse` | Fires after a tool call; async hooks emit no stdout; sync hooks may emit control JSON — `hookSpecificOutput.updatedToolOutput` rewrites tool output in context (cap 10k chars) |
-| `PreModelSwitch` | Fires before a model switch; block with `{"decision":"block","reason":"..."}` on stdout — use only for a high-confidence, narrowly-scoped rule (see `pre-model-switch.sh`); fail-open on ambiguous input |
-| `PostModelSwitch` | Fires after a model switch completes; audit/log only, no blocking — async, no passthrough required |
-| `PreCompact` | Fires before context compaction; output becomes part of compacted context |
-| `Stop` | Fires after each Claude response; reads full response on stdin, must write it back on stdout (passthrough); async hooks skip passthrough requirement |
-| `SessionEnd` | Fires when session closes; async OK |
+```bash
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOK_DIR/lib/payload.sh"   # df_read_input → DF_HOST DF_EVENT DF_TOOL DF_FILE DF_CMD DF_URL DF_IS_ERROR DF_SESSION DF_TRANSCRIPT DF_WORKSPACE
+. "$HOOK_DIR/lib/emit.sh"      # df_deny / df_context / df_notify — host-correct output
+df_read_input || exit 0        # returns 1 without jq → fail open
+```
+
+`DF_TOOL` is host-neutral: `shell`, `write`, `edit`, `read`, `fetch`, `subagent`, `other`. `df_read_input` also `cd`s into the workspace (payload `cwd` on Claude Code, `workspacePaths[0]` on Antigravity, whose hooks start in the plugin dir).
+
+**Available events (Claude Code):**
+
+| Event | Antigravity | Output contract |
+| --- | --- | --- |
+| `SessionStart` | yes | `df_context` → `hookSpecificOutput.additionalContext` (model context). Also fires after compaction (`source: "compact"`) |
+| `PreToolUse` | yes (tool names mapped) | `df_deny` → `hookSpecificOutput.permissionDecision: "deny"`; soft warning → `df_context` |
+| `PostToolUse` | yes (tool names mapped) | `df_context` → `additionalContext`; Bash output rewrite → `updatedToolOutput` as a Bash-shaped object `{stdout, stderr, interrupted, isImage}` (a string is ignored) |
+| `PostToolUseFailure` | no | Failed tool calls (PostToolUse fires on success only) |
+| `PreModelSwitch` | no | `{"decision":"block","reason":"..."}` — high-confidence, narrowly-scoped rules only (see `pre-model-switch.sh`); fail-open |
+| `PostModelSwitch` | no | Audit/log only — async |
+| `PreCompact` | no | Output never reaches the model — `df_notify` for the user; post-compaction context goes through `SessionStart` |
+| `Stop` | yes | `df_notify` → `systemMessage` (the only visible channel). Never echo stdin back |
+
+Antigravity also has `PreInvocation` / `PostInvocation` (per model call). Payload fixtures for both hosts: `hooks/tests/fixtures/`.
 
 **Script conventions:**
 
-- No `set -e` — hooks must never crash the Claude session
-- Always consume stdin: `RAW=$(cat)` — do not leave stdin open
-- Stop hooks: always `printf '%s' "$RAW"` at the end (passthrough)
-- Async hooks: add `"async": true, "timeout": N` in hooks.json
-- Guard with `|| true` on all fallible commands
-- Require `jq`? Check availability first: `command -v jq >/dev/null 2>&1 || exit 0`
-- Runtime artifacts (`.tmp`, `.jsonl`, `.json`): append to `.gitignore` if `.gitignore` exists
+- No `set -e` — hooks must never crash the session; guard fallible commands with `|| true`
+- Read stdin only through `df_read_input` — it always consumes it
+- Never write to stdout except through `hooks/lib/emit.sh`; stderr with exit 0 reaches nobody (debug log only)
+- Shared files (`.devflow-state.json`, counters, JSONL logs) only through `df_json_update` / `df_append` (locked + atomic — async hooks and parallel tool calls run concurrently); cap logs with `df_rotate`
+- Hook-owned counters/timing live in `.devflow-observe-state.json`; `.devflow-state.json` belongs to the pipeline (schema: `references/state-machine.md`)
+- Async hooks: `"async": true` in hooks.json (Claude Code does not enforce `timeout` on async hooks)
+- Optional tools (`yq`, `timeout`/`gtimeout`, `curl`): check with `command -v` and degrade silently; add them to `scripts/doctor.sh`
+- Runtime artefacts: `df_gitignore <entry...>`
 
 **Naming convention:** `<event>-<purpose>.sh` — e.g. `pre-config-protect.sh`, `stop-format-typecheck.sh`
 
@@ -161,7 +175,7 @@ Any skill writing DevFlow content into consumer-owned files (`AGENTS.md`, `const
 - Removal deletes fenced region only; delete file only if empty after removal
 - Add/remove exactly what you own — never clobber neighbouring user/tool sections; clean up empty parent keys only
 
-**Behavioral tests (required):** every hook manipulating consumer state gets a suite in `hooks/tests/test-<purpose>.sh` (plain bash asserts, temp-dir fixtures — copy structure from `test-pre-compact.sh`). Run all suites: `bash scripts/run-hook-tests.sh`. `bash -n` alone is not coverage.
+**Behavioral tests (required):** every hook manipulating consumer state gets a suite in `hooks/tests/test-<purpose>.sh` (plain bash asserts, temp-dir fixtures — copy structure from `test-pre-compact.sh`). Feed real host payloads (`hooks/tests/fixtures/`), never the legacy `{tool_use:{...}}` shape. Run all suites: `bash scripts/run-hook-tests.sh`. `bash -n` alone is not coverage.
 
 ## What Not to Do
 

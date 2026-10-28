@@ -35,7 +35,7 @@ OUT=/tmp/devflow-test-sessionstart-out
 # run_hook <workdir> <config-file>
 run_hook() {
   local workdir="$1" config="$2"
-  (cd "$workdir" && DEVFLOW_CONFIG_FILE="$config" bash "$HOOK" >"$OUT" 2>&1) || true
+  (cd "$workdir" && DEVFLOW_CONFIG_FILE="$config" bash "$HOOK" </dev/null >"$OUT" 2>&1) || true
 }
 
 # write a configured (no [TODO) or unconfigured config.md
@@ -58,9 +58,9 @@ echo "--- T1: inactive project ---"
 D=$(tmpdir)
 write_config "$D/config.md" "unconfigured"
 run_hook "$D" "$D/config.md"
-grep -q '"priority": *"INFO"' "$OUT" \
-  && assert "INFO priority for inactive project" pass \
-  || assert "INFO priority for inactive project" fail
+jq -e '.hookSpecificOutput.hookEventName == "SessionStart" and (.hookSpecificOutput.additionalContext | test("not set up"))' "$OUT" >/dev/null 2>&1 \
+  && assert "SessionStart additionalContext pointer for inactive project" pass \
+  || assert "SessionStart additionalContext pointer for inactive project" fail
 grep -q "Entry Point Decision Tree" "$OUT" \
   && assert "no decision tree injected" fail \
   || assert "no decision tree injected" pass
@@ -73,9 +73,9 @@ mkdir "$D/devflow"
 write_config "$D/config.md" "configured"
 printf '{"next_step":"devflow.implement","feature":"001_login"}' > "$D/.devflow-state.json"
 run_hook "$D" "$D/config.md"
-grep -q '"priority":"IMPORTANT"' "$OUT" \
-  && assert "IMPORTANT priority" pass \
-  || assert "IMPORTANT priority" fail
+jq -e '.hookSpecificOutput.hookEventName == "SessionStart"' "$OUT" >/dev/null 2>&1 \
+  && assert "SessionStart additionalContext JSON" pass \
+  || assert "SessionStart additionalContext JSON" fail
 grep -q "devflow.implement" "$OUT" \
   && assert "next step named" pass \
   || assert "next step named" fail
@@ -99,9 +99,9 @@ D=$(tmpdir)
 mkdir "$D/devflow"
 write_config "$D/config.md" "configured"
 run_hook "$D" "$D/config.md"
-grep -q '"priority":"IMPORTANT"' "$OUT" \
-  && assert "IMPORTANT priority" pass \
-  || assert "IMPORTANT priority" fail
+jq -e '.hookSpecificOutput.hookEventName == "SessionStart"' "$OUT" >/dev/null 2>&1 \
+  && assert "SessionStart additionalContext JSON" pass \
+  || assert "SessionStart additionalContext JSON" fail
 grep -q "Entry Point Decision Tree" "$OUT" \
   && assert "full meta-skill injected" pass \
   || assert "full meta-skill injected" fail
@@ -141,6 +141,23 @@ run_hook "$D" "$D/config.md"
 grep -q "devflow not configured" "$OUT" \
   && assert "warning in full branch" pass \
   || assert "warning in full branch" fail
+rm -rf "$D"
+
+# T6: project config read from the workspace, never from the plugin dir
+echo "--- T6: config.md resolved in the consumer project ---"
+D=$(tmpdir)
+mkdir -p "$D/devflow"
+write_config "$D/devflow/config.md" "configured"
+printf '{"next_step":"devflow.plan","feature":"002_x"}' > "$D/.devflow-state.json"
+(cd "$D" && bash "$HOOK" </dev/null >"$OUT" 2>&1) || true
+grep -q "devflow not configured" "$OUT" \
+  && assert "configured project gets no warning (plugin template ignored)" fail \
+  || assert "configured project gets no warning (plugin template ignored)" pass
+write_config "$D/devflow/config.md" "unconfigured"
+(cd "$D" && bash "$HOOK" </dev/null >"$OUT" 2>&1) || true
+grep -q "devflow not configured" "$OUT" \
+  && assert "unconfigured project config warns" pass \
+  || assert "unconfigured project config warns" fail
 rm -rf "$D"
 
 # ── summary ───────────────────────────────────────────────────────────────────

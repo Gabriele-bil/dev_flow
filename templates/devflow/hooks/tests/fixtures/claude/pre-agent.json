@@ -1,0 +1,1 @@
+{"session_id":"0f1c-cc","transcript_path":"__WS__/transcript.jsonl","cwd":"__WS__","hook_event_name":"PreToolUse","tool_name":"Agent","tool_input":{"subagent_type":"code-reviewer","prompt":"review"},"tool_use_id":"toolu_05"}

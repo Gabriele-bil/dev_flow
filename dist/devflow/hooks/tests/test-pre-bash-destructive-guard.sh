@@ -23,7 +23,7 @@ run_hook() {
   local command="$1"
   local branch="${2:-${DEVFLOW_CURRENT_BRANCH:-}}"
   local payload
-  payload=$(jq -cn --arg c "$command" '{tool_use: {name: "Bash", input: {command: $c}}}')
+  payload=$(jq -cn --arg c "$command" '{hook_event_name: "PreToolUse", session_id: "s1", tool_name: "Bash", tool_input: {command: $c}}')
   printf '%s' "$payload" | DEVFLOW_CURRENT_BRANCH="$branch" bash "$HOOK" 2>/dev/null || true
 }
 
@@ -31,7 +31,7 @@ expect_block() {
   local label="$1" command="$2" branch="${3:-${DEVFLOW_CURRENT_BRANCH:-}}"
   local out
   out=$(run_hook "$command" "$branch")
-  echo "$out" | grep -qE '"decision"[[:space:]]*:[[:space:]]*"block"' \
+  echo "$out" | grep -qE '"permissionDecision"[[:space:]]*:[[:space:]]*"deny"' \
     && assert "$label blocked" pass \
     || assert "$label blocked (output: '$out')" fail
 }

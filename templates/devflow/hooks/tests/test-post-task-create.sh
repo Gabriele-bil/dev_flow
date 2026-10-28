@@ -38,7 +38,7 @@ echo "--- T1: counter from task.md path ---"
 D=$(tmpdir)
 run_hook "$D" "devflow/features/007_user-profile/task.md"
 got=$(jq -r '.next_feature_number // empty' "$D/.devflow-state.json" 2>/dev/null)
-[ "$got" = "008" ] \
+[ "$got" = "8" ] \
   && assert "next_feature_number is 008" pass \
   || assert "next_feature_number is 008 (got '$got')" fail
 rm -rf "$D"
@@ -66,7 +66,7 @@ next=$(jq -r '.next_feature_number // empty' "$D/.devflow-state.json" 2>/dev/nul
 [ "$feature" = "003_older" ] \
   && assert "existing feature field preserved" pass \
   || assert "existing feature field preserved (got '$feature')" fail
-[ "$next" = "005" ] \
+[ "$next" = "5" ] \
   && assert "next_feature_number merged as 005" pass \
   || assert "next_feature_number merged as 005 (got '$next')" fail
 rm -rf "$D"

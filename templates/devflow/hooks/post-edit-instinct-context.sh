@@ -9,27 +9,26 @@
 # file's extension) or by an exact "when editing <file>" trigger, same
 # domain-inference table as session-start-learnings.sh.
 #
-# Triggered by: Write|Edit|MultiEdit
-# Input (stdin): JSON { "tool_use": { "name": "Edit", "input": { "file_path": "..." } } }
-# Output: { "hookSpecificOutput": { "hookEventName": "PostToolUse", "additionalContext": "..." } }
+# Triggered by: file write/edit tools (both hosts)
+# Input: host payload, parsed by lib/payload.sh (DF_FILE)
+# Output: lib/emit.sh df_context (additionalContext on Claude Code)
 # Silent (exit 0, no stdout) when nothing matches or tooling is missing.
 
-set -euo pipefail
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOK_DIR/lib/payload.sh"
+. "$HOOK_DIR/lib/emit.sh"
 
-command -v jq >/dev/null 2>&1 || exit 0
+df_read_input || exit 0
 command -v yq >/dev/null 2>&1 || exit 0
 
-WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-INSTINCTS_FILE="${CLAUDE_PROJECT_DIR:-${DEVFLOW_INSTINCTS_FILE:-$WORKSPACE_ROOT}}/.devflow-instincts.yaml"
+WORKSPACE_ROOT="$DF_WORKSPACE"
+INSTINCTS_FILE="${DEVFLOW_INSTINCTS_FILE:-$WORKSPACE_ROOT/.devflow-instincts.yaml}"
 MIN_CONFIDENCE="${DEVFLOW_INSTINCT_MIN_CONFIDENCE:-0.4}"
 MAX_SHOW=3
 
 [[ -f "$INSTINCTS_FILE" && -s "$INSTINCTS_FILE" ]] || exit 0
 
-INPUT="$(cat 2>/dev/null || true)"
-[[ -z "$INPUT" ]] && exit 0
-
-FILE_PATH="$(echo "$INPUT" | jq -r '.tool_use.input.file_path // empty' 2>/dev/null || true)"
+FILE_PATH="$DF_FILE"
 [[ -z "$FILE_PATH" ]] && exit 0
 
 DOMAIN="general"
@@ -53,5 +52,5 @@ CONTEXT="🧠 Instincts relevant to $BASENAME:
 
 $ENTRIES"
 
-jq -cn --arg ctx "$CONTEXT" '{hookSpecificOutput:{hookEventName:"PostToolUse", additionalContext:$ctx}}'
+df_context "$CONTEXT"
 exit 0

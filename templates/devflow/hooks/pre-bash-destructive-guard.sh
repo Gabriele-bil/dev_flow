@@ -10,27 +10,22 @@
 # bypass on commit). Anything reversible or context-dependent is left to the
 # model's own judgment, per CLAUDE.md.
 #
-# Triggered by: Bash tool
-# Input (stdin): JSON { "session_id": "...", "tool_use": { "id": "...", "name": "Bash", "input": { "command": "..." } } }
-# Block output:  { "decision": "block", "reason": "..." }  → stdout, exit 0
-# Allow output:  (silent) → exit 0
+# Triggered by: Bash (Claude Code), run_command (Antigravity CLI)
+# Input: host payload, parsed by lib/payload.sh (DF_CMD)
+# Block output: lib/emit.sh df_deny → stdout, exit 0
+# Allow output: (silent) → exit 0
+# Fail-open: missing jq or unparseable input never blocks.
 
-set -euo pipefail
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOK_DIR/lib/payload.sh"
+. "$HOOK_DIR/lib/emit.sh"
 
-# Require jq — if not available, allow silently (never block for missing tooling)
-if ! command -v jq &>/dev/null; then
-  exit 0
-fi
-
-INPUT="$(cat 2>/dev/null || true)"
-[[ -z "$INPUT" ]] && exit 0
-
-CMD="$(echo "$INPUT" | jq -r '.tool_use.input.command // empty' 2>/dev/null || true)"
-[[ -z "$CMD" ]] || [[ "$CMD" == "null" ]] && exit 0
+df_read_input || exit 0
+CMD="$DF_CMD"
+[[ -z "$CMD" ]] && exit 0
 
 block() {
-  local reason="$1"
-  printf '%s' "$(jq -n --arg reason "$reason" '{"decision":"block","reason":$reason}')"
+  df_deny "$1"
   exit 0
 }
 

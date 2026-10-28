@@ -2,16 +2,18 @@
 # stop-notify.sh — Stop hook: macOS desktop notification when Claude finishes a response.
 # Receives JSON stop event on stdin, outputs nothing meaningful to stdout.
 
-# Consume stdin to avoid broken pipe issues
-cat > /dev/null
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOK_DIR/lib/payload.sh"
+
+# Consume stdin and resolve the workspace (works without jq too)
+df_read_input || cat >/dev/null 2>&1
 
 # Only run on macOS
 if [ "$(uname -s)" != "Darwin" ]; then
   exit 0
 fi
 
-# Try to read context from .devflow-state.json in workspace root
-WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+WORKSPACE_ROOT="${DF_WORKSPACE:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 STATE_FILE="${DEVFLOW_STATE_FILE:-$WORKSPACE_ROOT/.devflow-state.json}"
 TITLE="DevFlow"
 BODY="Claude is done"

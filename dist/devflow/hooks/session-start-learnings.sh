@@ -1,18 +1,30 @@
 #!/bin/bash
 # session-start-learnings.sh — SessionStart hook: inject project instincts into session context.
 # Reads .devflow-instincts.yaml (auto-migrating from .devflow-learnings.jsonl if needed).
-# Outputs a JSON priority message with relevant instincts; exits silently if none.
+# Output: lib/emit.sh df_context (SessionStart additionalContext); silent if none.
+# Missing yq: one-line notice so the user knows instincts are disabled.
 
-WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOK_DIR/lib/payload.sh"
+. "$HOOK_DIR/lib/emit.sh"
+
+df_read_input || exit 0
+DF_EVENT="${DF_EVENT:-SessionStart}"
+
+WORKSPACE_ROOT="$DF_WORKSPACE"
 INSTINCTS_SHARED="${DEVFLOW_INSTINCTS_SHARED:-$WORKSPACE_ROOT/.devflow-instincts.shared.yaml}"
 INSTINCTS_FILE="${DEVFLOW_INSTINCTS_FILE:-$WORKSPACE_ROOT/.devflow-instincts.yaml}"
 LEARNINGS_LOG="${DEVFLOW_LEARNINGS_LOG:-$WORKSPACE_ROOT/.devflow-learnings.jsonl}"
 MAX_SHOW=6
 MIN_CONFIDENCE="0.4"
 
-# Guards: jq and yq both required
-if ! command -v jq >/dev/null 2>&1; then exit 0; fi
-if ! command -v yq >/dev/null 2>&1; then exit 0; fi
+# Guard: yq required — say so once per session when the project has instincts
+if ! command -v yq >/dev/null 2>&1; then
+  if [ -f "$INSTINCTS_FILE" ] || [ -f "$INSTINCTS_SHARED" ] || [ -f "$LEARNINGS_LOG" ]; then
+    df_notify "devflow: yq not installed — project instincts are disabled (brew install yq)."
+  fi
+  exit 0
+fi
 
 # ── Auto-migrate from old JSONL format (one-time) ────────────────────────────
 if [ ! -f "$INSTINCTS_FILE" ] && [ ! -f "$INSTINCTS_SHARED" ] && [ -f "$LEARNINGS_LOG" ] && [ -s "$LEARNINGS_LOG" ]; then
@@ -115,11 +127,10 @@ ENTRIES=$(
 
 [ -z "$ENTRIES" ] && exit 0
 
-jq -cn \
-  --arg entries "$ENTRIES" \
-  '{
-    priority: "INFO",
-    message: ("🧠 Project instincts (confidence ≥ 0.4):\n\n" + $entries + "\n\nUse /devflow.learn to manage instincts (log, search, list, prune, boost, promote).")
-  }'
+df_context "🧠 Project instincts (confidence ≥ 0.4):
+
+$ENTRIES
+
+Use /devflow.learn to manage instincts (log, search, list, prune, boost, promote)."
 
 exit 0

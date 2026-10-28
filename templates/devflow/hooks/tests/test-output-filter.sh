@@ -7,6 +7,8 @@ set -euo pipefail
 
 HOOK="$(cd "$(dirname "$0")/.." && pwd)/post-bash-output-filter.sh"
 export DEVFLOW_FILTER_STATS=off  # keep repo clean; T8 overrides with temp path
+SANDBOX=$(mktemp -d); trap 'rm -rf "$SANDBOX"' EXIT
+cd "$SANDBOX" || exit 1           # hooks resolve the workspace from cwd
 export DEVFLOW_TEST_SUMMARY=off  # keep repo clean; T9 overrides with temp path
 PASS=0
 FAIL=0
