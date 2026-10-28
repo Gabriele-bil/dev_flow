@@ -4,7 +4,8 @@
     "positive": [
       { "prompt": "Where am I in the devflow pipeline right now?", "top_k": 3 },
       { "prompt": "What's the next step for this feature?", "top_k": 3 },
-      { "prompt": "Show me the current pipeline state and active feature", "top_k": 3 }
+      { "prompt": "Show me the current pipeline state and active feature", "top_k": 3 },
+      { "prompt": "Which devflow step should I run next for my feature?", "top_k": 3 }
     ],
     "negative": [
       { "prompt": "The pipeline seems stuck or the state looks corrupted, fix it", "owner": "devflow-recovery" },

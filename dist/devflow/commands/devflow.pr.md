@@ -3,17 +3,8 @@ name: devflow.pr
 description: Commit, push, and open a PR for the current DevFlow feature using the devflow-pr skill workflow.
 argument-hint: "[optional notes for PR body]"
 disable-model-invocation: true
-model: sonnet
-effort: medium
 ---
 
-Use `@devflow/skills/devflow-pr/SKILL.md` and execute it exactly.
+Use `@devflow/skills/devflow-pr/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
 
-**Anchors (do not skip):**
-
-- Resolve adapter and app working directory per `@devflow/references/adapter-resolution.md`, then read the active adapter core (`ADAPTER.md`) + `steps/pr.md` for pre-push commands and PR checklist items.
-- Run the adapter’s verification commands (monorepo: from the resolved app's working directory) and capture real output before ticking checklist items.
-- Commit with a single conventional message; push `[type]/[NNN]_[feature-name]`; resolve the repo's actual default branch (not always `main`) and open PR toward it with `gh pr create`.
-
-Optional steering for PR body or title:
-`$ARGUMENTS`
+If `$ARGUMENTS` is empty, derive PR title/body from `task.md` + `plan.md`.

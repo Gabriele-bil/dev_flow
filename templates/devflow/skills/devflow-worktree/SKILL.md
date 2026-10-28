@@ -44,7 +44,7 @@ Any item fails → stop, report which check failed.
 
 ### Step 1 - Parse arguments
 
-Parse `$ARGUMENTS` as `[create|remove|list] [feature-name]`. Default subcommand: `create`. `feature-name` defaults to the current feature under `devflow/features/[NNN]_[feature-name]/` when omitted.
+Parse `$ARGUMENTS` as `[create|remove|list] [feature-name]`. Default subcommand: `create`. `feature-name` omitted → feature resolved per `@devflow/references/state-machine.md` → **Active feature resolution**.
 
 ### Step 2 - List (early exit)
 

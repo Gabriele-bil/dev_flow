@@ -5,11 +5,6 @@ argument-hint: "[--json] [--fix]"
 disable-model-invocation: true
 ---
 
-Use `@devflow/skills/devflow-doctor/SKILL.md` and execute it exactly.
+Use `@devflow/skills/devflow-doctor/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
 
-**Anchors (do not skip):**
-
-- Run environment diagnostics across MCP baseline, CLI toolchain, and pipeline state.
-- If `--json` flag is provided, output raw machine-readable JSON directly.
-- If `--fix` flag is provided, automatically repair safe runtime files.
-- Provide clear remediation commands for any missing tools or unconfigured MCP servers.
+If `$ARGUMENTS` is empty, run diagnostics read-only (no `--json`, no `--fix`).

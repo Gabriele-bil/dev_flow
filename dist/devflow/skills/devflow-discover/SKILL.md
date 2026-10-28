@@ -2,6 +2,8 @@
 name: devflow-discover
 description: "Guides architectural discovery for greenfield applications or complex features, compares technical options, and records decisions in ADRs. Use when exploring architecture choices, evaluating trade-offs, or before devflow.setup or devflow.task."
 argument-hint: "[--app <name>] [--feature <slug>] [topic-or-scope]"
+model: sonnet
+effort: high
 ---
 
 # Skill: devflow.discover

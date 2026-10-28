@@ -1,7 +1,7 @@
 ---
 name: devflow-recovery
-description: Diagnoses and recovers a stuck or corrupted DevFlow pipeline. Use when a pipeline step fails repeatedly, state is inconsistent, or the agent is unsure which step to run next.
-argument-hint: "[]"
+description: Diagnoses and repairs a stuck, blocked, or corrupted DevFlow pipeline. Use when a pipeline step fails repeatedly, plan.md is blocked, or state files are inconsistent or corrupted.
+argument-hint: "[optional-feature]"
 ---
 
 # Skill: devflow-recovery

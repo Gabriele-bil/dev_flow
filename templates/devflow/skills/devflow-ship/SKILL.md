@@ -56,6 +56,7 @@ Each agent receives:
 - List of files created/modified by `devflow.implement` and `devflow.beautify`
 - Active adapter name and app working directory (resolved per `@devflow/references/adapter-resolution.md`)
 - Optional reviewer notes from `$ARGUMENTS`
+- Dispatch roster (profile + agent names) — `code-reviewer` skips its security axis when `security-auditor` is on it
 - Exploration + output rules: `@devflow/references/token-economy.md` (index-first when code-index MCP available; derive, don't dump)
 
 **Agents per depth profile:**
@@ -68,7 +69,7 @@ Each agent receives:
 
 Agent definitions:
 
-1. `@devflow/agents/code-reviewer.md` — seven-axis code review (correctness, readability, architecture, security, performance, scope fidelity, simplicity)
+1. `@devflow/agents/code-reviewer.md` — seven-axis code review (security axis delegated to `security-auditor` when both dispatched)
 2. `@devflow/agents/security-auditor.md` — security audit
 3. `@devflow/agents/test-engineer.md` — coverage gap analysis
 4. `@devflow/agents/accessibility-auditor.md` — WCAG 2.1 AA audit (thorough only)
@@ -78,7 +79,7 @@ Agent definitions:
 
 ## Step 2 - Collect reports
 
-Wait for **all dispatched** reports. Do not proceed until all complete.
+Wait for **all dispatched** reports. Do not proceed until all complete. Agents are read-only (`disallowedTools` + Bash rule) — a report claiming it edited files is invalid; discard and re-dispatch.
 
 ---
 
