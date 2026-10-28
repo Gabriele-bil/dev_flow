@@ -112,6 +112,16 @@ done
   && assert "hooks wrote into the payload workspace, not their own cwd" pass \
   || assert "hooks wrote into their own cwd (/tmp)" fail
 
+echo "--- T5: changed-file accumulator matches whole paths ---"
+rm -f "$WS/.devflow-changed-files.tmp"
+for f in src/data.ts src/a.ts src/a.ts; do
+  jq -cn --arg cwd "$WS" --arg f "$WS/$f" '{hook_event_name:"PostToolUse",cwd:$cwd,tool_name:"Edit",tool_input:{file_path:$f}}' \
+    | bash "$HOOKS_DIR/post-edit-accumulate.sh"
+done
+[ "$(wc -l < "$WS/.devflow-changed-files.tmp" | tr -d ' ')" = "2" ] \
+  && assert "a.ts recorded despite data.ts, duplicates skipped" pass \
+  || assert "a.ts recorded despite data.ts ($(cat "$WS/.devflow-changed-files.tmp"))" fail
+
 echo ""
 echo "Results: $PASS passed, $FAIL failed"
 if [ ${#ERRORS[@]} -gt 0 ]; then

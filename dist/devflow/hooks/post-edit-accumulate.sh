@@ -17,9 +17,13 @@ FILE_PATH="$DF_FILE"
 WORKSPACE_ROOT="$DF_WORKSPACE"
 TMP_FILE="${DEVFLOW_CHANGED_FILES_TMP:-$WORKSPACE_ROOT/.devflow-changed-files.tmp}"
 
-if [[ ! -f "$TMP_FILE" ]] || ! grep -qF "$FILE_PATH" "$TMP_FILE" 2>/dev/null; then
+# Whole-line match: "a.ts" must not count as present because "data.ts" is
+df_lock "$TMP_FILE" || exit 0
+if [[ ! -f "$TMP_FILE" ]] || ! grep -qxF -- "$FILE_PATH" "$TMP_FILE" 2>/dev/null; then
   printf '%s\n' "$FILE_PATH" >> "$TMP_FILE"
 fi
+df_unlock "$TMP_FILE"
+df_gitignore ".devflow-changed-files.tmp"
 
 # Auto-sync DevFlow Board if a feature doc, blueprint, ADR, or state file changed
 if [ -f "$WORKSPACE_ROOT/devflow/board/index.html" ]; then

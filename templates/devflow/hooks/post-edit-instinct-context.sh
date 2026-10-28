@@ -40,10 +40,23 @@ case "$FILE_PATH" in *devflow*)  DOMAIN="devflow"    ;; esac
 
 BASENAME="$(basename "$FILE_PATH")"
 
+instinct_filter() {
+  jq -r --arg domain "$DOMAIN" --arg file "$FILE_PATH" --arg base "$BASENAME" \
+    --argjson min "$MIN_CONFIDENCE" --argjson max "$MAX_SHOW" '
+    map(select((.confidence // 0) >= $min))
+    | map(select(
+        ((.domain // "general") == $domain)
+        or ((.trigger // "") == ("when editing " + $file))
+        or ((.trigger // "") | contains($base))))
+    | sort_by(.confidence) | reverse | .[0:$max]
+    | .[]
+    | "• [" + (.confidence | tostring) + " " + (.domain // "general") + "] " + (.trigger // "") + " → " + (.action // "")'
+}
+
+# YAML → JSON once (yq), then filter in jq with values passed as --arg, so
+# file names like "[id].tsx" or quotes can't break the expression.
 ENTRIES=$(
-  yq -r \
-    ".instincts // [] | map(select(.confidence >= ${MIN_CONFIDENCE})) | map(select((.domain // \"general\") == \"${DOMAIN}\" or (.trigger // \"\") == \"when editing ${FILE_PATH}\" or (.trigger // \"\") | test(\"${BASENAME}\"))) | sort_by(.confidence) | reverse | .[0:${MAX_SHOW}] | .[] | \"• [\" + (.confidence | tostring) + \" \" + (.domain // \"general\") + \"] \" + .trigger + \" → \" + .action" \
-    "$INSTINCTS_FILE" 2>/dev/null
+  yq -o=json '.instincts // []' "$INSTINCTS_FILE" 2>/dev/null | instinct_filter
 ) || true
 
 [[ -z "$ENTRIES" ]] && exit 0

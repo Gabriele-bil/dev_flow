@@ -39,7 +39,9 @@ if [ -f "$STATE_FILE" ]; then
   fi
 fi
 
-# Send macOS notification (run in background to be non-blocking)
-(osascript -e "display notification \"$BODY\" with title \"$TITLE\"" > /dev/null 2>&1) &
+# Send macOS notification (run in background to be non-blocking). Text goes in
+# as argv, never spliced into the AppleScript source.
+(osascript -e 'on run argv' -e 'display notification (item 1 of argv) with title (item 2 of argv)' -e 'end run' \
+  "$BODY" "$TITLE" > /dev/null 2>&1) &
 
 exit 0
