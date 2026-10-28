@@ -33,12 +33,12 @@ Bracketed steps optional. Each step has a strict input contract; status lives in
 | Stuck, `blocked`, or inconsistent state | `devflow.recovery` | — |
 | Urgent bugfix | `devflow.hotfix` | small, root cause known |
 
-Active feature without explicit argument → `references/state-machine.md` → **Active feature resolution**. Session orientation → `skills/devflow-discovery/SKILL.md`.
+Active feature without explicit argument → `references/state-machine.md` → **Active feature resolution**. Session orientation → `references/orientation.md`.
 
 ## Orchestration
 
 - User orchestrates by default: one command per step, contracts verified at each entry — never bypass.
-- Orchestrator skills chain other skills explicitly and only them: `devflow.ship` (→ `devflow.pr`; fix loop → implement/beautify/test), `devflow.run` (implement → beautify → test [→ ship]), `devflow.auto` (task → … → pr), `devflow.hotfix` (→ `devflow.pr`). Run-mode contract: `skills/devflow-run/SKILL.md`.
+- Orchestrator skills chain other skills explicitly and only them: `devflow.ship` (→ `devflow.pr`; fix loop → implement/beautify/test), `devflow.run` (implement → beautify → test [→ ship]), `devflow.auto` (task → … → pr), `devflow.hotfix` (→ `devflow.pr`). Run-mode contract: `references/run-mode.md`.
 - Each step writes its status boundary to `plan.md` — never skip or merge steps.
 
 ## Adapters

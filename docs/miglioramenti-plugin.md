@@ -415,7 +415,7 @@ Il problema di fondo è uno solo: **c'è un solo `hooks.json`, scritto per Claud
 
 🟠 `CC+AGY` 📄 **La documentazione di routing salta ship.**
 
-- **Dove:** `AGENTS.md:9,20`, `skills/devflow-discovery/SKILL.md:60-61,78` e `agent.yaml:9` descrivono "test → pr".
+- **Dove:** `AGENTS.md:9,20`, *skills/devflow-discovery/SKILL.md:60-61,78* e `agent.yaml:9` descrivono "test → pr".
 - **Dichiarazione falsa:** "skills do not invoke each other" è smentita, perché ship, run, auto e hotfix concatenano altre skill.
 - **`AGENTS.md`:** cita solo Flutter e Angular. La riga 3 dice che setup lo copia nei progetti, ma setup usa `AGENTS.template.md`.
 - **Correzione:** aggiornare i tre file e riscrivere o eliminare `AGENTS.md`.
@@ -633,7 +633,7 @@ Il problema di fondo è uno solo: **c'è un solo `hooks.json`, scritto per Claud
 
 ## 9. Manutenibilità e costo in token
 
-- **Discovery** 🟡: `skills/devflow-discovery/SKILL.md` non ha comando né le sezioni richieste, e `session-start.sh:99-108` la inietta intera (998 parole) quando manca lo stato. Conviene spostarla in *references/orientation.md* (nuovo), ridotta all'albero di decisione. Su Antigravity diventerebbe `rules/`.
+- **Discovery** 🟡: *skills/devflow-discovery/SKILL.md* non ha comando né le sezioni richieste, e `session-start.sh:99-108` la inietta intera (998 parole) quando manca lo stato. Conviene spostarla in *references/orientation.md* (nuovo), ridotta all'albero di decisione. Su Antigravity diventerebbe `rules/`.
 - **Run e auto** 🟡: auto (1.982 parole) ripete per ogni passo le regole della modalità run, e il formato dei flag di decisione sta dentro `devflow-run`. Conviene un *references/run-mode.md* (nuovo) condiviso e un solo orchestratore con preset `--from/--until`.
 - **`allowed-tools` fissi** 🟡: implement, beautify, test e pr condividono una stringa che copre solo Flutter, Angular e npm/pnpm (no yarn, bun, nx). Non copre neanche la forma monorepo `(cd app && cmd)`.
 - **Metriche duplicate** 🟡: le righe Savings e Cost di status duplicano `devflow-metrics`.

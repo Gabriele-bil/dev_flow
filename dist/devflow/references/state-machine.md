@@ -1,6 +1,6 @@
 # Pipeline State Machine
 
-Single source of truth for DevFlow statuses and transitions. Cited by `devflow-discovery`, `devflow-status`, `devflow-resume`, `devflow-recovery`, and `hooks/pre-compact.sh`. Do not invent statuses outside this file.
+Single source of truth for DevFlow statuses and transitions. Cited by `references/orientation.md`, `devflow-status`, `devflow-resume`, `devflow-recovery`, and `hooks/pre-compact.sh`. Do not invent statuses outside this file.
 
 ## Where state lives
 
@@ -183,7 +183,7 @@ Append to existing arrays instead of overwriting: read current file with `jq '.d
 
 ## Run marker (autonomous mode)
 
-`.devflow-run.json` at project root — presence switches pipeline skills to **run mode**: ambiguity → decision flag in `plan.md` `## Decision flags` (see `devflow-run` skill → Step 2, `devflow-auto` skill → Step 2), intermediate notify gates do not wait for user.
+`.devflow-run.json` at project root — presence switches pipeline skills to **run mode**: behavior contract (autonomy policy, decision flags, discrepancy classes, disarm) in `@devflow/references/run-mode.md`. This section owns the file schema only.
 
 Shared by two orchestrators, distinguished by `from`/`until` vocabulary:
 

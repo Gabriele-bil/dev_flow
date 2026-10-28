@@ -53,7 +53,7 @@ write_config() {
 echo "=== test-session-start.sh ==="
 echo ""
 
-# T1: inactive project → short INFO pointer, no meta-skill content
+# T1: inactive project → short pointer, no orientation content
 echo "--- T1: inactive project ---"
 D=$(tmpdir)
 write_config "$D/config.md" "unconfigured"
@@ -61,7 +61,7 @@ run_hook "$D" "$D/config.md"
 jq -e '.hookSpecificOutput.hookEventName == "SessionStart" and (.hookSpecificOutput.additionalContext | test("not set up"))' "$OUT" >/dev/null 2>&1 \
   && assert "SessionStart additionalContext pointer for inactive project" pass \
   || assert "SessionStart additionalContext pointer for inactive project" fail
-grep -q "Entry Point Decision Tree" "$OUT" \
+grep -q "## Decision tree" "$OUT" \
   && assert "no decision tree injected" fail \
   || assert "no decision tree injected" pass
 rm -rf "$D"
@@ -85,7 +85,7 @@ grep -q "001_login" "$OUT" \
 grep -q "contexts/implement.md" "$OUT" \
   && assert "context hint present" pass \
   || assert "context hint present" fail
-grep -q "Entry Point Decision Tree" "$OUT" \
+grep -q "## Decision tree" "$OUT" \
   && assert "meta-skill NOT injected (compact)" fail \
   || assert "meta-skill NOT injected (compact)" pass
 grep -q "devflow not configured" "$OUT" \
@@ -102,7 +102,7 @@ run_hook "$D" "$D/config.md"
 jq -e '.hookSpecificOutput.hookEventName == "SessionStart"' "$OUT" >/dev/null 2>&1 \
   && assert "SessionStart additionalContext JSON" pass \
   || assert "SessionStart additionalContext JSON" fail
-grep -q "Entry Point Decision Tree" "$OUT" \
+grep -q "## Decision tree" "$OUT" \
   && assert "full meta-skill injected" pass \
   || assert "full meta-skill injected" fail
 rm -rf "$D"
@@ -114,13 +114,13 @@ mkdir "$D/devflow"
 write_config "$D/config.md" "configured"
 printf 'not-json{{{' > "$D/.devflow-state.json"
 run_hook "$D" "$D/config.md"
-grep -q "Entry Point Decision Tree" "$OUT" \
+grep -q "## Decision tree" "$OUT" \
   && assert "corrupted state → full injection" pass \
   || assert "corrupted state → full injection" fail
 
 printf '{"next_step":"devflow.bogus"}' > "$D/.devflow-state.json"
 run_hook "$D" "$D/config.md"
-grep -q "Entry Point Decision Tree" "$OUT" \
+grep -q "## Decision tree" "$OUT" \
   && assert "unknown next_step → full injection" pass \
   || assert "unknown next_step → full injection" fail
 rm -rf "$D"

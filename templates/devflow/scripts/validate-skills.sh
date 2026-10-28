@@ -22,8 +22,8 @@ OK=0
 ERRORS=0
 WARNINGS=0
 
-# Valid devflow.<verb> targets: every command, plus core skills without a
-# matching command (e.g. devflow-discovery, invoked internally as devflow.discovery)
+# Valid devflow.<verb> targets: every command, plus every core skill dir
+# (devflow-<name> -> devflow.<name>), even one without a matching command
 VALID_VERBS=$( { ls "$PLUGIN_ROOT/commands" 2>/dev/null | sed 's/\.md$//'; \
   ls "$PLUGIN_ROOT/skills" 2>/dev/null | sed -E 's/^devflow-/devflow./'; } | sort -u)
 

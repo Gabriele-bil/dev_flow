@@ -196,7 +196,7 @@ Format rules:
 - Adapter-specific sections: follow adapter plan step file layout exactly.
 - Language: English (all docs). Compression: caveman-compress (drop filler, keep precision).
 
-**Run mode** (`.devflow-run.json` present): a genuine **Open questions** entry (plan-level ambiguity, not a constitution violation) does not escalate to the user — pick defensible default (repo precedent > `constitution.md` > adapter convention), append it to `plan.md` **`## Decision flags`** (create on first flag; format per `@devflow/skills/devflow-run/SKILL.md` Step 2), and keep Status `ready`. Constitution Gate Critical/Required violations above are the one exception — those stop regardless of mode.
+**Run mode** (`.devflow-run.json` present, contract `@devflow/references/run-mode.md`): a genuine **Open questions** entry (plan-level ambiguity, not a constitution violation) does not escalate — default + `## Decision flags` entry per its **Decision flags**; keep Status `ready`. Constitution Gate Critical/Required violations above are the one exception — those stop regardless of mode.
 
 ### Step 6 - Notify user
 
@@ -242,7 +242,7 @@ Critical checks:
 | Reads | `@devflow/references/state-machine.md` (Active feature resolution, State update snippet) |
 | Writes | `devflow/features/[NNN]_[feature-name]/plan.md`, `.devflow-state.json` (merge) |
 | Writes (conditional) | `plan.md` `## Decision flags` (run mode — resolved Open questions) |
-| Reads (conditional) | `docs/adr/` (if present — active ADRs referenced in `task.md`); `.devflow-run.json` (existence — run-mode switch, per `devflow-auto`) |
+| Reads (conditional) | `docs/adr/` (if present — active ADRs referenced in `task.md`); `.devflow-run.json` (existence — run-mode switch, `@devflow/references/run-mode.md`) |
 | Reads (conditional) | `DESIGN.md` / `docs/design.md` (Step 4e — existence check + UI tagging) |
 | Writes (optional) | `devflow/features/[NNN]_[feature-name]/data-model.md` (Step 4c — triggered when feature touches persistent entities) |
 | Next step | `devflow.implement` |

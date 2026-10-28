@@ -64,8 +64,7 @@ Plan:        devflow/features/<feature>/plan.md
 Status:      <plan_status>  →  next: <next_step>
 Drift:       state file says <state_plan_status> — plan.md wins   <!-- only on drift -->
 Progress:    <done>/<total> files done (<pending> remaining)
-Savings:     output filter kept <kept_chars> of <raw_chars> chars over <n> cmds (~<pct>% saved)
-Cost:        ~<total_tokens> tokens · ~$<total_cost_usd> est. over <n> turns (this session's runs — see Cost line below)
+Metrics:     token savings, est. cost, pass@1 → devflow.metrics   <!-- only when .devflow-filter-stats.jsonl or .devflow-metrics.jsonl exists -->
 Learnings:   <n> auto-detected (retry loops etc.) · <m> contested instincts — see devflow.learn list
 
 Pending files:
@@ -99,25 +98,9 @@ Start a feature: devflow.task   <!-- blocked features listed → devflow.recover
 DevFlow not configured. Run: /devflow.setup
 ```
 
-## Filter savings line (optional)
+## Metrics pointer (optional)
 
-`Savings:` line only when `.devflow-filter-stats.jsonl` exists in consumer root (written by `post-bash-output-filter.sh`, one JSONL entry per filtered command). Compute:
-
-```bash
-jq -s '{n:length, raw:(map(.raw_chars)|add), kept:(map(.kept_chars)|add)}' .devflow-filter-stats.jsonl
-```
-
-`pct = 100 * (1 - kept/raw)`, rounded. File absent → omit line, zero behavior change. Measured local data — use to accept/reject filter tuning (thresholds, command classes) instead of upstream claims.
-
-## Cost line (optional)
-
-`Cost:` line only when `.devflow-metrics.jsonl` exists (written by `stop-metrics.sh`, one JSONL entry per Stop event). Compute:
-
-```bash
-jq -s '{n:length, tokens:(map(.input_tokens+.output_tokens+(.cache_creation_tokens//0)+(.cache_read_tokens//0))|add), cost:(map(.estimated_cost_usd // 0)|add)}' .devflow-metrics.jsonl
-```
-
-File absent → omit line, zero behavior change. Token counts are exact (from transcript usage fields); `estimated_cost_usd` is an approximation from a local pricing table (`stop-metrics.sh` header) — label it "est." in the dashboard, never present as billed cost.
+Savings/cost/pass@1 are owned by `devflow.metrics` — status never recomputes them. `Metrics:` line only when `.devflow-filter-stats.jsonl` or `.devflow-metrics.jsonl` exists; both absent → omit line.
 
 ## Learnings line (optional)
 
@@ -138,15 +121,14 @@ Both files absent → omit line, zero behavior change. Turns raw JSONL/YAML into
 | Prose or dashboard around `--json` output | Single JSON object on stdout — consumers parse it (see `status-schema.md`) |
 | Reporting status from memory | Always read `plan.md` at invocation time |
 | Reporting state-file status over `plan.md` | `plan.md` authoritative; state file only feeds the Drift line |
-| Using status instead of discovery at session start | Discovery = full orientation + routing; status = snapshot only |
+| Using status as full routing guide | `references/orientation.md` = routing tree; status = snapshot of active feature |
 
 ## I/O Reference
 
 | | |
 | --- | --- |
 | Reads | `.devflow-state.json`, `devflow/config.md`, `devflow/features/*/plan.md`, `@devflow/references/adapter-resolution.md`, `@devflow/references/state-machine.md`, `@devflow/references/status-schema.md` (`--json` mode) |
-| Reads (optional) | `.devflow-filter-stats.jsonl` — filter savings telemetry (Savings line) |
-| Reads (optional) | `.devflow-metrics.jsonl` — token/cost estimate telemetry (Cost line) |
+| Reads (optional) | `.devflow-filter-stats.jsonl`, `.devflow-metrics.jsonl` — existence only (Metrics pointer line) |
 | Reads (optional) | `.devflow-learnings.jsonl`, `.devflow-instincts.yaml` — auto-detected/contested learnings count (Learnings line) |
 | Writes | nothing |
-| Related | `devflow-discovery` (full pipeline orientation), `devflow-resume` (session re-entry), `devflow-recovery` (corrupted state), `devflow-learn` (full learnings detail) |
+| Related | `@devflow/references/orientation.md` (full routing tree), `devflow-resume` (session re-entry), `devflow-recovery` (corrupted state), `devflow-learn` (full learnings detail), `devflow-metrics` (savings, cost, pass@1) |

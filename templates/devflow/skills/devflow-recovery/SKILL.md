@@ -200,5 +200,5 @@ Next command: [exact command to continue]
 | Reads | `devflow/features/*/task.md`, `devflow/features/*/plan.md` |
 | Reads | `devflow/config.md`, `@devflow/references/adapter-resolution.md`, `@devflow/references/state-machine.md` |
 | Writes | `.devflow-state.json` (merge, only on user-confirmed resync/unblock); `plan.md` `**Status:**` (Category G only, user-confirmed) |
-| Related | `devflow-status` (non-recovery status check), `devflow-resume` (clean session re-entry), `devflow-discovery` (session orientation) |
+| Related | `devflow-status` (non-recovery status check), `devflow-resume` (clean session re-entry), `@devflow/references/orientation.md` (session orientation) |
 | Next step | Whichever pipeline step the recovery routes to |

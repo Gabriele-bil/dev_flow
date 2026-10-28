@@ -70,7 +70,7 @@ pipeline:
       description: "Show current pipeline state — active feature, progress, next step, adapter"
     - command: /devflow.learn
       skill: devflow-learn
-      description: "Manage the learnings log — log project quirks, search past lessons, list recent entries, prune stale ones"
+      description: "Manage local and team instincts — log, search, list, check (Rigor check_cmd/ratchet), prune, boost, promote to team store and REGISTRY.md"
     - command: /devflow.lint-skills
       script: scripts/validate-skills.sh
       description: "Validate all SKILL.md files for required structure (frontmatter, sections, style)"
@@ -159,12 +159,9 @@ skills:
     - id: devflow-pr
       path: skills/devflow-pr/SKILL.md
       description: "Commits all changes, pushes the current DevFlow feature branch, and opens a pull request toward the repo's default branch"
-    - id: devflow-discovery
-      path: skills/devflow-discovery/SKILL.md
-      description: 'Orients AI agents to the dev-flow pipeline at session start. Answers "where do I begin?" by mapping current project state to the correct pipeline entry point. Injected automatically via SessionStart hook'
     - id: devflow-learn
       path: skills/devflow-learn/SKILL.md
-      description: "Manage the DevFlow learnings log. Sub-commands: log (record a quirk/lesson/warning), search (find past entries), list (show recent), prune (remove entries older than 30 days)"
+      description: "Manage local (.devflow-instincts.yaml) and team (.devflow-instincts.shared.yaml) instincts. Sub-commands: log, search, list, check (run Rigor check_cmd with optional ratchet_max), prune, boost, promote (team store + REGISTRY.md)"
     - id: devflow-recovery
       path: skills/devflow-recovery/SKILL.md
       description: "Diagnoses and recovers a stuck or corrupted DevFlow pipeline. Reads state, observe log, and feature files to identify failure category and propose a targeted recovery action"
@@ -397,7 +394,7 @@ references:
     description: "AI agent threat model for DevFlow — attack surfaces (prompt injection, state corruption, memory poisoning, supply chain), safeguards, and incident response. Use during devflow-beautify security axis and devflow-ship review"
   - id: state-machine
     path: references/state-machine.md
-    description: "Pipeline state machine — canonical task.md/plan.md statuses, legal transitions, next-step mapping, state update snippet. Single source of truth for discovery, status, resume, recovery, and hooks"
+    description: "Pipeline state machine — canonical task.md/plan.md statuses, legal transitions, next-step mapping, state update snippet. State file schema, active feature resolution. Single source of truth for orientation, status, resume, recovery, and hooks"
   - id: escalation-ladder
     path: references/escalation-ladder.md
     description: "Unified failure-handling ladder for implement/beautify/test — bounded retry, debug mode, re-approach, decompose, block with stuck-report. Replaces scattered retry-3× clauses"
@@ -416,6 +413,12 @@ references:
   - id: adapter-resolution
     path: references/adapter-resolution.md
     description: "Adapter and app resolution rules for single-app and monorepo mode — mode detection, adapter/app lookup from config.md and plan.md, working-directory scoping. Single source of truth for every skill that needs the active adapter"
+  - id: orientation
+    path: references/orientation.md
+    description: "Session-start routing tree — maps project state (config, task.md, plan.md Status, run marker, handoff) to the single correct pipeline entry point. Injected by SessionStart hook"
+  - id: run-mode
+    path: references/run-mode.md
+    description: "Run-mode contract shared by devflow.run and devflow.auto — marker arming, autonomy policy per orchestrator, decision-flag format, discrepancy classes, disarm rule"
   - id: mcp-catalog
     path: references/mcp-catalog.md
     description: "Authoritative reference for Model Context Protocol (MCP) servers across DevFlow adapters — core principles, universal baseline, stack-specific core, conditional infrastructure, and client configs"
@@ -423,7 +426,7 @@ references:
 hooks:
   - event: SessionStart
     script: hooks/session-start.sh
-    description: "Inject devflow-discovery meta-skill, suggest context file based on active pipeline step from .devflow-state.json"
+    description: "Inject references/orientation.md routing tree (or compact pointer when state names next_step), suggest context file based on active pipeline step from .devflow-state.json"
   - event: PreToolUse
     matcher: "Write|Edit|MultiEdit"
     script: hooks/pre-config-protect.sh

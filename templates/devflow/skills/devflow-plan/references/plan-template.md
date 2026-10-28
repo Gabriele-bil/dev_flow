@@ -146,7 +146,7 @@ After **Implementation checkpoints**, append **every extra plan section** requir
 
 <!-- Sections below are appended later by pipeline skills — never written by devflow.plan:
 ## Deviations        — devflow.implement Step 7b / escalation Level 3: `[file]`: [planned] → [actual] — [reason]
-## Decision flags    — run mode only, format per @devflow/skills/devflow-run/SKILL.md Step 2
+## Decision flags    — run mode only, format per @devflow/references/run-mode.md
 -->
 ```
 

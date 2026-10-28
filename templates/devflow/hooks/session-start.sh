@@ -9,7 +9,6 @@
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PLUGIN_ROOT="$(dirname "$SCRIPT_DIR")"
 META_SKILL="${DEVFLOW_META_SKILL:-$PLUGIN_ROOT/references/orientation.md}"
-[ -f "$META_SKILL" ] || META_SKILL="$PLUGIN_ROOT/skills/devflow-discovery/SKILL.md"
 
 . "$SCRIPT_DIR/lib/payload.sh"
 . "$SCRIPT_DIR/lib/emit.sh"

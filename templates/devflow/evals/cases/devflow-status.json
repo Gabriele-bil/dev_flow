@@ -9,7 +9,7 @@
     ],
     "negative": [
       { "prompt": "The pipeline seems stuck or the state looks corrupted, fix it", "owner": "devflow-recovery" },
-      { "prompt": "Where do I begin with devflow on a brand new project?", "owner": "devflow-discovery" }
+      { "prompt": "Resume the work from where the last session stopped", "owner": "devflow-resume" }
     ]
   }
 }

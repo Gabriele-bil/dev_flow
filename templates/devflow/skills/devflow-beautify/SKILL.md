@@ -5,7 +5,6 @@ argument-hint: "[optional-plan-path]"
 disable-model-invocation: true
 model: sonnet
 effort: medium
-allowed-tools: "Bash(pnpm lint) Bash(pnpm run lint) Bash(pnpm test*) Bash(pnpm run test*) Bash(pnpm build) Bash(pnpm run build) Bash(npm run lint) Bash(npm run test*) Bash(npm run build) Bash(ng generate*) Bash(ng g *) Bash(ng lint*) Bash(ng test*) Bash(ng build*) Bash(flutter analyze*) Bash(flutter test*) Bash(flutter build*) Bash(dart format*) Bash(dart analyze*) Bash(dart run build_runner*) Bash(git status*) Bash(git diff*) Bash(git log*)"
 ---
 
 # Skill: devflow.beautify
@@ -122,7 +121,7 @@ Apply directly without asking:
 
 #### Opinable improvements
 
-**Run mode** (`.devflow-run.json` present): no approval channel exists — do not propose, do not apply. Log each opinable candidate as an entry in `plan.md` `## Decision flags` per `@devflow/skills/devflow-run/SKILL.md` Step 2 (decision: "not applied"), continue. Interactive mode below.
+**Run mode** (`.devflow-run.json` present): no approval channel exists — do not propose, do not apply. Log each opinable candidate as an entry in `plan.md` `## Decision flags` per `@devflow/references/run-mode.md` → **Decision flags** (decision: "not applied"), continue. Interactive mode below.
 
 Propose before applying:
 
@@ -171,7 +170,7 @@ On error: resolve autonomously; max 3 attempts; then escalate per `@devflow/refe
 
 Set `plan.md` `**Status:** beautified`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
 
-**Run mode** (`.devflow-run.json` present): emit the block below but do not wait — control returns to `devflow.run`.
+**Run mode** (`.devflow-run.json` present): emit the block below but do not wait — control returns to the orchestrator (`@devflow/references/run-mode.md`).
 
 Respond with:
 
@@ -241,7 +240,7 @@ Continue to testing? -> devflow.test
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md`, `registry.md` |
 | Reads | `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status), `@devflow/references/complexity-scoring.md` (depth profile) |
-| Reads (conditional) | `DESIGN.md` / `docs/design.md` — token source for UI consistency axis; `.devflow-run.json` (existence — run-mode switch) |
+| Reads (conditional) | `DESIGN.md` / `docs/design.md` — token source for UI consistency axis; `.devflow-run.json` (existence — run-mode switch, contract `@devflow/references/run-mode.md`) |
 | Writes | improvements to existing files only (no new files) |
 | Writes | `plan.md` — `**Status:** beautified`, `## Decision flags` (run mode — opinable candidates) |
 | Next step | `devflow.test` |
