@@ -562,7 +562,7 @@ Il problema di fondo è uno solo: **c'è un solo `hooks.json`, scritto per Claud
   - `.gitignore:28`: `.cursor/*.log` si può togliere.
 - **Da non toccare:**
   - Le occorrenze di `cursor: pointer` / `cursor-pointer` nel CSS (`templates/devflow/adapters/angular/skills/angular-aria/references/aria-patterns.md`, `templates/devflow/adapters/nextjs/skills/nextjs-ui/SKILL.md`, `devflow-board/assets/board-template.html`) non riguardano l'host.
-  - Lasciare invariati `CHANGELOG.md`, `docs/tokless-gap-analysis.md` (analisi di un progetto esterno) e `devflow/features/003_devflow-board/plan.md` (storico).
+  - Lasciare invariati `CHANGELOG.md`, `docs/tokless-gap-analysis.md` (analisi di un progetto esterno) e *devflow/features/003_devflow-board/plan.md* (storico).
 - **Comunicazione:** è una modifica che rompe la compatibilità per chi usa il plugin su Cursor. Va rilasciata con un commit `feat!:` o con `BREAKING CHANGE:` nel corpo, così release-please passa alla versione major (2.0.0). Nel CHANGELOG serve una nota di migrazione.
 - **Verifica:**
   - `bash scripts/build-plugin.sh`
