@@ -47,53 +47,9 @@ English for all identifiers, methods, properties, comments. Translate local term
 | **ISP** — Interface Segregation | "Are clients forced on unused methods?"         | Split fat interfaces            |
 | **DIP** — Dependency Inversion  | "Do high-level modules depend on abstractions?" | Inject dependencies             |
 
-## Design: Four Elements of Simple Design
+## Reference detail
 
-Priority order:
-
-1. **Runs all tests** — must work correctly
-2. **Expresses intent** — readable, reveals purpose
-3. **No duplication** — DRY after Rule of Three (wait for 3 occurrences)
-4. **Minimal** — fewest classes and methods needed
-
-## Design: Complexity Management
-
-**Essential complexity** = inherent to the problem domain. **Accidental complexity** = introduced by the solution.
-
-Detect complexity via:
-
-- Change amplification — small change requires many files
-- Cognitive load — hard to understand without context
-- Unknown unknowns — surprising or hidden behavior
-
-Fight with:
-
-- **YAGNI** — don't build for hypothetical future needs
-- **KISS** — simplest solution that works
-- **DRY** — but only after Rule of Three
-
-## Design: Object Roles
-
-| Stereotype         | Role                                  |
-| ------------------ | ------------------------------------- |
-| Information Holder | Holds data, minimal behavior          |
-| Structurer         | Manages relationships between objects |
-| Service Provider   | Performs work, stateless operations   |
-| Coordinator        | Orchestrates multiple services        |
-| Controller         | Makes decisions, delegates work       |
-| Interfacer         | Transforms data between systems       |
-
-## Design: Behavioral Principles
-
-- **Tell, Don't Ask** — command objects; do not query then decide
-- **Law of Demeter** — only talk to immediate collaborators; one dot per line
-- **Hollywood Principle** — invert control; let the framework call you
-
-## Design: Architecture
-
-- Dependencies point inward toward domain. Infrastructure depends on domain; never reverse.
-- Features are vertical slices — end-to-end, self-contained.
-- Layers do not expose internal details to each other.
+Detail for Design: Four Elements of Simple Design, Design: Complexity Management, Design: Object Roles, Design: Behavioral Principles, Design: Architecture: [references/design-principles.md](references/design-principles.md) — load when touching those areas.
 
 ## Code Smells
 

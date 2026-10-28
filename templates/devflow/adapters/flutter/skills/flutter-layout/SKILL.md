@@ -29,19 +29,9 @@ Core Flutter rule: **Constraints go down. Sizes go up. Parent sets position.**
 - Fixing `RenderFlex overflowed`, "unbounded constraints", clipped content, or inconsistent spacing.
 - Implementing responsive or adaptive behavior for phone/tablet/desktop.
 
-## Quick Layout Selector
+## Reference detail
 
-- **Linear horizontal/vertical:** `Row` / `Column`
-- **Distribute remaining space:** `Expanded` / `Flexible`
-- **Uniform gap between children:** `Row(spacing: ...)` / `Column(spacing: ...)` — **preferred over `SizedBox`**
-- **One-off fixed gap (e.g. between sections):** `SizedBox(width/height: ...)` — only when `spacing` cannot apply
-- **Padding around content:** `Padding`
-- **Decorated box + optional sizing/alignment:** `Container` (only when needed)
-- **Overlay elements:** `Stack` + `Positioned`
-- **Scrollable list/grid:** `ListView` / `GridView`
-- **Single scrollable body:** `SingleChildScrollView` (+ constrained child strategy)
-- **React to parent constraints:** `LayoutBuilder`
-- **Scale by screen classes:** adaptive branch (for example mobile vs tablet)
+Detail for Quick Layout Selector, Common Failures and Fast Fixes: [references/layout-patterns.md](references/layout-patterns.md) — load when touching those areas.
 
 ## Workflow (Constraint-First)
 
@@ -73,23 +63,6 @@ Core Flutter rule: **Constraints go down. Sizes go up. Parent sets position.**
 
 - **Responsive:** Same widget tree adapts with available constraints (`Expanded`, `Flexible`, `Wrap`, `LayoutBuilder`).
 - **Adaptive:** Different widget tree by form factor (for example bottom nav on mobile, `NavigationRail` on wide layouts).
-
-## Common Failures and Fast Fixes
-
-- **`RenderFlex overflowed` in `Row`/`Column`:**
-  - Wrap expanding child with `Expanded` or reduce fixed-size siblings.
-  - For long text, use `Expanded` + `maxLines` + `overflow`.
-- **Vertical viewport was given unbounded height (`ListView` in `Column`):**
-  - Wrap `ListView` with `Expanded`, or give bounded height via `SizedBox`.
-- **Nested scroll conflicts (`ListView` inside `SingleChildScrollView`):**
-  - Keep one primary scrollable whenever possible.
-  - If unavoidable, use `shrinkWrap: true` + `NeverScrollableScrollPhysics` for inner list (with performance awareness).
-- **Unexpected full-width/full-height children:**
-  - Inspect parent constraints; remove accidental `double.infinity` sizing in unbounded context.
-- **`SizedBox` scattered between every child in a `Row`/`Column`:**
-  - Replace all sibling gaps with a single `spacing:` parameter on the parent; remove the `SizedBox` nodes.
-- **Inconsistent spacing across screen:**
-  - Replace ad-hoc values with consistent spacing tokens/constants.
 
 ## Layout Quality Checklist (Definition of Done)
 

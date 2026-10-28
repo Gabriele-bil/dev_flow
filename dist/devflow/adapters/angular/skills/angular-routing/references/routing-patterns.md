@@ -148,3 +148,99 @@ provideRouter(routes, withExperimentalPlatformNavigation())
 ```
 
 Integrates router with browser Navigation API — finer control over back/forward and navigation interception. Developer-preview, opt-in only.
+
+## Resolvers
+
+Use `ResolveFn` + `withComponentInputBinding()`. Bind resolved data as component input — do NOT read via `ActivatedRoute.data` manually.
+
+```typescript
+// user.resolver.ts
+import { inject } from "@angular/core";
+import { ResolveFn } from "@angular/router";
+
+export const userResolver: ResolveFn<User> = (route) => {
+  const usersService = inject(UsersService);
+  return usersService.getById(route.paramMap.get("id")!);
+};
+```
+
+```typescript
+// app.routes.ts
+{ path: "users/:id", resolve: { user: userResolver }, loadComponent: () => import("./pages/user-detail/page").then((m) => m.UserDetailPage) }
+```
+
+```typescript
+// app.config.ts
+provideRouter(routes, withComponentInputBinding())
+```
+
+```typescript
+// user-detail page.ts — resolved data arrives as input
+export class UserDetailPage {
+  user = input.required<User>();
+}
+```
+
+Resolvers block navigation until resolved — keep them fast, surface loading via `Router.events`.
+
+## Outlets
+
+```html
+<router-outlet />
+<!-- Named outlet -->
+<router-outlet name="sidebar" />
+```
+
+```typescript
+{ path: "settings", loadComponent: () => ..., outlet: "sidebar" }
+```
+
+Nested outlets live in child route's component template. Pass contextual data via `routerOutletData` input + `ROUTER_OUTLET_DATA` injection token.
+
+## Router Lifecycle
+
+Event order: `NavigationStart` → `RoutesRecognized` → `GuardsCheckStart/End` → `ResolveStart/End` → `NavigationEnd`/`NavigationCancel`/`NavigationError`.
+
+```typescript
+private router = inject(Router);
+
+constructor() {
+  this.router.events
+    .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+    .subscribe((e) => this.analytics.trackPageView(e.urlAfterRedirects));
+}
+```
+
+Use `withDebugTracing()` in `provideRouter()` only for local debugging — remove before commit.
+
+## Rendering Strategy
+
+Decision matrix:
+
+| Strategy | When | Setup |
+|---|---|---|
+| CSR (default) | Internal tools, dashboards, authenticated apps | none |
+| SSG / prerender | Marketing/content pages, stable data | `ng add @angular/ssr`, `prerender: true` per route |
+| SSR + hydration | SEO-critical, fast first paint, dynamic data | `provideClientHydration(withEventReplay())` |
+
+Use incremental hydration (`@defer (hydrate on viewport)`) for below-fold heavy components on SSR pages.
+
+## Route Transition Animations
+
+```typescript
+// app.config.ts
+provideRouter(routes, withViewTransitions({
+  onViewTransitionCreated: ({ transition }) => {
+    if (shouldSkip()) transition.skipTransition();
+  },
+}))
+```
+
+```css
+/* src/styles.css — global only, NOT component-scoped */
+::view-transition-old(root) { animation: fade-out 0.2s ease-out; }
+::view-transition-new(root) { animation: fade-in 0.2s ease-in; }
+```
+
+View Transition CSS MUST live in `src/styles.css` — component encapsulation blocks pseudo-element selectors. Use `view-transition-name` for element-specific transitions.
+

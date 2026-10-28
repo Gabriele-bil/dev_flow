@@ -307,3 +307,27 @@ function Field() {
 ```
 
 Debug: Next.js error overlay shows the exact HTML element causing the mismatch. Look for "Expected server HTML to contain a matching...".
+
+## Suspense boundary requirements by hook
+
+| Hook | Suspense required |
+| --- | --- |
+| `useSearchParams()` | Always |
+| `usePathname()` | Dynamic routes only (`[slug]`, `[id]`) |
+| `useParams()` | No |
+| `useRouter()` | No |
+
+Without `<Suspense>` where required, Next.js triggers a full-page CSR bailout. Isolate `useSearchParams` components in leaf nodes wrapped in `<Suspense>`. Full code → `references/components-patterns.md`.
+
+## RSC Boundaries — Common Server→Client Errors
+
+1. **Async Client Component — forbidden.** Only Server Components can be `async`. Fetch in parent Server Component, pass result via props.
+2. **Non-serializable props.** Must be JSON-serializable: convert `Date` with `.toISOString()`, convert `Map`/`Set` to plain objects/arrays, pass class instances as plain objects, define non-Server-Action functions inside Client Component.
+
+Full code + type table → `references/components-patterns.md`.
+
+## Hydration Errors
+
+Caused by server vs client HTML mismatch. Common triggers: `Date.now()`/`Math.random()` during render, accessing `window`/`localStorage` during render, invalid HTML nesting, browser extensions, server-applied theme class. Fix: move browser/time logic to `useEffect`, add `suppressHydrationWarning` on root `<html>` when appropriate, use `useId()` instead of `Math.random()` for stable IDs.
+
+Debug: Next.js overlay highlights the mismatched HTML element. Look for "Expected server HTML to contain a matching...". Full code → `references/components-patterns.md`.

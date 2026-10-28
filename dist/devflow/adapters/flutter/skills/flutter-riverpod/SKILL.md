@@ -49,26 +49,9 @@ For any `AsyncValue<T>` rendered in UI:
 - **`data`**: build the real loaded UI once; extension reuses it for loading (with `Skeletonizer` enabled) and data (disabled, with switch animation).
 - **`mock`**: `Entity.mock()` / `Entity.mockList()` from the domain entity — never inline fakes.
 
-## `watch` / `read` / `listen` / `select`
+## Reference detail
 
-- **`watch`**: reactive read for rendering/derived logic.
-- **`read`**: one-shot read for callbacks/commands.
-- **`listen`**: side effects on transitions (snackbar, navigation).
-- **`select`**: rebuild only on selected field changes.
-
-`ref.read` inside `build` is an anti-pattern — UI won't react to updates. Use `ref.watch(provider.select(...))` instead.
-
-## Invalidation Semantics
-
-- **`ref.invalidate(provider)`**: mark stale; recompute when read next.
-- **`ref.refresh(provider)`**: invalidate + immediate read.
-- **`ref.invalidateSelf()`**: invalidate current provider/notifier.
-
-Use:
-
-- After a mutation in the same notifier: `invalidateSelf`.
-- Pull-to-refresh action: `refresh`.
-- External cache dependency changed: `invalidate(targetProvider)`.
+Detail for `watch` / `read` / `listen` / `select`, Invalidation Semantics: [references/riverpod-patterns.md](references/riverpod-patterns.md) — load when touching those areas.
 
 ## Lifecycle: autoDispose and keepAlive
 

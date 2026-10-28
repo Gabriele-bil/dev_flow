@@ -65,56 +65,9 @@ Full code: file-level and inline Server Action, progressive-enhancement form wit
 
 File: `app/api/[resource]/route.ts`. Named exports map to HTTP methods: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, `OPTIONS`.
 
-### API Routes vs Server Actions — decision rule
+## Reference detail
 
-| Use API Route when | Use Server Action when |
-| --- | --- |
-| External consumer (mobile app, third-party) | Mutation from within Next.js app |
-| Webhook receiver | Form submission |
-| OAuth callback | Button click mutation |
-| File upload endpoint | Any user-triggered data change |
-| Streaming response (SSE, chunked) | Revalidation after save |
-
-Full code: GET/POST handlers with Zod validation, dynamic route segments (`params` must be awaited: `const { resource } = await params`) → `references/server-patterns.md`.
-
-## 5) Async Request APIs (Cookies, Headers, Params)
-
-> **Next.js 16+ (and 15) breaking change:** `cookies()`, `headers()`, `params`, and `searchParams` return Promises. You MUST `await` them in Server Components, Route Handlers, and Server Actions.
->
-> - Server Component: `export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ [key: string]: string }> }) { const { id } = await params; ... }`
-> - Cookies: `const cookieStore = await cookies(); const token = cookieStore.get('token');`
-> - Headers: `const headersList = await headers();`
->
-> Codemod: `npx @next/codemod@latest upgrade .`
-
-`redirect()` and `notFound()` throw internally — place them AFTER try/catch blocks, never inside them.
-
-Full code → `references/server-patterns.md`.
-
-## 6) Error Handling
-
-Server Actions return typed error objects, never throw toward client. Server Components let unexpected errors propagate to `error.tsx`; use `notFound()` for expected not-found cases. API Routes catch and return `NextResponse.json({ error }, { status: 500 })`.
-
-`redirect()`/`notFound()`/`unauthorized()` throw internally — a generic try/catch swallows them. Use `unstable_rethrow(err)` from `next/navigation` to re-throw Next.js internal errors before handling real errors.
-
-Full code → `references/server-patterns.md`.
-
-## 7) `after()` — post-response code
-
-Run secondary work (analytics, logging, cleanup) after the response finishes streaming, without blocking response time. Guaranteed to complete even if client disconnects. Full code → `references/server-patterns.md`.
-
-## 8) Runtime Selection
-
-Default runtime = **Node.js**. Do not change unless necessary (`export const runtime = 'edge'`).
-
-| Use Node.js (default) when | Use Edge when |
-| --- | --- |
-| DB access (Prisma, Drizzle, pg) | Proxy / Routing (globally distributed) |
-| File system access | Request geolocation / A-B testing |
-| Node.js-only packages | Ultra-low latency, no Node.js APIs needed |
-| Auth, cron, heavy computation | Simple request rewriting |
-
-Edge runtime limitations: no Node.js APIs, no native addons, no filesystem, smaller bundle budget.
+Detail for API Routes vs Server Actions — decision rule, Async Request APIs (Cookies, Headers, Params), Error Handling, `after()` — post-response code, Runtime Selection, Debug — MCP Endpoint: [references/server-patterns.md](references/server-patterns.md) — load when touching those areas.
 
 ## Anti-Patterns
 
@@ -128,10 +81,6 @@ Do NOT:
 - Use `cache: 'no-store'` on every fetch by default — defeats the performance model.
 - Call Server Actions in `useEffect` — use `startTransition` or form `action` instead.
 - Put business logic in API Routes when Server Actions would suffice — Server Actions are simpler and type-safe end-to-end.
-
-## Debug — MCP Endpoint
-
-Next.js exposes `/_next/mcp` in development for AI-assisted debugging (Next.js 16+ enabled by default; < 16 needs `experimental.mcpServer: true`). Tools: `get_errors`, `get_routes`, `get_project_metadata`, `get_logs`, `get_server_action_by_id`. Full curl example and tool table → `references/server-patterns.md`.
 
 ## I/O Reference
 

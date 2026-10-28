@@ -154,6 +154,11 @@ for FILE in "${SKILL_FILES[@]}"; do
       fi
     done < <(grep -nE '^## ' "$FILE")
 
+    # Line-count check: adapter skills hard cap 100 lines (CONTRIBUTING.md rule)
+    if echo "$REL" | grep -q "^adapters/" && [[ $LINES -gt 100 ]]; then
+      FILE_ERRORS+=("adapter SKILL.md is $LINES lines (>100) — move detail to references/<topic>.md in the skill dir and link it from SKILL.md")
+    fi
+
     # Line-count check: core skills over budget should extract to references/
     if ! echo "$REL" | grep -q "^adapters/" && [[ $LINES -gt 250 ]]; then
       FILE_WARNINGS+=("style: SKILL.md is $LINES lines (>250) — extract detail to references/<file>.md")
