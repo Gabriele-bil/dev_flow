@@ -19,7 +19,7 @@ Use `@devflow/skills/devflow-setup/SKILL.md` and execute it exactly.
 - Write `AGENTS.md`, `REGISTRY.md`, and `docs/product.md` in the consumer project root using `devflow-managed` block markers.
 - After file writes, install adapter setup dependencies declared in `@devflow/adapters/<adapter>/steps/setup.md` under `Setup dependencies` — once per app in monorepo mode.
 - If `$ARGUMENTS` contains `--force`, overwrite full files; otherwise only replace `devflow-managed` sections.
-- If `$ARGUMENTS` contains `--mcp`, generate client-ready MCP configuration JSON (for Antigravity `mcp_config.json`, Claude Code `.mcp.json`, or Cursor) resolving universal baseline + stack core + conditional servers per `@devflow/references/mcp-catalog.md`.
+- If `$ARGUMENTS` contains `--mcp`, generate client-ready MCP configuration JSON (for Antigravity `mcp_config.json` or Claude Code `.mcp.json`) resolving universal baseline + stack core + conditional servers per `@devflow/references/mcp-catalog.md`.
 
 Optional flag:
 `$ARGUMENTS`

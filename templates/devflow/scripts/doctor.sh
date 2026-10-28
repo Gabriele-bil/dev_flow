@@ -59,13 +59,6 @@ fi
 [[ -f "$WORKSPACE_ROOT/.mcp.json" ]] && MCP_CONFIG_PATHS+=("$WORKSPACE_ROOT/.mcp.json")
 [[ -f "$HOME/.claude.json" ]] && MCP_CONFIG_PATHS+=("$HOME/.claude.json")
 
-# Check Cursor
-if [[ -f "$WORKSPACE_ROOT/.cursor/mcp.json" || -f "$HOME/.cursor/mcp.json" ]]; then
-  [[ "$DETECTED_CLIENT" == "Unknown" ]] && DETECTED_CLIENT="Cursor"
-fi
-[[ -f "$WORKSPACE_ROOT/.cursor/mcp.json" ]] && MCP_CONFIG_PATHS+=("$WORKSPACE_ROOT/.cursor/mcp.json")
-[[ -f "$HOME/.cursor/mcp.json" ]] && MCP_CONFIG_PATHS+=("$HOME/.cursor/mcp.json")
-
 # ── Section 2: Detect Active Adapter ─────────────────────────────────────────
 CONFIG_FILE=""
 if [[ -f "$WORKSPACE_ROOT/devflow/config.md" ]]; then

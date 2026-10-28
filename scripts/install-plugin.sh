@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 # install-plugin.sh — Unified installation script for DevFlow plugin.
-# Installs DevFlow across Antigravity, Cursor, and Claude Code environments.
+# Installs DevFlow across Antigravity CLI and Claude Code environments.
 #
 # Usage: bash scripts/install-plugin.sh [target] [options]
 #
 # Targets:
 #   antigravity, agy, gemini   Install to Antigravity (global ~/.gemini or workspace .agents)
-#   cursor                     Install to Cursor (~/.cursor/plugins/local/devflow)
 #   claude, claudecode         Configure/install for Claude Code
 #   all                        Install across all detected platforms (default)
 #
 # Options:
-#   -t, --target <name>        Target platform: antigravity | cursor | claude | all
+#   -t, --target <name>        Target platform: antigravity | claude | all
 #   -m, --mode <link|copy>     Install mode: link (symlink, default) or copy (directory copy)
 #   -s, --scope <scope>        Antigravity scope: global (default) or workspace
 #   -w, --workspace-dir <dir>  Target workspace path for workspace scope (default: pwd)
@@ -47,12 +46,11 @@ Usage:
 
 Targets:
   antigravity, agy, gemini   Install to Antigravity (global ~/.gemini or workspace .agents)
-  cursor                     Install to Cursor (~/.cursor/plugins/local/devflow)
   claude, claudecode         Configure/install for Claude Code
   all                        Install/configure for all detected platforms (default)
 
 Options:
-  -t, --target <name>        Target platform (antigravity | cursor | claude | all)
+  -t, --target <name>        Target platform (antigravity | claude | all)
   -m, --mode <link|copy>     Install mode: link (symlink, default) or copy
   -s, --scope <scope>        Scope for Antigravity: global (default) or workspace
   -w, --workspace-dir <dir>  Workspace directory for workspace scope (default: current directory)
@@ -65,7 +63,6 @@ Options:
 Examples:
   bash scripts/install-plugin.sh antigravity
   bash scripts/install-plugin.sh antigravity --scope workspace
-  bash scripts/install-plugin.sh cursor --mode link
   bash scripts/install-plugin.sh claude
   bash scripts/install-plugin.sh all --build --validate
   bash scripts/install-plugin.sh --uninstall --target antigravity
@@ -113,7 +110,7 @@ while [[ $# -gt 0 ]]; do
       exit 0
       ;;
     *)
-      if [[ -z "${POSITIONAL[*]:-}" ]] && [[ "$1" =~ ^(antigravity|agy|gemini|cursor|claude|claudecode|all)$ ]]; then
+      if [[ -z "${POSITIONAL[*]:-}" ]] && [[ "$1" =~ ^(antigravity|agy|gemini|claude|claudecode|all)$ ]]; then
         TARGET="$1"
         shift
       else
@@ -130,9 +127,6 @@ case "$TARGET" in
   antigravity|agy|gemini)
     TARGET="antigravity"
     ;;
-  cursor)
-    TARGET="cursor"
-    ;;
   claude|claudecode)
     TARGET="claude"
     ;;
@@ -140,7 +134,7 @@ case "$TARGET" in
     TARGET="all"
     ;;
   *)
-    fail "Unknown target: $TARGET. Choose: antigravity | cursor | claude | all"
+    fail "Unknown target: $TARGET. Choose: antigravity | claude | all"
     ;;
 esac
 
@@ -264,39 +258,6 @@ install_antigravity() {
   fi
 }
 
-# ── Install / Uninstall: Cursor ──────────────────────────────────────────────
-install_cursor() {
-  local TARGET_DIR="$HOME/.cursor/plugins/local/devflow"
-
-  if [ "$UNINSTALL" = true ]; then
-    step "Uninstalling DevFlow from Cursor ($TARGET_DIR)..."
-    if [ -d "$TARGET_DIR" ] || [ -L "$TARGET_DIR" ]; then
-      run_cmd rm -rf "$TARGET_DIR"
-      ok "DevFlow removed from Cursor"
-    else
-      warn "DevFlow directory not found at $TARGET_DIR"
-    fi
-    return 0
-  fi
-
-  step "Installing DevFlow to Cursor ($TARGET_DIR)..."
-
-  local TARGET_PARENT="$HOME/.cursor/plugins/local"
-  run_cmd mkdir -p "$TARGET_PARENT"
-
-  if [ "$MODE" = "link" ]; then
-    run_cmd rm -rf "$TARGET_DIR"
-    run_cmd ln -sfn "$DIST_DIR" "$TARGET_DIR"
-    ok "DevFlow linked: $TARGET_DIR → $DIST_DIR"
-  else
-    run_cmd rm -rf "$TARGET_DIR"
-    run_cmd cp -R "$DIST_DIR" "$TARGET_DIR"
-    ok "DevFlow copied to $TARGET_DIR"
-  fi
-
-  echo "  Note: Reload Cursor window to activate changes (Cmd+Shift+P > Developer: Reload Window)"
-}
-
 # ── Install / Configure: Claude Code ────────────────────────────────────────
 install_claude() {
   if [ "$UNINSTALL" = true ]; then
@@ -346,9 +307,6 @@ main() {
     antigravity)
       install_antigravity
       ;;
-    cursor)
-      install_cursor
-      ;;
     claude)
       install_claude
       ;;
@@ -361,12 +319,6 @@ main() {
         INSTALLED_ANY=true
       fi
 
-      # Cursor: check ~/.cursor
-      if [ -d "$HOME/.cursor" ]; then
-        install_cursor
-        INSTALLED_ANY=true
-      fi
-
       # Claude Code: check ~/.claude or claude binary
       if [ -d "$HOME/.claude" ] || command -v claude >/dev/null 2>&1; then
         install_claude
@@ -374,7 +326,7 @@ main() {
       fi
 
       if [ "$INSTALLED_ANY" = false ]; then
-        warn "No target platforms detected automatically (~/.gemini, ~/.cursor, ~/.claude)."
+        warn "No target platforms detected automatically (~/.gemini, ~/.claude)."
         echo "Installing to Antigravity global config by default..."
         install_antigravity
       fi

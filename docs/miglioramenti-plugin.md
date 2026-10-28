@@ -540,11 +540,11 @@ Il problema di fondo è uno solo: **c'è un solo `hooks.json`, scritto per Claud
 
 - **Decisione:** gli host supportati sono solo Claude Code e Antigravity CLI. Il target Cursor va rimosso del tutto. Oggi raddoppia il lavoro di build, documentazione e test per un host che non viene verificato da nessuna parte: non ha test, CI né validazione.
 - **Build e release:**
-  - Eliminare `scripts/builders/build-cursor.sh`.
+  - Eliminare *scripts/builders/build-cursor.sh*.
   - In `scripts/build-plugin.sh` (righe 28, 47-48, 57) togliere la lettura di `cursor_support`, la chiamata al builder e la voce "+ Cursor".
   - In `templates/devflow/manifest.json` (riga 15) togliere `"cursor_support": true`.
-  - In `release-please-config.json` (riga 32) togliere l'`extra-file` `dist/devflow/.cursor-plugin/plugin.json`. Senza questa modifica release-please fallisce, perché il file non esisterà più.
-  - Rigenerare `dist/`: spariscono `dist/devflow/.cursor-plugin/` e `dist/devflow/hooks/hooks.cursor.json`. Il builder Claude fa già `rm -rf dist`, quindi non restano file orfani.
+  - In `release-please-config.json` (riga 32) togliere l'`extra-file` *dist/devflow/.cursor-plugin/plugin.json*. Senza questa modifica release-please fallisce, perché il file non esisterà più.
+  - Rigenerare `dist/`: spariscono `dist/devflow/.cursor-plugin/` e *dist/devflow/hooks/hooks.cursor.json*. Il builder Claude fa già `rm -rf dist`, quindi non restano file orfani.
 - **Installazione:** in `scripts/install-plugin.sh` (24 occorrenze) togliere il target `cursor`, la funzione di installazione e disinstallazione e la voce nel ramo `all`. Aggiornare `--help` e il messaggio d'errore "Choose: antigravity | cursor | claude | all".
 - **Script del plugin:** in `templates/devflow/scripts/doctor.sh` (righe 62-67) togliere il rilevamento del client Cursor e i percorsi *.cursor/mcp.json*.
 - **Skill e comandi:** togliere Cursor dagli elenchi dei client MCP in:

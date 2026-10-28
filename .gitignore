@@ -25,7 +25,6 @@ $RECYCLE.BIN/
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
-.cursor/*.log
 
 # Environment & secrets (if tooling is added later)
 .env

@@ -29,11 +29,6 @@
         },
         {
           "type": "json",
-          "path": "dist/devflow/.cursor-plugin/plugin.json",
-          "jsonpath": "$.version"
-        },
-        {
-          "type": "json",
           "path": "dist/devflow/.antigravity-plugin/plugin.json",
           "jsonpath": "$.version"
         },

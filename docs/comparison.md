@@ -15,7 +15,7 @@ Honest positioning against the three closest alternatives: [Forge](https://githu
 | Failure handling | Bounded escalation ladder (retry → debug → re-approach → block) | 7-level circuit breakers incl. cross-model rescue | none | none |
 | Recovery/resume | state machine + `devflow.resume` / `devflow.recovery` | on-disk state machine, checkpoints, forensic rebuild | none | compaction summary only |
 | Multi-machine collaboration | none | claim leases, flags, transports | none | none |
-| Hosts | Claude Code, Cursor, Antigravity | Claude Code | Copilot, Claude Code, Gemini, Cursor + | Claude Code |
+| Hosts | Claude Code, Antigravity CLI | Claude Code | Copilot, Claude Code, Gemini, Cursor + | Claude Code |
 
 ## Where each wins
 

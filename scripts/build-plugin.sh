@@ -25,7 +25,6 @@ export AUTHOR=$(jq -r '.author'       "$MANIFEST")
 export REPOSITORY=$(jq -r '.repository // empty' "$MANIFEST")
 export HOMEPAGE=$(jq -r '.homepage // empty'     "$MANIFEST")
 export KEYWORDS_JSON=$(jq -c '.keywords // []'   "$MANIFEST")
-CURSOR_SUPPORT=$(jq -r '.cursor_support // false' "$MANIFEST")
 ANTIGRAVITY_SUPPORT=$(jq -r '.antigravity_support // false' "$MANIFEST")
 
 # Sanifica template da artefatti di runtime temporanei
@@ -44,17 +43,12 @@ for RUNTIME_SH in board.sh metrics.sh doctor.sh validate-skills.sh; do
   fi
 done
 
-if [ "$CURSOR_SUPPORT" = "true" ]; then
-  bash "$BUILDERS_DIR/build-cursor.sh"
-fi
-
 if [ "$ANTIGRAVITY_SUPPORT" = "true" ]; then
   bash "$BUILDERS_DIR/build-antigravity.sh"
 fi
 
 echo ""
 TARGETS="Claude Code"
-[ "$CURSOR_SUPPORT" = "true" ] && TARGETS="$TARGETS + Cursor"
 [ "$ANTIGRAVITY_SUPPORT" = "true" ] && TARGETS="$TARGETS + Antigravity CLI"
 ok "Build completato → dist/ ($TARGETS)"
 

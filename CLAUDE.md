@@ -1,6 +1,6 @@
 # DevFlow Plugin — Claude Code Context
 
-Claude Code + Cursor plugin for spec-driven development pipelines.
+Claude Code + Antigravity CLI plugin for spec-driven development pipelines.
 Read `templates/devflow/CONTRIBUTING.md` for quality bar and style guidelines before modifying any skill.
 
 ## Critical structure
