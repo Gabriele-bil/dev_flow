@@ -48,6 +48,8 @@ Single source of truth for DevFlow statuses and transitions. Cited by `reference
 | `progress` | object | `{done, pending, total}` File List markers |
 | `saved_at` | string | ISO-8601 UTC of last write |
 | `next_feature_number` | int | next free `NNN`; readers also accept legacy string form (`"004"`) |
+| `plan_path` | string | snapshot by `hooks/pre-compact.sh` — workspace-relative `plan.md` |
+| `done_files` / `pending_files` | string[] | snapshot by `hooks/pre-compact.sh` — File List paths per marker; read by `devflow.resume` |
 
 Rules:
 

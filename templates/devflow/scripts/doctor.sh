@@ -45,15 +45,17 @@ REMEDIATIONS=()
 DETECTED_CLIENT="Unknown"
 MCP_CONFIG_PATHS=()
 
-# Check Antigravity / Gemini IDE
-if [[ -n "${ANTIGRAVITY_APP_DIR:-}" || -d "$HOME/.gemini/antigravity-ide" || -d "$WORKSPACE_ROOT/.agents" ]]; then
-  DETECTED_CLIENT="Antigravity / Gemini IDE"
+# Check Antigravity (CLI sets ANTIGRAVITY_CONVERSATION_ID for hooks/tools)
+if [[ -n "${ANTIGRAVITY_CONVERSATION_ID:-}" || -n "${ANTIGRAVITY_APP_DIR:-}" || -d "$HOME/.gemini/antigravity-cli" || -d "$HOME/.gemini/antigravity-ide" || -d "$WORKSPACE_ROOT/.agents" ]]; then
+  DETECTED_CLIENT="Antigravity"
 fi
 [[ -f "$HOME/.gemini/config/mcp_config.json" ]] && MCP_CONFIG_PATHS+=("$HOME/.gemini/config/mcp_config.json")
 [[ -f "$WORKSPACE_ROOT/.agents/mcp_config.json" ]] && MCP_CONFIG_PATHS+=("$WORKSPACE_ROOT/.agents/mcp_config.json")
 
-# Check Claude Code
-if [[ -f "$WORKSPACE_ROOT/.mcp.json" || -f "$HOME/.claude.json" ]]; then
+# Check Claude Code (CLAUDECODE=1 inside a session wins over file heuristics)
+if [[ -n "${CLAUDECODE:-}" ]]; then
+  DETECTED_CLIENT="Claude Code"
+elif [[ -f "$WORKSPACE_ROOT/.mcp.json" || -f "$HOME/.claude.json" ]]; then
   [[ "$DETECTED_CLIENT" == "Unknown" ]] && DETECTED_CLIENT="Claude Code"
 fi
 [[ -f "$WORKSPACE_ROOT/.mcp.json" ]] && MCP_CONFIG_PATHS+=("$WORKSPACE_ROOT/.mcp.json")
@@ -170,21 +172,15 @@ case "$DETECTED_ADAPTER" in
 esac
 
 # Check conditional infrastructure
-USES_SUPABASE=false
 if grep -qiE 'supabase' "$WORKSPACE_ROOT/package.json" 2>/dev/null || grep -qiE 'supabase' "$WORKSPACE_ROOT/pubspec.yaml" 2>/dev/null; then
-  USES_SUPABASE=true
   record_mcp "supabase" "conditional" "Detected Supabase dependency in project"
 fi
 
-USES_POSTGRES=false
 if grep -qiE 'pg|postgres|typeorm' "$WORKSPACE_ROOT/package.json" 2>/dev/null; then
-  USES_POSTGRES=true
   record_mcp "postgres" "conditional" "Detected PostgreSQL / TypeORM in project"
 fi
 
-USES_SENTRY=false
 if grep -qiE 'sentry' "$WORKSPACE_ROOT/package.json" 2>/dev/null || grep -qiE 'sentry' "$WORKSPACE_ROOT/pubspec.yaml" 2>/dev/null; then
-  USES_SENTRY=true
   record_mcp "sentry" "conditional" "Detected Sentry monitoring in project"
 fi
 
@@ -215,6 +211,25 @@ check_cli "git" "true" "--version"
 check_cli "gh" "false" "--version"
 check_cli "jq" "true" "--version"
 
+# Optional tools: each silently disables a feature when absent — say which
+check_optional() {
+  local label="$1" feature="$2" remedy="$3"; shift 3
+  local bin
+  for bin in "$@"; do
+    if command -v "$bin" >/dev/null 2>&1; then
+      CLI_RESULTS+=("$label|OK|$(command -v "$bin")")
+      return
+    fi
+  done
+  CLI_RESULTS+=("$label|OPTIONAL|Missing — $feature disabled")
+  WARNINGS=$((WARNINGS + 1))
+  REMEDIATIONS+=("Install $label ($remedy) — enables $feature")
+}
+check_optional "yq" "project instincts (learning hooks, devflow.learn)" "brew install yq" yq
+check_optional "timeout" "time limits on Stop-hook lint/typecheck" "brew install coreutils" timeout gtimeout
+check_optional "curl" "WebFetch revalidation cache" "brew install curl" curl
+check_optional "sha256" "WebFetch revalidation cache" "shasum ships with Perl" shasum sha256sum
+
 case "$DETECTED_ADAPTER" in
   flutter)
     check_cli "flutter" "true" "--version"
@@ -243,9 +258,7 @@ esac
 PIPELINE_RESULTS=()
 
 # Git repo check
-IN_GIT=false
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  IN_GIT=true
   BRANCH=$(git branch --show-current 2>/dev/null || echo "detached")
   DIRTY=$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')
   if [[ "$DIRTY" -eq 0 ]]; then
@@ -264,10 +277,10 @@ fi
 STATE_FILE="$WORKSPACE_ROOT/.devflow-state.json"
 if [[ -f "$STATE_FILE" ]]; then
   if command -v jq >/dev/null 2>&1 && jq empty "$STATE_FILE" >/dev/null 2>&1; then
-    ACTIVE_FEAT=$(jq -r '.active_feature // empty' "$STATE_FILE")
+    ACTIVE_FEAT=$(jq -r '.feature // .active_feature // empty' "$STATE_FILE")
     NEXT_STEP=$(jq -r '.next_step // empty' "$STATE_FILE")
     if [[ -n "$ACTIVE_FEAT" ]]; then
-      PIPELINE_RESULTS+=("Pipeline State|OK|Feature: $ACTIVE_FEAT | Next step: ${NEXT_STEP:-none}")
+      PIPELINE_RESULTS+=("Pipeline State|OK|Feature: $ACTIVE_FEAT — next step: ${NEXT_STEP:-none}")
     else
       PIPELINE_RESULTS+=("Pipeline State|OK|Idle (no active feature)")
     fi
@@ -276,7 +289,7 @@ if [[ -f "$STATE_FILE" ]]; then
     CRITICAL_ERRORS=$((CRITICAL_ERRORS + 1))
     REMEDIATIONS+=("Repair pipeline state with 'devflow.recovery' or reset .devflow-state.json")
     if [[ "$FIX_MODE" == true ]]; then
-      echo '{"active_feature": null, "next_step": null}' > "$STATE_FILE"
+      echo '{}' > "$STATE_FILE"
       REMEDIATIONS+=("Auto-fix: Reset corrupted .devflow-state.json to valid idle state")
     fi
   fi
@@ -296,6 +309,18 @@ if [[ -f "$WORKSPACE_ROOT/.gitignore" ]]; then
       echo -e "\n# devflow runtime state\n.devflow-state.json" >> "$WORKSPACE_ROOT/.gitignore"
       REMEDIATIONS+=("Auto-fix: Appended .devflow-state.json to .gitignore")
     fi
+  fi
+fi
+
+# Antigravity plugin install: hooks are read only from <plugin>/hooks.json
+AGY_PLUGIN_DIR="$HOME/.gemini/antigravity-cli/plugins/devflow"
+if [[ -d "$AGY_PLUGIN_DIR" ]]; then
+  if [[ -f "$AGY_PLUGIN_DIR/hooks.json" ]]; then
+    PIPELINE_RESULTS+=("Antigravity Hooks|OK|$AGY_PLUGIN_DIR/hooks.json")
+  else
+    PIPELINE_RESULTS+=("Antigravity Hooks|WARN|No hooks.json at the plugin root — guards and telemetry inactive")
+    WARNINGS=$((WARNINGS + 1))
+    REMEDIATIONS+=("Reinstall the plugin: agy plugin install <path-to>/dist/devflow")
   fi
 fi
 
@@ -320,33 +345,27 @@ elif [[ $WARNINGS -gt 0 ]]; then
 fi
 
 if [[ "$JSON_MODE" == true ]]; then
-  export DOCTOR_STATUS="$OVERALL_STATUS"
-  export DOCTOR_EXIT_CODE="$EXIT_CODE"
-  export DOCTOR_CLIENT="$DETECTED_CLIENT"
-  export DOCTOR_ADAPTER_NAME="$DETECTED_ADAPTER"
-  export DOCTOR_ADAPTER_STATUS="$ADAPTER_STATUS"
-
-  python3 -c '
-import os, sys, json
-
-data = {
-  "status": os.environ["DOCTOR_STATUS"],
-  "exit_code": int(os.environ["DOCTOR_EXIT_CODE"]),
-  "client": os.environ["DOCTOR_CLIENT"],
-  "adapter": {
-    "name": os.environ["DOCTOR_ADAPTER_NAME"],
-    "status": os.environ["DOCTOR_ADAPTER_STATUS"]
-  },
-  "mcp_servers": json.loads(sys.argv[1]),
-  "cli_tools": json.loads(sys.argv[2]),
-  "pipeline_health": json.loads(sys.argv[3]),
-  "remediations": json.loads(sys.argv[4])
-}
-print(json.dumps(data, indent=2))
-' "$(printf '%s\n' "${MCP_RESULTS[@]}" | python3 -c 'import sys, json; print(json.dumps([{"name": p[0], "tier": p[1], "status": p[2], "note": p[3]} for l in sys.stdin if l.strip() for p in [l.strip().split("|")] if len(p)>=4]))')" \
-  "$(printf '%s\n' "${CLI_RESULTS[@]}" | python3 -c 'import sys, json; print(json.dumps([{"name": p[0], "status": p[1], "detail": p[2]} for l in sys.stdin if l.strip() for p in [l.strip().split("|")] if len(p)>=3]))')" \
-  "$(printf '%s\n' "${PIPELINE_RESULTS[@]}" | python3 -c 'import sys, json; print(json.dumps([{"check": p[0], "status": p[1], "detail": p[2]} for l in sys.stdin if l.strip() for p in [l.strip().split("|")] if len(p)>=3]))')" \
-  "$(printf '%s\n' "${REMEDIATIONS[@]}" | python3 -c 'import sys, json; print(json.dumps([l.strip() for l in sys.stdin if l.strip()]))')"
+  # rows "a|b|c" → JSON objects with the given keys (jq only, no python)
+  rows_json() {
+    local keys="$1"; shift
+    printf '%s\n' "$@" | jq -R --arg keys "$keys" '
+      select(length > 0) | split("|") as $p
+      | ($keys | split(",")) as $k
+      | if ($p | length) >= ($k | length)
+        then [range(0; $k | length) | {($k[.]): $p[.]}] | add
+        else empty end' | jq -s '.'
+  }
+  jq -n \
+    --arg status "$OVERALL_STATUS" --argjson exit_code "$EXIT_CODE" \
+    --arg client "$DETECTED_CLIENT" --arg adapter "$DETECTED_ADAPTER" --arg adapter_status "$ADAPTER_STATUS" \
+    --argjson mcp "$(rows_json name,tier,status,note ${MCP_RESULTS[@]+"${MCP_RESULTS[@]}"})" \
+    --argjson cli "$(rows_json name,status,detail ${CLI_RESULTS[@]+"${CLI_RESULTS[@]}"})" \
+    --argjson pipeline "$(rows_json check,status,detail ${PIPELINE_RESULTS[@]+"${PIPELINE_RESULTS[@]}"})" \
+    --argjson remediations "$(printf '%s\n' ${REMEDIATIONS[@]+"${REMEDIATIONS[@]}"} | jq -R 'select(length > 0)' | jq -s '.')" \
+    '{status: $status, exit_code: $exit_code, client: $client,
+      adapter: {name: $adapter, status: $adapter_status},
+      mcp_servers: $mcp, cli_tools: $cli, pipeline_health: $pipeline,
+      remediations: $remediations}'
 
   exit $EXIT_CODE
 fi
