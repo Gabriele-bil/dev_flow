@@ -7,7 +7,7 @@
     {
       "name": "devflow",
       "description": "Spec-driven development pipeline: idea → task → plan → implement → beautify → test → PR. Adapter-based architecture — supports Angular, Flutter, NestJS and Next.js.",
-      "source": "./dist/devflow",
+      "source": "./dist/devflow-antigravity",
       "version": "1.19.0"
     }
   ]

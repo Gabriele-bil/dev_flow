@@ -71,6 +71,13 @@ p=$(printf '{"conversationId":"c","workspacePaths":["%s"],"toolName":"run_comman
 [ "$(field "$p" tool)" = "shell" ] && [ "$(field "$p" cmd)" = "rm -rf /" ] \
   && assert "agy tool shape (best-effort): run_command/CommandLine" pass || assert "agy tool shape ($p)" fail
 
+p=$(parse antigravity/pre-tool-write.json DEVFLOW_EVENT=PreToolUse)
+[ "$(field "$p" tool)" = "write" ] && [ "$(field "$p" file)" = "$WS/b.txt" ] \
+  && assert "agy captured write_file: toolCall.args.Path" pass || assert "agy captured write_file ($p)" fail
+p=$(parse antigravity/post-tool-read.json DEVFLOW_EVENT=PostToolUse)
+[ "$(field "$p" tool)" = "read" ] && [ "$(field "$p" err)" = "false" ] \
+  && assert "agy captured read_file post: error \"\" → false" pass || assert "agy captured read_file post ($p)" fail
+
 echo "--- T3: guards deny in each host's format ---"
 out=$(fixture claude/pre-bash.json | bash "$HOOKS_DIR/pre-bash-destructive-guard.sh")
 printf '%s' "$out" | jq -e '.hookSpecificOutput.permissionDecision == "deny"' >/dev/null 2>&1 \
@@ -82,6 +89,10 @@ out=$(printf '{"conversationId":"c","workspacePaths":["%s"],"toolName":"run_comm
   | DEVFLOW_EVENT=PreToolUse bash "$HOOKS_DIR/pre-bash-destructive-guard.sh")
 printf '%s' "$out" | jq -e '.decision == "deny"' >/dev/null 2>&1 \
   && assert "Antigravity: decision deny" pass || assert "Antigravity deny ($out)" fail
+
+out=$(fixture antigravity/pre-tool-write.json | sed 's|/b.txt"|/tsconfig.json"|' | DEVFLOW_EVENT=PreToolUse bash "$HOOKS_DIR/pre-config-protect.sh")
+printf '%s' "$out" | jq -e '.decision == "deny"' >/dev/null 2>&1 \
+  && assert "Antigravity: captured write_file on tsconfig.json denied" pass || assert "Antigravity tsconfig deny ($out)" fail
 
 echo "--- T4: every hook × every fixture: exit 0, no echo, JSON or nothing ---"
 HOOK_ARGS=(

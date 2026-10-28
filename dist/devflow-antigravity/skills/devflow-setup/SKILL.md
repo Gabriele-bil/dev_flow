@@ -1,0 +1,245 @@
+---
+name: devflow-setup
+description: "Generates AGENTS.md, REGISTRY.md, docs/product.md via adapter templates + questionnaire. Use when running devflow.setup post-install, or adapter/stack/product context changes."
+argument-hint: "[--force] [--mcp]"
+---
+
+# Skill: devflow.setup
+
+## Purpose
+
+Create or refresh global AI context files (`AGENTS.md`, `REGISTRY.md`) and product context (`docs/product.md`) in the consumer project root.
+
+## Core Principles
+
+- **spec-first** — no code before `task.md` + `plan.md` approved
+- **traceability** — every subtask → acceptance criterion → file(s)
+- **vertical slices** — end-to-end increments, never layers
+- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+
+## When NOT to Use
+
+- No adapter supported by devflow is detected and user cannot identify the stack — resolve adapter choice first
+- `devflow.setup` already ran and only a specific managed section needs updating — pass `--force` and edit directly instead of re-running the full questionnaire (command is standalone, pre-pipeline)
+
+## Input
+
+- Optional `$ARGUMENTS`: `--force` (overwrite full files), `--mcp` (emit client-specific MCP configuration block per `@devflow/references/mcp-catalog.md`)
+
+## Managed block format (required)
+
+All generated sections must use this delimiter format:
+
+```markdown
+<!-- devflow-managed:start:<section-id> -->
+...managed content...
+<!-- devflow-managed:end:<section-id> -->
+```
+
+Never edit user content outside managed blocks unless `--force` is set.
+
+## Workflow
+
+### Step 1 - Resolve mode, apps, and adapter(s)
+
+1. Ask the user: "Single app, or multiple apps in this repo (monorepo)?" (`AskQuestion`, two options).
+
+**Single app** (unchanged from pre-monorepo behavior):
+
+1. Scan the consumer project root to detect the stack:
+   - If `pubspec.yaml` exists, adapter is `flutter`.
+   - If `angular.json` exists, or `analog` / `@angular/core` are in `package.json`, adapter is `angular`.
+   - If `next.config.js`, `next.config.mjs`, or `next.config.ts` exists, or `next` is in `package.json`, adapter is `nextjs`.
+   - If `nest-cli.json` exists, or `@nestjs/core` is in `package.json`, adapter is `nestjs`.
+2. If the stack cannot be detected automatically, ask the user: "What stack are you using? (Available adapters: angular, flutter, nextjs, nestjs)" and wait for their choice.
+3. Overwrite `@devflow/config.md` with the resolved adapter — template: `references/config-template.md` § Single app.
+
+**Monorepo:**
+
+1. Loop: ask for one app's name (kebab-case) + path (relative, e.g. `apps/web/`) at a time; after each, ask "add another app?" — repeat until user stops. Require ≥2 declared apps (1 app → fall back to single-app flow). Apps are **declared explicitly by the user** — never auto-scan the repo tree or infer apps from folder names.
+2. For each declared app, run the single-app detection heuristic scoped to that app's directory (e.g. `<path>/pubspec.yaml`); if undetectable, ask the user for that app's stack.
+3. Overwrite `@devflow/config.md` with the Apps table — template: `references/config-template.md` § Monorepo.
+
+**Both modes — build adapter contract paths:**
+`@devflow/adapters/<adapter>/ADAPTER.md` (core) and `@devflow/adapters/<adapter>/steps/setup.md` (setup templates + dependencies; legacy adapters keep all sections in `ADAPTER.md`). Monorepo builds a list of `(app, adapter, adapter_root)` tuples and repeats Steps 2–7c per app unless noted.
+
+### Step 2 - Load contract and templates
+
+Monorepo: repeat this step once per declared app, using that app's own adapter.
+
+1. Read adapter contract files (core + setup step file).
+2. Read `Setup dependencies` section from `@devflow/adapters/<adapter>/steps/setup.md` (legacy: `ADAPTER.md`) and extract:
+   - JavaScript package list (runtime + dev where applicable)
+   - Flutter package list (`dependencies`, `dev_dependencies` if explicitly declared)
+   - Optional adapter notes for setup installs
+3. Resolve template directory in this order:
+   - `@devflow/adapters/<adapter>/templates/` (preferred)
+   - `@devflow/skills/devflow-setup/templates/` (fallback)
+4. Read all templates from chosen directory:
+   - `AGENTS.template.md`
+   - `REGISTRY.template.md`
+   - `PRODUCT.template.md`
+   - `CONSTITUTION.template.md`
+
+If preferred directory missing, report fallback in final response.
+If `Setup dependencies` is missing in adapter contract, report this as a setup contract error and stop.
+
+### Step 3 - Mandatory full questionnaire (always)
+
+Before rendering any file, run a complete questionnaire to collect all values required by all templates.
+Do not skip this step even if values can be inferred.
+
+Collection order:
+
+1. Prefer `AskQuestion` for structured choices.
+2. Use concise chat questions for free text fields.
+3. Confirm ambiguous answers once, then proceed.
+
+Rules:
+
+- Always ask for every field listed in **Placeholder map**.
+- If user refuses or does not know, store `[TODO: fill]`.
+- Keep questions short and grouped by topic (product, conventions, patterns, commands, architecture).
+- Monorepo: product-level fields (`project-name`, `product-domain`, `target-users`, `primary-outcome`, feature rows) are asked **once, globally**. Adapter-scoped fields (`layer-order`, `layer-N-*`, `naming-conventions`, `import-conventions`, `key-decisions`, `format-cmd`, `analyze-cmd`, `test-cmd`, `pattern-1/2`) are asked **once per declared app** — group by app when asking, don't interleave.
+
+### Step 3b - Codebase scan (optional, run after questionnaire)
+
+After collecting questionnaire answers, scan the live repo to ground REGISTRY.md in real patterns. Single-app: scan root = `.`. Monorepo: repeat this scan once per declared app, scan root = that app's Path — producing separate `pattern-1/2` and `naming-conventions` values per app instead of one global set.
+
+1. Run `Glob` on the adapter's primary feature directory relative to the scan root (e.g. `lib/features/*/` for Flutter, `src/app/*/` for Angular, `app/*/` or `src/app/*/` for Next.js) to enumerate existing feature/page folders
+2. Sample 2-3 existing file names from each folder to infer naming conventions in use
+3. For each observed pattern, extract: name, trigger condition (`when`), and example file path
+
+Use these observations to pre-fill `pattern-1`, `pattern-2` (and optionally `pattern-3`) in the placeholder map before rendering — replacing any questionnaire `[TODO: fill]` values for patterns with real examples from the repo.
+
+Sample 5-10 existing source files under the scan root to infer `naming-conventions`:
+
+- Extract file naming pattern (snake_case.dart, kebab-case.ts, PascalCase.tsx, etc.)
+- Extract class and top-level function naming from file headers
+- Pre-fill `naming-conventions` placeholder if a consistent pattern is found; otherwise leave `[TODO: fill]`
+
+If the feature directory does not exist or is empty, skip feature scan and use questionnaire values or adapter defaults for all constitution fields (that app's, in monorepo mode).
+
+### Step 4 - Build placeholder map from answers + context
+
+Build final values for template placeholders from:
+
+| Source | Extract | Required |
+| --- | --- | :---: |
+| `constitution.md` | architecture/layering, naming, default commands | no |
+| existing `docs/product.md` | product/app hints for continuity | no |
+| Adapter-defined project manifests (for example language/package manifests) | package/project name | no |
+| `@devflow/config.md` | adapter id (single-app) or Apps table (monorepo) | yes |
+| `@devflow/adapters/<adapter>/ADAPTER.md` + `steps/setup.md` | stack commands, key rules — per app in monorepo | yes |
+| **Mandatory questionnaire answers** | all unresolved placeholders | yes |
+
+If a value cannot be inferred, keep a literal placeholder token:
+`[TODO: fill]`.
+
+For constitution fields and the full required placeholder table, see `references/placeholder-map.md`.
+
+### Step 5 - Placeholder map (required)
+
+Collect and resolve every field in `references/placeholder-map.md` before render — adapter-scoped fields once per app in monorepo mode (§Step 3). Resolve `mcp-baseline` for `AGENTS.md` dynamically: include universal baseline (`context7`, `sequential-thinking`, code-index if present) and stack core tools (`dart`, `angular-cli`, `next-devtools`, `openapi`, `playwright`), but add conditional infrastructure servers ONLY when used in the project (`supabase` only if project uses Supabase; `postgres` only if project uses PostgreSQL; omit both if not used). Collect at least 3 features globally, regardless of mode. Ask: "List your key features (name, status, notes). Add as many as needed." Add one table row per feature; monorepo adds an **App** column too, left blank at setup time (no features exist yet — `devflow.task` fills it). `devflow.task` will maintain this table as features progress.
+
+### Step 6 - Render token-lean content
+
+Render all files by replacing `{{...}}` placeholders. Template files themselves are never forked or edited for monorepo support — the same `AGENTS.template.md` / `REGISTRY.template.md` / `PRODUCT.template.md` / `CONSTITUTION.template.md` render in both modes; only what gets written into the rendered output differs, per the rules below (this is orchestration logic, kept in this skill, not in the templates).
+
+Monorepo-specific rendering (single-app: skip this block, render exactly as before):
+
+- **`AGENTS.md`**: replace the stack/adapter line with one pointer line — `**Apps:** see @devflow/config.md → Apps table` — never duplicate the Apps table here.
+- **`REGISTRY.md`**: replace the `format-cmd`/`analyze-cmd`/`test-cmd` lines with one pointer line — `Per-app commands: see @devflow/config.md → Apps table + adapters/<adapter>/steps/*.md`. The **Patterns** table keeps one row per observed pattern but gains a leading **App** column (from Step 3b's per-app scan) since patterns genuinely differ per app.
+- **`constitution.md`**: render one `<!-- devflow-managed:start:constitution-shared -->` block for cross-app rules (branch/commit conventions, engineering principles that don't vary by stack), then render the template **once per declared app** into its own `<!-- devflow-managed:start:constitution-<app-name> -->` block, headed `## App: <name> (<adapter>)`, using that app's placeholder values (layer table, naming, import conventions, key decisions). Do not merge apps into one block.
+- **`docs/product.md`**: Feature status table header gains an **App** column (left blank — see Step 5).
+
+Token-efficiency & source-fidelity rules:
+
+- imperative short lines; no filler or empty emphasis (`crucial`, `robust`, `seamless`)
+- preserve exact commands, paths, and symbols from codebase scan; use `[TODO: fill]` over invented conventions
+- never restate section headings in opening sentences
+- keep section count fixed to template structure
+
+Budget targets:
+
+- `AGENTS.md`: under ~300 tokens
+- `REGISTRY.md`: under ~600 tokens
+- `docs/product.md`: under ~700 tokens
+- `constitution.md`: under ~530 tokens
+
+### Step 6b - Token budget check (after render, before write)
+
+After rendering each file, estimate token count using word count as proxy (300 words ≈ 400 tokens):
+
+- `AGENTS.md`: warn if rendered content exceeds ~225 words
+- `REGISTRY.md`: warn if rendered content exceeds ~450 words
+- `docs/product.md`: warn if rendered content exceeds ~525 words
+- `constitution.md`: warn if rendered content exceeds ~400 words
+
+If over budget, trim in order: (1) replace long explanations with imperative fragments, (2) remove sentences starting with "This section..." or "Note that...", (3) deduplicate skill paths.
+
+Monorepo: budgets apply to each rendered file as a whole (all apps combined) — `constitution.md`'s per-app blocks share the one ~530-token/~400-word budget for the file; trim the largest app block first if over.
+
+Log the final word count per file in the Step 8 summary.
+
+### Step 7 - Write files
+
+Target location: consumer project root. Same rules for all four files (`AGENTS.md`, `REGISTRY.md`, `docs/product.md`, `constitution.md`):
+
+- file missing: create from rendered template (`docs/product.md` and `constitution.md`: always create if missing)
+- file exists, no `--force`: replace only managed sections by matching `<section-id>`
+- file exists + `--force`: overwrite full file
+
+When non-force mode cannot find valid managed markers in an existing file (`docs/product.md`, `constitution.md`):
+
+- Marker-less DevFlow-looking content present (headings matching template sections — pre-marker leftovers)? → stop, list conflicts, ask user: replace with managed blocks or append fresh. Never guess; never leave two copies of same section (plugin `CONTRIBUTING.md` → **Managed-Section Discipline**)
+- Otherwise append rendered managed blocks to the end of the file; do not rewrite existing user sections
+
+### Step 7b - Gitignore (runtime artifacts)
+
+Ensure `.devflow-state.json` is listed in consumer `.gitignore`. If missing, append `# devflow runtime state` and `.devflow-state.json`. Skip if already present or if `.gitignore` does not exist (handled by `pre-compact`).
+
+### Step 7c - Install adapter setup dependencies (required)
+
+After successful file writes, install dependencies declared in the active adapter `Setup dependencies` section. Single-app: install from the consumer project root. Monorepo: install once per declared app, from that app's own directory (its own `package.json`/`pubspec.yaml` lives there, not at repo root). Full rules: `references/dependency-install.md`.
+
+### Step 8 - Notify user
+
+Respond using the template in `references/notify-template.md`. If `--mcp` in `$ARGUMENTS`: emit ready-to-copy client MCP config JSON (Antigravity `mcp_config.json` or Claude Code `.mcp.json`) and offer to write it.
+
+## Output quality checklist
+
+Before final response:
+
+- [ ] all four files exist in consumer root (AGENTS.md, REGISTRY.md, docs/product.md, constitution.md)
+- [ ] managed markers are valid and paired
+- [ ] non-managed user content preserved (unless `--force`)
+- [ ] adapter setup dependencies installed (or explicit skip reason reported)
+- [ ] no verbose filler added
+- [ ] unresolved values listed as `[TODO: fill]`
+- [ ] constitution.md layer table has at least one row per adapter layer (per declared app, in monorepo)
+- [ ] all constitution `{{placeholder}}` tokens are resolved or marked `[TODO: fill]`
+- [ ] monorepo: `@devflow/config.md` Apps table has ≥2 rows, each with a distinct Path; single-app: unchanged 2-field shape
+
+## Anti-Patterns
+
+Key anti-patterns (full catalog: `@devflow/skills/devflow-setup/references/setup-anti-patterns.md`):
+
+| Anti-Pattern | Fix |
+| --- | --- |
+| Writing files inside `devflow/features/` | Write only to consumer root; `devflow/` is read-only. |
+| Skipping questionnaire and guessing adapter | Always run full questionnaire; no silent defaults. |
+| Regenerating files without `--force` | Check managed markers; preserve user content. |
+| Installing dependencies globally | Use project package manager (`pnpm add`, `flutter pub add`). |
+| Generating marker-less content | Wrap all managed content with `<!-- devflow-managed:start / :end -->`. |
+| Auto-scanning tree for apps in monorepo | Apps are declared explicitly by user — ask, never infer. |
+
+## I/O Reference
+
+| | |
+| --- | --- |
+| Reads | `@devflow/config.md`, `references/config-template.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/setup.md` (including `Setup dependencies`) — per declared app in monorepo mode, adapter + fallback templates |
+| Reads | `@devflow/skills/devflow-setup/references/setup-anti-patterns.md` (Anti-patterns catalog) |
+| Writes | `AGENTS.md`, `REGISTRY.md`, `docs/product.md` (consumer project root); `@devflow/config.md`; `.gitignore` (appends `.devflow-state.json` if missing) |
+| Side effects | Installs adapter setup dependencies using project package manager or Flutter pub |
+| Next step | `devflow.task` |

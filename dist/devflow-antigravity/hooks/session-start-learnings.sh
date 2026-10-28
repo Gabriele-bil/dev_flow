@@ -1,0 +1,136 @@
+#!/bin/bash
+# session-start-learnings.sh — SessionStart hook: inject project instincts into session context.
+# Reads .devflow-instincts.yaml (auto-migrating from .devflow-learnings.jsonl if needed).
+# Output: lib/emit.sh df_context (SessionStart additionalContext); silent if none.
+# Missing yq: one-line notice so the user knows instincts are disabled.
+
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOK_DIR/lib/payload.sh"
+. "$HOOK_DIR/lib/emit.sh"
+
+df_read_input || exit 0
+DF_EVENT="${DF_EVENT:-SessionStart}"
+
+WORKSPACE_ROOT="$DF_WORKSPACE"
+INSTINCTS_SHARED="${DEVFLOW_INSTINCTS_SHARED:-$WORKSPACE_ROOT/.devflow-instincts.shared.yaml}"
+INSTINCTS_FILE="${DEVFLOW_INSTINCTS_FILE:-$WORKSPACE_ROOT/.devflow-instincts.yaml}"
+LEARNINGS_LOG="${DEVFLOW_LEARNINGS_LOG:-$WORKSPACE_ROOT/.devflow-learnings.jsonl}"
+MAX_SHOW=6
+MIN_CONFIDENCE="0.4"
+
+# Guard: yq required — say so once per session when the project has instincts
+if ! command -v yq >/dev/null 2>&1; then
+  if [ -f "$INSTINCTS_FILE" ] || [ -f "$INSTINCTS_SHARED" ] || [ -f "$LEARNINGS_LOG" ]; then
+    df_notify "devflow: yq not installed — project instincts are disabled (brew install yq)."
+  fi
+  exit 0
+fi
+
+# ── Auto-migrate from old JSONL format (one-time) ────────────────────────────
+if [ ! -f "$INSTINCTS_FILE" ] && [ ! -f "$INSTINCTS_SHARED" ] && [ -f "$LEARNINGS_LOG" ] && [ -s "$LEARNINGS_LOG" ]; then
+  YAML_OUT="# DevFlow project instincts — auto-migrated from .devflow-learnings.jsonl"$'\n'"instincts:"
+
+  while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    TYPE=$(printf '%s' "$line" | jq -r '.type // "lesson"' 2>/dev/null) || continue
+    NOTE=$(printf '%s' "$line" | jq -r '.note // ""'       2>/dev/null) || continue
+    FILE=$(printf '%s' "$line" | jq -r '.file // ""'       2>/dev/null) || true
+    TS=$(printf '%s'   "$line" | jq -r '.ts // ""'         2>/dev/null) || true
+    [ -z "$NOTE" ] && continue
+
+    # Trigger and id
+    if [ -n "$FILE" ]; then
+      TRIGGER="when editing $FILE"
+      ID_SLUG=$(printf '%s' "$FILE" | tr '[:upper:]' '[:lower:]' \
+        | sed 's/[^a-z0-9]/-/g; s/--*/-/g; s/^-//; s/-$//')
+      INSTINCT_ID="churn-${ID_SLUG}"
+    else
+      TRIGGER="when working on this project"
+      ID_SLUG=$(printf '%s' "$NOTE" | tr '[:upper:]' '[:lower:]' \
+        | sed 's/[^a-z0-9]/-/g; s/--*/-/g; s/^-//; s/-$//' \
+        | cut -c1-40 | sed 's/-$//')
+      INSTINCT_ID="migrated-${ID_SLUG}"
+    fi
+
+    # Confidence by type
+    case "$TYPE" in
+      churn_file) CONF=0.5  ;;
+      quirk)      CONF=0.6  ;;
+      lesson)     CONF=0.65 ;;
+      warning)    CONF=0.7  ;;
+      *)          CONF=0.6  ;;
+    esac
+
+    # Domain inference
+    DOMAIN="general"
+    case "$FILE" in *.dart)     DOMAIN="flutter"    ;; esac
+    case "$FILE" in *.ts|*.tsx) DOMAIN="typescript" ;; esac
+    case "$FILE" in *.py)       DOMAIN="python"     ;; esac
+    case "$FILE" in *.sh)       DOMAIN="shell"      ;; esac
+    case "$FILE" in *devflow*)  DOMAIN="devflow"    ;; esac
+
+    SAFE_NOTE=$(printf '%s'    "$NOTE"    | sed 's/"/\\"/g')
+    SAFE_TRIGGER=$(printf '%s' "$TRIGGER" | sed 's/"/\\"/g')
+    TS_VAL="${TS:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")}"
+
+    YAML_OUT="${YAML_OUT}"$'\n'"  - id: ${INSTINCT_ID}"
+    YAML_OUT="${YAML_OUT}"$'\n'"    trigger: \"${SAFE_TRIGGER}\""
+    YAML_OUT="${YAML_OUT}"$'\n'"    confidence: ${CONF}"
+    YAML_OUT="${YAML_OUT}"$'\n'"    domain: ${DOMAIN}"
+    YAML_OUT="${YAML_OUT}"$'\n'"    scope: project"
+    YAML_OUT="${YAML_OUT}"$'\n'"    action: \"${SAFE_NOTE}\""
+    YAML_OUT="${YAML_OUT}"$'\n'"    evidence: \"migrated from ${TYPE}\""
+    YAML_OUT="${YAML_OUT}"$'\n'"    ts: \"${TS_VAL}\""
+  done < "$LEARNINGS_LOG"
+
+  printf '%s\n' "$YAML_OUT" > "$INSTINCTS_FILE"
+  mv "$LEARNINGS_LOG" "${LEARNINGS_LOG}.migrated" 2>/dev/null || true
+fi
+
+# Guard: no instincts file or both empty
+HAS_SHARED=0
+HAS_LOCAL=0
+[ -f "$INSTINCTS_SHARED" ] && [ -s "$INSTINCTS_SHARED" ] && HAS_SHARED=1
+[ -f "$INSTINCTS_FILE" ] && [ -s "$INSTINCTS_FILE" ] && HAS_LOCAL=1
+
+if [ "$HAS_SHARED" -eq 0 ] && [ "$HAS_LOCAL" -eq 0 ]; then
+  exit 0
+fi
+
+# ── Read and merge instincts from shared and local stores ─────────────────────
+SHARED_JSON="[]"
+LOCAL_JSON="[]"
+
+if [ "$HAS_SHARED" -eq 1 ]; then
+  SHARED_JSON=$(yq -o=json '.instincts // [] | map(.scope = (.scope // "team"))' "$INSTINCTS_SHARED" 2>/dev/null || echo "[]")
+fi
+
+if [ "$HAS_LOCAL" -eq 1 ]; then
+  LOCAL_JSON=$(yq -o=json '.instincts // [] | map(.scope = (.scope // "local"))' "$INSTINCTS_FILE" 2>/dev/null || echo "[]")
+fi
+
+ENTRIES=$(
+  jq -rn --argjson shared "$SHARED_JSON" --argjson local "$LOCAL_JSON" \
+        --arg min "$MIN_CONFIDENCE" --arg max "$MAX_SHOW" '
+    ($shared + $local)
+    | group_by(.id) | map(.[0])
+    | map(select((.confidence // 0) >= ($min | tonumber)))
+    | sort_by(.confidence) | reverse
+    | .[0:($max | tonumber)]
+    | .[]
+    | (if .contested then "⚠ " else "• " end)
+      + "[" + (.confidence | tostring) + " " + (.domain // "general")
+      + (if .scope == "team" then " 👥 team" else " 🏠 local" end)
+      + "] " + .trigger + " → " + .action
+  ' 2>/dev/null
+) || true
+
+[ -z "$ENTRIES" ] && exit 0
+
+df_context "🧠 Project instincts (confidence ≥ 0.4):
+
+$ENTRIES
+
+Use /devflow.learn to manage instincts (log, search, list, prune, boost, promote)."
+
+exit 0

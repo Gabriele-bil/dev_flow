@@ -1,0 +1,494 @@
+# DevFlow Plugin Catalog
+# Machine-readable index of all pipeline components.
+# Updated manually when commands/skills/agents are added or removed.
+# Drift guard: scripts/run-evals.sh check 3 diffs catalog IDs/paths against the
+# filesystem (skills, adapters, agents, references, commands) and fails on mismatch.
+
+name: devflow
+version: "1.19.0"
+description: "Spec-driven development pipeline: task → [clarify] → plan → [analyze] → implement → beautify → test → ship → pr"
+
+pipeline:
+  steps:
+    - id: init
+      command: /devflow.init
+      skill: devflow-init
+      description: "End-to-end greenfield project bootstrap: upfront long-process notice, multi-phase interview, evergreen technology scaffolding (Nx, Angular, Next.js, Flutter, NestJS), DevFlow context + ADR-001 generation, and topological multi-task roadmap (001..NNN)"
+    - id: discover
+      command: /devflow.discover
+      skill: devflow-discover
+      description: "Interactive architectural discovery for greenfield app creation or complex features: explores technical alternatives, evaluates trade-offs, and generates formal ADR in docs/adr/"
+    - id: setup
+      command: /devflow.setup
+      skill: devflow-setup
+      description: "Generate or update AGENTS.md, REGISTRY.md, and docs/product.md in the consumer project root from adapter templates with a mandatory full questionnaire"
+    - id: blueprint
+      command: /devflow.blueprint
+      skill: devflow-blueprint
+      description: "Optional macro step before task for large objectives: transforms the objective into a multi-PR blueprint with dependency graph and parallel-step detection; each step then runs its own task → plan → implement cycle"
+    - id: task
+      command: /devflow.task
+      skill: devflow-task
+      description: "Transforms a raw idea into a structured DevFlow task by reading product and architecture context, optionally stress-testing scope, and generating a user story with HMW framing, scope boundaries, key assumptions, and verifiable subtasks"
+    - id: clarify
+      command: /devflow.clarify
+      skill: devflow-clarify
+      description: "Optional step between task and plan: resolves [NEEDS CLARIFICATION: ...] markers in task.md via incremental Q&A (8D scan, up to 5 questions) and sets Status clarified"
+    - id: plan
+      command: /devflow.plan
+      skill: devflow-plan
+      description: "Transforms a structured DevFlow task into a detailed, file-oriented implementation plan for devflow.implement"
+    - id: analyze
+      command: /devflow.analyze
+      skill: devflow-analyze
+      description: "Optional read-only consistency check between plan and implement: flags traceability gaps, untestable acceptance criteria, terminology drift, and constitution violations across task.md + plan.md + constitution.md"
+    - id: implement
+      command: /devflow.implement
+      skill: devflow-implement
+      description: "Implements all files defined in a DevFlow plan using project architecture conventions, MCP-assisted API validation, and verification steps"
+    - id: beautify
+      command: /devflow.beautify
+      skill: devflow-beautify
+      description: "Reviews and improves devflow.implement output across correctness, readability, security, performance, architecture compliance, and UI consistency"
+    - id: test
+      command: /devflow.test
+      skill: devflow-test
+      description: "Writes and executes unit and integration tests for the current DevFlow feature using the active adapter targets, with bounded retry handling and standardized reporting"
+    - id: pr
+      command: /devflow.pr
+      skill: devflow-pr
+      description: "Commits all changes, pushes the current DevFlow feature branch, and opens a pull request toward the repo's default branch"
+
+  orchestrator:
+    command: /devflow.ship
+    skill: devflow-ship
+    description: "Pre-merge gate before devflow.pr. Dispatches 1–5 review agents in parallel per complexity profile (quick: code-reviewer; standard: + security-auditor, test-engineer; thorough: + accessibility-auditor, docs-reviewer), synthesizes reports, and routes to devflow.pr if no blockers"
+
+  utility:
+    - command: /devflow.status
+      skill: devflow-status
+      description: "Show current pipeline state — active feature, progress, next step, adapter"
+    - command: /devflow.learn
+      skill: devflow-learn
+      description: "Manage local and team instincts — log, search, list, check (Rigor check_cmd/ratchet), prune, boost, promote to team store and REGISTRY.md"
+    - command: /devflow.lint-skills
+      script: scripts/validate-skills.sh
+      description: "Validate all SKILL.md files for required structure (frontmatter, sections, style)"
+    - command: /devflow.recovery
+      skill: devflow-recovery
+      description: "Diagnose and recover a stuck or corrupted DevFlow pipeline — reads state, observe log, and feature files to identify failure and propose a targeted recovery"
+    - command: /devflow.resume
+      skill: devflow-resume
+      description: "Resume an interrupted DevFlow session — read saved state, cross-check plan.md markers, confirm position, re-enter the correct pipeline step"
+    - command: /devflow.run
+      skill: devflow-run
+      description: "Chain implement → beautify → test as one unattended session — decision flags instead of pauses, consolidated report, stop before ship"
+    - command: /devflow.auto
+      skill: devflow-auto
+      description: "Full-cycle autonomous delivery: chains task → plan → analyze → implement → beautify → test → ship → pr in total autonomy from idea to opened pull request"
+    - command: /devflow.backprop
+      skill: devflow-backprop
+      description: "Backpropagate a bug or failing test into the spec — trace to acceptance criterion, classify the gap, tighten task.md, add regression test"
+    - command: /devflow.worktree
+      skill: devflow-worktree
+      description: "Create, list, or remove isolated git worktrees for parallel feature development, with automatic dev-server port-offset assignment and overlap detection"
+    - command: /devflow.doctor
+      skill: devflow-doctor
+      description: "Diagnose environment readiness, MCP servers reachability, CLI toolchains, and pipeline state integrity"
+    - command: /devflow.rollback
+      skill: devflow-rollback
+      description: "Roll back the active DevFlow step (implement or beautify) to its pre-step checkpoint without corrupting pipeline state"
+    - command: /devflow.hotfix
+      skill: devflow-hotfix
+      description: "Fast-track pipeline for critical bugfixes, targeted patches, or hotfixes — compact task+plan, implement, targeted test, and quick ship gate directly to PR"
+    - command: /devflow.metrics
+      skill: devflow-metrics
+      description: "Display token savings dashboard, estimated cost per feature, pass@1 success rate, and step durations"
+    - command: /devflow.board
+      skill: devflow-board
+      description: "Generate and auto-sync a deterministic, static, read-only HTML project board in devflow/board/index.html showing tasks, Kanban pipeline, dependency DAG, Markdown docs, and command timings"
+
+agents:
+  - id: code-reviewer
+    path: agents/code-reviewer.md
+    description: "Staff-engineer-level code reviewer. Seven-axis review across correctness, readability, architecture, security, performance, scope fidelity, simplicity. Use before merge or via devflow.ship fan-out"
+    invoked_by: devflow.ship
+  - id: security-auditor
+    path: agents/security-auditor.md
+    description: "Security engineer focused on exploitable vulnerabilities, threat modeling, and secure coding. Use for security-focused review or via devflow.ship fan-out"
+    invoked_by: devflow.ship
+  - id: test-engineer
+    path: agents/test-engineer.md
+    description: "QA engineer focused on test strategy, coverage gap analysis, and test quality. Use for coverage review, test design, or via devflow.ship fan-out"
+    invoked_by: devflow.ship
+  - id: accessibility-auditor
+    path: agents/accessibility-auditor.md
+    description: "Accessibility engineer focused on WCAG 2.1 AA compliance across keyboard/focus, screen readers, visual contrast, touch targets, and forms. Use for UI/component review or via devflow.ship fan-out"
+    invoked_by: devflow.ship
+  - id: docs-reviewer
+    path: agents/docs-reviewer.md
+    description: "Documentation engineer focused on public API coverage, accuracy, README/CHANGELOG sync, and plan traceability. Use for documentation drift review or via devflow.ship fan-out"
+    invoked_by: devflow.ship
+
+skills:
+  core:
+    - id: devflow-init
+      path: skills/devflow-init/SKILL.md
+      description: "Bootstraps greenfield projects end-to-end: conducts a multi-phase interview, scaffolds evergreen workspaces (Nx, Angular, Next.js, Flutter, NestJS), generates plugin context and ADR-001, and writes an ordered multi-task roadmap with inter-task dependencies. Use when user runs devflow.init or starts a brand-new project from scratch"
+    - id: devflow-discover
+      path: skills/devflow-discover/SKILL.md
+      description: "Guides architectural discovery for greenfield applications or complex features, compares technical options, and records decisions in ADRs. Use when exploring architecture choices, evaluating trade-offs, or before devflow.setup or devflow.task"
+    - id: devflow-setup
+      path: skills/devflow-setup/SKILL.md
+      description: "Generates or updates AGENTS.md, REGISTRY.md, and docs/product.md in the consumer project root from adapter templates using token-lean managed sections and a mandatory questionnaire"
+    - id: devflow-task
+      path: skills/devflow-task/SKILL.md
+      description: "Transforms a raw idea into a structured DevFlow task by reading product and architecture context, optionally stress-testing scope, and generating a user story with HMW framing, scope boundaries, key assumptions, and verifiable subtasks"
+    - id: devflow-plan
+      path: skills/devflow-plan/SKILL.md
+      description: "Transforms a structured DevFlow task into a detailed, file-oriented implementation plan for devflow.implement"
+    - id: devflow-implement
+      path: skills/devflow-implement/SKILL.md
+      description: "Implements all files defined in a DevFlow plan using project architecture conventions, MCP-assisted API validation, and verification steps"
+    - id: devflow-beautify
+      path: skills/devflow-beautify/SKILL.md
+      description: "Reviews and improves devflow.implement output across correctness, readability, security, performance, architecture compliance, and UI consistency"
+    - id: devflow-test
+      path: skills/devflow-test/SKILL.md
+      description: "Writes and executes unit and integration tests for the current DevFlow feature using the active adapter targets, with bounded retry handling and standardized reporting"
+    - id: devflow-pr
+      path: skills/devflow-pr/SKILL.md
+      description: "Commits all changes, pushes the current DevFlow feature branch, and opens a pull request toward the repo's default branch"
+    - id: devflow-learn
+      path: skills/devflow-learn/SKILL.md
+      description: "Manage local (.devflow-instincts.yaml) and team (.devflow-instincts.shared.yaml) instincts. Sub-commands: log, search, list, check (run Rigor check_cmd with optional ratchet_max), prune, boost, promote (team store + REGISTRY.md)"
+    - id: devflow-recovery
+      path: skills/devflow-recovery/SKILL.md
+      description: "Diagnoses and recovers a stuck or corrupted DevFlow pipeline. Reads state, observe log, and feature files to identify failure category and propose a targeted recovery action"
+    - id: devflow-resume
+      path: skills/devflow-resume/SKILL.md
+      description: "Resumes an interrupted DevFlow session — reads saved state, cross-checks plan.md markers, confirms resume position, re-enters correct pipeline skill"
+    - id: devflow-run
+      path: skills/devflow-run/SKILL.md
+      description: "Chains implement → beautify → test as one unattended session — autonomy policy table, decision flags instead of pauses, consolidated report, stops before ship"
+    - id: devflow-auto
+      path: skills/devflow-auto/SKILL.md
+      description: "Full-cycle autonomous delivery: chains task → plan → analyze → implement → beautify → test → ship → pr in total autonomy from idea to opened pull request"
+    - id: devflow-backprop
+      path: skills/devflow-backprop/SKILL.md
+      description: "Backpropagates a bug or failing test into the spec — traces failure to its acceptance criterion, classifies the gap, tightens task.md, adds regression test"
+    - id: devflow-blueprint
+      path: skills/devflow-blueprint/SKILL.md
+      description: "Transforms a large objective into a multi-PR blueprint with dependency graph, parallel-step detection, and adversarial review. For features requiring 3+ PRs, spanning sessions, or needing parallel workstreams"
+    - id: devflow-clarify
+      path: skills/devflow-clarify/SKILL.md
+      description: "Resolves [NEEDS CLARIFICATION: ...] markers in task.md via incremental Q&A — 8D scan, up to 5 questions, updates task.md, sets Status clarified"
+    - id: devflow-analyze
+      path: skills/devflow-analyze/SKILL.md
+      description: "Read-only consistency check across task.md + plan.md + constitution.md — flags traceability gaps, untestable acceptance criteria, terminology drift, layer violations. Runs after devflow.plan, before devflow.implement"
+    - id: devflow-ship
+      path: skills/devflow-ship/SKILL.md
+      description: "Pre-merge fan-out gate — dispatches 1–5 review agents per complexity profile, synthesizes a Ship Gate Report, routes to devflow.pr if clean"
+    - id: devflow-status
+      path: skills/devflow-status/SKILL.md
+      description: "Shows current DevFlow pipeline state — active feature, progress, next step, adapter. Supports --json for machine-readable output with stable exit codes"
+    - id: devflow-worktree
+      path: skills/devflow-worktree/SKILL.md
+      description: "Creates, lists, or removes isolated git worktrees for parallel feature development, with automatic dev-server port-offset assignment and overlap detection"
+    - id: devflow-doctor
+      path: skills/devflow-doctor/SKILL.md
+      description: "Pre-flight diagnostic tool for DevFlow. Checks MCP server reachability, CLI toolchains, active adapter configuration, and pipeline state integrity. Supports --json and --fix"
+    - id: devflow-rollback
+      path: skills/devflow-rollback/SKILL.md
+      description: "Roll back the active DevFlow step (implement or beautify) to its pre-step checkpoint without corrupting pipeline state"
+    - id: devflow-hotfix
+      path: skills/devflow-hotfix/SKILL.md
+      description: "Fast-track pipeline for critical bugfixes, targeted patches, or hotfixes — compact task+plan, implement, targeted test, and quick ship gate directly to PR"
+    - id: devflow-metrics
+      path: skills/devflow-metrics/SKILL.md
+      description: "Display token savings dashboard, estimated cost per feature, pass@k success rate, and step durations. Use when user runs devflow.metrics or inspects token efficiency"
+    - id: devflow-board
+      path: skills/devflow-board/SKILL.md
+      description: "Generates and auto-syncs a deterministic, static, read-only HTML project board in devflow/board/index.html visualizing Kanban task stages, dependency DAG critical path, formatted Markdown specs, and per-command execution timings. Use when user runs devflow.board, opens the visual project kanban board, or inspects task lead times"
+
+  adapters:
+    flutter:
+      path: adapters/flutter/ADAPTER.md
+      step_files:
+        - path: adapters/flutter/steps/setup.md
+        - path: adapters/flutter/steps/plan.md
+        - path: adapters/flutter/steps/implement.md
+        - path: adapters/flutter/steps/beautify.md
+        - path: adapters/flutter/steps/test.md
+        - path: adapters/flutter/steps/pr.md
+      skills:
+        - id: flutter-architecture
+          path: adapters/flutter/skills/flutter-architecture/SKILL.md
+          description: "Use when designing a new Flutter feature, reviewing cross-layer dependencies, deciding which layer owns a piece of logic, or scaffolding a feature's file tree against the DevFlow Riverpod stack"
+        - id: flutter-theme
+          path: adapters/flutter/skills/flutter-theme/SKILL.md
+          description: "Use when implementing or refactoring Flutter visual styling (colors, typography, radii, spacing, component themes, light/dark mode). Enforces theme-first UI, semantic Material 3 tokens, and scoped overrides only when unavoidable"
+        - id: flutter-form
+          path: adapters/flutter/skills/flutter-form/SKILL.md
+          description: "Use when implementing or refactoring Flutter forms with flutter_form_builder and form_builder_validators, including validation, submit flow, edit forms, and multi-step wizards"
+        - id: flutter-layout
+          path: adapters/flutter/skills/flutter-layout/SKILL.md
+          description: "Use when implementing or fixing Flutter widget layouts, especially with overflows, unbounded constraints, nested scrollables, alignment issues, or responsive/adaptive breakpoints"
+        - id: flutter-models
+          path: adapters/flutter/skills/flutter-models/SKILL.md
+          description: "Use when creating or refactoring Flutter domain entities, DTOs, enums, failures, and repository contracts. Applies to Freezed/json_serializable model design, JSON mapping boundaries, and immutable data patterns"
+        - id: flutter-riverpod
+          path: adapters/flutter/skills/flutter-riverpod/SKILL.md
+          description: "Use when implementing, refactoring, or debugging Flutter state management with Riverpod, especially for async state, invalidation/refresh, rebuild optimization, families, and provider testing"
+        - id: flutter-supabase
+          path: adapters/flutter/skills/flutter-supabase/SKILL.md
+          description: "Use when implementing or refactoring Flutter data/auth/storage/realtime code with Supabase. Covers provider-based client access, datasource boundaries, Postgrest query patterns, storage paths, realtime streams, RPC/functions, and repository error mapping"
+        - id: flutter-supabase-migrations
+          path: adapters/flutter/skills/flutter-supabase-migrations/SKILL.md
+          description: "Use when creating, reviewing, or applying Supabase database migrations, especially for remote schema changes, migration drift, RLS updates, and safe production rollout"
+
+    angular:
+      path: adapters/angular/ADAPTER.md
+      step_files:
+        - path: adapters/angular/steps/setup.md
+        - path: adapters/angular/steps/plan.md
+        - path: adapters/angular/steps/implement.md
+        - path: adapters/angular/steps/beautify.md
+        - path: adapters/angular/steps/test.md
+        - path: adapters/angular/steps/pr.md
+      skills:
+        - id: angular-animations
+          path: adapters/angular/skills/angular-animations/SKILL.md
+          description: "Angular v22+ DOM animations. Native CSS animate.enter/leave by default; @angular/animations DSL for pre-v20.2 only. Use for enter/leave, state transitions, or animation-library (GSAP) integration"
+        - id: angular-architecture
+          path: adapters/angular/skills/angular-architecture/SKILL.md
+          description: "Use when defining or refactoring Angular app architecture (folders, boundaries, dependency flow, root wiring). Enforces standalone + signals-first and Signal Store as single state standard for global and local state"
+        - id: angular-aria
+          path: adapters/angular/skills/angular-aria/SKILL.md
+          description: "Angular v22+ accessible widgets (Accordion, Listbox, Combobox, Menu, Tabs, Tree, Grid) via @angular/aria headless directives. Use for keyboard-navigable ARIA components"
+        - id: angular-routing
+          path: adapters/angular/skills/angular-routing/SKILL.md
+          description: "Angular v22+ routing — routes, guards, resolvers, navigation, SSR/hydration. Use for route config, lazy loading, protection, prefetch, or rendering decisions"
+        - id: angular-component
+          path: adapters/angular/skills/angular-component/SKILL.md
+          description: "Create modern Angular standalone components following v20+ best practices. Use for building UI components with signal-based inputs/outputs, OnPush change detection, host bindings, content projection, and lifecycle hooks"
+        - id: angular-forms
+          path: adapters/angular/skills/angular-forms/SKILL.md
+          description: "Build signal-based forms in Angular v21+ using the new Signal Forms API. Use for form creation with automatic two-way binding, schema-based validation, field state management, and dynamic forms"
+        - id: angular-http
+          path: adapters/angular/skills/angular-http/SKILL.md
+          description: "Implement HTTP data fetching in Angular v20+ using resource(), httpResource(), and HttpClient. Use for API calls, data loading with signals, request/response handling, and interceptors"
+        - id: angular-state
+          path: adapters/angular/skills/angular-state/SKILL.md
+          description: "Build Angular state with NgRx Signal Store using withState, withProps, withComputed, withMethods, rxMethod, and withEntities. Use for global/local feature stores, async state handling, derived state, HTTP orchestration, and entity CRUD"
+        - id: angular-testing
+          path: adapters/angular/skills/angular-testing/SKILL.md
+          description: "Write unit and integration tests for Angular v20+ applications using Vitest with TestBed and modern testing patterns. Use for testing components with signals, OnPush change detection, services with inject(), HTTP interactions, and router flows"
+        - id: angular-theme
+          path: adapters/angular/skills/angular-theme/SKILL.md
+          description: "Build and refactor Angular app theme with Tailwind and shared CSS layers. Use when defining global styles, component theme classes, design tokens, dark mode, or style architecture cleanup"
+
+    nextjs:
+      path: adapters/nextjs/ADAPTER.md
+      step_files:
+        - path: adapters/nextjs/steps/setup.md
+        - path: adapters/nextjs/steps/plan.md
+        - path: adapters/nextjs/steps/implement.md
+        - path: adapters/nextjs/steps/beautify.md
+        - path: adapters/nextjs/steps/test.md
+        - path: adapters/nextjs/steps/pr.md
+      skills:
+        - id: nextjs-architecture
+          path: adapters/nextjs/skills/nextjs-architecture/SKILL.md
+          description: "App Router folder structure, route segments, layout nesting, and server/client boundary discipline. Load when creating or refactoring routes, layouts, or feature folder organization"
+        - id: nextjs-server
+          path: adapters/nextjs/skills/nextjs-server/SKILL.md
+          description: "Server Components, Server Actions, API Routes, and data fetching with Next.js cache extensions. Load when touching files with 'use server' directive, app/api/** routes, or **/actions.ts files"
+        - id: nextjs-components
+          path: adapters/nextjs/skills/nextjs-components/SKILL.md
+          description: "Client Components with 'use client' directive, React hooks, interactivity patterns, and context providers. Load when touching files containing 'use client' directive"
+        - id: nextjs-state
+          path: adapters/nextjs/skills/nextjs-state/SKILL.md
+          description: "Zustand client state management — stores, middleware, selectors, and decision matrix for choosing state location. Load when touching store.ts, *Store.ts, or use*Store.ts files"
+        - id: nextjs-ui
+          path: adapters/nextjs/skills/nextjs-ui/SKILL.md
+          description: "shadcn/ui components, Tailwind CSS styling, design tokens, dark mode with next-themes, and responsive layout. Load when touching components/ui/** files or components importing from @/components/ui"
+        - id: nextjs-forms
+          path: adapters/nextjs/skills/nextjs-forms/SKILL.md
+          description: "React Hook Form with Zod validation, shadcn/ui Form components, and Server Action integration. Load when touching files with useForm, zodResolver, or z.object patterns"
+        - id: nextjs-metadata
+          path: adapters/nextjs/skills/nextjs-metadata/SKILL.md
+          description: "Metadata API, SEO, OG images, file-based metadata. Load when touching generateMetadata, opengraph-image, or head files"
+        - id: nextjs-performance
+          path: adapters/nextjs/skills/nextjs-performance/SKILL.md
+          description: "next/image, next/font, next/script, bundling gotchas. Load when touching img tags, font imports, script tags, or next.config.ts"
+        - id: nextjs-testing
+          path: adapters/nextjs/skills/nextjs-testing/SKILL.md
+          description: "Jest + React Testing Library for Next.js — Client Components, Server Components, Server Actions, API Routes, and Zustand stores. Load when touching *.test.tsx, *.test.ts, or __tests__/** files"
+
+    nestjs:
+      path: adapters/nestjs/ADAPTER.md
+      step_files:
+        - path: adapters/nestjs/steps/setup.md
+        - path: adapters/nestjs/steps/plan.md
+        - path: adapters/nestjs/steps/implement.md
+        - path: adapters/nestjs/steps/beautify.md
+        - path: adapters/nestjs/steps/test.md
+        - path: adapters/nestjs/steps/pr.md
+      skills:
+        - id: nestjs-architecture
+          path: adapters/nestjs/skills/nestjs-architecture/SKILL.md
+          description: "Module structure, dependency injection, injection tokens, provider scopes, circular deps, service boundaries. Load when creating or refactoring *.module.ts, *.service.ts, or any file wiring constructor DI"
+        - id: nestjs-error-handling
+          path: adapters/nestjs/skills/nestjs-error-handling/SKILL.md
+          description: "HTTP exceptions, exception filters, async error handling, structured logging. Load when creating or refactoring *.filter.ts, catch blocks, event handlers, scheduled tasks, or any file that throws/logs errors"
+        - id: nestjs-security
+          path: adapters/nestjs/skills/nestjs-security/SKILL.md
+          description: "Guards, JWT auth, rate limiting, input validation (DTOs/class-validator), output sanitization. Load when creating or refactoring *.guard.ts, auth strategies, DTOs, or any route accepting user input"
+        - id: nestjs-performance
+          path: adapters/nestjs/skills/nestjs-performance/SKILL.md
+          description: "Async lifecycle hooks, lazy module loading, query optimization, caching strategy, graceful shutdown. Load when profiling latency, touching lifecycle hooks, adding cache decorators, or handling SIGTERM/shutdown"
+        - id: nestjs-database
+          path: adapters/nestjs/skills/nestjs-database/SKILL.md
+          description: "TypeORM entities, migrations, transactions, N+1 avoidance, repository queries. Load when creating or refactoring *.entity.ts, migration files, or any repository/query-builder code"
+        - id: nestjs-api-design
+          path: adapters/nestjs/skills/nestjs-api-design/SKILL.md
+          description: "Response DTOs/serialization, interceptors, pipes, API versioning, OpenAPI docs. Load when creating or refactoring *.controller.ts, *.interceptor.ts, response DTOs, or @nestjs/swagger decorators"
+        - id: nestjs-testing
+          path: adapters/nestjs/skills/nestjs-testing/SKILL.md
+          description: "TestingModule unit tests, Supertest e2e tests, mocking external services/repositories. Load when creating or refactoring *.spec.ts, *.e2e-spec.ts, or test fixtures/mocks"
+        - id: nestjs-microservices
+          path: adapters/nestjs/skills/nestjs-microservices/SKILL.md
+          description: "MessagePattern/EventPattern communication, BullMQ background jobs, Terminus health checks. Load when creating or refactoring *.processor.ts, message/event handlers, or health controllers"
+
+    common:
+      skills:
+        - id: common-caveman
+          path: adapters/common/skills/common-caveman/SKILL.md
+          description: "Rewrite current response in caveman-speak — drop articles, filler, hedging; keep full technical accuracy. ~75% fewer output tokens. Single invocation — does not persist"
+        - id: common-clean-code
+          path: adapters/common/skills/common-clean-code/SKILL.md
+          description: "Enforce Clean Code, SOLID, and design principles across all technologies. Use when writing code, refactoring, designing architecture, or reviewing code quality"
+        - id: common-state-patterns
+          path: adapters/common/skills/common-state-patterns/SKILL.md
+          description: "Cross-adapter state management guide — Riverpod (Flutter), Signal Store (Angular), Zustand (Next.js). Use when choosing a state solution, designing state architecture, or diagnosing state-related bugs"
+        - id: common-web-interface-guidelines
+          path: adapters/common/skills/common-web-interface-guidelines/SKILL.md
+          description: "Audit UI files against Vercel Web Interface Guidelines — accessibility, design, UX best-practice review for web-facing adapters"
+
+references:
+  - id: security-checklist
+    path: references/security-checklist.md
+    description: "Stack-agnostic security checklist. Pre-commit checks, auth, input validation, OWASP Top 10 baseline. Use alongside devflow-beautify security axis and adapter data/auth skill"
+  - id: testing-patterns
+    path: references/testing-patterns.md
+    description: "Stack-agnostic testing patterns. AAA structure, Beyonce Rule, Prove-It Pattern, test pyramid. Use alongside devflow-test and adapter technology test skills"
+  - id: accessibility-checklist
+    path: references/accessibility-checklist.md
+    description: "Stack-agnostic accessibility checklist. WCAG 2.1 AA baseline covering keyboard/focus, screen readers, and touch targets. Stack-specific patterns in active ADAPTER.md"
+  - id: model-selection
+    path: references/model-selection.md
+    description: "Model selection guide — Haiku/Sonnet/Opus recommendations per DevFlow pipeline step. Use when declaring skill frontmatter model field or choosing model for a specific task"
+  - id: security-threat-model
+    path: references/security-threat-model.md
+    description: "AI agent threat model for DevFlow — attack surfaces (prompt injection, state corruption, memory poisoning, supply chain), safeguards, and incident response. Use during devflow-beautify security axis and devflow-ship review"
+  - id: state-machine
+    path: references/state-machine.md
+    description: "Pipeline state machine — canonical task.md/plan.md statuses, legal transitions, next-step mapping, state update snippet. State file schema, active feature resolution. Single source of truth for orientation, status, resume, recovery, and hooks"
+  - id: escalation-ladder
+    path: references/escalation-ladder.md
+    description: "Unified failure-handling ladder for implement/beautify/test — bounded retry, debug mode, re-approach, decompose, block with stuck-report. Replaces scattered retry-3× clauses"
+  - id: verification-levels
+    path: references/verification-levels.md
+    description: "Goal-backward verification for devflow-test Step 6b — four levels (existence, substantive, wired, runtime) checked per acceptance criterion, with verification.md report template"
+  - id: complexity-scoring
+    path: references/complexity-scoring.md
+    description: "Feature complexity score (0–20, five signals) mapped to quick/standard/thorough depth profiles. Written by devflow-plan Step 4d; read by beautify/test/ship to scale review axes, test scope, verification depth, and agent fan-out"
+  - id: status-schema
+    path: references/status-schema.md
+    description: "Machine-readable status schema for devflow.status --json — output fields, emitter snippet, stable exit codes (0 healthy, 1 no-pipeline, 2 inconsistent) for CI and scripts"
+  - id: token-economy
+    path: references/token-economy.md
+    description: "Token economy rules — index-first exploration decision tree (code-index MCP before grep/Read, trust results) and derive-don't-dump output discipline for build/test/diff steps"
+  - id: adapter-resolution
+    path: references/adapter-resolution.md
+    description: "Adapter and app resolution rules for single-app and monorepo mode — mode detection, adapter/app lookup from config.md and plan.md, working-directory scoping. Single source of truth for every skill that needs the active adapter"
+  - id: orientation
+    path: references/orientation.md
+    description: "Session-start routing tree — maps project state (config, task.md, plan.md Status, run marker, handoff) to the single correct pipeline entry point. Injected by SessionStart hook"
+  - id: run-mode
+    path: references/run-mode.md
+    description: "Run-mode contract shared by devflow.run and devflow.auto — marker arming, autonomy policy per orchestrator, decision-flag format, discrepancy classes, disarm rule"
+  - id: mcp-catalog
+    path: references/mcp-catalog.md
+    description: "Authoritative reference for Model Context Protocol (MCP) servers across DevFlow adapters — core principles, universal baseline, stack-specific core, conditional infrastructure, and client configs"
+
+hooks:
+  - event: SessionStart
+    script: hooks/session-start.sh
+    description: "Inject references/orientation.md routing tree (or compact pointer when state names next_step), suggest context file based on active pipeline step from .devflow-state.json"
+  - event: PreToolUse
+    matcher: "Write|Edit|MultiEdit"
+    script: hooks/pre-config-protect.sh
+    description: "Block modifications to linter/analyzer config files. Steers agent to fix code instead of weakening configs"
+  - event: PreToolUse
+    matcher: "*"
+    script: hooks/observe.sh
+    args: pre
+    async: true
+    description: "Log pre-tool-call events to .devflow-observe.jsonl for pattern analysis"
+  - event: PostToolUse
+    matcher: "*"
+    script: hooks/observe.sh
+    args: post
+    async: true
+    description: "Log post-tool-call events to .devflow-observe.jsonl for pattern analysis"
+  - event: PostToolUse
+    matcher: "Bash"
+    script: hooks/post-bash-output-filter.sh
+    description: "Compress verbose adapter command output (flutter/dart test-analyze, pnpm/npm/yarn/ng lint-test-build, git diff/log) past 2k chars — keeps head, error/warning lines, tail via updatedToolOutput"
+  - event: PreCompact
+    script: hooks/pre-compact.sh
+    description: "Snapshot plan.md [done]/[pending] progress before context compaction. Saves .devflow-state.json and injects resume reminder"
+  - event: PostToolUse
+    matcher: "Write|Edit|MultiEdit"
+    script: hooks/post-edit-accumulate.sh
+    async: true
+    description: "Accumulate modified file paths to .devflow-changed-files.tmp for batch format+typecheck at Stop time"
+  - event: PostToolUse
+    matcher: "Write"
+    script: hooks/post-task-create.sh
+    async: true
+    description: "After writing task.md under devflow/features/, update next_feature_number in .devflow-state.json to skip directory scan on next devflow.task"
+  - event: Stop
+    script: hooks/stop-format-typecheck.sh
+    description: "Run adapter format+analyze on files modified this response (dart format/analyze or pnpm lint/tsc)"
+  - event: Stop
+    script: hooks/stop-notify.sh
+    async: true
+    description: "Send macOS desktop notification when Claude finishes a response, showing next pipeline step and feature"
+  - event: Stop
+    script: hooks/stop-debug-check.sh
+    description: "Scan modified files for debug output (print() in Dart, console.log in TypeScript) and warn without blocking"
+  - event: Stop
+    script: hooks/stop-learn-distill.sh
+    description: "Distill learning signals from .devflow-observe.jsonl — detect file churn (≥4 edits), write deduplicated entries to .devflow-learnings.jsonl"
+  - event: Stop
+    script: hooks/observe.sh
+    args: stop
+    async: true
+    description: "Log response-boundary events to .devflow-observe.jsonl; emits strategic-compact advisory when tool-call count exceeds threshold"
+  - event: SessionStart
+    script: hooks/session-start-learnings.sh
+    description: "Inject past learnings from .devflow-learnings.jsonl into session context, filtered by active feature"
+
+contexts:
+  - id: implement
+    path: contexts/implement.md
+    suggested_for: [devflow.implement, devflow.beautify]
+  - id: review
+    path: contexts/review.md
+    suggested_for: [devflow.ship]
+  - id: research
+    path: contexts/research.md
+    suggested_for: [devflow.init, devflow.discover, devflow.task, devflow.plan]

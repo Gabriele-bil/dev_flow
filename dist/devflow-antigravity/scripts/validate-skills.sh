@@ -1,0 +1,242 @@
+#!/bin/bash
+# devflow skill validator
+# Checks all SKILL.md files for required structure.
+# Usage: bash scripts/validate-skills.sh [--strict]
+# Exit 0: all ok (or only warnings)
+# Exit 1: one or more SKILL.md missing required sections/frontmatter
+
+STRICT=false
+if [[ "$1" == "--strict" ]]; then
+  STRICT=true
+fi
+
+PLUGIN_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
+SKILL_FILES=()
+while IFS= read -r f; do
+  SKILL_FILES+=("$f")
+done < <(find "$PLUGIN_ROOT" -name "SKILL.md" | sort)
+
+TOTAL=${#SKILL_FILES[@]}
+OK=0
+ERRORS=0
+WARNINGS=0
+
+# Valid devflow.<verb> targets: every command, plus every core skill dir
+# (devflow-<name> -> devflow.<name>), even one without a matching command
+VALID_VERBS=$( { ls "$PLUGIN_ROOT/commands" 2>/dev/null | sed 's/\.md$//'; \
+  ls "$PLUGIN_ROOT/skills" 2>/dev/null | sed -E 's/^devflow-/devflow./'; } | sort -u)
+
+echo "Validating $TOTAL skill files..."
+echo ""
+
+for FILE in "${SKILL_FILES[@]}"; do
+  # Relative path for display
+  REL="${FILE#"$PLUGIN_ROOT/"}"
+
+  FILE_ERRORS=()
+  FILE_WARNINGS=()
+
+  # ── skip-validation check ────────────────────────────────────────────────────
+  if grep -qE '^skip-validation:[[:space:]]*true' "$FILE"; then
+    echo "✓ $REL (skip-validation)"
+    OK=$((OK + 1))
+    continue
+  fi
+
+  # ── Frontmatter check ────────────────────────────────────────────────────────
+  FIRST_LINE=$(head -1 "$FILE")
+  if [[ "$FIRST_LINE" != "---" ]]; then
+    FILE_ERRORS+=("missing YAML frontmatter (file must start with ---)")
+  else
+    # Extract frontmatter block (between first and second ---)
+    FRONTMATTER=$(awk '/^---/{count++; if(count==2) exit; next} count==1' "$FILE")
+
+    # Validate YAML syntax with real parser
+    if command -v ruby >/dev/null 2>&1; then
+      if ! echo "$FRONTMATTER" | ruby -ryaml -e 'YAML.safe_load(STDIN.read)' >/dev/null 2>&1; then
+        YAML_ERR=$(echo "$FRONTMATTER" | ruby -ryaml -e 'YAML.safe_load(STDIN.read)' 2>&1 | head -1)
+        FILE_ERRORS+=("invalid YAML syntax in frontmatter: $YAML_ERR")
+      fi
+    elif python3 -c "import yaml" >/dev/null 2>&1; then
+      if ! echo "$FRONTMATTER" | python3 -c "import sys, yaml; yaml.safe_load(sys.stdin)" >/dev/null 2>&1; then
+        YAML_ERR=$(echo "$FRONTMATTER" | python3 -c "import sys, yaml; yaml.safe_load(sys.stdin)" 2>&1 | head -1)
+        FILE_ERRORS+=("invalid YAML syntax in frontmatter: $YAML_ERR")
+      fi
+    fi
+
+    # name: must be present and non-empty
+    NAME_LINE=$(echo "$FRONTMATTER" | grep -E '^name:')
+    if [[ -z "$NAME_LINE" ]]; then
+      FILE_ERRORS+=("frontmatter missing required field: name")
+    else
+      NAME_VALUE=$(echo "$NAME_LINE" | sed 's/^name:[[:space:]]*//' | tr -d '"'"'")
+      if [[ -z "$NAME_VALUE" ]]; then
+        FILE_ERRORS+=("frontmatter field 'name' is empty")
+      elif ! echo "$NAME_VALUE" | grep -qE '^[a-z][a-z0-9-]*$'; then
+        FILE_ERRORS+=("frontmatter field 'name' is not kebab-case: $NAME_VALUE")
+      fi
+    fi
+
+    # description: must be present and non-empty
+    DESC_LINE=$(echo "$FRONTMATTER" | grep -E '^description:')
+    if [[ -z "$DESC_LINE" ]]; then
+      FILE_ERRORS+=("frontmatter missing required field: description")
+    else
+      DESC_VALUE=$(echo "$DESC_LINE" | sed 's/^description:[[:space:]]*//')
+      if [[ -z "$DESC_VALUE" ]]; then
+        FILE_ERRORS+=("frontmatter field 'description' is empty")
+      elif [[ "$STRICT" == true ]]; then
+        DESC_LEN=${#DESC_VALUE}
+        if [[ $DESC_LEN -lt 40 ]]; then
+          FILE_WARNINGS+=("style: description is $DESC_LEN chars (<40) — likely too generic to trigger reliably")
+        fi
+        if ! echo "$DESC_VALUE" | grep -qiE 'use when|when the user|when [a-z]+ing|when a |when this|triggers? (on|when|for)'; then
+          FILE_WARNINGS+=("style: description missing explicit trigger condition (expected phrasing like 'Use when ...')")
+        fi
+      fi
+    fi
+
+
+  fi
+
+  # ── Required sections check ──────────────────────────────────────────────────
+  # Adapter skills (adapters/*/skills/) use numbered-section reference format:
+  # only ## I/O Reference is required. Core skills (skills/) require full set.
+  if echo "$REL" | grep -q "^adapters/"; then
+    # Adapter skill: require only I/O Reference
+    if ! grep -qF "## I/O Reference" "$FILE"; then
+      FILE_ERRORS+=("missing section \"## I/O Reference\"")
+    fi
+  else
+    # Core skill: require Purpose + Core Principles + I/O Reference; Workflow OR any Step heading
+    for SECTION in "## Purpose" "## Core Principles" "## I/O Reference" "## Anti-Patterns"; do
+      if ! grep -qF "$SECTION" "$FILE"; then
+        FILE_ERRORS+=("missing section \"$SECTION\"")
+      fi
+    done
+    # Accept "## Workflow" or any "## Step N" as workflow section
+    if ! grep -qF "## Workflow" "$FILE" && ! grep -qE "^## Step [0-9]" "$FILE"; then
+      FILE_ERRORS+=("missing workflow section (add \"## Workflow\" or numbered \"## Step N\" headings)")
+    fi
+    # When NOT to Use: warning only (some meta-skills intentionally omit it)
+    if ! grep -qF "## When NOT to Use" "$FILE"; then
+      FILE_WARNINGS+=("missing recommended section \"## When NOT to Use\"")
+    fi
+  fi
+
+  # ── Style checks (--strict only) ─────────────────────────────────────────────
+  if [[ "$STRICT" == true ]]; then
+    # Lines starting with "This section..." or "Note that..."
+    if grep -qiE '^(This section|Note that)' "$FILE"; then
+      MATCHES=$(grep -inE '^(This section|Note that)' "$FILE" | head -3 | sed 's/^/      /')
+      FILE_WARNINGS+=("style: line(s) starting with 'This section...' or 'Note that...' (caveman-compress violation)")
+    fi
+
+    # Empty sections: a ## heading followed immediately by another ## heading or EOF
+    LINES=$(wc -l < "$FILE" | tr -d ' ')
+    while IFS= read -r LINE_NUM_CONTENT; do
+      LINE_NUM=$(echo "$LINE_NUM_CONTENT" | cut -d: -f1)
+      HEADING=$(echo "$LINE_NUM_CONTENT" | cut -d: -f2-)
+      NEXT_LINE_NUM=$((LINE_NUM + 1))
+      if [[ $NEXT_LINE_NUM -gt $LINES ]]; then
+        FILE_WARNINGS+=("style: empty section at end of file: $HEADING")
+      else
+        NEXT_CONTENT=$(sed -n "${NEXT_LINE_NUM}p" "$FILE")
+        if [[ -z "$NEXT_CONTENT" ]]; then
+          # Allow one blank line, check the line after
+          NEXT_LINE_NUM=$((LINE_NUM + 2))
+          NEXT_CONTENT=$(sed -n "${NEXT_LINE_NUM}p" "$FILE")
+        fi
+        if echo "$NEXT_CONTENT" | grep -qE '^## '; then
+          FILE_WARNINGS+=("style: empty section: $HEADING")
+        fi
+      fi
+    done < <(grep -nE '^## ' "$FILE")
+
+    # Line-count check: adapter skills hard cap 100 lines (CONTRIBUTING.md rule)
+    if echo "$REL" | grep -q "^adapters/" && [[ $LINES -gt 100 ]]; then
+      FILE_ERRORS+=("adapter SKILL.md is $LINES lines (>100) — move detail to references/<topic>.md in the skill dir and link it from SKILL.md")
+    fi
+
+    # Line-count check: core skills over budget should extract to references/
+    if ! echo "$REL" | grep -q "^adapters/" && [[ $LINES -gt 250 ]]; then
+      FILE_WARNINGS+=("style: SKILL.md is $LINES lines (>250) — extract detail to references/<file>.md")
+    fi
+
+    # Dead-reference check: every @devflow/<path> must resolve to a real file/dir
+    while IFS= read -r REF; do
+      [[ -z "$REF" ]] && continue
+      REF_PATH="${REF#@devflow/}"
+      [[ "$REF_PATH" == *"..."* ]] && continue
+      if [[ "$REF_PATH" == */ ]]; then
+        [[ -d "$PLUGIN_ROOT/$REF_PATH" ]] || FILE_ERRORS+=("dead reference: $REF (no such directory)")
+      else
+        [[ -f "$PLUGIN_ROOT/$REF_PATH" ]] || FILE_ERRORS+=("dead reference: $REF (no such file)")
+      fi
+    done < <(grep -Eo '@devflow/[A-Za-z0-9/_.-]+' "$FILE" | sort -u)
+
+    # Dead-reference check: every bare devflow.<verb> mention must be a real command or skill
+    while IFS= read -r VERB; do
+      [[ -z "$VERB" ]] && continue
+      echo "$VALID_VERBS" | grep -qxF "$VERB" || FILE_ERRORS+=("dead reference: $VERB (no matching command or skill)")
+    done < <(grep -Eo 'devflow\.[a-z][a-z-]*' "$FILE" | sort -u)
+
+    # Hardcoded-secret check (heuristic, warning only — avoid false-positive CI breaks)
+    if grep -qEn "AKIA[0-9A-Z]{16}|sk-[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|(api[_-]?key|secret|password)[[:space:]]*[:=][[:space:]]*['\"][A-Za-z0-9_/+.=-]{16,}['\"]" "$FILE"; then
+      FILE_WARNINGS+=("security: possible hardcoded secret — review before committing")
+    fi
+
+    # Clarity & Markdown checks: trailing empty table column on separator row (e.g. "|---|---| |")
+    if grep -qE '^\|([[:space:]]*:?-+:[[:space:]]*\|)+[[:space:]]*\|[[:space:]]*$' "$FILE"; then
+      FILE_WARNINGS+=("style: malformed markdown table (trailing empty column '| |' on separator row)")
+    fi
+
+    # Clarity & Language check: non-English (Italian) prose tokens in SKILL.md
+    if grep -qiE '\b(solo i|vietato|avvolgili|causati|sposta|invece|per siti|genera più|dividi|dove sono nel|non fare così|intera page|invalido|non funziona|genitore|tabella tipi|silenzioso|istanza|definisci|correggi|estensioni|obbligatorio)\b' "$FILE"; then
+      FILE_WARNINGS+=("style: non-English (Italian) text detected — all SKILL.md prose must be in English")
+    fi
+
+    # Clarity check: AI-slop model_lexis / stock closers (excluding lines that explicitly ban/flag them)
+    SLOP_HITS=$(grep -inE '\b(delve|delves|delving|tapestry|testament|synergy|pivotal|transformative|seamlessly|leverages|leveraging|underscores|underscoring|in conclusion|to summarize|at the end of the day|it is worth noting|it goes without saying)\b' "$FILE" \
+      | grep -ivE '(never|zero|no |avoid|forbid|flag|ban|booster|slop|anti-pattern|vague)' || true)
+    if [[ -n "$SLOP_HITS" ]]; then
+      FIRST_HIT=$(echo "$SLOP_HITS" | head -1)
+      FILE_WARNINGS+=("clarity: model_lexis / stock phrase detected ($FIRST_HIT) — state concrete mechanism instead")
+    fi
+
+    # Clarity check: chatbot send-offs / assistant residue (Rule 16: Stop where the thought stops)
+    if grep -qiE '\b(I hope this helps|let me know if you|feel free to|happy to help|Review the PR link above!)\b' "$FILE"; then
+      FILE_WARNINGS+=("clarity: chatbot send-off / residue detected — stop where the thought stops")
+    fi
+  fi
+
+  # ── Output for this file ─────────────────────────────────────────────────────
+  if [[ ${#FILE_ERRORS[@]} -gt 0 ]]; then
+    echo "✗ $REL"
+    for ERR in "${FILE_ERRORS[@]}"; do
+      echo "    ERROR: $ERR"
+    done
+    for WARN in "${FILE_WARNINGS[@]}"; do
+      echo "    WARN: $WARN"
+    done
+    ERRORS=$((ERRORS + 1))
+  elif [[ ${#FILE_WARNINGS[@]} -gt 0 ]]; then
+    echo "⚠ $REL"
+    for WARN in "${FILE_WARNINGS[@]}"; do
+      echo "    WARN: $WARN"
+    done
+    WARNINGS=$((WARNINGS + 1))
+  else
+    echo "✓ $REL"
+    OK=$((OK + 1))
+  fi
+done
+
+echo ""
+echo "Results: $OK ok, $ERRORS error(s), $WARNINGS warning(s)"
+
+if [[ $ERRORS -gt 0 ]]; then
+  exit 1
+fi
+exit 0

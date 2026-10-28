@@ -235,7 +235,7 @@ Il problema di fondo è uno solo: **c'è un solo `hooks.json`, scritto per Claud
 
 🔴 `AGY` ✅ **Gli hook non vengono installati con il comando documentato.**
 
-- **Evidenza:** `agy plugin validate ./dist/devflow` riporta `hooks : skipped (not found)`, perché Antigravity cerca `hooks.json` nella radice del plugin. Solo `scripts/install-plugin.sh` (radice del repo) copia `hooks/hooks.antigravity.json` in `hooks.json`. Il README indica invece `agy plugin install ./dist/devflow`, che non installa nessun hook.
+- **Evidenza:** `agy plugin validate ./dist/devflow` riporta `hooks : skipped (not found)`, perché Antigravity cerca `hooks.json` nella radice del plugin. Solo `scripts/install-plugin.sh` (radice del repo) copia *hooks/hooks.antigravity.json* in `hooks.json`. Il README indica invece `agy plugin install ./dist/devflow`, che non installa nessun hook.
 - **Correzione:** fare generare a `build-antigravity.sh` direttamente *dist/devflow/hooks.json* (nuovo). Claude Code legge `hooks/hooks.json` e ignora il file nella radice. Allineare README e `install-plugin.sh`.
 
 ### A-2

@@ -5,7 +5,8 @@
 # Claude Code stdin:  { hook_event_name, session_id, cwd, transcript_path,
 #                       tool_name, tool_input, tool_response }
 # Antigravity stdin:  { conversationId, workspacePaths[], transcriptPath,
-#                       lastUserInput, modelName, ... } — event name comes from
+#                       lastUserInput, modelName, toolCall: {name, args},
+#                       error (PostToolUse), ... } — event name comes from
 #                       DEVFLOW_EVENT (set by the generated hooks.json); hook
 #                       cwd is the plugin dir, so the workspace comes from
 #                       workspacePaths[0].
@@ -39,7 +40,7 @@ df_read_input() {
         @sh "DF_FILE=\($i.file_path // $i.FilePath // $i.TargetFile // $i.Path // $i.AbsolutePath // $i.notebook_path // $i.path // "")",
         @sh "DF_CMD=\($i.command // $i.CommandLine // $i.Command // "")",
         @sh "DF_URL=\($i.url // $i.Url // "")",
-        @sh "DF_IS_ERROR=\(if $err != null then ($err | tostring) elif (.hook_event_name // "") == "PostToolUseFailure" then "true" else "" end)",
+        @sh "DF_IS_ERROR=\(if $err != null then ($err | tostring) elif (.hook_event_name // "") == "PostToolUseFailure" then "true" elif (.error | type) == "string" and has("toolCall") then (.error != "" | tostring) else "" end)",
         @sh "DF_SESSION=\(.session_id // .conversationId // "")",
         @sh "DF_TRANSCRIPT=\(.transcript_path // .transcriptPath // "")",
         @sh "cwd_in=\(.cwd // ((.workspacePaths // [])[0]) // "")"

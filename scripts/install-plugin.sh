@@ -25,6 +25,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 BUILDERS_DIR="$SCRIPT_DIR/builders"
 DIST_DIR="$ROOT_DIR/dist/devflow"
+AGY_DIST_DIR="$ROOT_DIR/dist/devflow-antigravity"
 
 source "$BUILDERS_DIR/common.sh"
 
@@ -173,24 +174,31 @@ validate_plugin() {
     bash "$ROOT_DIR/templates/devflow/scripts/validate-skills.sh" --strict
   fi
 
-  if command -v agy >/dev/null 2>&1 && [ -d "$DIST_DIR" ]; then
-    agy plugin validate "$DIST_DIR"
+  if command -v agy >/dev/null 2>&1 && [ -d "$AGY_DIST_DIR" ]; then
+    agy plugin validate "$AGY_DIST_DIR"
   fi
   ok "Validation passed"
 }
 
 # ── Install / Uninstall: Antigravity ─────────────────────────────────────────
 install_antigravity() {
+  # dist/devflow-antigravity/ is the Antigravity build (root hooks.json,
+  # rules/, no commands/). Global scope goes through agy itself, which stages
+  # plugins under ~/.gemini/antigravity-cli/plugins/<name>/.
   local TARGET_DIR
   if [ "$SCOPE" = "workspace" ]; then
     TARGET_DIR="$WORKSPACE_DIR/.agents/plugins/devflow"
   else
-    TARGET_DIR="$HOME/.gemini/config/plugins/devflow"
+    TARGET_DIR="$HOME/.gemini/antigravity-cli/plugins/devflow"
   fi
+
+  [ -d "$AGY_DIST_DIR" ] || fail "Missing $AGY_DIST_DIR — run with --build first"
 
   if [ "$UNINSTALL" = true ]; then
     step "Uninstalling DevFlow from Antigravity ($SCOPE: $TARGET_DIR)..."
-    if [ -d "$TARGET_DIR" ] || [ -L "$TARGET_DIR" ]; then
+    if [ "$SCOPE" != "workspace" ] && command -v agy >/dev/null 2>&1; then
+      run_cmd agy plugin uninstall devflow || warn "agy plugin uninstall reported an error"
+    elif [ -d "$TARGET_DIR" ] || [ -L "$TARGET_DIR" ]; then
       run_cmd rm -rf "$TARGET_DIR"
       ok "DevFlow removed from $TARGET_DIR"
     else
@@ -201,56 +209,22 @@ install_antigravity() {
 
   step "Installing DevFlow to Antigravity ($SCOPE: $TARGET_DIR)..."
 
-  local TARGET_PARENT
-  TARGET_PARENT="$(dirname "$TARGET_DIR")"
-  run_cmd mkdir -p "$TARGET_PARENT"
+  if [ "$SCOPE" != "workspace" ] && [ "$MODE" = "copy" ] && command -v agy >/dev/null 2>&1; then
+    run_cmd agy plugin install "$AGY_DIST_DIR"
+    ok "DevFlow installed with agy plugin install"
+    return 0
+  fi
 
+  run_cmd mkdir -p "$(dirname "$TARGET_DIR")"
+  run_cmd rm -rf "$TARGET_DIR"
   if [ "$MODE" = "link" ]; then
-    run_cmd rm -rf "$TARGET_DIR"
-    run_cmd mkdir -p "$TARGET_DIR"
-
-    # Link all component directories and top-level files
-    for ITEM in skills agents commands adapters references contexts hooks scripts; do
-      if [ -d "$DIST_DIR/$ITEM" ]; then
-        run_cmd ln -sfn "$DIST_DIR/$ITEM" "$TARGET_DIR/$ITEM"
-      fi
-    done
-
-    for FILE in config.md ETHOS.md AGENTS.md agent.yaml README.md; do
-      if [ -f "$DIST_DIR/$FILE" ]; then
-        run_cmd ln -sf "$DIST_DIR/$FILE" "$TARGET_DIR/$FILE"
-      fi
-    done
-
-    # Antigravity requires plugin.json at the root of the plugin directory
-    if [ -f "$DIST_DIR/plugin.json" ]; then
-      run_cmd cp "$DIST_DIR/plugin.json" "$TARGET_DIR/plugin.json"
-    elif [ -f "$DIST_DIR/.antigravity-plugin/plugin.json" ]; then
-      run_cmd cp "$DIST_DIR/.antigravity-plugin/plugin.json" "$TARGET_DIR/plugin.json"
-    fi
-
-    # Antigravity requires hooks.json at the root of the plugin directory with ANTIGRAVITY_PLUGIN_ROOT
-    if [ -f "$DIST_DIR/hooks/hooks.antigravity.json" ]; then
-      run_cmd cp "$DIST_DIR/hooks/hooks.antigravity.json" "$TARGET_DIR/hooks.json"
-    fi
-
-    ok "DevFlow linked to $TARGET_DIR"
+    run_cmd ln -sfn "$AGY_DIST_DIR" "$TARGET_DIR"
+    ok "DevFlow linked: $TARGET_DIR → $AGY_DIST_DIR"
   else
-    run_cmd rm -rf "$TARGET_DIR"
-    run_cmd cp -R "$DIST_DIR" "$TARGET_DIR"
-
-    # Ensure root plugin.json & hooks.json for Antigravity
-    if [ -f "$DIST_DIR/hooks/hooks.antigravity.json" ]; then
-      run_cmd cp "$DIST_DIR/hooks/hooks.antigravity.json" "$TARGET_DIR/hooks.json"
-    fi
-    if [ -f "$DIST_DIR/.antigravity-plugin/plugin.json" ]; then
-      run_cmd cp "$DIST_DIR/.antigravity-plugin/plugin.json" "$TARGET_DIR/plugin.json"
-    fi
-
+    run_cmd cp -R "$AGY_DIST_DIR" "$TARGET_DIR"
     ok "DevFlow copied to $TARGET_DIR"
   fi
 
-  # Validate installed directory if agy CLI is present
   if command -v agy >/dev/null 2>&1 && [ "$DRY_RUN" = false ]; then
     echo ""
     echo "  Running 'agy plugin validate' on installed target..."
