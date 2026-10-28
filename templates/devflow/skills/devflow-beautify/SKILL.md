@@ -13,7 +13,7 @@ allowed-tools: "Bash(pnpm lint) Bash(pnpm run lint) Bash(pnpm test*) Bash(pnpm r
 Run `/devflow.beautify [optional plan path]`.
 
 - If an argument is passed, use it as the `plan.md` path
-- If no argument is passed, use the current file modified in git
+- If no argument is passed, resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**
 
 ## Purpose
 
@@ -44,7 +44,7 @@ If any item fails → stop, report which check failed, do not apply changes.
 
 ## Input
 
-Files from `devflow.implement` summary + `devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, use current git-modified file.
+Files from `devflow.implement` summary + `devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**. Summary unavailable (new session) → `plan.md` File List `[done]` entries are the scope.
 
 ## Workflow
 

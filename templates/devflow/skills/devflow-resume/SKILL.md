@@ -37,13 +37,7 @@ Both absent → stop: "Nothing to resume. Start with `/devflow.task` (or `/devfl
 
 ### Step 1 — Read saved state
 
-```bash
-cat .devflow-state.json 2>/dev/null || echo "STATE_MISSING"
-```
-
-Extract `feature`, `plan_status`, `next_step`, `pending_files`.
-
-If `STATE_MISSING`: derive from files — latest `devflow/features/*/plan.md` (highest `NNN_` prefix), read its `**Status:**`, map to `next_step` via `@devflow/references/state-machine.md` status table. Continue with derived values.
+Resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution** (explicit argument → state `.feature // .active_feature` → lowest open feature → ask). Read its `plan.md` `**Status:**`, map to `next_step` via the status table. State file (`plan_status`, `next_step`, `pending_files`) = hint only — Step 2 cross-checks it.
 
 Also read the feature checkpoint when present — restores working context lost at compaction (`slice`, `decisions`, `constraints`, `errors_tried`; schema: `state-machine.md` → **Checkpoint file**):
 

@@ -13,7 +13,7 @@ allowed-tools: "Bash(pnpm lint) Bash(pnpm run lint) Bash(pnpm test*) Bash(pnpm r
 Run `/devflow.test [optional plan path]`.
 
 - If an argument is passed, use it as the `plan.md` path
-- If no argument is passed, resolve the latest `devflow/features/*/plan.md`
+- If no argument is passed, resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**
 
 ## Purpose
 
@@ -44,7 +44,7 @@ If any item fails → stop, report which check failed, do not write test files.
 
 ## Input
 
-Files from `devflow.implement` + `devflow.beautify` + `devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, resolve latest `devflow/features/*/plan.md`.
+Files from `devflow.implement` + `devflow.beautify` + `devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**.
 
 ## Workflow
 

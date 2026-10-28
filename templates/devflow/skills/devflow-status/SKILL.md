@@ -34,11 +34,12 @@ Emit compact status dashboard. Answers "where am I in the pipeline?" — no step
 
 ### Step 1 — Read pipeline state
 
-Priority order:
+Order (plan.md authoritative, state file = derived cache):
 
-1. `.devflow-state.json` in CWD — most recent state, saved by pre-compact hook
-2. `devflow/config.md` — active adapter (single-app) or `## Apps` table (monorepo)
-3. `devflow/features/*/plan.md` — find most recent via `ls -t`; parse progress from plan if `.devflow-state.json` absent
+1. `devflow/config.md` — absent → Case C. Active adapter (single-app) or `## Apps` table (monorepo)
+2. Active feature — resolve per `@devflow/references/state-machine.md` → **Active feature resolution**
+3. Resolved feature's `plan.md` — `**Status:**`, `**App:**`, File List `[done]`/`[pending]` progress; no `plan.md` → `task.md` `**Status:**` (next step `devflow.plan`, or `devflow.clarify` when markers open)
+4. `.devflow-state.json` — drift check only: its `plan_status` ≠ `plan.md` Status → add `Drift:` line (plan.md wins; `devflow.recovery` resyncs)
 
 Status semantics and next-step mapping: `@devflow/references/state-machine.md` (authoritative). Adapter/app resolution: `@devflow/references/adapter-resolution.md`.
 
@@ -52,7 +53,7 @@ Scan `devflow/features/`. For each directory found:
 
 ### Step 3 — Emit dashboard
 
-**Case A — `.devflow-state.json` present:**
+**Case A — active feature resolved:**
 
 ```text
 DevFlow Status
@@ -60,8 +61,9 @@ DevFlow Status
 Adapter:     <adapter>
 App:         <app>   <!-- monorepo only, omit line in single-app -->
 Feature:     <feature>
-Plan:        <plan_path>
+Plan:        devflow/features/<feature>/plan.md
 Status:      <plan_status>  →  next: <next_step>
+Drift:       state file says <state_plan_status> — plan.md wins   <!-- only on drift -->
 Progress:    <done>/<total> files done (<pending> remaining)
 Savings:     output filter kept <kept_chars> of <raw_chars> chars over <n> cmds (~<pct>% saved)
 Cost:        ~<total_tokens> tokens · ~$<total_cost_usd> est. over <n> turns (this session's runs — see Cost line below)
@@ -81,15 +83,15 @@ Commands:
   devflow.plan  — start planning <next_unstarted_feature>
 ```
 
-**Case B — no `.devflow-state.json`, but `devflow/config.md` present:**
+**Case B — no active feature resolved, `devflow/config.md` present:**
 
 ```text
 DevFlow Status
 
 Adapter: <adapter>   <!-- monorepo: "Apps: <N> configured (web→nextjs, mobile→flutter, …)" instead -->
-No active pipeline session found.
+No open feature (all terminal, blocked, or none yet).
 
-Start a feature: devflow.task
+Start a feature: devflow.task   <!-- blocked features listed → devflow.recovery -->
 ```
 
 **Case C — no `devflow/config.md`:**
@@ -135,7 +137,8 @@ Both files absent → omit line, zero behavior change. Turns raw JSONL/YAML into
 | --- | --- |
 | Editing `.devflow-state.json` directly | Use `devflow-recovery`; never hand-edit state |
 | Prose or dashboard around `--json` output | Single JSON object on stdout — consumers parse it (see `status-schema.md`) |
-| Reporting status from memory | Always read state file at invocation time |
+| Reporting status from memory | Always read `plan.md` at invocation time |
+| Reporting state-file status over `plan.md` | `plan.md` authoritative; state file only feeds the Drift line |
 | Using status instead of discovery at session start | Discovery = full orientation + routing; status = snapshot only |
 
 ## I/O Reference

@@ -32,7 +32,7 @@ Provides a streamlined, token-efficient pipeline for critical bugs, regressions,
 
 ### Step 1 - Generate Compact Task and Plan
 
-1. Resolve next feature number from `devflow/features/` or `.devflow-state.json`.
+1. Resolve next feature number from `.devflow-state.json` `next_feature_number`, else highest `devflow/features/` prefix + 1 (numbering only — never reuse a prefix).
 2. Name feature `hotfix-[kebab-name]` (e.g. `005_hotfix-auth-token-expiry`).
 3. Scaffold `task.md` with:
    - **Problem Statement**: Symptom, error message, or broken behavior.
@@ -43,7 +43,7 @@ Provides a streamlined, token-efficient pipeline for critical bugs, regressions,
    - `**Status:** ready`
    - File list with bottom-up dependency ordering (typically 1–3 files).
 5. Create and switch to git branch `fix/[NNN]_[name]`.
-6. Update `.devflow-state.json` to mark active feature and `plan_status: ready`.
+6. Merge into `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet** (`feature`, `branch`, `plan_status: ready`, `next_step: devflow.implement`).
 
 ### Step 2 - Implement the Fix
 

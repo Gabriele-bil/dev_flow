@@ -19,4 +19,4 @@ Use `@devflow/skills/devflow-beautify/SKILL.md` and execute it exactly.
 Optional input (`plan.md` path):
 `$ARGUMENTS`
 
-If `$ARGUMENTS` is empty, follow the skill Quick Start: **use the file most recently modified in git** to establish scope (do not default to “latest” `plan.md` by numeric prefix alone).
+If `$ARGUMENTS` is empty, resolve the feature per `@devflow/references/state-machine.md` → **Active feature resolution** and proceed.

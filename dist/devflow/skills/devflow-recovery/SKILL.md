@@ -42,7 +42,7 @@ cat .devflow-state.json 2>/dev/null || echo "STATE_MISSING"
 
 Extract:
 
-- `active_feature` — feature directory name
+- `feature` — feature directory name (read `.feature // .active_feature`; legacy alias, never write it)
 - `next_step` — last recorded step
 - `next_feature_number` — NNN counter
 
@@ -72,10 +72,10 @@ For **Category A or B**: read these files in order:
 ls devflow/features/ 2>/dev/null
 
 # 2. Check task.md
-cat devflow/features/${ACTIVE_FEATURE}/task.md 2>/dev/null | head -20
+cat devflow/features/${FEATURE}/task.md 2>/dev/null | head -20
 
 # 3. Check plan.md — look for [done] markers
-grep -n "\[done\]\|\[pending\]\|\[blocked\]" devflow/features/${ACTIVE_FEATURE}/plan.md 2>/dev/null
+grep -n "\[done\]\|\[pending\]\|\[blocked\]" devflow/features/${FEATURE}/plan.md 2>/dev/null
 
 # 4. Check observe log for last tool calls
 tail -20 .devflow-observe.jsonl 2>/dev/null | jq -r '.tool_name, .file_path // empty' 2>/dev/null
@@ -84,7 +84,7 @@ tail -20 .devflow-observe.jsonl 2>/dev/null | jq -r '.tool_name, .file_path // e
 grep -i "error\|fail\|stuck\|issue" .devflow-learnings.jsonl 2>/dev/null | tail -5
 
 # 6. Check per-feature checkpoint — decisions + errors already tried
-cat devflow/features/${ACTIVE_FEATURE}/.checkpoint.json 2>/dev/null
+cat devflow/features/${FEATURE}/.checkpoint.json 2>/dev/null
 ```
 
 Checkpoint present → include `errors_tried` in the diagnosis; never re-propose a fix already listed there. Schema: `@devflow/references/state-machine.md` → **Checkpoint file**.
@@ -137,15 +137,7 @@ Execute only the user-chosen option.
 
 **Resync state** (Option 2 typical):
 
-```bash
-# Reconstruct .devflow-state.json from files
-jq -n \
-  --arg feature "$ACTIVE_FEATURE" \
-  --arg step "$INFERRED_STEP" \
-  --argjson num $NNN \
-  '{active_feature: $feature, next_step: $step, next_feature_number: $num}' \
-  > .devflow-state.json
-```
+Merge (never overwrite) via `@devflow/references/state-machine.md` → **State update snippet**, values derived from `plan.md`: `feature`, `plan_status` (= `plan.md` Status), `next_step` (status table), `next_feature_number` (int, highest `devflow/features/` prefix + 1). Unknown keys preserved; legacy `active_feature` dropped by the snippet.
 
 **Nuclear reset** (Option 3):
 

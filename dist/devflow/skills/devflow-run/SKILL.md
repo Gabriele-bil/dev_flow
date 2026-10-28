@@ -50,6 +50,7 @@ Opt-in gated autonomy. Execute middle pipeline (implement → beautify → test)
 
 ## Input contract
 
+- [ ] Feature resolved — explicit `NNN_name` argument, else `@devflow/references/state-machine.md` → **Active feature resolution**
 - [ ] `task.md` + `plan.md` exist at `devflow/features/[NNN]_[feature-name]/`
 - [ ] `plan.md` **Status** satisfies the `--from` step's input contract (`implement` → `ready`; `beautify` → `implemented`; `test` → `beautified` or `implemented`)
 - [ ] No active `.devflow-run.json` (stale marker from crashed run → confirm deletion with user, or route `devflow.recovery`)

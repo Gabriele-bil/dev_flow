@@ -115,18 +115,17 @@ Write `devflow/plans/project-blueprint.md` using this structure (adapted from `@
 
 ## 5. Final `.devflow-state.json` Initialization (Post-Hook Override)
 
-Because the `PostToolUse` hook `hooks/post-task-create.sh` fires on every `Write` to `devflow/features/[NNN]_*/task.md` and sets `next_feature_number` to `NNN + 1`, writing `001` through `NNN` sequentially leaves `.devflow-state.json` without `active_feature` pointing to `001`.
+Because the `PostToolUse` hook `hooks/post-task-create.sh` fires on every `Write` to `devflow/features/[NNN]_*/task.md` and sets `next_feature_number` to `NNN + 1`, writing `001` through `NNN` sequentially leaves `.devflow-state.json` without `feature` pointing to `001`.
 
-**Mandatory final step:** After ALL `task.md` files (`001..NNN`) and `docs/product.md` have been written, write `.devflow-state.json` in the project root with:
+**Mandatory final step:** After ALL `task.md` files (`001..NNN`) and `docs/product.md` have been written, merge into `.devflow-state.json` at project root (schema: `@devflow/references/state-machine.md` → **State file schema**; keep keys you do not own; never write legacy `active_feature` — delete it if present):
 
 ```json
 {
   "feature": "001_<first-feature-slug>",
-  "active_feature": "001_<first-feature-slug>",
   "feature_path": "devflow/features/001_<first-feature-slug>",
   "branch": "feat/001_<first-feature-slug>",
   "task_status": "draft",
-  "next_feature_number": "<NNN+1 formatted as 3 digits, e.g. 006>",
+  "next_feature_number": 6,
   "next_step": "devflow.plan",
   "saved_at": "<ISO-8601 timestamp>"
 }

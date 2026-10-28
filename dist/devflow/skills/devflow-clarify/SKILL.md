@@ -36,7 +36,7 @@ Run when either condition is true:
 
 Before running, verify:
 
-- [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md`
+- [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md` — no path argument → resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**
 - [ ] `task.md` Status is not `done`
 
 If any item fails → stop and report which check failed.
@@ -100,7 +100,7 @@ After the Q&A loop completes:
 1. Scan `task.md` for remaining `[NEEDS CLARIFICATION: ...]` markers.
    - Resolved markers: already removed inline during Step 2.
    - Skipped markers: leave in place — they represent accepted risk.
-2. Update `task.md` header: set `**Status:** clarified`.
+2. Update `task.md` header: set `**Status:** clarified`; refresh `.devflow-state.json` (`task_status: clarified`, `next_step: devflow.plan`) per `@devflow/references/state-machine.md` → **State update snippet**.
 3. Output a **Clarification Summary** in the response:
 
 ```text

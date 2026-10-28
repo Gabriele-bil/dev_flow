@@ -105,12 +105,12 @@ Decompose project and generate all tasks on `main` per `@devflow/skills/devflow-
    - Pre-populate `**Branch:** feat/[NNN]_[feature-name]` in each `task.md` header (`devflow.implement` creates/switches to the branch when that task executes).
    - For every feature `001` through `NNN` in ascending topological order, write `devflow/features/[NNN]_[feature-name]/task.md` following `@devflow/skills/devflow-task/references/task-template.md`, including `**ADRs:** docs/adr/ADR-001-initial-architecture.md`, `**Blockers:**`, `**Unlocks:**`, Connextra User Story, Read/Write isolated `UC-1..UC-N`, single-`When` BDD Gherkin `AC-1..AC-N` with explicit async states, Scope Boundaries, and Assumptions & Risks.
 5. **Populate `docs/product.md`:** Fill the `devflow-managed:feature-status` table with all tasks `001..NNN` in topological order (`status: planned`, blocker notes, and `App` column in monorepo mode).
-6. **Final State Initialization (MUST run after all `task.md` writes):** Because `post-task-create.sh` updates `.devflow-state.json` on each `task.md` write, write `.devflow-state.json` one final time after `NNN` finishes:
-   - `active_feature`: `"001_<first-feature>"`
+6. **Final State Initialization (MUST run after all `task.md` writes):** Because `post-task-create.sh` updates `.devflow-state.json` on each `task.md` write, merge into `.devflow-state.json` one final time after `NNN` finishes (schema: `@devflow/references/state-machine.md` → **State file schema**; never write `active_feature`):
+   - `feature`: `"001_<first-feature>"`
    - `feature_path`: `"devflow/features/001_<first-feature>"`
    - `branch`: `"feat/001_<first-feature>"`
    - `task_status`: `"draft"`
-   - `next_feature_number`: `"<NNN+1 zero-padded>"`
+   - `next_feature_number`: `<NNN+1>` (int)
    - `next_step`: `"devflow.plan"`
 
 ### Step 5 — Completion Summary & Handoff
@@ -124,7 +124,7 @@ Emit consolidated initialization report: project root, topology & stack(s), scaf
 | "Hardcode standard package versions in package.json/pubspec.yaml to save time" | Hardcoded versions rot immediately. Query `context7` / registry and use `@latest` CLIs |
 | "Generate only task 001 now and let user run devflow.task later" | `devflow.init` contract requires full project decomposition (`001..NNN`) with verified DAG upfront |
 | "Create and switch git branches for each task during batch generation" | Switching branches N times leaves tasks scattered or dirty. Stay on `main` and record `**Branch:**` in `task.md` |
-| "Skip final `.devflow-state.json` write since `post-task-create.sh` runs automatically" | Hook only sets `next_feature_number` from last task `NNN`; final write is required to point `active_feature` to `001` |
+| "Skip final `.devflow-state.json` write since `post-task-create.sh` runs automatically" | Hook only sets `next_feature_number` from last task `NNN`; final write is required to point `feature` to `001` |
 | "Write `tsconfig.json` or `eslint.config.mjs` directly via Write tool" | `pre-config-protect.sh` blocks Write/Edit on linter/tsconfig files; scaffold via official CLI commands in Bash |
 
 ## Anti-Patterns

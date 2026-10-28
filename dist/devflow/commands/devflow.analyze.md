@@ -19,4 +19,4 @@ Use `@devflow/skills/devflow-analyze/SKILL.md` and execute it exactly.
 Optional input (feature path):
 `$ARGUMENTS`
 
-If `$ARGUMENTS` is empty, resolve the feature at `devflow/features/*/plan.md` with the **highest existing `NNN_` numeric prefix** and proceed.
+If `$ARGUMENTS` is empty, resolve the feature per `@devflow/references/state-machine.md` → **Active feature resolution** and proceed.

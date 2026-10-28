@@ -151,7 +151,7 @@ If any item fails, fix task content before writing file.
 
 ### Step 9 - Write task file
 
-Create `devflow/features/[NNN]_[feature-name]/task.md` using template + format rules in `references/task-template.md`. Write `**Branch:**` with the resolved branch name (`[type]/[number-of-task-is-present]_[feature-name]`), `**App:**` frontmatter field with Step 1 resolution when `config.md` has `## Apps`; include `**ADRs:**` if applicable; omit when absent. Update `.devflow-state.json` with active feature, feature_path, branch, task_status (`draft`), and next_step (`devflow.plan`). See **`examples.md`** for worked examples.
+Create `devflow/features/[NNN]_[feature-name]/task.md` using template + format rules in `references/task-template.md`. Write `**Branch:**` with the resolved branch name (`[type]/[number-of-task-is-present]_[feature-name]`), `**App:**` frontmatter field with Step 1 resolution when `config.md` has `## Apps`; include `**ADRs:**` if applicable; omit when absent. Merge into `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**: `feature`, `feature_path`, `branch`, `task_status: draft`, `next_step: devflow.plan` (+ `app` in monorepo); never write `active_feature`. See **`examples.md`** for worked examples.
 
 ### Step 10 - Update docs/product.md feature status
 
@@ -200,6 +200,6 @@ Respond using template in `references/notify-template.md` (includes feature path
 | --- | --- |
 | Reads | `devflow/config.md` (Apps table, monorepo only); `docs/product.md` (required); `constitution.md`, `registry.md` (as needed); `DESIGN.md` / `docs/design.md` (if present); `refinement-hints.md` (Step 5); `references/invest-criteria.md`, `references/story-splitting.md`, `references/bdd-acceptance-criteria.md` (Step 5); `@devflow/skills/devflow-clarify/references/interactive-interview.md` (Step 4); `examples.md` (guidance); `references/task-template.md`, `references/notify-template.md` |
 | Reads (conditional) | `docs/adr/` (if present — active ADRs); `.devflow-run.json` (run-mode switch) |
-| Writes | `devflow/features/[NNN]_[feature-name]/task.md`, `.devflow-state.json` (branch, active_feature) |
+| Writes | `devflow/features/[NNN]_[feature-name]/task.md`, `.devflow-state.json` (merge: feature, feature_path, branch, task_status, next_step) |
 | Side effects | Creates and switches git branch `[feat/fix/chore/doc/ecc...]/[number-of-task-is-present]_[name]` |
 | Next step | `devflow.plan` → `plan.md` (full template in `devflow/skills/devflow-plan/SKILL.md`) |

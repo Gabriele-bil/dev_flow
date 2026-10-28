@@ -18,4 +18,4 @@ Use `@devflow/skills/devflow-run/SKILL.md` and execute it exactly.
 Optional input (flags):
 `$ARGUMENTS`
 
-If `$ARGUMENTS` is empty, use `--from implement --until test` on the plan at `devflow/features/*/plan.md` with the **highest existing `NNN_` numeric prefix**.
+If `$ARGUMENTS` is empty, use `--from implement --until test` on the feature resolved per `@devflow/references/state-machine.md` → **Active feature resolution**.
