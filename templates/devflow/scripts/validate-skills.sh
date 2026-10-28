@@ -129,8 +129,8 @@ for FILE in "${SKILL_FILES[@]}"; do
   if [[ "$STRICT" == true ]]; then
     # Lines starting with "This section..." or "Note that..."
     if grep -qiE '^(This section|Note that)' "$FILE"; then
-      MATCHES=$(grep -inE '^(This section|Note that)' "$FILE" | head -3 | sed 's/^/      /')
-      FILE_WARNINGS+=("style: line(s) starting with 'This section...' or 'Note that...' (caveman-compress violation)")
+      MATCHES=$(grep -inE '^(This section|Note that)' "$FILE" | head -3 | cut -d: -f1 | paste -sd, -)
+      FILE_WARNINGS+=("style: line(s) $MATCHES start with 'This section...' or 'Note that...' (caveman-compress violation)")
     fi
 
     # Empty sections: a ## heading followed immediately by another ## heading or EOF

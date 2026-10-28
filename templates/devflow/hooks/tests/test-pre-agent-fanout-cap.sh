@@ -35,7 +35,7 @@ echo ""
 echo "--- T1: calls 1-5 within window allowed ---"
 rm -f "$TMPDIR/.devflow-fanout-state.json"
 ALL_ALLOWED=true
-for i in 1 2 3 4 5; do
+for _ in 1 2 3 4 5; do
   out=$(run_hook)
   [ -z "$out" ] || ALL_ALLOWED=false
 done

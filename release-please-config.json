@@ -18,6 +18,21 @@
           "jsonpath": "$.version"
         },
         {
+          "type": "yaml",
+          "path": "dist/devflow-antigravity/agent.yaml",
+          "jsonpath": "$.version"
+        },
+        {
+          "type": "yaml",
+          "path": "dist/devflow/agent.yaml",
+          "jsonpath": "$.version"
+        },
+        {
+          "type": "yaml",
+          "path": "templates/devflow/agent.yaml",
+          "jsonpath": "$.version"
+        },
+        {
           "type": "json",
           "path": "dist/devflow/.claude-plugin/plugin.json",
           "jsonpath": "$.version"

@@ -1,1 +1,0 @@
-{"session_id":"0f1c-cc","transcript_path":"__WS__/transcript.jsonl","cwd":"__WS__","permission_mode":"default","hook_event_name":"PreToolUse","tool_name":"Edit","tool_input":{"file_path":"__WS__/tsconfig.json","old_string":"a","new_string":"b"},"tool_use_id":"toolu_02"}

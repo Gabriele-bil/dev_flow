@@ -35,6 +35,13 @@ for FILE in config.md ETHOS.md AGENTS.md agent.yaml README.md; do
   fi
 done
 
+cp "$ROOT_DIR/LICENSE" "$DIST_DIR/LICENSE"
+ok "Copiato: LICENSE"
+
+# File di sviluppo del plugin, non per chi lo usa: test degli hook e il comando
+# di lint delle skill (resta in templates/, eseguito dalla CI)
+rm -rf "$DIST_DIR/hooks/tests" "$DIST_DIR/commands/devflow.lint-skills.md"
+
 # Pulizia di sicurezza in dist/ per rimuovere file temporanei o di runtime
 find "$DIST_DIR" \( -name ".devflow-*" ! -name ".devflow-instincts.shared.yaml" -o -name ".DS_Store" -o -name "*.tmp" \) -exec rm -rf {} + 2>/dev/null || true
 
@@ -46,6 +53,7 @@ jq -n \
   --arg version     "$VERSION" \
   --arg description "$DESCRIPTION" \
   --arg author      "$AUTHOR" \
+  --arg license     "$LICENSE_ID" \
   --arg repository  "${REPOSITORY:-}" \
   --arg homepage    "${HOMEPAGE:-}" \
   --argjson keywords "${KEYWORDS_JSON:-[]}" \
@@ -53,12 +61,13 @@ jq -n \
     name:        $name,
     version:     $version,
     description: $description,
-    author:      { name: $author }
+    author:      { name: $author },
+    license:     $license
   }
   + (if $repository != "" then { repository: $repository } else {} end)
   + (if $homepage   != "" then { homepage:   $homepage }   else {} end)
   + (if ($keywords | length) > 0 then { keywords: $keywords } else {} end)
-  ' | python3 -c 'import sys, json; print(json.dumps(json.load(sys.stdin), ensure_ascii=False, indent=2))' > "$DIST_DIR/.claude-plugin/plugin.json"
+  ' > "$DIST_DIR/.claude-plugin/plugin.json" || fail "jq: generazione plugin.json fallita"
 
 ok "plugin.json generato (v$VERSION)"
 
@@ -68,10 +77,14 @@ step "Aggiornamento .claude-plugin/marketplace.json"
 MARKETPLACE="$ROOT_DIR/.claude-plugin/marketplace.json"
 
 if [ -f "$MARKETPLACE" ]; then
-  jq --arg name "$NAME" --arg src "./dist/$NAME" --arg ver "$VERSION" --arg desc "$DESCRIPTION" \
+  TMP="$(mktemp "${MARKETPLACE}.XXXXXX")"
+  if jq --arg name "$NAME" --arg src "./dist/$NAME" --arg ver "$VERSION" --arg desc "$DESCRIPTION" \
     '(.plugins[] | select(.name == $name)) |= (.source = $src | .version = $ver | .description = $desc)' \
-    "$MARKETPLACE" > "${MARKETPLACE}.tmp" \
-    && mv "${MARKETPLACE}.tmp" "$MARKETPLACE"
+    "$MARKETPLACE" > "$TMP"; then
+    mv "$TMP" "$MARKETPLACE"
+  else
+    rm -f "$TMP"; fail "jq: aggiornamento marketplace.json fallito"
+  fi
   ok "marketplace.json: source → ./dist/$NAME, version → $VERSION"
 else
   warn "marketplace.json non trovato — skip"

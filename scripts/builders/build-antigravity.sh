@@ -30,7 +30,7 @@ AGY_STAGING="\$HOME/.gemini/antigravity-cli/plugins/$NAME"
 rm -rf "$AGY_DIR"
 mkdir -p "$AGY_DIR"
 # AGENTS.md escluso: agy carica regole solo da rules/ (orientamento → rules/)
-for ITEM in skills adapters hooks agents contexts references templates scripts config.md ETHOS.md agent.yaml README.md; do
+for ITEM in skills adapters hooks agents contexts references templates scripts config.md ETHOS.md agent.yaml README.md LICENSE; do
   [ -e "$DIST_DIR/$ITEM" ] && cp -R "$DIST_DIR/$ITEM" "$AGY_DIR/$ITEM"
 done
 rm -f "$AGY_DIR/hooks/hooks.json"

@@ -89,7 +89,7 @@ rm -rf "$D"
 echo "--- T4: no advisory below threshold at stop ---"
 D=$(tmpdir)
 export DEVFLOW_COMPACT_THRESHOLD=5
-for i in $(seq 1 4); do run_post "$D" Bash sess-1; done
+for _ in $(seq 1 4); do run_post "$D" Bash sess-1; done
 out=$(run_stop "$D" sess-1)
 [ -z "$out" ] && assert "no advisory below threshold at stop" pass \
               || assert "no advisory below threshold at stop (got '$out')" fail
@@ -99,7 +99,7 @@ rm -rf "$D"
 echo "--- T5: advisory is a systemMessage mentioning /compact ---"
 D=$(tmpdir)
 export DEVFLOW_COMPACT_THRESHOLD=3
-for i in $(seq 1 3); do run_post "$D" Bash sess-1; done
+for _ in $(seq 1 3); do run_post "$D" Bash sess-1; done
 out=$(run_stop "$D" sess-1)
 printf '%s' "$out" | jq -e '.systemMessage | test("/compact")' >/dev/null 2>&1 \
   && assert "systemMessage advisory at threshold" pass \
@@ -114,7 +114,7 @@ rm -rf "$D"
 echo "--- T7: no advisory after session reset ---"
 D=$(tmpdir)
 export DEVFLOW_COMPACT_THRESHOLD=3
-for i in $(seq 1 3); do run_post "$D" Bash sess-1; done
+for _ in $(seq 1 3); do run_post "$D" Bash sess-1; done
 run_post "$D" Bash sess-2
 out=$(run_stop "$D" sess-2)
 [ -z "$out" ] && assert "no advisory after session reset" pass \
@@ -143,7 +143,7 @@ rm -rf "$D"
 
 echo "--- T10: concurrent posts lose no updates and never empty the file ---"
 D=$(tmpdir)
-for i in $(seq 1 12); do run_post "$D" Bash sess-1 & done
+for _ in $(seq 1 12); do run_post "$D" Bash sess-1 & done
 wait
 count=$(obs "$D" '.tool_call_count // 0')
 [ "$count" = "12" ] && assert "12 concurrent posts counted as 12" pass \
