@@ -7,6 +7,8 @@ model: sonnet
 effort: high
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Skill: devflow.plan
 
 ## Quick Start
@@ -14,7 +16,7 @@ effort: high
 Run `/devflow.plan [optional task path]`.
 
 - If an argument is passed, use it as the `task.md` path
-- If no argument is passed, resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**
+- If no argument is passed, resolve feature per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Active feature resolution**
 - Produce `plan.md` in the same feature directory
 
 ## Purpose
@@ -64,15 +66,15 @@ If any item fails → stop, report which check failed, do not write `plan.md`.
 
 ## Input
 
-Path: `devflow/features/[NNN]_[feature-name]/task.md` — if no arg, resolve per `@devflow/references/state-machine.md` → **Active feature resolution** (never highest `NNN`). Resolved feature already has `plan.md` past `ready` → stop, report status; re-plan only on explicit argument.
+Path: `devflow/features/[NNN]_[feature-name]/task.md` — if no arg, resolve per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Active feature resolution** (never highest `NNN`). Resolved feature already has `plan.md` past `ready` → stop, report status; re-plan only on explicit argument.
 
 ## Workflow
 
 ### Step 0 - Resolve adapter + app
 
 1. Note `task.md`'s `**App:**` field if present (monorepo repos only).
-2. Resolve adapter, adapter root, and app working directory per `@devflow/references/adapter-resolution.md`. `task.md` monorepo but missing `**App:**` → hard stop, ask user.
-3. Read `@devflow/adapters/<adapter>/ADAPTER.md` (core: technology skills, MCP) plus `@devflow/adapters/<adapter>/steps/plan.md` (plan extra sections, dependency ordering, localization). Legacy adapters without `steps/`: all sections live in `ADAPTER.md` — read it in full.
+2. Resolve adapter, adapter root, and app working directory per `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`. `task.md` monorepo but missing `**App:**` → hard stop, ask user.
+3. Read `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core: technology skills, MCP) plus `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/steps/plan.md` (plan extra sections, dependency ordering, localization). Legacy adapters without `steps/`: all sections live in `ADAPTER.md` — read it in full.
 
 ### Step 0b - Constitution Gate
 
@@ -100,12 +102,12 @@ Always read:
 
 - `constitution.md` (architecture rules, conventions, stack)
 - `registry.md` (existing patterns and shared utilities)
-- `@devflow/adapters/common/skills/common-clean-code/SKILL.md` (clean code, SOLID rules)
+- `${CLAUDE_PLUGIN_ROOT}/adapters/common/skills/common-clean-code/SKILL.md` (clean code, SOLID rules)
 - `docs/adr/` (if present) — inspect referenced ADRs or `docs/adr/README.md` to ensure planned architecture respects accepted decisions
 
-Then apply the **Technology skills** table in the active `ADAPTER.md`: load each listed `@devflow/adapters/.../SKILL.md` when its trigger matches the feature (DB, UI, forms, etc.).
+Then apply the **Technology skills** table in the active `ADAPTER.md`: load each listed `${CLAUDE_PLUGIN_ROOT}/adapters/.../SKILL.md` when its trigger matches the feature (DB, UI, forms, etc.).
 
-**Exploration (planning research):** structural questions about existing code (who calls X, where is Y, blast radius) → index-first per `@devflow/references/token-economy.md`: one semantic query when code-index MCP available; trust results, no re-grep. grep/Read only for what index does not cover.
+**Exploration (planning research):** structural questions about existing code (who calls X, where is Y, blast radius) → index-first per `${CLAUDE_PLUGIN_ROOT}/references/token-economy.md`: one semantic query when code-index MCP available; trust results, no re-grep. grep/Read only for what index does not cover.
 
 ### Step 2 - MCP usage
 
@@ -140,7 +142,7 @@ Analyze:
 
 Verify **File list** order per Dependency ordering. **Contracts First:** migrations and shared contracts (types, schemas, state interfaces shared by ≥2 slices or `[P]` files) MUST sit in the first blocking slice (`deps: none`) before consumers; shared components before consumers. Never copy contracts across parallel slices. Never plan or cite `task.md` rows marked `[wont]` or `[retired]`.
 
-**Scope fidelity & 4-Part Brief:** every **File List** entry must map to ≥1 **Traceability** row (no gold-plating, one concern per entry) and include the 4-part brief (`Change`, `Contract`, `Test`, `Out of scope`) per `references/plan-template.md`. Optionally tag slices/entries with `[route: light|mid|strong]` per `@devflow/references/model-selection.md` (`light` requires a complete 4-part brief and exact test target).
+**Scope fidelity & 4-Part Brief:** every **File List** entry must map to ≥1 **Traceability** row (no gold-plating, one concern per entry) and include the 4-part brief (`Change`, `Contract`, `Test`, `Out of scope`) per `references/plan-template.md`. Optionally tag slices/entries with `[route: light|mid|strong]` per `${CLAUDE_PLUGIN_ROOT}/references/model-selection.md` (`light` requires a complete 4-part brief and exact test target).
 
 ### Step 4c - Data model extraction
 
@@ -172,7 +174,7 @@ If not triggered: skip.
 
 ### Step 4d - Complexity score
 
-Score feature per `@devflow/references/complexity-scoring.md`: 5 signals (files touched, task type, judgment, cross-component surface, novelty), each 0–4, sum 0–20 → profile (`0–6 quick`, `7–13 standard`, `14–20 thorough`). Apply profile floor: auth/payments/security boundaries/migrations/user-input handling → minimum `standard`. Record in `plan.md` frontmatter: `**Complexity:** N (profile)`. Read by `devflow.beautify`, `devflow.test`, `devflow.ship` to scale rigor.
+Score feature per `${CLAUDE_PLUGIN_ROOT}/references/complexity-scoring.md`: 5 signals (files touched, task type, judgment, cross-component surface, novelty), each 0–4, sum 0–20 → profile (`0–6 quick`, `7–13 standard`, `14–20 thorough`). Apply profile floor: auth/payments/security boundaries/migrations/user-input handling → minimum `standard`. Record in `plan.md` frontmatter: `**Complexity:** N (profile)`. Read by `devflow.beautify`, `devflow.test`, `devflow.ship` to scale rigor.
 
 ### Step 4e - Design system detection (conditional)
 
@@ -187,7 +189,7 @@ Read by `devflow.implement` (loads DESIGN.md for `[ui]` batches) and `devflow.be
 
 ### Step 5 - Write plan file
 
-Create `devflow/features/[NNN]_[feature-name]/plan.md` using the template in `references/plan-template.md`. After write: `**Status:** ready`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet** (`next_step: devflow.implement`). Sections in order: Overview, Architecture decisions, Risks and mitigations, Open questions, Traceability, File List, Implementation checkpoints, Adapter-specific sections, Edge Cases & Error Handling, Pre-implement checklist.
+Create `devflow/features/[NNN]_[feature-name]/plan.md` using the template in `references/plan-template.md`. After write: `**Status:** ready`; refresh `.devflow-state.json` per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **State update snippet** (`next_step: devflow.implement`). Sections in order: Overview, Architecture decisions, Risks and mitigations, Open questions, Traceability, File List, Implementation checkpoints, Adapter-specific sections, Edge Cases & Error Handling, Pre-implement checklist.
 
 Header: copy `**App:**` from `task.md` verbatim when present; omit the line entirely when absent (single-app repos) — never invent it.
 
@@ -196,7 +198,7 @@ Format rules:
 - Adapter-specific sections: follow adapter plan step file layout exactly.
 - Language: English (all docs). Compression: caveman-compress (drop filler, keep precision).
 
-**Run mode** (`.devflow-run.json` present, contract `@devflow/references/run-mode.md`): a genuine **Open questions** entry (plan-level ambiguity, not a constitution violation) does not escalate — default + `## Decision flags` entry per its **Decision flags**; keep Status `ready`. Constitution Gate Critical/Required violations above are the one exception — those stop regardless of mode.
+**Run mode** (`.devflow-run.json` present, contract `${CLAUDE_PLUGIN_ROOT}/references/run-mode.md`): a genuine **Open questions** entry (plan-level ambiguity, not a constitution violation) does not escalate — default + `## Decision flags` entry per its **Decision flags**; keep Status `ready`. Constitution Gate Critical/Required violations above are the one exception — those stop regardless of mode.
 
 ### Step 6 - Notify user
 
@@ -219,7 +221,7 @@ Continue to implementation? -> devflow.implement
 
 ## Anti-Patterns
 
-Full catalog: `@devflow/skills/devflow-plan/references/plan-anti-patterns.md`.
+Full catalog: `${CLAUDE_PLUGIN_ROOT}/skills/devflow-plan/references/plan-anti-patterns.md`.
 
 Critical checks:
 
@@ -234,15 +236,15 @@ Critical checks:
 | | |
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md` |
-| Reads | `constitution.md`, `registry.md`, `@devflow/adapters/common/skills/common-clean-code/SKILL.md` |
-| Reads (adapter) | `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/plan.md`; technology skills per ADAPTER table |
-| Reads | `@devflow/references/complexity-scoring.md` (Step 4d — score + profile) |
-| Reads | `@devflow/references/token-economy.md` (Step 1 — index-first exploration) |
-| Reads | `@devflow/skills/devflow-plan/references/plan-anti-patterns.md` (Anti-patterns catalog) |
-| Reads | `@devflow/references/state-machine.md` (Active feature resolution, State update snippet) |
+| Reads | `constitution.md`, `registry.md`, `${CLAUDE_PLUGIN_ROOT}/adapters/common/skills/common-clean-code/SKILL.md` |
+| Reads (adapter) | `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`, `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core) + `steps/plan.md`; technology skills per ADAPTER table |
+| Reads | `${CLAUDE_PLUGIN_ROOT}/references/complexity-scoring.md` (Step 4d — score + profile) |
+| Reads | `${CLAUDE_PLUGIN_ROOT}/references/token-economy.md` (Step 1 — index-first exploration) |
+| Reads | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-plan/references/plan-anti-patterns.md` (Anti-patterns catalog) |
+| Reads | `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` (Active feature resolution, State update snippet) |
 | Writes | `devflow/features/[NNN]_[feature-name]/plan.md`, `.devflow-state.json` (merge) |
 | Writes (conditional) | `plan.md` `## Decision flags` (run mode — resolved Open questions) |
-| Reads (conditional) | `docs/adr/` (if present — active ADRs referenced in `task.md`); `.devflow-run.json` (existence — run-mode switch, `@devflow/references/run-mode.md`) |
+| Reads (conditional) | `docs/adr/` (if present — active ADRs referenced in `task.md`); `.devflow-run.json` (existence — run-mode switch, `${CLAUDE_PLUGIN_ROOT}/references/run-mode.md`) |
 | Reads (conditional) | `DESIGN.md` / `docs/design.md` (Step 4e — existence check + UI tagging) |
 | Writes (optional) | `devflow/features/[NNN]_[feature-name]/data-model.md` (Step 4c — triggered when feature touches persistent entities) |
 | Next step | `devflow.implement` |

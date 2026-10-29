@@ -4,6 +4,7 @@ description: "Full-cycle autonomous delivery: turns a raw feature idea directly 
 argument-hint: "[idea-or-attached-context] [--app <name>]"
 ---
 
+
 # Skill: devflow.auto
 
 ## Quick Start
@@ -15,7 +16,7 @@ Run `/devflow.auto <idea> [--app <name>]`.
 
 ## Purpose
 
-End-to-end autonomous delivery from raw idea to opened PR. Same contract as `devflow.run` (`@devflow/references/run-mode.md`, `auto` column) — extended upstream (task, plan, analyze) and downstream (ship → pr). Halts only on major discrepancies; minor ones become decision flags surfaced in the PR body.
+End-to-end autonomous delivery from raw idea to opened PR. Same contract as `devflow.run` (`$HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md`, `auto` column) — extended upstream (task, plan, analyze) and downstream (ship → pr). Halts only on major discrepancies; minor ones become decision flags surfaced in the PR body.
 
 ## Core Principles
 
@@ -45,17 +46,17 @@ Any item fails → stop, report, do not arm.
 
 ### Step 0 - Arm
 
-Arm per `@devflow/references/run-mode.md` → **Marker**, immediately (no confirmation): `feature: null`, `from: "task"`, `until: "pr"`, `orchestrator: "devflow.auto"`, `ship_grader_iterations: 2`, `ship_grader_iteration_count: 0`. Announce: `🤖 devflow.auto: task → plan → analyze → implement → beautify → test → ship → pr (unattended; halts only on major discrepancies)`.
+Arm per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md` → **Marker**, immediately (no confirmation): `feature: null`, `from: "task"`, `until: "pr"`, `orchestrator: "devflow.auto"`, `ship_grader_iterations: 2`, `ship_grader_iteration_count: 0`. Announce: `🤖 devflow.auto: task → plan → analyze → implement → beautify → test → ship → pr (unattended; halts only on major discrepancies)`.
 
 ### Step 1 - Chain
 
 Every step: full skill workflow, run-mode clauses active, status boundaries written. Stop/continue per **Discrepancy classes** in `run-mode.md`.
 
-1. `@devflow/skills/devflow-task/SKILL.md` — after Step 9 writes `task.md`, set marker `feature` to `NNN_name`.
-2. `@devflow/skills/devflow-plan/SKILL.md`.
-3. `@devflow/skills/devflow-analyze/SKILL.md` — Critical → stop; Required/Nit → plan adjustment or waiver flag.
+1. `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-task/SKILL.md` — after Step 9 writes `task.md`, set marker `feature` to `NNN_name`.
+2. `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-plan/SKILL.md`.
+3. `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-analyze/SKILL.md` — Critical → stop; Required/Nit → plan adjustment or waiver flag.
 4. Middle pipeline — `devflow-run` Step 1 chain rules, `--from implement --until ship`: implement → beautify → test (incl. Step 6b) → ship.
-5. Ship gate passes (or loop cap reached with exceptions flagged) → `devflow-ship` Step 5 executes `@devflow/skills/devflow-pr/SKILL.md`; PR body carries `## Autonomous Decisions & Discrepancies` from `## Decision flags`, `## Deviations`, `task.md` `## Assumptions & Risks`.
+5. Ship gate passes (or loop cap reached with exceptions flagged) → `devflow-ship` Step 5 executes `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-pr/SKILL.md`; PR body carries `## Autonomous Decisions & Discrepancies` from `## Decision flags`, `## Deviations`, `task.md` `## Assumptions & Risks`.
 
 ### Step 2 - Disarm + report
 
@@ -84,7 +85,7 @@ Flags:    [N] decision flags / discrepancies (in PR body when opened)
 | Anti-Pattern | Fix |
 | --- | --- |
 | Asking the user mid-chain | Collect idea/app/stale-marker decisions before Step 0 |
-| Re-stating run-mode rules per step | `@devflow/references/run-mode.md` is the contract — cite, don't copy |
+| Re-stating run-mode rules per step | `$HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md` is the contract — cite, don't copy |
 | Silent defaults | Every autonomous choice → `## Decision flags` → PR body |
 | Leaving `.devflow-run.json` after exit | Disarm on every exit path |
 
@@ -92,7 +93,7 @@ Flags:    [N] decision flags / discrepancies (in PR body when opened)
 
 | | |
 | --- | --- |
-| Reads | `@devflow/references/run-mode.md`, `@devflow/references/state-machine.md` (run marker, handoff), `@devflow/references/escalation-ladder.md`, `@devflow/references/adapter-resolution.md` |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` (run marker, handoff), `$HOME/.gemini/antigravity-cli/plugins/devflow/references/escalation-ladder.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md` |
 | Executes | `devflow-task`, `devflow-plan`, `devflow-analyze`, then `devflow-run` chain (`devflow-implement`, `devflow-beautify`, `devflow-test`, `devflow-ship`) → `devflow-pr` |
 | Writes | `.devflow-run.json` (armed Step 0, `feature` set after task, deleted Step 2); feature artifacts via chained skills |
 | Output | Opened PR with autonomous decisions & discrepancies section |

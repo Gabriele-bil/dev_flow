@@ -3,6 +3,7 @@ name: devflow-clarify
 description: "Resolves [NEEDS CLARIFICATION: ...] markers in task.md via incremental Q&A. 8D scan → up to 5 questions → updates task.md → sets Status clarified. Use when task.md has open markers or high-risk assumptions before devflow.plan."
 ---
 
+
 # Skill: devflow.clarify
 
 ## Purpose
@@ -34,7 +35,7 @@ Run when either condition is true:
 
 Before running, verify:
 
-- [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md` — no path argument → resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**
+- [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md` — no path argument → resolve feature per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **Active feature resolution**
 - [ ] `task.md` Status is not `done`
 
 If any item fails → stop and report which check failed.
@@ -44,7 +45,7 @@ If any item fails → stop and report which check failed.
 ### Step 1 — Load and scan
 
 1. Read `task.md` in full.
-2. Read `@devflow/skills/devflow-task/refinement-hints.md` — use all 8 dimensions as the scan framework.
+2. Read `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-task/refinement-hints.md` — use all 8 dimensions as the scan framework.
 3. Build the question backlog:
    - Extract every `[NEEDS CLARIFICATION: ...]` marker in `task.md` → one candidate question per marker.
    - Run the 8D scan on the full task content; generate additional candidate questions for dimensions with open ambiguities not already covered by a marker.
@@ -54,7 +55,7 @@ If any item fails → stop and report which check failed.
 
 ### Step 2 — Interactive Q&A loop
 
-Follow structured interview standards in `@devflow/skills/devflow-clarify/references/interactive-interview.md`.
+Follow structured interview standards in `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-clarify/references/interactive-interview.md`.
 
 For each question in the prioritized queue, one at a time:
 
@@ -98,7 +99,7 @@ After the Q&A loop completes:
 1. Scan `task.md` for remaining `[NEEDS CLARIFICATION: ...]` markers.
    - Resolved markers: already removed inline during Step 2.
    - Skipped markers: leave in place — they represent accepted risk.
-2. Update `task.md` header: set `**Status:** clarified`; refresh `.devflow-state.json` (`task_status: clarified`, `next_step: devflow.plan`) per `@devflow/references/state-machine.md` → **State update snippet**.
+2. Update `task.md` header: set `**Status:** clarified`; refresh `.devflow-state.json` (`task_status: clarified`, `next_step: devflow.plan`) per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **State update snippet**.
 3. Output a **Clarification Summary** in the response:
 
 ```text
@@ -153,8 +154,8 @@ Audit trail only — do not reformat, compress, or omit after writing.
 | | |
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md` |
-| Reads | `@devflow/skills/devflow-task/refinement-hints.md` (8D scan framework) |
-| Reads | `@devflow/skills/devflow-clarify/references/interactive-interview.md` (structured interview standards) |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-task/refinement-hints.md` (8D scan framework) |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-clarify/references/interactive-interview.md` (structured interview standards) |
 | Writes | `devflow/features/[NNN]_[feature-name]/task.md` — inline marker removal, targeted section updates, `## Clarifications` section appended, `Status` → `clarified` |
 | Precedes | `devflow.plan` |
 | Follows | `devflow.task` |

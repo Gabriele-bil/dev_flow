@@ -5,6 +5,8 @@ argument-hint: "[--json] [--fix]"
 disable-model-invocation: true
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Skill: devflow.doctor
 
 Pre-flight diagnostic health check for DevFlow. Assesses environment readiness across MCP servers, CLI toolchains, project configuration, and pipeline state.
@@ -34,12 +36,12 @@ Validate that the consumer environment satisfies all DevFlow operational prerequ
 
 Inspect `$ARGUMENTS`:
 
-- If `--json` is present: run `bash templates/devflow/scripts/doctor.sh --json` directly and emit only the raw JSON payload with its exit code. Stop here.
+- If `--json` is present: run `bash "${CLAUDE_PLUGIN_ROOT}/scripts/doctor.sh" --json` directly and emit only the raw JSON payload with its exit code. Stop here.
 - If `--fix` is present: pass `--fix` to the diagnostic script to automatically repair safe runtime files (e.g. `.gitignore`, resetting corrupted `.devflow-state.json`).
 
 ### Step 2 - Execute Environment Diagnostics
 
-Run `bash templates/devflow/scripts/doctor.sh` and capture its structured report across the 4 core inspection axes:
+Run `bash "${CLAUDE_PLUGIN_ROOT}/scripts/doctor.sh"` and capture its structured report across the 4 core inspection axes:
 
 1. **MCP Baseline Verification**:
    - Universal baseline: `context7`, `sequential-thinking`, code index (`serena` / LSP).

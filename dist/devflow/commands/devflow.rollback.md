@@ -5,6 +5,8 @@ argument-hint: "[--to <step>] [--force]"
 disable-model-invocation: true
 ---
 
-Use `@devflow/skills/devflow-rollback/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
+Use `${CLAUDE_PLUGIN_ROOT}/skills/devflow-rollback/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
 
 If `$ARGUMENTS` is empty, roll back the active feature's last step (skill Step 1 defaults).

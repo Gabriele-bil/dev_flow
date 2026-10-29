@@ -29,6 +29,6 @@ Full field/form patterns (setup, models, state, validation, conditional fields, 
 
 |            |                                                           |
 | ---------- | --------------------------------------------------------- |
-| Reads      | Active form files, `@devflow/adapters/angular/ADAPTER.md` |
+| Reads      | Active form files, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/ADAPTER.md` |
 | Writes     | New or refactored Angular signal-based form files         |
 | Invoked by | `devflow.implement`, `devflow.beautify`                   |

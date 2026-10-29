@@ -36,6 +36,6 @@ Full code (component structure, signal inputs/outputs, model(), computed/linkedS
 
 |            |                                                                |
 | ---------- | -------------------------------------------------------------- |
-| Reads      | Active component files, `@devflow/adapters/angular/ADAPTER.md` |
+| Reads      | Active component files, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/ADAPTER.md` |
 | Writes     | New or refactored Angular standalone component files           |
 | Invoked by | `devflow.implement`, `devflow.beautify`                        |

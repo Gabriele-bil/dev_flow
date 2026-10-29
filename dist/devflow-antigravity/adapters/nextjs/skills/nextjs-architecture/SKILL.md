@@ -92,5 +92,5 @@ Before merge, confirm:
 | | |
 | --- | --- |
 | Invoked by | `devflow-implement` when file path matches `app/**/page.tsx`, `app/**/layout.tsx`, `app/**/template.tsx`, `app/**/loading.tsx`, `app/**/error.tsx`, `app/**/not-found.tsx` |
-| Reads | `@devflow/adapters/nextjs/ADAPTER.md` |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/ADAPTER.md` |
 | Related | `nextjs-server`, `nextjs-components` |

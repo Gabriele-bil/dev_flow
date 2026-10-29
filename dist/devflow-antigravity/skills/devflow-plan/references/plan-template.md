@@ -81,7 +81,7 @@ execution.
 
 **Contracts First rule:** Shared contracts (types, interfaces, DTOs, DB schemas, state contracts) shared across ≥2 slices or `[P]` files MUST sit in `Slice 1` (`deps: none`). Parallel slices/files consume contracts via `--after` / `deps:` and never copy or redeclare another slice's contract.
 
-**Subtask model routing (`[route: light | mid | strong]`, optional):** Tag slices or individual file entries with the cheapest model tier capable of building them (`@devflow/references/model-selection.md`). Entries tagged `[route: light]` MUST include all 4 brief lines below (`Change`, `Contract`, `Test`, `Out of scope`); omit `[route: ...]` to use the default step model.
+**Subtask model routing (`[route: light | mid | strong]`, optional):** Tag slices or individual file entries with the cheapest model tier capable of building them (`$HOME/.gemini/antigravity-cli/plugins/devflow/references/model-selection.md`). Entries tagged `[route: light]` MUST include all 4 brief lines below (`Change`, `Contract`, `Test`, `Out of scope`); omit `[route: ...]` to use the default step model.
 
 **4-Part File Brief (recommended for `standard`/`thorough` and mandatory for `[route: light]`):**
 Under each `### [NNN].` heading, write four compact bullets so a cold agent can implement and verify the file without guessing:
@@ -146,7 +146,7 @@ After **Implementation checkpoints**, append **every extra plan section** requir
 
 <!-- Sections below are appended later by pipeline skills — never written by devflow.plan:
 ## Deviations        — devflow.implement Step 7b / escalation Level 3: `[file]`: [planned] → [actual] — [reason]
-## Decision flags    — run mode only, format per @devflow/references/run-mode.md
+## Decision flags    — run mode only, format per $HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md
 -->
 ```
 

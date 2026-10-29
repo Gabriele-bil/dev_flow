@@ -4,6 +4,8 @@ description: Manage local and team instincts (.devflow-instincts.yaml, .devflow-
 argument-hint: "[log, search <query>, list, check, prune, boost <id>, promote <id>]"
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Skill: devflow.learn
 
 ## Purpose

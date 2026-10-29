@@ -6,14 +6,14 @@ Single source of truth for Flutter behavior. Pipeline skills (`devflow-plan`, `d
 
 | When | Load |
 | ------ | ------ |
-| New feature architecture, layer ownership, feature file-tree scaffold | `@devflow/adapters/flutter/skills/flutter-architecture/SKILL.md` |
-| Database read/write/auth, schema, RLS | `@devflow/adapters/flutter/skills/flutter-supabase/SKILL.md` |
-| Schema migrations / SQL artifacts | `@devflow/adapters/flutter/skills/flutter-supabase-migrations/SKILL.md` |
-| New UI screens or visual styling | `@devflow/adapters/flutter/skills/flutter-theme/SKILL.md` |
-| Riverpod providers, notifiers, async state | `@devflow/adapters/flutter/skills/flutter-riverpod/SKILL.md` |
-| Entities, DTOs, JSON boundaries | `@devflow/adapters/flutter/skills/flutter-models/SKILL.md` |
-| Layout, breakpoints, scrollables | `@devflow/adapters/flutter/skills/flutter-layout/SKILL.md` |
-| Form / wizard flows | `@devflow/adapters/flutter/skills/flutter-form/SKILL.md` |
+| New feature architecture, layer ownership, feature file-tree scaffold | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/flutter/skills/flutter-architecture/SKILL.md` |
+| Database read/write/auth, schema, RLS | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/flutter/skills/flutter-supabase/SKILL.md` |
+| Schema migrations / SQL artifacts | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/flutter/skills/flutter-supabase-migrations/SKILL.md` |
+| New UI screens or visual styling | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/flutter/skills/flutter-theme/SKILL.md` |
+| Riverpod providers, notifiers, async state | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/flutter/skills/flutter-riverpod/SKILL.md` |
+| Entities, DTOs, JSON boundaries | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/flutter/skills/flutter-models/SKILL.md` |
+| Layout, breakpoints, scrollables | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/flutter/skills/flutter-layout/SKILL.md` |
+| Form / wizard flows | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/flutter/skills/flutter-form/SKILL.md` |
 | PR review, blast radius, architecture risk checks | `@code-review-graph/skills/code-review-graph/SKILL.md` |
 
 ## MCP (when available)

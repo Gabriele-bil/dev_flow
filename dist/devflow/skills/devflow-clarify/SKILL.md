@@ -5,6 +5,8 @@ model: haiku
 effort: low
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Skill: devflow.clarify
 
 ## Purpose
@@ -36,7 +38,7 @@ Run when either condition is true:
 
 Before running, verify:
 
-- [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md` — no path argument → resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**
+- [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md` — no path argument → resolve feature per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Active feature resolution**
 - [ ] `task.md` Status is not `done`
 
 If any item fails → stop and report which check failed.
@@ -46,7 +48,7 @@ If any item fails → stop and report which check failed.
 ### Step 1 — Load and scan
 
 1. Read `task.md` in full.
-2. Read `@devflow/skills/devflow-task/refinement-hints.md` — use all 8 dimensions as the scan framework.
+2. Read `${CLAUDE_PLUGIN_ROOT}/skills/devflow-task/refinement-hints.md` — use all 8 dimensions as the scan framework.
 3. Build the question backlog:
    - Extract every `[NEEDS CLARIFICATION: ...]` marker in `task.md` → one candidate question per marker.
    - Run the 8D scan on the full task content; generate additional candidate questions for dimensions with open ambiguities not already covered by a marker.
@@ -56,7 +58,7 @@ If any item fails → stop and report which check failed.
 
 ### Step 2 — Interactive Q&A loop
 
-Follow structured interview standards in `@devflow/skills/devflow-clarify/references/interactive-interview.md`.
+Follow structured interview standards in `${CLAUDE_PLUGIN_ROOT}/skills/devflow-clarify/references/interactive-interview.md`.
 
 For each question in the prioritized queue, one at a time:
 
@@ -100,7 +102,7 @@ After the Q&A loop completes:
 1. Scan `task.md` for remaining `[NEEDS CLARIFICATION: ...]` markers.
    - Resolved markers: already removed inline during Step 2.
    - Skipped markers: leave in place — they represent accepted risk.
-2. Update `task.md` header: set `**Status:** clarified`; refresh `.devflow-state.json` (`task_status: clarified`, `next_step: devflow.plan`) per `@devflow/references/state-machine.md` → **State update snippet**.
+2. Update `task.md` header: set `**Status:** clarified`; refresh `.devflow-state.json` (`task_status: clarified`, `next_step: devflow.plan`) per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **State update snippet**.
 3. Output a **Clarification Summary** in the response:
 
 ```text
@@ -155,8 +157,8 @@ Audit trail only — do not reformat, compress, or omit after writing.
 | | |
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md` |
-| Reads | `@devflow/skills/devflow-task/refinement-hints.md` (8D scan framework) |
-| Reads | `@devflow/skills/devflow-clarify/references/interactive-interview.md` (structured interview standards) |
+| Reads | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-task/refinement-hints.md` (8D scan framework) |
+| Reads | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-clarify/references/interactive-interview.md` (structured interview standards) |
 | Writes | `devflow/features/[NNN]_[feature-name]/task.md` — inline marker removal, targeted section updates, `## Clarifications` section appended, `Status` → `clarified` |
 | Precedes | `devflow.plan` |
 | Follows | `devflow.task` |

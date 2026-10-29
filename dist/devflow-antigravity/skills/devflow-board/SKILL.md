@@ -4,13 +4,14 @@ description: "Generates and auto-syncs a deterministic, static, read-only HTML p
 argument-hint: "[--open] [--sync] [--port <port>] [--json]"
 ---
 
+
 # Skill: devflow.board
 
 ## Quick Start
 
 Run `/devflow.board [--open] [--sync] [--port <port>] [--json]`.
 
-- First run initializes `devflow/board/index.html` from `@devflow/skills/devflow-board/assets/board-template.html` and writes `devflow/board/board-data.js` + `devflow/board/board-data.json`
+- First run initializes `devflow/board/index.html` from `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-board/assets/board-template.html` and writes `devflow/board/board-data.js` + `devflow/board/board-data.json`
 - Subsequent runs or hook invocations (`board.sh --sync`) refresh `devflow/board/board-data.js` in place without recreating `index.html`
 - `--open`: open `devflow/board/index.html` in system browser; `--port <N>`: serve over local read-only HTTP; `--json`: emit compiled JSON payload to stdout
 
@@ -36,7 +37,7 @@ Generate and synchronize a deterministic, portable, strictly read-only HTML proj
 Before proceeding, verify:
 
 - [ ] `jq` is installed (`command -v jq >/dev/null 2>&1`) — if missing, stop and provide `brew install jq` remediation
-- [ ] Canonical template `@devflow/skills/devflow-board/assets/board-template.html` and generator `@devflow/scripts/board.sh` exist
+- [ ] Canonical template `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-board/assets/board-template.html` and generator `$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/board.sh` exist
 - [ ] If `--port <port>` is passed, `<port>` is numeric and not already bound by another process
 
 If any item fails → stop, report which check failed, do not write partial board artifacts.
@@ -54,23 +55,15 @@ Inspect `$ARGUMENTS` for optional flags:
 
 ### Step 2 — Execute Deterministic Board Generator
 
-Resolve and run `board.sh`:
+Run `board.sh`:
 
 ```bash
-BOARD_SCRIPT="templates/devflow/scripts/board.sh"
-if [ ! -f "$BOARD_SCRIPT" ] && [ -n "${CLAUDE_PLUGIN_ROOT:-}" ]; then
-  BOARD_SCRIPT="$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/board.sh"
-fi
-if [ ! -f "$BOARD_SCRIPT" ]; then
-  BOARD_SCRIPT="dist/devflow/scripts/board.sh"
-fi
-
-bash "$BOARD_SCRIPT" $ARGUMENTS
+bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/board.sh" $ARGUMENTS
 ```
 
 What `board.sh` executes deterministically:
 
-1. **Template Initialization:** On first run (or when `devflow/board/index.html` is absent), copies `@devflow/skills/devflow-board/assets/board-template.html` byte-for-byte to `devflow/board/index.html`. Never generates custom per-project HTML/CSS.
+1. **Template Initialization:** On first run (or when `devflow/board/index.html` is absent), copies `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-board/assets/board-template.html` byte-for-byte to `devflow/board/index.html`. Never generates custom per-project HTML/CSS.
 2. **Artifact & Telemetry Parsing:** Scans `devflow/features/[NNN]_*/` (`task.md`, `plan.md`, `verification.md`), `devflow/plans/project-blueprint.md`, `docs/adr/*.md`, `.devflow-state.json`, `.devflow-metrics.jsonl`, and `.devflow-timings.jsonl`.
 3. **Kanban & Dependency DAG Computation:**
    - Assigns each task to one of 5 read-only columns (`Draft / Clarified`, `Planned / Ready`, `In Progress`, `Implemented / Verified`, `PR Opened / Done`).
@@ -88,7 +81,7 @@ Report generated board location (`devflow/board/index.html`), project completion
 
 | Thought | Reality |
 | --- | --- |
-| "Write a custom HTML dashboard tailored to this repo's stack" | Forbidden. Every project must use the exact `@devflow/skills/devflow-board/assets/board-template.html` via `board.sh` |
+| "Write a custom HTML dashboard tailored to this repo's stack" | Forbidden. Every project must use the exact `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-board/assets/board-template.html` via `board.sh` |
 | "Add drag-and-drop card moving or checkbox toggling in the browser" | Board is strictly static and read-only; state changes happen exclusively through DevFlow pipeline commands |
 | "Recreate `devflow/board/index.html` from scratch on every hook event" | Once initialized, hooks run `board.sh --sync --quiet` to update only `board-data.js` |
 | "Require npm/vite/webpack in the consumer project to build the board" | Zero consumer build dependencies allowed; `index.html` + `board-data.js` run directly on `file://` or static HTTP |
@@ -106,7 +99,7 @@ Report generated board location (`devflow/board/index.html`), project completion
 
 | | |
 | --- | --- |
-| Reads | `@devflow/skills/devflow-board/assets/board-template.html`, `devflow/features/*/task.md`, `plan.md`, `verification.md`, `devflow/plans/project-blueprint.md`, `docs/adr/*.md`, `.devflow-state.json`, `.devflow-metrics.jsonl`, `.devflow-timings.jsonl` |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-board/assets/board-template.html`, `devflow/features/*/task.md`, `plan.md`, `verification.md`, `devflow/plans/project-blueprint.md`, `docs/adr/*.md`, `.devflow-state.json`, `.devflow-metrics.jsonl`, `.devflow-timings.jsonl` |
 | Writes | `devflow/board/index.html` (initial setup), `devflow/board/board-data.js`, `devflow/board/board-data.json` (initial + `--sync`) |
-| Executes | `@devflow/scripts/board.sh` |
+| Executes | `$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/board.sh` |
 | Related | `devflow.status`, `devflow.metrics`, `hooks/stop-metrics.sh`, `hooks/post-task-create.sh`, `hooks/post-edit-accumulate.sh` |

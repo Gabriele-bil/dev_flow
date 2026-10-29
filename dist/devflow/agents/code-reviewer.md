@@ -6,6 +6,8 @@ disallowedTools: Write, Edit, MultiEdit, NotebookEdit
 model: sonnet
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Code Reviewer
 
 Staff Engineer perspective. Evaluate changes for merge readiness.
@@ -68,7 +70,7 @@ Skip this axis when the dispatch roster includes `security-auditor` (`standard`/
 - No secrets, tokens, or keys in code, logs, or git
 - Auth/authorization checks present where needed
 - Queries parameterized; output encoded
-- Full checklist: `@devflow/references/security-checklist.md`
+- Full checklist: `${CLAUDE_PLUGIN_ROOT}/references/security-checklist.md`
 
 ### 5. Performance
 

@@ -62,5 +62,5 @@ Fix: `.catch(err => logger.error(...))` on fire-and-forget promises; `try/catch`
 | | |
 | --- | --- |
 | Invoked by | `devflow-implement` when file path matches `*.filter.ts`, or content has `catch`/`@OnEvent`/`@Cron`/`Logger`/`throw` |
-| Reads | `@devflow/adapters/nestjs/ADAPTER.md` |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nestjs/ADAPTER.md` |
 | Related | `nestjs-api-design` (RFC7807-style error response shape), `nestjs-security` (input validation errors) |

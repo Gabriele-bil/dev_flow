@@ -48,5 +48,5 @@ Never call a real Stripe/HTTP/queue client or real database in a unit test — s
 | | |
 | --- | --- |
 | Invoked by | `devflow-test` and `devflow-implement` when file path matches `*.spec.ts` or `*.e2e-spec.ts` |
-| Reads | `@devflow/adapters/nestjs/ADAPTER.md`, `steps/test.md` |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nestjs/ADAPTER.md`, `steps/test.md` |
 | Related | `nestjs-architecture` (DI shape under test), `nestjs-security` (guard test patterns) |

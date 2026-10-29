@@ -40,7 +40,7 @@ Loaded by all pipeline skills immediately after adapter resolution.
 
 | Section / Element | Expected Heading / Key | Type | Consumer Skill | Notes |
 | --- | --- | :---: | --- | --- |
-| Technology skills table | `## Technology skills` | `[R]` | All steps | Table mapping feature type / concern → `@devflow/adapters/<adapter>/skills/<skill>/SKILL.md` |
+| Technology skills table | `## Technology skills` | `[R]` | All steps | Table mapping feature type / concern → `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/skills/<skill>/SKILL.md` |
 | MCP baseline | `## MCP` | `[R]` | `devflow.setup`, `plan`, `implement` | Universal baseline + stack core tools + conditional infrastructure |
 | Step files index | `## Step files` | `[R]` | All steps | Table mapping step (`setup`, `plan`, `implement`, `beautify`, `test`, `pr`) → `steps/<step>.md` |
 | Caveman response rules | `## Caveman response rules` | `[O]` | All steps | Style reminders: imperative, filler-free, token-lean |

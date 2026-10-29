@@ -120,10 +120,22 @@ for f in "$AGY_DIR"/agents/*.md; do
 done
 ok "Campi solo-Claude Code rimossi"
 
-# ${CLAUDE_PLUGIN_ROOT} nelle skill → cartella di staging di agy
+# Percorsi del plugin: agy installa in una cartella fissa, quindi anche i file
+# letti con Read possono usare il percorso assoluto e la nota "Plugin root"
+# della build Claude Code non serve. I template per il consumer (adapters/*/templates)
+# restano invariati. @devflow/config.md è del consumer e non viene toccato.
+step "Percorsi del plugin → $AGY_STAGING"
+PLUGIN_DIRS_RE='(references|adapters|skills|agents|scripts|contexts)'
 while IFS= read -r f; do
-  sed -e "s|\${CLAUDE_PLUGIN_ROOT}|$AGY_STAGING|g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
-done < <(grep -rl 'CLAUDE_PLUGIN_ROOT' "$AGY_DIR/skills" "$AGY_DIR/references" 2>/dev/null || true)
+  sed -E -e '/^> \*\*Plugin root:\*\*/d' \
+    -e "s#@devflow/${PLUGIN_DIRS_RE}/#$AGY_STAGING/\1/#g" \
+    -e "s#\\\$\\{CLAUDE_PLUGIN_ROOT\\}#$AGY_STAGING#g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+done < <(find "$AGY_DIR/skills" "$AGY_DIR/references" "$AGY_DIR/agents" "$AGY_DIR/adapters" "$AGY_DIR/contexts" \
+  -name '*.md' ! -path '*/templates/*' 2>/dev/null)
+LEFT="$(find "$AGY_DIR/skills" "$AGY_DIR/references" "$AGY_DIR/agents" "$AGY_DIR/adapters" "$AGY_DIR/contexts" \
+  -name '*.md' ! -path '*/templates/*' -exec grep -lE "@devflow/${PLUGIN_DIRS_RE}/|CLAUDE_PLUGIN_ROOT|Plugin root:" {} + 2>/dev/null || true)"
+[ -z "$LEFT" ] || fail "percorsi non tradotti in: $LEFT"
+ok "Percorsi del plugin risolti"
 
 # ── rules/ ────────────────────────────────────────────────────────────────────
 step "rules/devflow-orientation.md"

@@ -4,6 +4,7 @@ description: "Roll back the active DevFlow step (implement or beautify) to its p
 argument-hint: "[--to <step>] [--force]"
 ---
 
+
 # Skill: devflow.rollback
 
 Reverts the active DevFlow step to its clean pre-step checkpoint, restoring code and state machine synchronization.
@@ -31,7 +32,7 @@ Safely discard unwanted changes made during `devflow.implement` or `devflow.beau
 
 ### Step 1 - Resolve Active Feature and Target Step
 
-1. Resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**; read current Status from its `plan.md` (authoritative — never from the state file).
+1. Resolve feature per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **Active feature resolution**; read current Status from its `plan.md` (authoritative — never from the state file).
 2. Determine target rollback destination:
    - If `$ARGUMENTS` contains `--to <step>`: use the specified step (`implement` or `beautify`).
    - If unspecified:

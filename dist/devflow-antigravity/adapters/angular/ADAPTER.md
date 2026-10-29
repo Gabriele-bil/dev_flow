@@ -8,14 +8,14 @@ Baseline: **standalone + signals-first**. Keep output token-lean and imperative.
 
 | When | Load | |
 |------|------| |
-| App structure, folder layout, boundaries, communication flow | `@devflow/adapters/angular/skills/angular-architecture/SKILL.md` | |
-| New components, refactor existing components, template/class split | `@devflow/adapters/angular/skills/angular-component/SKILL.md` | |
-| Reactive forms, validation, form UX, submit flows | `@devflow/adapters/angular/skills/angular-forms/SKILL.md` | |
-| API clients, HttpClient usage, interceptors, error mapping | `@devflow/adapters/angular/skills/angular-http/SKILL.md` | |
-| Global and local state management patterns | `@devflow/adapters/angular/skills/angular-state/SKILL.md` | |
-| Routes, guards, resolvers, navigation, rendering strategy | `@devflow/adapters/angular/skills/angular-routing/SKILL.md` | |
-| Accessible custom widgets (Accordion, Listbox, Combobox, Menu, Tabs, Tree, Grid, Toolbar) | `@devflow/adapters/angular/skills/angular-aria/SKILL.md` | |
-| Enter/leave animations, state transitions, route transitions | `@devflow/adapters/angular/skills/angular-animations/SKILL.md` | |
+| App structure, folder layout, boundaries, communication flow | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/skills/angular-architecture/SKILL.md` | |
+| New components, refactor existing components, template/class split | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/skills/angular-component/SKILL.md` | |
+| Reactive forms, validation, form UX, submit flows | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/skills/angular-forms/SKILL.md` | |
+| API clients, HttpClient usage, interceptors, error mapping | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/skills/angular-http/SKILL.md` | |
+| Global and local state management patterns | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/skills/angular-state/SKILL.md` | |
+| Routes, guards, resolvers, navigation, rendering strategy | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/skills/angular-routing/SKILL.md` | |
+| Accessible custom widgets (Accordion, Listbox, Combobox, Menu, Tabs, Tree, Grid, Toolbar) | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/skills/angular-aria/SKILL.md` | |
+| Enter/leave animations, state transitions, route transitions | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/skills/angular-animations/SKILL.md` | |
 | PR review, blast radius, architecture risk checks | `@code-review-graph/skills/code-review-graph/SKILL.md` | |
 
 ## MCP (when available)

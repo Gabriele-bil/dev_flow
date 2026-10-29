@@ -4,6 +4,8 @@ description: Resumes an interrupted DevFlow session — reads saved state, cross
 argument-hint: "[optional-feature]"
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Skill: devflow.resume
 
 First-class session re-entry. Reads state, validates it against files, routes to the correct pipeline step — no re-deriving from scratch, no re-implementing `[done]` work.
@@ -28,7 +30,7 @@ Resume an interrupted pipeline at the exact position it stopped. Promotes the re
 
 ## Input contract
 
-- [ ] `devflow/config.md` exists (adapter known; monorepo: `plan.md`'s App resolves in the `## Apps` table — see `@devflow/references/adapter-resolution.md`)
+- [ ] `devflow/config.md` exists (adapter known; monorepo: `plan.md`'s App resolves in the `## Apps` table — see `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`)
 - [ ] `.devflow-state.json` exists OR at least one `devflow/features/*/plan.md` exists
 
 Both absent → stop: "Nothing to resume. Start with `/devflow.task` (or `/devflow.setup` on a new project)."
@@ -37,7 +39,7 @@ Both absent → stop: "Nothing to resume. Start with `/devflow.task` (or `/devfl
 
 ### Step 1 — Read saved state
 
-Resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution** (explicit argument → state `.feature // .active_feature` → lowest open feature → ask). Read its `plan.md` `**Status:**`, map to `next_step` via the status table. State file (`plan_status`, `next_step`, `pending_files`) = hint only — Step 2 cross-checks it.
+Resolve feature per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Active feature resolution** (explicit argument → state `.feature // .active_feature` → lowest open feature → ask). Read its `plan.md` `**Status:**`, map to `next_step` via the status table. State file (`plan_status`, `next_step`, `pending_files`) = hint only — Step 2 cross-checks it.
 
 Also read the feature checkpoint when present — restores working context lost at compaction (`slice`, `decisions`, `constraints`, `errors_tried`; schema: `state-machine.md` → **Checkpoint file**):
 
@@ -55,7 +57,7 @@ cat devflow/features/[NNN]_[feature-name]/handoff.md 2>/dev/null
 
 ### Step 2 — Cross-check state against files
 
-Trust order: `plan.md` > `.devflow-state.json` (state file is derived cache — see `@devflow/references/state-machine.md`).
+Trust order: `plan.md` > `.devflow-state.json` (state file is derived cache — see `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md`).
 
 1. Read `plan.md` `**Status:**` for the active feature.
 2. Count `[done]` / `[pending]` markers in **File List**.
@@ -120,8 +122,8 @@ After position confirmed: delete consumed `handoff.md` (`rm -f devflow/features/
 
 | | |
 | --- | --- |
-| Reads | `.devflow-state.json`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md` (existence), `devflow/features/[NNN]_[feature-name]/.checkpoint.json` (working context), `devflow/features/[NNN]_[feature-name]/handoff.md` (context-pressure handoff), `.devflow-run.json` (stale-marker check), `devflow/config.md`, `@devflow/references/adapter-resolution.md` |
-| Reads | `@devflow/references/state-machine.md` — status/transition source of truth |
+| Reads | `.devflow-state.json`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md` (existence), `devflow/features/[NNN]_[feature-name]/.checkpoint.json` (working context), `devflow/features/[NNN]_[feature-name]/handoff.md` (context-pressure handoff), `.devflow-run.json` (stale-marker check), `devflow/config.md`, `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md` |
+| Reads | `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` — status/transition source of truth |
 | Deletes | `handoff.md` (after position confirmed), stale `.devflow-run.json` (unless user re-arms `devflow.run` or `devflow.auto`) |
 | Writes | nothing else (routing only) |
 | Routes to | pipeline skill matching `next_step` |

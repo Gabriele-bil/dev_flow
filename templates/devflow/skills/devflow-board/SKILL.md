@@ -55,18 +55,10 @@ Inspect `$ARGUMENTS` for optional flags:
 
 ### Step 2 — Execute Deterministic Board Generator
 
-Resolve and run `board.sh`:
+Run `board.sh`:
 
 ```bash
-BOARD_SCRIPT="templates/devflow/scripts/board.sh"
-if [ ! -f "$BOARD_SCRIPT" ] && [ -n "${CLAUDE_PLUGIN_ROOT:-}" ]; then
-  BOARD_SCRIPT="${CLAUDE_PLUGIN_ROOT}/scripts/board.sh"
-fi
-if [ ! -f "$BOARD_SCRIPT" ]; then
-  BOARD_SCRIPT="dist/devflow/scripts/board.sh"
-fi
-
-bash "$BOARD_SCRIPT" $ARGUMENTS
+bash "@devflow/scripts/board.sh" $ARGUMENTS
 ```
 
 What `board.sh` executes deterministically:

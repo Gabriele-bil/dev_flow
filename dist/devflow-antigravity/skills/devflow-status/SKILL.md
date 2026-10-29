@@ -4,6 +4,7 @@ description: Shows current DevFlow pipeline state (read-only) — active feature
 argument-hint: "[--json]"
 ---
 
+
 # Skill: devflow-status
 
 Pipeline dashboard. Shows current state without advancing the pipeline. `--json` → machine-readable output for CI/scripts.
@@ -29,18 +30,18 @@ Emit compact status dashboard. Answers "where am I in the pipeline?" — no step
 
 ### Step 0 — Mode
 
-`$ARGUMENTS` contains `--json` → skip Steps 1–3, run the emitter snippet from `@devflow/references/status-schema.md` verbatim, output only the resulting JSON object (no prose, no dashboard), report its exit code (0 = healthy, 1 = no pipeline, 2 = inconsistent state). Otherwise continue below.
+`$ARGUMENTS` contains `--json` → skip Steps 1–3, run the emitter snippet from `$HOME/.gemini/antigravity-cli/plugins/devflow/references/status-schema.md` verbatim, output only the resulting JSON object (no prose, no dashboard), report its exit code (0 = healthy, 1 = no pipeline, 2 = inconsistent state). Otherwise continue below.
 
 ### Step 1 — Read pipeline state
 
 Order (plan.md authoritative, state file = derived cache):
 
 1. `devflow/config.md` — absent → Case C. Active adapter (single-app) or `## Apps` table (monorepo)
-2. Active feature — resolve per `@devflow/references/state-machine.md` → **Active feature resolution**
+2. Active feature — resolve per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **Active feature resolution**
 3. Resolved feature's `plan.md` — `**Status:**`, `**App:**`, File List `[done]`/`[pending]` progress; no `plan.md` → `task.md` `**Status:**` (next step `devflow.plan`, or `devflow.clarify` when markers open)
 4. `.devflow-state.json` — drift check only: its `plan_status` ≠ `plan.md` Status → add `Drift:` line (plan.md wins; `devflow.recovery` resyncs)
 
-Status semantics and next-step mapping: `@devflow/references/state-machine.md` (authoritative). Adapter/app resolution: `@devflow/references/adapter-resolution.md`.
+Status semantics and next-step mapping: `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` (authoritative). Adapter/app resolution: `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md`.
 
 ### Step 2 — List active features
 
@@ -127,8 +128,8 @@ Both files absent → omit line, zero behavior change. Turns raw JSONL/YAML into
 
 | | |
 | --- | --- |
-| Reads | `.devflow-state.json`, `devflow/config.md`, `devflow/features/*/plan.md`, `@devflow/references/adapter-resolution.md`, `@devflow/references/state-machine.md`, `@devflow/references/status-schema.md` (`--json` mode) |
+| Reads | `.devflow-state.json`, `devflow/config.md`, `devflow/features/*/plan.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/status-schema.md` (`--json` mode) |
 | Reads (optional) | `.devflow-filter-stats.jsonl`, `.devflow-metrics.jsonl` — existence only (Metrics pointer line) |
 | Reads (optional) | `.devflow-learnings.jsonl`, `.devflow-instincts.yaml` — auto-detected/contested learnings count (Learnings line) |
 | Writes | nothing |
-| Related | `@devflow/references/orientation.md` (full routing tree), `devflow-resume` (session re-entry), `devflow-recovery` (corrupted state), `devflow-learn` (full learnings detail), `devflow-metrics` (savings, cost, pass@1) |
+| Related | `$HOME/.gemini/antigravity-cli/plugins/devflow/references/orientation.md` (full routing tree), `devflow-resume` (session re-entry), `devflow-recovery` (corrupted state), `devflow-learn` (full learnings detail), `devflow-metrics` (savings, cost, pass@1) |

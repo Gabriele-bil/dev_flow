@@ -39,7 +39,7 @@ Options:
 
 ## Cross-model rescue & Subtask Tier Auto-Escalation
 
-- **Subtask route escalation (`[route: light | mid | strong]`):** When a slice or file entry tagged `[route: light]` or `[route: mid]` in `plan.md` exhausts Level 1 (3 failed attempts), automatically escalate execution one tier up (`light → mid`, `mid → strong` per `@devflow/references/model-selection.md`) before entering Level 3/4 re-planning.
+- **Subtask route escalation (`[route: light | mid | strong]`):** When a slice or file entry tagged `[route: light]` or `[route: mid]` in `plan.md` exhausts Level 1 (3 failed attempts), automatically escalate execution one tier up (`light → mid`, `mid → strong` per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/model-selection.md`) before entering Level 3/4 re-planning.
 - **Cross-model rescue (optional variant):** Hosts supporting per-agent model switching: at Level 2, one hypothesis may come from a fresh agent on a different model family (fresh perspective, zero shared context blind spots). Counts against the 2-hypothesis budget. Skip on hosts without model routing.
 
 ## Anti-Patterns

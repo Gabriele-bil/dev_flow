@@ -4,6 +4,8 @@ description: Diagnoses and repairs a stuck, blocked, or corrupted DevFlow pipeli
 argument-hint: "[optional-feature]"
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Skill: devflow-recovery
 
 Pipeline rescue. Diagnoses state, identifies failure point, proposes recovery path — no guessing.
@@ -46,13 +48,13 @@ Extract:
 - `next_step` — last recorded step
 - `next_feature_number` — NNN counter
 
-No explicit feature argument → resolve per `@devflow/references/state-machine.md` → **Active feature resolution**; also list every feature whose `plan.md` Status is `blocked` (step 3 of that resolution skips them — recovery is where they surface).
+No explicit feature argument → resolve per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Active feature resolution**; also list every feature whose `plan.md` Status is `blocked` (step 3 of that resolution skips them — recovery is where they surface).
 
 If `STATE_MISSING`: proceed to **Recovery path C**.
 
 ### Step 2 — Classify failure
 
-Valid statuses and legal transitions: `@devflow/references/state-machine.md` (authoritative — a status outside its tables is itself corruption).
+Valid statuses and legal transitions: `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` (authoritative — a status outside its tables is itself corruption).
 
 Determine failure category based on state + file existence:
 
@@ -90,7 +92,7 @@ grep -i "error\|fail\|stuck\|issue" .devflow-learnings.jsonl 2>/dev/null | tail 
 cat devflow/features/${FEATURE}/.checkpoint.json 2>/dev/null
 ```
 
-Checkpoint present → include `errors_tried` in the diagnosis; never re-propose a fix already listed there. Schema: `@devflow/references/state-machine.md` → **Checkpoint file**.
+Checkpoint present → include `errors_tried` in the diagnosis; never re-propose a fix already listed there. Schema: `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Checkpoint file**.
 
 For **Category G (blocked)**: find blocking step — stuck-report (`🛑 BLOCKED: [step]`) in recent output/handoff, else `.checkpoint.json` `step`, else File List markers. Map to reset status:
 
@@ -146,7 +148,7 @@ Execute only the user-chosen option.
 
 **Re-run step** (Option 1 typical):
 
-- Step = `next_step` for current `plan.md` Status (`@devflow/references/state-machine.md` → status table) — not always implement
+- Step = `next_step` for current `plan.md` Status (`${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → status table) — not always implement
 - `devflow.implement`: continue from first `[pending]` entry; never re-run `[done]` entries (targeted rework → `--fix` re-entry)
 - Other steps: run from their Step 0, honoring their input contract
 
@@ -158,7 +160,7 @@ Execute only the user-chosen option.
 
 **Resync state** (Option 2 typical):
 
-Merge (never overwrite) via `@devflow/references/state-machine.md` → **State update snippet**, values derived from `plan.md`: `feature`, `plan_status` (= `plan.md` Status), `next_step` (status table), `next_feature_number` (int, highest `devflow/features/` prefix + 1). Unknown keys preserved; legacy `active_feature` dropped by the snippet.
+Merge (never overwrite) via `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **State update snippet**, values derived from `plan.md`: `feature`, `plan_status` (= `plan.md` Status), `next_step` (status table), `next_feature_number` (int, highest `devflow/features/` prefix + 1). Unknown keys preserved; legacy `active_feature` dropped by the snippet.
 
 **Nuclear reset** (Option 3):
 
@@ -198,7 +200,7 @@ Next command: [exact command to continue]
 | --- | --- |
 | Reads | `.devflow-state.json`, `.devflow-observe.jsonl`, `.devflow-learnings.jsonl`, `devflow/features/*/.checkpoint.json` |
 | Reads | `devflow/features/*/task.md`, `devflow/features/*/plan.md` |
-| Reads | `devflow/config.md`, `@devflow/references/adapter-resolution.md`, `@devflow/references/state-machine.md` |
+| Reads | `devflow/config.md`, `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`, `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` |
 | Writes | `.devflow-state.json` (merge, only on user-confirmed resync/unblock); `plan.md` `**Status:**` (Category G only, user-confirmed) |
-| Related | `devflow-status` (non-recovery status check), `devflow-resume` (clean session re-entry), `@devflow/references/orientation.md` (session orientation) |
+| Related | `devflow-status` (non-recovery status check), `devflow-resume` (clean session re-entry), `${CLAUDE_PLUGIN_ROOT}/references/orientation.md` (session orientation) |
 | Next step | Whichever pipeline step the recovery routes to |

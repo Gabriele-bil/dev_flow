@@ -4,6 +4,8 @@ description: Resume an interrupted DevFlow session — read saved state, cross-c
 argument-hint: "[optional-feature]"
 ---
 
-Use `@devflow/skills/devflow-resume/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
 
-If `$ARGUMENTS` is empty, resume the feature resolved per `@devflow/references/state-machine.md` → **Active feature resolution**.
+Use `${CLAUDE_PLUGIN_ROOT}/skills/devflow-resume/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
+
+If `$ARGUMENTS` is empty, resume the feature resolved per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Active feature resolution**.

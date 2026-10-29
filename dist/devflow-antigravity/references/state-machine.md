@@ -185,7 +185,7 @@ Append to existing arrays instead of overwriting: read current file with `jq '.d
 
 ## Run marker (autonomous mode)
 
-`.devflow-run.json` at project root — presence switches pipeline skills to **run mode**: behavior contract (autonomy policy, decision flags, discrepancy classes, disarm) in `@devflow/references/run-mode.md`. This section owns the file schema only.
+`.devflow-run.json` at project root — presence switches pipeline skills to **run mode**: behavior contract (autonomy policy, decision flags, discrepancy classes, disarm) in `$HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md`. This section owns the file schema only.
 
 Shared by two orchestrators, distinguished by `from`/`until` vocabulary:
 

@@ -5,6 +5,8 @@ argument-hint: "[--from implement|beautify|test] [--until beautify|test|ship]"
 disable-model-invocation: true
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Skill: devflow.run
 
 ## Quick Start
@@ -28,7 +30,7 @@ Opt-in gated autonomy. Execute middle pipeline (implement → beautify → test)
 
 ## Autonomy policy
 
-Run-mode contract (marker, autonomy table `run` column, decision flags, discrepancy classes, disarm): `@devflow/references/run-mode.md`. Commit/push/PR and config edits never unattended here.
+Run-mode contract (marker, autonomy table `run` column, decision flags, discrepancy classes, disarm): `${CLAUDE_PLUGIN_ROOT}/references/run-mode.md`. Commit/push/PR and config edits never unattended here.
 
 ## When NOT to Use
 
@@ -40,7 +42,7 @@ Run-mode contract (marker, autonomy table `run` column, decision flags, discrepa
 
 ## Input contract
 
-- [ ] Feature resolved — explicit `NNN_name` argument, else `@devflow/references/state-machine.md` → **Active feature resolution**
+- [ ] Feature resolved — explicit `NNN_name` argument, else `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Active feature resolution**
 - [ ] `task.md` + `plan.md` exist at `devflow/features/[NNN]_[feature-name]/`
 - [ ] `plan.md` **Status** satisfies the `--from` step's input contract (`implement` → `ready`; `beautify` → `implemented`; `test` → `beautified` or `implemented`)
 - [ ] No active `.devflow-run.json` (stale marker from crashed run → confirm deletion with user, or route `devflow.recovery`)
@@ -63,31 +65,31 @@ Ambiguity → defensible default + flag in plan.md ## Decision flags (you review
 Proceed? (yes / no)
 ```
 
-On yes: arm per `@devflow/references/run-mode.md` → **Marker** (`orchestrator: "devflow.run"`, `from`/`until` from flags; schema `state-machine.md` → **Run marker**).
+On yes: arm per `${CLAUDE_PLUGIN_ROOT}/references/run-mode.md` → **Marker** (`orchestrator: "devflow.run"`, `from`/`until` from flags; schema `state-machine.md` → **Run marker**).
 
 ### Step 1 - Chain steps
 
 Execute each step skill in order from `--from` to `--until`, honoring each input contract:
 
-1. `@devflow/skills/devflow-implement/SKILL.md` — full workflow
-2. `@devflow/skills/devflow-beautify/SKILL.md` — **certain improvements** only; opinable proposals become decision flags, never applied
-3. `@devflow/skills/devflow-test/SKILL.md` — full workflow including Step 6b goal-backward verification
-4. `@devflow/skills/devflow-ship/SKILL.md` — only with `--until ship`; fan-out + synthesis, never Step 5 route to `devflow.pr`
+1. `${CLAUDE_PLUGIN_ROOT}/skills/devflow-implement/SKILL.md` — full workflow
+2. `${CLAUDE_PLUGIN_ROOT}/skills/devflow-beautify/SKILL.md` — **certain improvements** only; opinable proposals become decision flags, never applied
+3. `${CLAUDE_PLUGIN_ROOT}/skills/devflow-test/SKILL.md` — full workflow including Step 6b goal-backward verification
+4. `${CLAUDE_PLUGIN_ROOT}/skills/devflow-ship/SKILL.md` — only with `--until ship`; fan-out + synthesis, never Step 5 route to `devflow.pr`
 
 Chain rules:
 
 - Between steps: no user prompt. Record each step's notify block for the Step 3 consolidated report.
 - Step input contract fails mid-chain → stop run (Step 3), report failed check; never force a step.
-- Failures inside a step follow `@devflow/references/escalation-ladder.md`; Level 5 block → stop run, keep flags, write consolidated report with stuck-report.
-- Context pressure (host warning, >20 files into large plan) → write handoff per `@devflow/references/state-machine.md` → **Handoff file**, stop run, tell user: restart + `devflow.resume`.
+- Failures inside a step follow `${CLAUDE_PLUGIN_ROOT}/references/escalation-ladder.md`; Level 5 block → stop run, keep flags, write consolidated report with stuck-report.
+- Context pressure (host warning, >20 files into large plan) → write handoff per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Handoff file**, stop run, tell user: restart + `devflow.resume`.
 
 ### Step 2 - Decision flags (forward-motion)
 
-Never block on ambiguity while armed — defensible default + `plan.md` `## Decision flags` entry, format and precedence per `@devflow/references/run-mode.md` → **Decision flags**. Major discrepancies stop the run per its **Discrepancy classes**.
+Never block on ambiguity while armed — defensible default + `plan.md` `## Decision flags` entry, format and precedence per `${CLAUDE_PLUGIN_ROOT}/references/run-mode.md` → **Decision flags**. Major discrepancies stop the run per its **Discrepancy classes**.
 
 ### Step 3 - Disarm + consolidated report
 
-Disarm per `@devflow/references/run-mode.md` → **Disarm** (every exit path). Report:
+Disarm per `${CLAUDE_PLUGIN_ROOT}/references/run-mode.md` → **Disarm** (every exit path). Report:
 
 ```text
 🤖 devflow.run complete: [from] → [last step executed]
@@ -130,8 +132,8 @@ Next (human): devflow.ship — reviews code AND open flags
 
 | | |
 | --- | --- |
-| Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `plan.md`, `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
-| Reads | `@devflow/references/run-mode.md` (run-mode contract), `@devflow/references/state-machine.md` (run marker + handoff schemas), `@devflow/references/escalation-ladder.md` (failure bounds) |
+| Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `plan.md`, `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`, `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` |
+| Reads | `${CLAUDE_PLUGIN_ROOT}/references/run-mode.md` (run-mode contract), `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` (run marker + handoff schemas), `${CLAUDE_PLUGIN_ROOT}/references/escalation-ladder.md` (failure bounds) |
 | Writes | `.devflow-run.json` — armed Step 0, deleted Step 3 (every exit path) |
 | Writes | `plan.md` — `## Decision flags` entries |
 | Executes | `devflow-implement`, `devflow-beautify`, `devflow-test` skills in order (+ `devflow-ship` with `--until ship`) |

@@ -45,6 +45,29 @@ rm -rf "$DIST_DIR/hooks/tests" "$DIST_DIR/commands/devflow.lint-skills.md"
 # Pulizia di sicurezza in dist/ per rimuovere file temporanei o di runtime
 find "$DIST_DIR" \( -name ".devflow-*" ! -name ".devflow-instincts.shared.yaml" -o -name ".DS_Store" -o -name "*.tmp" \) -exec rm -rf {} + 2>/dev/null || true
 
+# Percorsi del plugin. @devflow/<dir>/ è la notazione degli autori; nel progetto
+# consumer devflow/ contiene solo config.md e features/, quindi quei percorsi non
+# esistono. Claude Code sostituisce ${CLAUDE_PLUGIN_ROOT} solo nel testo di skill,
+# comandi e agenti caricati dall'host: lì il percorso diventa assoluto. Un file
+# letto con Read (references/, adapters/, contexts/, e il SKILL.md che un comando
+# fa leggere) resta letterale, e la variabile non esiste nell'ambiente di Bash:
+# la nota "Plugin root" in testa a skill, comandi e agenti dà al modello la
+# radice assoluta. @devflow/config.md resta com'è: è un file del progetto consumer.
+step "Percorsi @devflow/ → \${CLAUDE_PLUGIN_ROOT}"
+PLUGIN_DIRS_RE='(references|adapters|skills|agents|scripts|contexts)'
+PATHS_NOTE='> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.'
+for f in "$DIST_DIR"/skills/*/SKILL.md "$DIST_DIR"/commands/*.md "$DIST_DIR"/agents/*.md; do
+  [ -f "$f" ] || continue
+  sed -E "s#@devflow/${PLUGIN_DIRS_RE}/#\${CLAUDE_PLUGIN_ROOT}/\1/#g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+done
+for f in "$DIST_DIR"/skills/*/SKILL.md "$DIST_DIR"/commands/*.md "$DIST_DIR"/agents/*.md; do
+  [ -f "$f" ] || continue
+  awk -v note="$PATHS_NOTE" '{ print } $0 == "---" && ++n == 2 { print ""; print note }' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+done
+LEFT="$(grep -lE "@devflow/${PLUGIN_DIRS_RE}/" "$DIST_DIR"/skills/*/SKILL.md "$DIST_DIR"/commands/*.md "$DIST_DIR"/agents/*.md 2>/dev/null || true)"
+[ -z "$LEFT" ] || fail "@devflow/ non riscritto in: $LEFT"
+ok "Percorsi del plugin risolti in skill, comandi e agenti"
+
 # Genera .claude-plugin/plugin.json da manifest
 step "Generazione .claude-plugin/plugin.json"
 

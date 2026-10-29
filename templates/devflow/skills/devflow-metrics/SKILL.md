@@ -50,13 +50,7 @@ Identify flags from user invocation:
 Run the standalone telemetry aggregator:
 
 ```bash
-PLUGIN_ROOT="$(dirname "$(dirname "$(dirname "$0")")")"
-SCRIPT_PATH="$PLUGIN_ROOT/scripts/metrics.sh"
-if [ ! -f "$SCRIPT_PATH" ]; then
-  SCRIPT_PATH="scripts/metrics.sh"
-fi
-
-bash "$SCRIPT_PATH" "$@"
+bash "@devflow/scripts/metrics.sh" $ARGUMENTS
 ```
 
 ### Step 3 — Interpret key indicators

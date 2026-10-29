@@ -52,5 +52,5 @@ Custom `HealthIndicator` subclasses for business-specific health (queue backlog,
 | | |
 | --- | --- |
 | Invoked by | `devflow-implement` when file path matches `*.processor.ts`, or content has `@MessagePattern`/`@EventPattern`/`@InjectQueue`/`HealthCheckService` |
-| Reads | `@devflow/adapters/nestjs/ADAPTER.md` |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nestjs/ADAPTER.md` |
 | Related | `nestjs-performance` (graceful shutdown pairs with readiness state), `nestjs-architecture` (event-driven decoupling via `EventEmitter2`, the in-process analog) |

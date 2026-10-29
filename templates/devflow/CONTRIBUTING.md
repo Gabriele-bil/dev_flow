@@ -91,6 +91,8 @@ DevFlow supports monorepos with multiple applications, each on its own adapter. 
 | `ADAPTER.md` | Always uppercase | `ADAPTER.md` |
 | Feature directories | `NNN_<kebab-name>` | `003_user-profile` |
 
+**Paths.** Plugin files are written `@devflow/<references|adapters|skills|agents|scripts|contexts>/…`; consumer files without `@` (`devflow/features/…`) except `@devflow/config.md`. The build rewrites plugin paths per host (`scripts/builders/build-claude.sh` → `${CLAUDE_PLUGIN_ROOT}/…` in skills, commands and agents, plus a "Plugin root" note for files read later; `scripts/builders/build-antigravity.sh` → the fixed agy install path everywhere). Never hardcode `templates/devflow/…` or `dist/devflow/…` in a skill — those exist only in this repo. Run plugin scripts as `bash "@devflow/scripts/<name>.sh"`.
+
 ## Common Rationalizations (when writing skills)
 
 | Thought | Reality |

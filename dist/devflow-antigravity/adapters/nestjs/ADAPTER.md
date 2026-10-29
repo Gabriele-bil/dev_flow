@@ -8,14 +8,14 @@ Baseline: **NestJS 11+/12+ · Express v5 default · ESM-first & Standard Schema 
 
 | When | Load |
 | ------ | ------ |
-| Module structure, folder layout, DI wiring, injection tokens, circular deps, service boundaries | `@devflow/adapters/nestjs/skills/nestjs-architecture/SKILL.md` |
-| Exception filters, HTTP exceptions, async error propagation, structured error responses | `@devflow/adapters/nestjs/skills/nestjs-error-handling/SKILL.md` |
-| Guards, JWT auth, input validation, output sanitization, rate limiting | `@devflow/adapters/nestjs/skills/nestjs-security/SKILL.md` |
-| Caching, lazy-loaded modules, async lifecycle hooks, graceful shutdown, query cost | `@devflow/adapters/nestjs/skills/nestjs-performance/SKILL.md` |
-| Entities, repository pattern, transactions, migrations, N+1 avoidance | `@devflow/adapters/nestjs/skills/nestjs-database/SKILL.md` |
-| DTOs, serialization, interceptors, pipes, API versioning, OpenAPI/Swagger docs | `@devflow/adapters/nestjs/skills/nestjs-api-design/SKILL.md` |
-| Testing module, unit mocks, e2e Supertest flows, mocking external services | `@devflow/adapters/nestjs/skills/nestjs-testing/SKILL.md` |
-| Message/event patterns (`@MessagePattern`/`@EventPattern`), queues, health checks | `@devflow/adapters/nestjs/skills/nestjs-microservices/SKILL.md` |
+| Module structure, folder layout, DI wiring, injection tokens, circular deps, service boundaries | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nestjs/skills/nestjs-architecture/SKILL.md` |
+| Exception filters, HTTP exceptions, async error propagation, structured error responses | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nestjs/skills/nestjs-error-handling/SKILL.md` |
+| Guards, JWT auth, input validation, output sanitization, rate limiting | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nestjs/skills/nestjs-security/SKILL.md` |
+| Caching, lazy-loaded modules, async lifecycle hooks, graceful shutdown, query cost | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nestjs/skills/nestjs-performance/SKILL.md` |
+| Entities, repository pattern, transactions, migrations, N+1 avoidance | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nestjs/skills/nestjs-database/SKILL.md` |
+| DTOs, serialization, interceptors, pipes, API versioning, OpenAPI/Swagger docs | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nestjs/skills/nestjs-api-design/SKILL.md` |
+| Testing module, unit mocks, e2e Supertest flows, mocking external services | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nestjs/skills/nestjs-testing/SKILL.md` |
+| Message/event patterns (`@MessagePattern`/`@EventPattern`), queues, health checks | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nestjs/skills/nestjs-microservices/SKILL.md` |
 
 ## MCP (when available)
 

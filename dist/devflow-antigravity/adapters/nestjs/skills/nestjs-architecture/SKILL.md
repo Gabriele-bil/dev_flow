@@ -95,5 +95,5 @@ Never read `process.env` directly in business code. Use `ConfigModule.forRoot()`
 | | |
 | --- | --- |
 | Invoked by | `devflow-implement` when file path matches `*.module.ts`, `*.service.ts`, or files with constructor DI / `@Inject()` / injection tokens |
-| Reads | `@devflow/adapters/nestjs/ADAPTER.md` |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nestjs/ADAPTER.md` |
 | Related | `nestjs-database` (repository pattern), `nestjs-api-design` (controllers), `nestjs-microservices` (event patterns) |

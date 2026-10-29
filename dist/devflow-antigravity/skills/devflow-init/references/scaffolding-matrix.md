@@ -204,7 +204,7 @@ Use when user selects **Nx Monorepo** in Phase B (`QB.1`).
 
 ## 4. Adapter Setup Dependency Installation & Latest Upgrade
 
-After CLI scaffolding completes, read `@devflow/adapters/<adapter>/steps/setup.md` → `## Setup dependencies` for each active app and install latest compatible packages:
+After CLI scaffolding completes, read `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/steps/setup.md` → `## Setup dependencies` for each active app and install latest compatible packages:
 
 1. **Node / TypeScript adapters (`angular`, `nextjs`, `nestjs`):**
    - Run from the app directory (or workspace root with `-w` / `--filter` in Nx/pnpm workspaces):

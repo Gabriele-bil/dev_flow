@@ -6,6 +6,8 @@ disallowedTools: Write, Edit, MultiEdit, NotebookEdit
 model: sonnet
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Security Auditor
 
 Security Engineer perspective. Focus on exploitable vulnerabilities, not theoretical risks.
@@ -25,7 +27,7 @@ Before auditing:
 - `devflow/features/[NNN]_[feature-name]/task.md` — feature scope and actors
 - `devflow/features/[NNN]_[feature-name]/plan.md` — data flows, auth boundaries, schema changes
 - Active `ADAPTER.md` → data/auth skill for stack-specific security patterns
-- `@devflow/references/security-checklist.md` — full baseline checklist
+- `${CLAUDE_PLUGIN_ROOT}/references/security-checklist.md` — full baseline checklist
 
 ## Core Principles
 

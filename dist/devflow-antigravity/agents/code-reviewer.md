@@ -4,6 +4,7 @@ name: code-reviewer
 description: Staff-engineer-level code reviewer. Seven-axis review across correctness, readability, architecture, security (delegated when security-auditor runs alongside), performance, scope fidelity, simplicity. Use before merge or via devflow.ship fan-out.
 ---
 
+
 # Code Reviewer
 
 Staff Engineer perspective. Evaluate changes for merge readiness.
@@ -66,7 +67,7 @@ Skip this axis when the dispatch roster includes `security-auditor` (`standard`/
 - No secrets, tokens, or keys in code, logs, or git
 - Auth/authorization checks present where needed
 - Queries parameterized; output encoded
-- Full checklist: `@devflow/references/security-checklist.md`
+- Full checklist: `$HOME/.gemini/antigravity-cli/plugins/devflow/references/security-checklist.md`
 
 ### 5. Performance
 

@@ -7,6 +7,8 @@ model: sonnet
 effort: medium
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Skill: devflow.setup
 
 ## Purpose
@@ -27,7 +29,7 @@ Create or refresh global AI context files (`AGENTS.md`, `REGISTRY.md`) and produ
 
 ## Input
 
-- Optional `$ARGUMENTS`: `--force` (overwrite full files), `--mcp` (emit client-specific MCP configuration block per `@devflow/references/mcp-catalog.md`)
+- Optional `$ARGUMENTS`: `--force` (overwrite full files), `--mcp` (emit client-specific MCP configuration block per `${CLAUDE_PLUGIN_ROOT}/references/mcp-catalog.md`)
 
 ## Managed block format (required)
 
@@ -64,20 +66,20 @@ Never edit user content outside managed blocks unless `--force` is set.
 3. Overwrite `@devflow/config.md` with the Apps table — template: `references/config-template.md` § Monorepo.
 
 **Both modes — build adapter contract paths:**
-`@devflow/adapters/<adapter>/ADAPTER.md` (core) and `@devflow/adapters/<adapter>/steps/setup.md` (setup templates + dependencies; legacy adapters keep all sections in `ADAPTER.md`). Monorepo builds a list of `(app, adapter, adapter_root)` tuples and repeats Steps 2–7c per app unless noted.
+`${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core) and `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/steps/setup.md` (setup templates + dependencies; legacy adapters keep all sections in `ADAPTER.md`). Monorepo builds a list of `(app, adapter, adapter_root)` tuples and repeats Steps 2–7c per app unless noted.
 
 ### Step 2 - Load contract and templates
 
 Monorepo: repeat this step once per declared app, using that app's own adapter.
 
 1. Read adapter contract files (core + setup step file).
-2. Read `Setup dependencies` section from `@devflow/adapters/<adapter>/steps/setup.md` (legacy: `ADAPTER.md`) and extract:
+2. Read `Setup dependencies` section from `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/steps/setup.md` (legacy: `ADAPTER.md`) and extract:
    - JavaScript package list (runtime + dev where applicable)
    - Flutter package list (`dependencies`, `dev_dependencies` if explicitly declared)
    - Optional adapter notes for setup installs
 3. Resolve template directory in this order:
-   - `@devflow/adapters/<adapter>/templates/` (preferred)
-   - `@devflow/skills/devflow-setup/templates/` (fallback)
+   - `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/templates/` (preferred)
+   - `${CLAUDE_PLUGIN_ROOT}/skills/devflow-setup/templates/` (fallback)
 4. Read all templates from chosen directory:
    - `AGENTS.template.md`
    - `REGISTRY.template.md`
@@ -133,7 +135,7 @@ Build final values for template placeholders from:
 | existing `docs/product.md` | product/app hints for continuity | no |
 | Adapter-defined project manifests (for example language/package manifests) | package/project name | no |
 | `@devflow/config.md` | adapter id (single-app) or Apps table (monorepo) | yes |
-| `@devflow/adapters/<adapter>/ADAPTER.md` + `steps/setup.md` | stack commands, key rules — per app in monorepo | yes |
+| `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` + `steps/setup.md` | stack commands, key rules — per app in monorepo | yes |
 | **Mandatory questionnaire answers** | all unresolved placeholders | yes |
 
 If a value cannot be inferred, keep a literal placeholder token:
@@ -226,7 +228,7 @@ Before final response:
 
 ## Anti-Patterns
 
-Key anti-patterns (full catalog: `@devflow/skills/devflow-setup/references/setup-anti-patterns.md`):
+Key anti-patterns (full catalog: `${CLAUDE_PLUGIN_ROOT}/skills/devflow-setup/references/setup-anti-patterns.md`):
 
 | Anti-Pattern | Fix |
 | --- | --- |
@@ -241,8 +243,8 @@ Key anti-patterns (full catalog: `@devflow/skills/devflow-setup/references/setup
 
 | | |
 | --- | --- |
-| Reads | `@devflow/config.md`, `references/config-template.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/setup.md` (including `Setup dependencies`) — per declared app in monorepo mode, adapter + fallback templates |
-| Reads | `@devflow/skills/devflow-setup/references/setup-anti-patterns.md` (Anti-patterns catalog) |
+| Reads | `@devflow/config.md`, `references/config-template.md`, `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core) + `steps/setup.md` (including `Setup dependencies`) — per declared app in monorepo mode, adapter + fallback templates |
+| Reads | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-setup/references/setup-anti-patterns.md` (Anti-patterns catalog) |
 | Writes | `AGENTS.md`, `REGISTRY.md`, `docs/product.md` (consumer project root); `@devflow/config.md`; `.gitignore` (appends `.devflow-state.json` if missing) |
 | Side effects | Installs adapter setup dependencies using project package manager or Flutter pub |
 | Next step | `devflow.task` |

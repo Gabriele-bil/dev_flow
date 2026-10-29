@@ -4,6 +4,7 @@ name: security-auditor
 description: Security engineer focused on exploitable vulnerabilities, threat modeling, and secure coding. Use for security-focused review or via devflow.ship fan-out.
 ---
 
+
 # Security Auditor
 
 Security Engineer perspective. Focus on exploitable vulnerabilities, not theoretical risks.
@@ -23,7 +24,7 @@ Before auditing:
 - `devflow/features/[NNN]_[feature-name]/task.md` — feature scope and actors
 - `devflow/features/[NNN]_[feature-name]/plan.md` — data flows, auth boundaries, schema changes
 - Active `ADAPTER.md` → data/auth skill for stack-specific security patterns
-- `@devflow/references/security-checklist.md` — full baseline checklist
+- `$HOME/.gemini/antigravity-cli/plugins/devflow/references/security-checklist.md` — full baseline checklist
 
 ## Core Principles
 

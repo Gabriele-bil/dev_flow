@@ -6,6 +6,8 @@ disallowedTools: Write, Edit, MultiEdit, NotebookEdit
 model: sonnet
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Accessibility Auditor
 
 Accessibility engineer perspective. Evaluate UI/component changes for WCAG 2.1 AA compliance.
@@ -28,8 +30,8 @@ Before auditing:
 
 - `devflow/features/[NNN]_[feature-name]/task.md` — acceptance criteria and affected UI surfaces
 - `devflow/features/[NNN]_[feature-name]/plan.md` — component structure and interaction flows
-- Active adapter beautify step file (`@devflow/adapters/<adapter>/steps/beautify.md`; legacy: `ADAPTER.md`) → **Beautify: accessibility** — stack-specific patterns (Flutter `Semantics`, Angular `aria-*`)
-- Full checklist: `@devflow/references/accessibility-checklist.md`
+- Active adapter beautify step file (`${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/steps/beautify.md`; legacy: `ADAPTER.md`) → **Beautify: accessibility** — stack-specific patterns (Flutter `Semantics`, Angular `aria-*`)
+- Full checklist: `${CLAUDE_PLUGIN_ROOT}/references/accessibility-checklist.md`
 
 ## Core Principles
 

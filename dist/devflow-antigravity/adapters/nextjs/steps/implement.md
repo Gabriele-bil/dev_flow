@@ -41,4 +41,4 @@ Retry failed steps up to **3** attempts each; then stop and report full output.
 - [ ] `lint`, `test`, `build` pass (or failures documented)
 - [ ] Relevant Next.js skills loaded and applied for touched areas
 - [ ] Server/Client boundary respected (no unnecessary `use client`)
-- [ ] Web Interface Guidelines applied to modified UI files (`@devflow/adapters/common/skills/common-web-interface-guidelines/SKILL.md`)
+- [ ] Web Interface Guidelines applied to modified UI files (`$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/common/skills/common-web-interface-guidelines/SKILL.md`)

@@ -4,6 +4,7 @@ description: "Creates, lists, or removes isolated git worktrees for parallel fea
 argument-hint: "[create|remove|list] [feature-name]"
 ---
 
+
 # Skill: devflow.worktree
 
 ## Purpose
@@ -40,7 +41,7 @@ Any item fails → stop, report which check failed.
 
 ### Step 1 - Parse arguments
 
-Parse `$ARGUMENTS` as `[create|remove|list] [feature-name]`. Default subcommand: `create`. `feature-name` omitted → feature resolved per `@devflow/references/state-machine.md` → **Active feature resolution**.
+Parse `$ARGUMENTS` as `[create|remove|list] [feature-name]`. Default subcommand: `create`. `feature-name` omitted → feature resolved per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **Active feature resolution**.
 
 ### Step 2 - List (early exit)
 
@@ -77,7 +78,7 @@ while jq -e --argjson o "$OFFSET" '.worktrees[] | select(.port_offset == $o)' .d
 done
 ```
 
-Resolve the adapter's base dev port (read `@devflow/adapters/<adapter>/ADAPTER.md`; fall back to this table when the adapter doc doesn't state one):
+Resolve the adapter's base dev port (read `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md`; fall back to this table when the adapter doc doesn't state one):
 
 | Adapter | Base port |
 | --- | --- |
@@ -145,7 +146,7 @@ cd ../[repo-name]-worktrees/[feature-name]
 
 | | |
 | --- | --- |
-| Reads | `.devflow-worktrees.json`, `@devflow/adapters/<adapter>/ADAPTER.md` (base dev port) |
+| Reads | `.devflow-worktrees.json`, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md` (base dev port) |
 | Runs | `git worktree add` · `git worktree remove` · `git worktree list` · `git branch` |
 | Writes | `.devflow-worktrees.json` (add/remove entry) |
 | Next step | `devflow.implement` inside the new worktree (separate Claude Code session) |

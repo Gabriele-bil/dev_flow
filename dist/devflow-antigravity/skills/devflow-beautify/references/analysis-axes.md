@@ -34,7 +34,7 @@ Full per-axis checklist for `devflow.beautify` Step 3. Stack-agnostic defaults; 
 - User and external input validated or normalized at boundaries before use in logic, storage, or queries
 - No secrets, tokens, or private keys committed in client code or logs
 - Auth-sensitive operations align with project data-layer patterns. For deep review, load adapter data/auth skill from `ADAPTER.md`.
-- Full checklist: `@devflow/references/security-checklist.md`
+- Full checklist: `$HOME/.gemini/antigravity-cli/plugins/devflow/references/security-checklist.md`
 
 ## Performance (heuristics - default pass)
 
@@ -75,4 +75,4 @@ Do not add blanket memoization or rendering boundaries everywhere - overuse hurt
 - Modal/overlay components manage focus correctly (trap on open, restore on close)
 
 For stack-specific checks, follow **Beautify: accessibility** section of active `ADAPTER.md`.
-Full checklist: `@devflow/references/accessibility-checklist.md`
+Full checklist: `$HOME/.gemini/antigravity-cli/plugins/devflow/references/accessibility-checklist.md`

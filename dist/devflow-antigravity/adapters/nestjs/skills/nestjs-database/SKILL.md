@@ -47,5 +47,5 @@ Any sequence of writes that must all succeed or all fail together (`create order
 | | |
 | --- | --- |
 | Invoked by | `devflow-implement` when file path matches `*.entity.ts`, `**/migrations/*.ts`, `*.repository.ts`, or content uses `createQueryBuilder`/`dataSource.transaction` |
-| Reads | `@devflow/adapters/nestjs/ADAPTER.md` |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nestjs/ADAPTER.md` |
 | Related | `nestjs-architecture` (repository pattern placement), `nestjs-performance` (query/index optimization, caching) |

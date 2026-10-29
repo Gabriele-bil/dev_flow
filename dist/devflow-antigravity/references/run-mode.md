@@ -4,7 +4,7 @@ Single source for unattended execution. Orchestrators: `devflow.run` (middle pip
 
 ## Marker
 
-`.devflow-run.json` at project root — schema + lifecycle: `@devflow/references/state-machine.md` → **Run marker**. Presence = run mode. No marker = interactive rules, whatever the user said earlier.
+`.devflow-run.json` at project root — schema + lifecycle: `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **Run marker**. Presence = run mode. No marker = interactive rules, whatever the user said earlier.
 
 - Armed only by an orchestrator's Step 0 — never by a step skill, never mid-conversation.
 - `devflow.run`: armed after one explicit user confirmation.

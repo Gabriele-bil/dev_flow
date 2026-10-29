@@ -10,19 +10,19 @@ Include these in `plan.md` when applicable (after core sections from `devflow-pl
 
 Order the **File list** bottom-up by layer ownership. Source of truth for Angular boundaries and dependency flow:
 
-- `@devflow/adapters/angular/skills/angular-architecture/SKILL.md`
+- `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/skills/angular-architecture/SKILL.md`
 
 ### State plan (add when state changes)
 
 Use the structure and constraints from:
 
-- `@devflow/adapters/angular/skills/angular-state/SKILL.md`
+- `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/skills/angular-state/SKILL.md`
 
 ### Forms plan (add when forms change)
 
 Use the structure and constraints from:
 
-- `@devflow/adapters/angular/skills/angular-forms/SKILL.md`
+- `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/skills/angular-forms/SKILL.md`
 
 ### Data model (omit if no new persistent entities)
 

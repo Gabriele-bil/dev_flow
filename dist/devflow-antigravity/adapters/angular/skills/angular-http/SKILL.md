@@ -28,6 +28,6 @@ Functional interceptors recommended (`HttpInterceptorFn`), registered via `provi
 
 |            |                                                                   |
 | ---------- | ----------------------------------------------------------------- |
-| Reads      | Active HTTP/service files, `@devflow/adapters/angular/ADAPTER.md` |
+| Reads      | Active HTTP/service files, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/ADAPTER.md` |
 | Writes     | New or refactored Angular HTTP resource and service files         |
 | Invoked by | `devflow.implement`, `devflow.beautify`                           |

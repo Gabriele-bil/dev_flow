@@ -40,7 +40,7 @@ Apply core `devflow-beautify` axes, then evaluate touched code with relevant Nex
 
 Trigger: edit to `**/components/**`, `**/app/**/page.tsx`, `**/app/**/layout.tsx`, files importing `@/components/ui`.
 
-1. Load `@devflow/adapters/common/skills/common-web-interface-guidelines/SKILL.md`
+1. Load `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/common/skills/common-web-interface-guidelines/SKILL.md`
 2. Read modified UI files
 3. Apply all rules
 4. Output `file:line — rule`. No preamble.

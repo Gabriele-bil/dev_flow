@@ -6,6 +6,8 @@ model: sonnet
 effort: high
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Skill: devflow.discover
 
 ## Purpose
@@ -47,7 +49,7 @@ Before proceeding, verify:
 
 ### Step 2 — Multi-axis problem analysis
 
-Analyze the problem across six core architectural axes defined in `@devflow/skills/devflow-discover/references/discovery-axes.md`:
+Analyze the problem across six core architectural axes defined in `${CLAUDE_PLUGIN_ROOT}/skills/devflow-discover/references/discovery-axes.md`:
 
 1. **Scope & Boundaries:** Core problem, primary actors, key user flows, edge cases, out-of-scope boundaries.
 2. **Scale & Performance:** Concurrency, throughput, read/write ratio, latency budgets, real-time vs batch.
@@ -96,7 +98,7 @@ Generate 2–3 distinct, viable architectural options grounded in the confirmed 
    - Check `docs/adr/ADR-*.md`. Find highest 3-digit prefix (`NNN`).
    - If none exist, start with `001`. Next is `max + 1` zero-padded.
 2. Create directory `docs/adr/` if missing.
-3. Write `docs/adr/ADR-[NNN]-[title-slug].md` using template from `@devflow/skills/devflow-discover/references/adr-template.md`.
+3. Write `docs/adr/ADR-[NNN]-[title-slug].md` using template from `${CLAUDE_PLUGIN_ROOT}/skills/devflow-discover/references/adr-template.md`.
    - Record Multi-Axis Context Analysis, Decision Drivers, Considered Options (all 2–3), Decision Outcome, Consequences, Blueprint diagram, and Next Steps.
 4. Update or create `docs/adr/README.md` index table with columns: `ADR | Title | Status | Date | Scope`.
 
@@ -134,6 +136,6 @@ Generate 2–3 distinct, viable architectural options grounded in the confirmed 
 | | |
 | --- | --- |
 | Reads | `docs/product.md`, `constitution.md`, `registry.md`, `devflow/config.md`, existing code modules |
-| Reads (references) | `@devflow/skills/devflow-discover/references/discovery-axes.md`, `@devflow/skills/devflow-discover/references/adr-template.md` |
+| Reads (references) | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-discover/references/discovery-axes.md`, `${CLAUDE_PLUGIN_ROOT}/skills/devflow-discover/references/adr-template.md` |
 | Writes | `docs/adr/ADR-[NNN]-[title-slug].md`, `docs/adr/README.md` |
 | Leads to | `devflow.setup` (greenfield app) or `devflow.task` (feature) |

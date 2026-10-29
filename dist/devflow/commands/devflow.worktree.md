@@ -5,6 +5,8 @@ argument-hint: "[create|remove|list] [feature-name]"
 disable-model-invocation: true
 ---
 
-Use `@devflow/skills/devflow-worktree/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
+Use `${CLAUDE_PLUGIN_ROOT}/skills/devflow-worktree/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
 
 If `$ARGUMENTS` is empty, run `create` for the active feature.

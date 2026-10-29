@@ -81,6 +81,6 @@ Prefer `RouterLink` for declarative nav, `Router.navigate()` for conditional/pos
 
 |            |                                                                  |
 | ---------- | ---------------------------------------------------------------- |
-| Reads      | Active route/guard/resolver files, `@devflow/adapters/angular/ADAPTER.md` |
+| Reads      | Active route/guard/resolver files, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/ADAPTER.md` |
 | Writes     | New or refactored route config, guard, resolver, navigation files |
 | Invoked by | `devflow.implement`, `devflow.beautify`                          |

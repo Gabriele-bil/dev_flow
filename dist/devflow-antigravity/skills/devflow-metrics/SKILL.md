@@ -4,6 +4,7 @@ description: Display token savings dashboard, estimated cost per feature, pass@1
 argument-hint: "[--json] [--feature <name>]"
 ---
 
+
 # Skill: devflow.metrics
 
 ## Purpose
@@ -50,13 +51,7 @@ Identify flags from user invocation:
 Run the standalone telemetry aggregator:
 
 ```bash
-PLUGIN_ROOT="$(dirname "$(dirname "$(dirname "$0")")")"
-SCRIPT_PATH="$PLUGIN_ROOT/scripts/metrics.sh"
-if [ ! -f "$SCRIPT_PATH" ]; then
-  SCRIPT_PATH="scripts/metrics.sh"
-fi
-
-bash "$SCRIPT_PATH" "$@"
+bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/metrics.sh" $ARGUMENTS
 ```
 
 ### Step 3 — Interpret key indicators
@@ -82,5 +77,5 @@ When presenting or inspecting dashboard numbers:
 | | |
 | --- | --- |
 | Reads | `.devflow-filter-stats.jsonl`, `.devflow-metrics.jsonl`, `.devflow-observe.jsonl`, `.devflow-test-summary.json` |
-| Executes | `@devflow/scripts/metrics.sh` |
+| Executes | `$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/metrics.sh` |
 | Related | `devflow.status`, `devflow.doctor`, `stop-metrics.sh`, `post-bash-output-filter.sh` |

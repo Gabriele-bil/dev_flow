@@ -4,6 +4,7 @@ description: Transforms raw idea into Agile product task.md with goal, Connextra
 argument-hint: "[--app <name>]"
 ---
 
+
 # Skill: devflow.task
 
 ## Purpose
@@ -73,7 +74,7 @@ Stop and ask before writing task if:
 - Core workflow trigger or output format is ambiguous
 - Idea overlaps with existing feature in `docs/product.md`
 
-Structured elicitation rules (per `@devflow/skills/devflow-clarify/references/interactive-interview.md`):
+Structured elicitation rules (per `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-clarify/references/interactive-interview.md`):
 
 - Max 5 questions, asked sequentially one at a time
 - **High-stakes filter:** ask ONLY when the answer changes user-visible behavior, scope, safety, or data/cost boundaries. If a sensible, cheap-to-reverse default exists, record it in `## Assumptions & Risks` instead of asking
@@ -122,7 +123,7 @@ Read **`refinement-hints.md`**, run pass:
 2. Switch to / create branch:
    - If git is already on the target branch `<type>/<NNN>_<name>`, proceed.
    - Branch exists locally → `git switch <type>/<NNN>_<name>`.
-   - Otherwise create it from the up-to-date default branch, never from current `HEAD` (base detection per `@devflow/skills/devflow-pr/SKILL.md` Step 0):
+   - Otherwise create it from the up-to-date default branch, never from current `HEAD` (base detection per `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-pr/SKILL.md` Step 0):
      ```bash
      git fetch origin "$BASE_BRANCH" 2>/dev/null || true
      git switch -c <type>/<NNN>_<name> "origin/$BASE_BRANCH" 2>/dev/null || git switch -c <type>/<NNN>_<name>
@@ -153,7 +154,7 @@ If any item fails, fix task content before writing file.
 
 ### Step 9 - Write task file
 
-Create `devflow/features/[NNN]_[feature-name]/task.md` using template + format rules in `references/task-template.md`. Write `**Branch:**` with the resolved branch name (`[type]/[number-of-task-is-present]_[feature-name]`), `**App:**` frontmatter field with Step 1 resolution when `config.md` has `## Apps`; include `**ADRs:**` if applicable; omit when absent. Merge into `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**: `feature`, `feature_path`, `branch`, `task_status: draft`, `next_step: devflow.plan` (+ `app` in monorepo); never write `active_feature`. See **`examples.md`** for worked examples.
+Create `devflow/features/[NNN]_[feature-name]/task.md` using template + format rules in `references/task-template.md`. Write `**Branch:**` with the resolved branch name (`[type]/[number-of-task-is-present]_[feature-name]`), `**App:**` frontmatter field with Step 1 resolution when `config.md` has `## Apps`; include `**ADRs:**` if applicable; omit when absent. Merge into `.devflow-state.json` per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **State update snippet**: `feature`, `feature_path`, `branch`, `task_status: draft`, `next_step: devflow.plan` (+ `app` in monorepo); never write `active_feature`. See **`examples.md`** for worked examples.
 
 ### Step 10 - Update docs/product.md feature status
 
@@ -200,7 +201,7 @@ Respond using template in `references/notify-template.md` (includes feature path
 
 | | |
 | --- | --- |
-| Reads | `devflow/config.md` (Apps table, monorepo only); `docs/product.md` (required); `constitution.md`, `registry.md` (as needed); `DESIGN.md` / `docs/design.md` (if present); `refinement-hints.md` (Step 5); `references/invest-criteria.md`, `references/story-splitting.md`, `references/bdd-acceptance-criteria.md` (Step 5); `@devflow/skills/devflow-clarify/references/interactive-interview.md` (Step 4); `examples.md` (guidance); `references/task-template.md`, `references/notify-template.md` |
+| Reads | `devflow/config.md` (Apps table, monorepo only); `docs/product.md` (required); `constitution.md`, `registry.md` (as needed); `DESIGN.md` / `docs/design.md` (if present); `refinement-hints.md` (Step 5); `references/invest-criteria.md`, `references/story-splitting.md`, `references/bdd-acceptance-criteria.md` (Step 5); `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-clarify/references/interactive-interview.md` (Step 4); `examples.md` (guidance); `references/task-template.md`, `references/notify-template.md` |
 | Reads (conditional) | `docs/adr/` (if present — active ADRs); `.devflow-run.json` (run-mode switch) |
 | Writes | `devflow/features/[NNN]_[feature-name]/task.md`, `.devflow-state.json` (merge: feature, feature_path, branch, task_status, next_step) |
 | Side effects | Creates (from `origin/<default>`) and switches git branch `[feat/fix/chore/doc/ecc...]/[number-of-task-is-present]_[name]` |

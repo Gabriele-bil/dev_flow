@@ -26,8 +26,8 @@ Identical to pre-monorepo behavior — no new reads, no new questions.
 
 ## Load adapter contract (both modes, once `adapter`/`adapter_root` known)
 
-- `@devflow/adapters/<adapter>/ADAPTER.md` (core: technology skills, MCP).
-- `@devflow/adapters/<adapter>/steps/<step>.md` for the active step's commands, plan sections, checklists.
+- `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md` (core: technology skills, MCP).
+- `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/steps/<step>.md` for the active step's commands, plan sections, checklists.
 - Legacy adapters without `steps/`: all sections live in `ADAPTER.md` — read it in full.
 
 ## Working-directory scoping (monorepo only)
@@ -54,7 +54,7 @@ Pipeline skills declare no per-stack `allowed-tools` Bash allowlist — adapter 
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Inlining a fresh `config.md`-read explanation in a new skill | Point here instead — one line: "Resolve adapter + app root per `@devflow/references/adapter-resolution.md`" |
+| Inlining a fresh `config.md`-read explanation in a new skill | Point here instead — one line: "Resolve adapter + app root per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md`" |
 | Guessing the app when `**App:**` is missing in monorepo mode | Hard stop, ask the user — App is the declared source of truth |
 | Running adapter shell commands at repo-root cwd in monorepo mode | Scope via `(cd "<path>" && <command>)` per app |
 | Re-reading `task.md` from every downstream skill to find App | `plan.md` already carries it once `devflow.plan` propagates it — read that instead |

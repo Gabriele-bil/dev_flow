@@ -6,9 +6,9 @@ Loaded by `devflow-setup` together with the adapter core (`ADAPTER.md`).
 
 `devflow.setup` uses adapter templates first, then global fallback:
 
-- Preferred: `@devflow/adapters/flutter/templates/AGENTS.template.md`
-- Preferred: `@devflow/adapters/flutter/templates/REGISTRY.template.md`
-- Fallback (if adapter templates are missing): `@devflow/skills/devflow-setup/templates/*.template.md`
+- Preferred: `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/flutter/templates/AGENTS.template.md`
+- Preferred: `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/flutter/templates/REGISTRY.template.md`
+- Fallback (if adapter templates are missing): `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-setup/templates/*.template.md`
 
 Template intent:
 

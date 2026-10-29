@@ -5,6 +5,8 @@ argument-hint: "[optional notes for reviewers]"
 disable-model-invocation: true
 ---
 
-Use `@devflow/skills/devflow-ship/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
+Use `${CLAUDE_PLUGIN_ROOT}/skills/devflow-ship/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
 
 If `$ARGUMENTS` is empty, dispatch without reviewer notes.

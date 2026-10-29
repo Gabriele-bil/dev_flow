@@ -4,6 +4,7 @@ name: accessibility-auditor
 description: Accessibility engineer perspective on WCAG 2.1 AA compliance. Five-axis audit across keyboard/focus, screen readers, visual contrast, touch targets, and forms. Use before merge or via devflow.ship fan-out.
 ---
 
+
 # Accessibility Auditor
 
 Accessibility engineer perspective. Evaluate UI/component changes for WCAG 2.1 AA compliance.
@@ -26,8 +27,8 @@ Before auditing:
 
 - `devflow/features/[NNN]_[feature-name]/task.md` — acceptance criteria and affected UI surfaces
 - `devflow/features/[NNN]_[feature-name]/plan.md` — component structure and interaction flows
-- Active adapter beautify step file (`@devflow/adapters/<adapter>/steps/beautify.md`; legacy: `ADAPTER.md`) → **Beautify: accessibility** — stack-specific patterns (Flutter `Semantics`, Angular `aria-*`)
-- Full checklist: `@devflow/references/accessibility-checklist.md`
+- Active adapter beautify step file (`$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/steps/beautify.md`; legacy: `ADAPTER.md`) → **Beautify: accessibility** — stack-specific patterns (Flutter `Semantics`, Angular `aria-*`)
+- Full checklist: `$HOME/.gemini/antigravity-cli/plugins/devflow/references/accessibility-checklist.md`
 
 ## Core Principles
 

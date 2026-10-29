@@ -60,7 +60,7 @@ Goal: extract complete functional inventory and actors to drive `docs/product.md
 
 ## Phase B — Architecture, Workspace Topology & Technology Stack
 
-Goal: resolve single-app vs monorepo/Nx topology, stack adapters per app, and the 6 architectural discovery axes (`@devflow/skills/devflow-discover/references/discovery-axes.md`).
+Goal: resolve single-app vs monorepo/Nx topology, stack adapters per app, and the 6 architectural discovery axes (`$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-discover/references/discovery-axes.md`).
 
 ### QB.1 — Workspace Topology
 - **Question:** What workspace structure fits this project?

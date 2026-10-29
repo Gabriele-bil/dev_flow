@@ -64,13 +64,13 @@ fi
 # Context file hint per next step
 case "$NEXT_STEP" in
   devflow.task|devflow.plan)
-    CTX="@devflow/contexts/research.md"
+    CTX="$PLUGIN_ROOT/contexts/research.md"
     ;;
   devflow.implement|devflow.beautify)
-    CTX="@devflow/contexts/implement.md"
+    CTX="$PLUGIN_ROOT/contexts/implement.md"
     ;;
   devflow.ship)
-    CTX="@devflow/contexts/review.md"
+    CTX="$PLUGIN_ROOT/contexts/review.md"
     ;;
   *)
     CTX=""
@@ -99,7 +99,7 @@ if [ "$KNOWN_STEP" = true ]; then
 Load context: $CTX"
   fi
   MSG="dev-flow active$FEATURE_LABEL. Next step: $NEXT_STEP — run /$NEXT_STEP, or /devflow.resume to re-orient after an interruption.$CTX_LINE
-User orchestrates; only ship/run/auto/hotfix chain other steps. Full orientation: @devflow/references/orientation.md.$CONFIG_WARN"
+User orchestrates; only ship/run/auto/hotfix chain other steps. Full orientation: $PLUGIN_ROOT/references/orientation.md.$CONFIG_WARN"
   df_context "$MSG"
   exit 0
 fi

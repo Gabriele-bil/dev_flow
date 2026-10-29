@@ -89,6 +89,6 @@ For advanced patterns — component harnesses (incl. `.with()` predicates), rout
 
 |            |                                                                |
 | ---------- | -------------------------------------------------------------- |
-| Reads      | Active spec/test files, `@devflow/adapters/angular/ADAPTER.md` |
+| Reads      | Active spec/test files, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/ADAPTER.md` |
 | Writes     | New or refactored Vitest + TestBed spec files                  |
 | Invoked by | `devflow.test`                                                 |

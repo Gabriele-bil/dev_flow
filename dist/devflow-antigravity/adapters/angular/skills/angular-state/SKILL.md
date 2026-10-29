@@ -38,6 +38,6 @@ Full store examples (base structure, global vs local, async `rxMethod`, entity C
 
 |            |                                                                    |
 | ---------- | ------------------------------------------------------------------ |
-| Reads      | Active store/feature files, `@devflow/adapters/angular/ADAPTER.md` |
+| Reads      | Active store/feature files, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/ADAPTER.md` |
 | Writes     | New or refactored NgRx Signal Store files                          |
 | Invoked by | `devflow.implement`, `devflow.beautify`                            |

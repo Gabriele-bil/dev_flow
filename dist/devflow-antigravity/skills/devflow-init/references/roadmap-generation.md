@@ -7,7 +7,7 @@ Used by `devflow.init` Step 4 — rules for decomposing a greenfield project int
 ## 1. Full Project Decomposition Rules (`001` to `NNN`)
 
 1. **INVEST & Vertical Slice Discipline:**
-   - Every task `001..NNN` must satisfy INVEST criteria (`@devflow/skills/devflow-task/references/invest-criteria.md`) and deliver an observable, testable increment (`@devflow/skills/devflow-task/references/story-splitting.md`).
+   - Every task `001..NNN` must satisfy INVEST criteria (`$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-task/references/invest-criteria.md`) and deliver an observable, testable increment (`$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-task/references/story-splitting.md`).
    - Isolate Read/View flows from Write/Mutation flows where complexity warrants separate PRs.
 2. **Contracts & Foundation First (`001`):**
    - Task `001` MUST establish shared foundations: core domain contracts, authentication/session boundaries, base database schema/migrations, or app shell routing required by downstream tasks.
@@ -38,7 +38,7 @@ Before writing any `task.md` file, construct and verify the inter-task Directed 
 
 ## 3. Master Roadmap Artifact (`devflow/plans/project-blueprint.md`)
 
-Write `devflow/plans/project-blueprint.md` using this structure (adapted from `@devflow/skills/devflow-blueprint/references/blueprint-template.md`):
+Write `devflow/plans/project-blueprint.md` using this structure (adapted from `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-blueprint/references/blueprint-template.md`):
 
 ```markdown
 # Project Blueprint — [Project Name]
@@ -100,7 +100,7 @@ Write `devflow/plans/project-blueprint.md` using this structure (adapted from `@
    - All `devflow/features/[NNN]_[slug]/task.md` files are written on `main` so the entire project roadmap is committed and visible from the default branch.
    - Write `**Branch:** feat/[NNN]_[slug]` in each `task.md` header; `devflow.implement` Step 3 creates and switches to that branch when implementation starts for that task.
 2. **Complete Specification per Task (No Stubs):**
-   - Every `devflow/features/[NNN]_[slug]/task.md` MUST be a complete, self-contained specification conforming to `@devflow/skills/devflow-task/references/task-template.md`:
+   - Every `devflow/features/[NNN]_[slug]/task.md` MUST be a complete, self-contained specification conforming to `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-task/references/task-template.md`:
      - Header with `**ID:** TASK-[NNN]`, `**Date:**`, `**Status:** draft`, `**Branch:** feat/[NNN]_[slug]`, `**App:**` (monorepo only), `**ADRs:** docs/adr/ADR-001-initial-architecture.md`, `**Blockers:**`, and `**Unlocks:**`.
      - `## Goal & Value` (`Problem` + `Objective`, zero empty boosters).
      - `## User Story` (strictly Connextra format with human/external actor).
@@ -117,7 +117,7 @@ Write `devflow/plans/project-blueprint.md` using this structure (adapted from `@
 
 Because the `PostToolUse` hook `hooks/post-task-create.sh` fires on every `Write` to `devflow/features/[NNN]_*/task.md` and sets `next_feature_number` to `NNN + 1`, writing `001` through `NNN` sequentially leaves `.devflow-state.json` without `feature` pointing to `001`.
 
-**Mandatory final step:** After ALL `task.md` files (`001..NNN`) and `docs/product.md` have been written, merge into `.devflow-state.json` at project root (schema: `@devflow/references/state-machine.md` → **State file schema**; keep keys you do not own; never write legacy `active_feature` — delete it if present):
+**Mandatory final step:** After ALL `task.md` files (`001..NNN`) and `docs/product.md` have been written, merge into `.devflow-state.json` at project root (schema: `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **State file schema**; keep keys you do not own; never write legacy `active_feature` — delete it if present):
 
 ```json
 {

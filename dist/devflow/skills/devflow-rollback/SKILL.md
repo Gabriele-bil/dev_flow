@@ -5,6 +5,8 @@ argument-hint: "[--to <step>] [--force]"
 disable-model-invocation: true
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Skill: devflow.rollback
 
 Reverts the active DevFlow step to its clean pre-step checkpoint, restoring code and state machine synchronization.
@@ -32,7 +34,7 @@ Safely discard unwanted changes made during `devflow.implement` or `devflow.beau
 
 ### Step 1 - Resolve Active Feature and Target Step
 
-1. Resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**; read current Status from its `plan.md` (authoritative — never from the state file).
+1. Resolve feature per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Active feature resolution**; read current Status from its `plan.md` (authoritative — never from the state file).
 2. Determine target rollback destination:
    - If `$ARGUMENTS` contains `--to <step>`: use the specified step (`implement` or `beautify`).
    - If unspecified:

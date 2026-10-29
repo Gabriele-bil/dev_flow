@@ -61,5 +61,5 @@ Full code examples: `references/performance-patterns.md`.
 | | |
 | --- | --- |
 | Invoked by | `devflow-implement`/`devflow-beautify` when touching lifecycle hooks, cache decorators/`CACHE_MANAGER`, `main.ts` bootstrap, or per the performance profiling trigger in `ADAPTER.md` |
-| Reads | `@devflow/adapters/nestjs/ADAPTER.md` |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nestjs/ADAPTER.md` |
 | Related | `nestjs-database` (query/index correctness), `nestjs-architecture` (lifecycle/DI placement) |

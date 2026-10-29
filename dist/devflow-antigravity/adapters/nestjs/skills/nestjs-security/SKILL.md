@@ -58,5 +58,5 @@ JSON responses are inherently low XSS risk (browsers don't execute JSON), but an
 | | |
 | --- | --- |
 | Invoked by | `devflow-implement` when file path matches `*.guard.ts`, `*.strategy.ts`, `*.dto.ts`, or any controller accepting `@Body()`/`@Query()`/`@Param()` |
-| Reads | `@devflow/adapters/nestjs/ADAPTER.md` |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nestjs/ADAPTER.md` |
 | Related | `nestjs-api-design` (DTO response shaping), `nestjs-error-handling` (auth failure responses) |

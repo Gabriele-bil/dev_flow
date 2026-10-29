@@ -69,5 +69,5 @@ Enable via `app.enableVersioning({ type: VersioningType.URI | HEADER | MEDIA_TYP
 | | |
 | --- | --- |
 | Invoked by | `devflow-implement` when file path matches `*.controller.ts`, `*.interceptor.ts`, `*.pipe.ts`, or response-shaping DTOs |
-| Reads | `@devflow/adapters/nestjs/ADAPTER.md` |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nestjs/ADAPTER.md` |
 | Related | `nestjs-error-handling` (error response shape), `nestjs-security` (request-side DTO validation) |

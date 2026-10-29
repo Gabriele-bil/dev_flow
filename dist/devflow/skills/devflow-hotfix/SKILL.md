@@ -5,6 +5,8 @@ argument-hint: "<bug-or-issue-description>"
 disable-model-invocation: true
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Skill: devflow.hotfix
 
 Accelerated DevFlow pipeline execution for urgent bugfixes and targeted patches.
@@ -38,19 +40,19 @@ Any item fails → stop, report check, touch nothing.
 
 ## Workflow
 
-Fast-track transitions per `@devflow/references/state-machine.md`: `ready → implementing → implemented → tested → shipped → pr-opened` (beautify skipped). Every boundary: set `plan.md` `**Status:**` + **State update snippet**.
+Fast-track transitions per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md`: `ready → implementing → implemented → tested → shipped → pr-opened` (beautify skipped). Every boundary: set `plan.md` `**Status:**` + **State update snippet**.
 
 ### Step 1 - Compact task + plan from real templates
 
 1. `NNN` = `.devflow-state.json` `next_feature_number`, else highest `devflow/features/` prefix + 1 (never reuse). Dir `[NNN]_hotfix-[kebab-name]`; branch `fix/[NNN]_hotfix-[kebab-name]`.
 2. Diagnose root cause (file/function) before writing anything — read-only.
-3. `task.md` from `@devflow/skills/devflow-task/references/task-template.md`: full header (`**ID:**`, `**Date:**`, `**Status:** draft`, `**Branch:**`, `**App:**` monorepo only); Goal & Value (Problem = symptom, Objective = fixed behavior); `UC-1` fixed path; `AC-1 (UC-1)` fixed behavior (Gherkin); `AC-2 (UC-1)` regression test fails before fix, passes after; root cause in `## Notes`. Other template sections: one line or `none`.
-4. `plan.md` from `@devflow/skills/devflow-plan/references/plan-template.md`: header (`**Task:**`, `**App:**` copied, `**Status:** ready`, `**Complexity:** N (quick)`); Overview = root cause; **Traceability** row per AC → file(s); **File List** 1–3 entries `[pending]`, regression test file first; Implementation checkpoints = adapter test + analyze commands.
-5. Branch from up-to-date default branch — base detection per `@devflow/skills/devflow-pr/SKILL.md` Step 0, then `git fetch origin "$BASE_BRANCH" && git switch -c fix/[NNN]_hotfix-[name] "origin/$BASE_BRANCH"`.
+3. `task.md` from `${CLAUDE_PLUGIN_ROOT}/skills/devflow-task/references/task-template.md`: full header (`**ID:**`, `**Date:**`, `**Status:** draft`, `**Branch:**`, `**App:**` monorepo only); Goal & Value (Problem = symptom, Objective = fixed behavior); `UC-1` fixed path; `AC-1 (UC-1)` fixed behavior (Gherkin); `AC-2 (UC-1)` regression test fails before fix, passes after; root cause in `## Notes`. Other template sections: one line or `none`.
+4. `plan.md` from `${CLAUDE_PLUGIN_ROOT}/skills/devflow-plan/references/plan-template.md`: header (`**Task:**`, `**App:**` copied, `**Status:** ready`, `**Complexity:** N (quick)`); Overview = root cause; **Traceability** row per AC → file(s); **File List** 1–3 entries `[pending]`, regression test file first; Implementation checkpoints = adapter test + analyze commands.
+5. Branch from up-to-date default branch — base detection per `${CLAUDE_PLUGIN_ROOT}/skills/devflow-pr/SKILL.md` Step 0, then `git fetch origin "$BASE_BRANCH" && git switch -c fix/[NNN]_hotfix-[name] "origin/$BASE_BRANCH"`.
 
 ### Step 2 - Checkpoint, then failing test first
 
-1. Resolve adapter + app per `@devflow/references/adapter-resolution.md`; read `steps/test.md`, `steps/implement.md`.
+1. Resolve adapter + app per `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`; read `steps/test.md`, `steps/implement.md`.
 2. **Before any code edit:** `git tag -f "devflow-checkpoint/$(git branch --show-current)/implement" HEAD`; Status `implementing`.
 3. Write regression test (AC-2) per adapter test conventions; run it. Must FAIL for the reported reason (Prove-It). Passes → root cause wrong → back to Step 1.2; never fix against a green test.
 
@@ -62,17 +64,17 @@ Fast-track transitions per `@devflow/references/state-machine.md`: `ready → im
 
 ### Step 4 - Verify
 
-1. Full adapter test suite; failures per `@devflow/references/escalation-ladder.md` (max 3 bounded attempts → block).
-2. Write `verification.md` per `@devflow/references/verification-levels.md` — AC-1, AC-2 with evidence; zero FAIL.
+1. Full adapter test suite; failures per `${CLAUDE_PLUGIN_ROOT}/references/escalation-ladder.md` (max 3 bounded attempts → block).
+2. Write `verification.md` per `${CLAUDE_PLUGIN_ROOT}/references/verification-levels.md` — AC-1, AC-2 with evidence; zero FAIL.
 3. Status `tested`.
 
 ### Step 5 - Quick ship gate
 
-Dispatch `@devflow/agents/code-reviewer.md` (= `devflow.ship` `quick` profile) on touched files. Critical/Required → fix → back to Step 3 (tests + `verification.md` regenerated). Clean → Status `shipped`.
+Dispatch `${CLAUDE_PLUGIN_ROOT}/agents/code-reviewer.md` (= `devflow.ship` `quick` profile) on touched files. Critical/Required → fix → back to Step 3 (tests + `verification.md` regenerated). Clean → Status `shipped`.
 
 ### Step 6 - PR
 
-Execute `@devflow/skills/devflow-pr/SKILL.md` exactly — base-branch detection, artifact cleanup, commit, push, PR body, `pr-opened` + task `done`. Never hand-roll `gh pr create`.
+Execute `${CLAUDE_PLUGIN_ROOT}/skills/devflow-pr/SKILL.md` exactly — base-branch detection, artifact cleanup, commit, push, PR body, `pr-opened` + task `done`. Never hand-roll `gh pr create`.
 
 ## Common Rationalizations
 
@@ -95,8 +97,8 @@ Execute `@devflow/skills/devflow-pr/SKILL.md` exactly — base-branch detection,
 
 | | |
 | --- | --- |
-| Reads | Bug report from `$ARGUMENTS`, codebase, `@devflow/references/adapter-resolution.md`, adapter `steps/test.md` + `steps/implement.md` |
-| Reads | `@devflow/skills/devflow-task/references/task-template.md`, `@devflow/skills/devflow-plan/references/plan-template.md`, `@devflow/references/state-machine.md`, `@devflow/references/verification-levels.md` |
+| Reads | Bug report from `$ARGUMENTS`, codebase, `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`, adapter `steps/test.md` + `steps/implement.md` |
+| Reads | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-task/references/task-template.md`, `${CLAUDE_PLUGIN_ROOT}/skills/devflow-plan/references/plan-template.md`, `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md`, `${CLAUDE_PLUGIN_ROOT}/references/verification-levels.md` |
 | Writes | `devflow/features/[NNN]_hotfix-[name]/task.md`, `plan.md`, `verification.md`, fix files, regression test, `.devflow-state.json` (merge) |
 | Side effects | Branch `fix/*` from `origin/<default>`, tag `devflow-checkpoint/<branch>/implement` |
 | Next step | `devflow-pr` (executed in Step 6) |

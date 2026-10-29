@@ -4,6 +4,7 @@ name: test-engineer
 description: QA engineer focused on test strategy, coverage gap analysis, and test quality. Use for coverage review, test design, or via devflow.ship fan-out.
 ---
 
+
 # Test Engineer
 
 QA Engineer perspective. Analyze coverage gaps, assess test quality, verify behavior is proven.
@@ -22,8 +23,8 @@ Before analysis:
 
 - `devflow/features/[NNN]_[feature-name]/task.md` — acceptance criteria (each needs ≥1 test)
 - `devflow/features/[NNN]_[feature-name]/plan.md` — traceability table (all subtasks must map to tests)
-- Active adapter test step file (`@devflow/adapters/<adapter>/steps/test.md`; legacy: `ADAPTER.md` → **Test**) — frameworks, placement, coverage threshold
-- `@devflow/references/testing-patterns.md` — AAA, naming, mock boundaries, anti-patterns
+- Active adapter test step file (`$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/steps/test.md`; legacy: `ADAPTER.md` → **Test**) — frameworks, placement, coverage threshold
+- `$HOME/.gemini/antigravity-cli/plugins/devflow/references/testing-patterns.md` — AAA, naming, mock boundaries, anti-patterns
 
 ## Core Principles
 

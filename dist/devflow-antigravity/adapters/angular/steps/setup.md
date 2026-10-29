@@ -6,8 +6,8 @@ Loaded by `devflow-setup` together with the adapter core (`ADAPTER.md`).
 
 `devflow.setup` uses adapter templates first, then global fallback:
 
-- `@devflow/adapters/angular/templates/AGENTS.template.md`
-- `@devflow/adapters/angular/templates/REGISTRY.template.md`
+- `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/templates/AGENTS.template.md`
+- `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/templates/REGISTRY.template.md`
 
 Template intent:
 

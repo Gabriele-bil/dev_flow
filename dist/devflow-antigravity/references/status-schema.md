@@ -50,7 +50,7 @@ Machine-readable pipeline status for CI and scripts. `devflow.status --json` run
 
 ## Emitter snippet
 
-Run by `devflow.status` Step 3-JSON. Requires `jq`. Prepend the **Shell form** from `@devflow/references/state-machine.md` → **Active feature resolution** (sets `$FEATURE`); explicit feature argument overrides it.
+Run by `devflow.status` Step 3-JSON. Requires `jq`. Prepend the **Shell form** from `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **Active feature resolution** (sets `$FEATURE`); explicit feature argument overrides it.
 
 ```bash
 #!/bin/bash

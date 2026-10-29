@@ -13,7 +13,7 @@ init ─────────────────────────
               blueprint (3+ PRs) ─────┘
 ```
 
-Statuses + transitions: `@devflow/references/state-machine.md`. Active feature: its **Active feature resolution**. `plan.md` Status wins over `.devflow-state.json`.
+Statuses + transitions: `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md`. Active feature: its **Active feature resolution**. `plan.md` Status wins over `.devflow-state.json`.
 
 ## Decision tree (first match wins)
 
@@ -42,11 +42,11 @@ Bug escaped a passing pipeline           → devflow.backprop
 "Where am I?"                            → devflow.status
 ```
 
-Opt-in autonomy, explicit command only: `/devflow.run` (implement → test unattended), `/devflow.auto` (idea → PR). Contract: `@devflow/references/run-mode.md`.
+Opt-in autonomy, explicit command only: `/devflow.run` (implement → test unattended), `/devflow.auto` (idea → PR). Contract: `$HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md`.
 
 ## Rules
 
 - User orchestrates; only `ship`, `run`, `auto`, `hotfix` chain other skills.
 - Every entry skill checks its input contract — never skip a step or bypass a contract.
-- Adapter + app: `@devflow/references/adapter-resolution.md` (all steps except task/setup).
-- Code-index MCP available → index-first exploration per `@devflow/references/token-economy.md`.
+- Adapter + app: `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md` (all steps except task/setup).
+- Code-index MCP available → index-first exploration per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/token-economy.md`.

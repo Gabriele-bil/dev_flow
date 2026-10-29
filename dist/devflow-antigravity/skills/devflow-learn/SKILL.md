@@ -4,6 +4,7 @@ description: Manage local and team instincts (.devflow-instincts.yaml, .devflow-
 argument-hint: "[log, search <query>, list, check, prune, boost <id>, promote <id>]"
 ---
 
+
 # Skill: devflow.learn
 
 ## Purpose

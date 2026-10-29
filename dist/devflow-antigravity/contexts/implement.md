@@ -14,7 +14,7 @@ Focus: Writing code per plan.md, following adapter conventions
 
 ## Adapter loading
 
-- Read `@devflow/config.md` then `@devflow/adapters/<adapter>/ADAPTER.md` before touching code
+- Read `@devflow/config.md` then `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md` before touching code
 - Load technology skills per **Implement: skill load decision matrix** in ADAPTER.md — match file paths, load only what applies; never load all skills preemptively
 
 ## Reuse pre-check (before writing any file)

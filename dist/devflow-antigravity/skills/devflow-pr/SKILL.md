@@ -3,6 +3,7 @@ name: devflow-pr
 description: Commits all changes, pushes the current DevFlow feature branch, and opens a pull request toward the repo's default branch. Use at the final step of the DevFlow pipeline or when the user asks to run devflow.pr.
 ---
 
+
 # Skill: devflow.pr
 
 ## Purpose
@@ -20,7 +21,7 @@ Commit all changes, push feature branch, open PR to the repo's default branch. F
 
 ## Step 0 - Resolve adapter and base branch
 
-Resolve adapter, adapter root, and app working directory per `@devflow/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `@devflow/adapters/<adapter>/ADAPTER.md` (core) plus `@devflow/adapters/<adapter>/steps/pr.md`. Legacy adapters without `steps/`: the **PR** section lives in `ADAPTER.md`. Use the PR step file for pre-push verification commands, expected success output, and checklist items that must appear in the PR body (monorepo: run verification commands from the resolved app's working directory).
+Resolve adapter, adapter root, and app working directory per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md` (core) plus `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/steps/pr.md`. Legacy adapters without `steps/`: the **PR** section lives in `ADAPTER.md`. Use the PR step file for pre-push verification commands, expected success output, and checklist items that must appear in the PR body (monorepo: run verification commands from the resolved app's working directory).
 
 Resolve the base branch instead of assuming `main` — repos also use `master`, `develop`, or `next` as their default:
 
@@ -81,7 +82,7 @@ Identify if the feature includes visual/UI changes:
 
 ## Step 2 - Commit
 
-Delete session files first — session context is never committed (`@devflow/references/state-machine.md` → **Checkpoint file**, **Handoff file**). Never delete files this pipeline did not create.
+Delete session files first — session context is never committed (`$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **Checkpoint file**, **Handoff file**). Never delete files this pipeline did not create.
 
 ```bash
 rm -f devflow/features/[NNN]_[feature-name]/.checkpoint.json devflow/features/[NNN]_[feature-name]/handoff.md
@@ -185,7 +186,7 @@ Closes TASK-[NNN]
 
 ## Step 6 - Notify user
 
-After successful `gh pr create`: set `plan.md` `**Status:** pr-opened` and `task.md` `**Status:** done`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
+After successful `gh pr create`: set `plan.md` `**Status:** pr-opened` and `task.md` `**Status:** done`; refresh `.devflow-state.json` per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **State update snippet**.
 
 ```text
 ✅ Pull request opened: [type]/[NNN]_[feature-name] -> $BASE_BRANCH
@@ -221,7 +222,7 @@ DevFlow pipeline complete for TASK-[NNN].
 
 | | |
 | --- | --- |
-| Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/pr.md` |
+| Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/pr.md` |
 | Runs | `git add -- <expected paths>` · `git commit` · `git push` · `gh pr create --body-file` |
 | Deletes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json`, `devflow/features/[NNN]_[feature-name]/handoff.md`, PR body temp file |
 | Writes | `plan.md` `**Status:** pr-opened`, `task.md` `**Status:** done` |

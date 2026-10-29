@@ -47,7 +47,7 @@ Full code: `references/testing-patterns.md`.
 
 | | |
 | --- | --- |
-| Reads | Active spec/test files, `@devflow/adapters/nextjs/ADAPTER.md` |
+| Reads | Active spec/test files, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/ADAPTER.md` |
 | Writes | New or refactored Jest + RTL spec files |
 | Invoked by | `devflow-implement` for `**/*.test.tsx`, `**/*.test.ts`, `**/__tests__/**` |
 | Related | `nextjs-components`, `nextjs-server`, `nextjs-forms`, `nextjs-state` |

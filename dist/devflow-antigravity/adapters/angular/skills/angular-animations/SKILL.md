@@ -80,6 +80,6 @@ Cross-route animations use the View Transitions API via `withViewTransitions()` 
 
 |            |                                                                   |
 | ---------- | ----------------------------------------------------------------- |
-| Reads      | Active component/template/style files, `package.json` (Angular version), `@devflow/adapters/angular/ADAPTER.md` |
+| Reads      | Active component/template/style files, `package.json` (Angular version), `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/ADAPTER.md` |
 | Writes     | New or refactored animation triggers, CSS keyframes/transitions, animation event handlers |
 | Invoked by | `devflow.implement`, `devflow.beautify`                          |

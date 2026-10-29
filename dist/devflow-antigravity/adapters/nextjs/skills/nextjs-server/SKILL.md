@@ -87,5 +87,5 @@ Do NOT:
 | | |
 | --- | --- |
 | Invoked by | `devflow-implement` when `app/api/**`, `**/actions.ts`, `**/action.ts`, or files containing `'use server'` |
-| Reads | `@devflow/adapters/nextjs/ADAPTER.md` |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/ADAPTER.md` |
 | Related | `nextjs-architecture`, `nextjs-components`, `nextjs-forms` |

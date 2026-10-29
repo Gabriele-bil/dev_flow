@@ -4,6 +4,7 @@ description: "Bootstraps greenfield projects end-to-end: conducts a multi-phase 
 argument-hint: "[optional-project-name-or-brief] [--mcp]"
 ---
 
+
 # Skill: devflow.init
 
 ## Quick Start
@@ -59,7 +60,7 @@ Notice: Deep architectural and planning workflow. Takes all necessary time to ex
 
 ### Step 1 — Multi-Phase Structured Interview
 
-Execute the 3-phase interview per `@devflow/skills/devflow-init/references/interview-protocol.md`:
+Execute the 3-phase interview per `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-init/references/interview-protocol.md`:
 
 - Ask **one question at a time** via `AskQuestion` / `ask_question` (2–4 options, first option prefixed `(Recommended)` with 1-sentence technical rationale).
 - **Phase A (Product & Scope):** Project name/slug, domain, target personas (real human/external actors, never technical roles), primary outcome, complete feature inventory (core + secondary flows), async/edge expectations.
@@ -67,12 +68,12 @@ Execute the 3-phase interview per `@devflow/skills/devflow-init/references/inter
   - Workspace topology: Single-app vs Monorepo (explicitly supporting **Nx workspace** orchestration alongside standard multi-app folders).
   - Stack per app: **Angular**, **Next.js**, **Flutter**, **NestJS** (+ **Nx** when selected).
   - Technology scaffolding confirmation: generate live config/entry files (`nx.json`, `project.json`, `angular.json`, `next.config.ts`, `nest-cli.json`, `pubspec.yaml`, `analysis_options.yaml`, `tsconfig.base.json`, `eslint.config.mjs`, entrypoints, layer folders) vs DevFlow-only files.
-  - Architectural drivers across the 6 discovery axes (`@devflow/skills/devflow-discover/references/discovery-axes.md`): data/DB (`Supabase`, `PostgreSQL`, none), auth, state, observability (`Sentry`), scale.
+  - Architectural drivers across the 6 discovery axes (`$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-discover/references/discovery-axes.md`): data/DB (`Supabase`, `PostgreSQL`, none), auth, state, observability (`Sentry`), scale.
 - **Phase C (Conventions & Quality):** Layering rules, naming/import conventions, test coverage threshold, `--mcp` client target (if requested).
 
 ### Step 2 — Evergreen Technology Scaffolding (Always Up-to-Date Guarantee)
 
-Execute directory initialization and optional technology scaffolding per `@devflow/skills/devflow-init/references/scaffolding-matrix.md`:
+Execute directory initialization and optional technology scaffolding per `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-init/references/scaffolding-matrix.md`:
 
 1. **Workspace & Git init:** Create `<project-slug>/` (if subfolder mode), `cd` into root, run `git init -b main` (if `.git` absent), write `.gitignore` (stack ignores + `.devflow-state.json`, `.devflow-run.json`, `.devflow-*.jsonl`, `.devflow-*.tmp`), and create `devflow/features/`, `devflow/plans/`, `docs/adr/`.
 2. **If technology scaffolding is enabled, enforce the Always Up-to-Date rule:**
@@ -80,29 +81,29 @@ Execute directory initialization and optional technology scaffolding per `@devfl
    - **Live version & config resolution:** Query `context7` MCP (or stack MCPs: `dart`, `angular-cli`, `next-devtools`) and live registries (`npm view <pkg> version`, `flutter pub outdated`) to confirm current latest stable conventions before generating files.
    - **Official `@latest` CLI execution & hook safety:** Run non-interactive `@latest` CLI generators (`npx create-nx-workspace@latest`, `npx @angular/cli@latest new`, `npx create-next-app@latest`, `npx @nestjs/cli@latest new`, `flutter create`) in Bash so linter/compiler configs (`tsconfig*.json`, `eslint.config.mjs`, `analysis_options.yaml`) are created by official CLIs without triggering `pre-config-protect.sh` blocks.
    - **Architectural layers & barrels:** Create layer directories (`domain/`, `data/`, `ui/`, `core/`, `shared/`, `app/`) and barrel files (`index.ts`, `index.dart`, `public-api.ts`) matching `constitution.md`.
-   - **Adapter setup dependencies:** Install packages from `@devflow/adapters/<adapter>/steps/setup.md` (`Setup dependencies`) per app using latest compatible versions (`pnpm add <pkg>@latest` / `flutter pub add` + `flutter pub upgrade --major-versions`) and verify clean static analysis.
+   - **Adapter setup dependencies:** Install packages from `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/steps/setup.md` (`Setup dependencies`) per app using latest compatible versions (`pnpm add <pkg>@latest` / `flutter pub add` + `flutter pub upgrade --major-versions`) and verify clean static analysis.
 3. If any CLI generator or install command fails: halt immediately, report exact command and stderr, preserve completed artifacts on disk, do not claim scaffolding complete.
 
 ### Step 3 — DevFlow Plugin Context & Initial ADR Generation
 
-1. **Write `@devflow/config.md`:** Single-app (`**Adapter:** <adapter>`) or Monorepo (`**Mode:** monorepo` + `## Apps` table) per `@devflow/skills/devflow-setup/references/config-template.md`.
-2. **Render & write context files:** Load adapter templates (`@devflow/adapters/<adapter>/templates/` → fallback `@devflow/skills/devflow-setup/templates/`), resolve placeholders per `@devflow/skills/devflow-setup/references/placeholder-map.md`, enforce token budgets (`AGENTS.md` <300t, `REGISTRY.md` <600t, `docs/product.md` <700t, `constitution.md` <530t), and write `AGENTS.md`, `REGISTRY.md`, `constitution.md`, `docs/product.md` wrapped in `<!-- devflow-managed:start:<section-id> -->` / `<!-- devflow-managed:end:<section-id> -->` markers.
-3. **Write Initial ADR:** Create `docs/adr/ADR-001-initial-architecture.md` using `@devflow/skills/devflow-discover/references/adr-template.md` (recording multi-axis context, 2–3 considered stack/topology options with real trade-offs, chosen architecture, and component layout) and `docs/adr/README.md` index table.
-4. **Optional MCP configuration (`--mcp`):** Emit or write client MCP config (`mcp_config.json` / `.mcp.json`) resolving universal baseline + active stack core + conditional servers (`supabase`, `postgres`, `sentry` ONLY when chosen) per `@devflow/references/mcp-catalog.md`.
+1. **Write `@devflow/config.md`:** Single-app (`**Adapter:** <adapter>`) or Monorepo (`**Mode:** monorepo` + `## Apps` table) per `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-setup/references/config-template.md`.
+2. **Render & write context files:** Load adapter templates (`$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/templates/` → fallback `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-setup/templates/`), resolve placeholders per `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-setup/references/placeholder-map.md`, enforce token budgets (`AGENTS.md` <300t, `REGISTRY.md` <600t, `docs/product.md` <700t, `constitution.md` <530t), and write `AGENTS.md`, `REGISTRY.md`, `constitution.md`, `docs/product.md` wrapped in `<!-- devflow-managed:start:<section-id> -->` / `<!-- devflow-managed:end:<section-id> -->` markers.
+3. **Write Initial ADR:** Create `docs/adr/ADR-001-initial-architecture.md` using `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-discover/references/adr-template.md` (recording multi-axis context, 2–3 considered stack/topology options with real trade-offs, chosen architecture, and component layout) and `docs/adr/README.md` index table.
+4. **Optional MCP configuration (`--mcp`):** Emit or write client MCP config (`mcp_config.json` / `.mcp.json`) resolving universal baseline + active stack core + conditional servers (`supabase`, `postgres`, `sentry` ONLY when chosen) per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/mcp-catalog.md`.
 
 ### Step 4 — Full Project Task Decomposition, DAG Verification & Batch `task.md` Generation
 
-Decompose project and generate all tasks on `main` per `@devflow/skills/devflow-init/references/roadmap-generation.md`:
+Decompose project and generate all tasks on `main` per `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-init/references/roadmap-generation.md`:
 
-1. **Decompose into vertical tasks (`001..NNN`):** Split feature inventory into INVEST-compliant vertical increments (`@devflow/skills/devflow-task/references/invest-criteria.md`, `@devflow/skills/devflow-task/references/story-splitting.md`). Place foundational shared contracts/schemas/auth in `001_<foundation-slug>`.
+1. **Decompose into vertical tasks (`001..NNN`):** Split feature inventory into INVEST-compliant vertical increments (`$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-task/references/invest-criteria.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-task/references/story-splitting.md`). Place foundational shared contracts/schemas/auth in `001_<foundation-slug>`.
 2. **Verify Dependency DAG:** Ensure zero circular dependencies (if cycle detected, extract shared contract into `001`), assign explicit `Blockers` (`TASK-NNN` or `none`) and `Unlocks` (`TASK-MMM` or `none`), assign `lane` ownership, and mark `[parallel-safe: yes]` ONLY when blockers are identical and zero files/contracts overlap (default `no`).
 3. **Write master blueprint:** Write `devflow/plans/project-blueprint.md` containing the ASCII dependency DAG, Blockers/Unlocks table, parallel workstreams, lane ownership, and execution guide.
 4. **Batch-generate `task.md` files on `main` (do NOT switch branches):**
    - Stay on `main` branch throughout Step 4. Never run `git switch -c feat/...` during batch task generation.
    - Pre-populate `**Branch:** feat/[NNN]_[feature-name]` in each `task.md` header (`devflow.implement` creates/switches to the branch when that task executes).
-   - For every feature `001` through `NNN` in ascending topological order, write `devflow/features/[NNN]_[feature-name]/task.md` following `@devflow/skills/devflow-task/references/task-template.md`, including `**ADRs:** docs/adr/ADR-001-initial-architecture.md`, `**Blockers:**`, `**Unlocks:**`, Connextra User Story, Read/Write isolated `UC-1..UC-N`, single-`When` BDD Gherkin `AC-1..AC-N` with explicit async states, Scope Boundaries, and Assumptions & Risks.
+   - For every feature `001` through `NNN` in ascending topological order, write `devflow/features/[NNN]_[feature-name]/task.md` following `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-task/references/task-template.md`, including `**ADRs:** docs/adr/ADR-001-initial-architecture.md`, `**Blockers:**`, `**Unlocks:**`, Connextra User Story, Read/Write isolated `UC-1..UC-N`, single-`When` BDD Gherkin `AC-1..AC-N` with explicit async states, Scope Boundaries, and Assumptions & Risks.
 5. **Populate `docs/product.md`:** Fill the `devflow-managed:feature-status` table with all tasks `001..NNN` in topological order (`status: planned`, blocker notes, and `App` column in monorepo mode).
-6. **Final State Initialization (MUST run after all `task.md` writes):** Because `post-task-create.sh` updates `.devflow-state.json` on each `task.md` write, merge into `.devflow-state.json` one final time after `NNN` finishes (schema: `@devflow/references/state-machine.md` → **State file schema**; never write `active_feature`):
+6. **Final State Initialization (MUST run after all `task.md` writes):** Because `post-task-create.sh` updates `.devflow-state.json` on each `task.md` write, merge into `.devflow-state.json` one final time after `NNN` finishes (schema: `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **State file schema**; never write `active_feature`):
    - `feature`: `"001_<first-feature>"`
    - `feature_path`: `"devflow/features/001_<first-feature>"`
    - `branch`: `"feat/001_<first-feature>"`
@@ -129,7 +130,7 @@ Emit consolidated initialization report: project root, topology & stack(s), scaf
 | Anti-Pattern | Problem | Fix |
 | --- | --- | --- |
 | Dumping all interview questions in one wall of text | Overwhelms user and skips adaptive follow-ups | Ask one bounded question at a time via `AskQuestion` with `(Recommended)` first |
-| Using legacy stack flags (`--no-standalone`, Pages router, `.eslintrc.json`) | Violates adapter rules and modern stack baselines | Follow `@devflow/skills/devflow-init/references/scaffolding-matrix.md` and live `context7` docs |
+| Using legacy stack flags (`--no-standalone`, Pages router, `.eslintrc.json`) | Violates adapter rules and modern stack baselines | Follow `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-init/references/scaffolding-matrix.md` and live `context7` docs |
 | Leaving circular blockers between tasks (`002` ↔ `003`) | Deadlocks planning and implementation order | Extract shared contracts/types into foundation task `001` before consumers |
 | Omitting `**Blockers:**` / `**Unlocks:**` in generated `task.md` files | Downstream `devflow.plan` cannot verify unblocked execution order | Populate explicit `**Blockers:**` and `**Unlocks:**` headers in every roadmap `task.md` |
 | Writing Technical Personas ("As a backend developer") in `task.md` | Violates `devflow-task` product-only spec discipline | Use real human or external system actors and functional BDD Gherkin ACs |
@@ -138,9 +139,9 @@ Emit consolidated initialization report: project root, topology & stack(s), scaf
 
 | | |
 | --- | --- |
-| Reads | `@devflow/skills/devflow-init/references/interview-protocol.md`, `@devflow/skills/devflow-init/references/scaffolding-matrix.md`, `@devflow/skills/devflow-init/references/roadmap-generation.md` |
-| Reads | `@devflow/adapters/<adapter>/ADAPTER.md`, `@devflow/adapters/<adapter>/steps/setup.md`, `@devflow/skills/devflow-setup/references/config-template.md`, `@devflow/skills/devflow-setup/references/placeholder-map.md` |
-| Reads | `@devflow/skills/devflow-discover/references/discovery-axes.md`, `@devflow/skills/devflow-discover/references/adr-template.md`, `@devflow/references/mcp-catalog.md`, `@devflow/skills/devflow-task/references/task-template.md` |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-init/references/interview-protocol.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-init/references/scaffolding-matrix.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-init/references/roadmap-generation.md` |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/steps/setup.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-setup/references/config-template.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-setup/references/placeholder-map.md` |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-discover/references/discovery-axes.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-discover/references/adr-template.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/mcp-catalog.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-task/references/task-template.md` |
 | Writes | `<project-slug>/` technology scaffold (optional: Nx, Angular, Next.js, Flutter, NestJS), `.gitignore`, `@devflow/config.md`, `AGENTS.md`, `REGISTRY.md`, `constitution.md`, `docs/product.md` |
 | Writes | `docs/adr/ADR-001-initial-architecture.md`, `docs/adr/README.md`, `devflow/plans/project-blueprint.md`, `devflow/features/[NNN]_[feature-name]/task.md` (`001..NNN`), `.devflow-state.json` |
 | Next step | `devflow.plan` (resolves `001_<first-feature>`) |

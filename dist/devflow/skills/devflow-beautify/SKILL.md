@@ -7,6 +7,8 @@ model: sonnet
 effort: medium
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Skill: devflow.beautify
 
 ## Quick Start
@@ -14,7 +16,7 @@ effort: medium
 Run `/devflow.beautify [optional plan path]`.
 
 - If an argument is passed, use it as the `plan.md` path
-- If no argument is passed, resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**
+- If no argument is passed, resolve feature per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Active feature resolution**
 
 ## Purpose
 
@@ -45,13 +47,13 @@ If any item fails → stop, report which check failed, do not apply changes.
 
 ## Input
 
-Files from `devflow.implement` summary + `devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**. Summary unavailable (new session) → `plan.md` File List `[done]` entries are the scope.
+Files from `devflow.implement` summary + `devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, resolve feature per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Active feature resolution**. Summary unavailable (new session) → `plan.md` File List `[done]` entries are the scope.
 
 ## Workflow
 
 ### Step 0 - Resolve adapter
 
-Resolve adapter, adapter root, and app working directory per `@devflow/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `@devflow/adapters/<adapter>/ADAPTER.md` (core) plus `@devflow/adapters/<adapter>/steps/beautify.md`. Legacy adapters without `steps/`: the **Beautify** sections live in `ADAPTER.md`. Use the beautify step file's commands and stack-specific review axes (monorepo: run commands from the resolved app's working directory).
+Resolve adapter, adapter root, and app working directory per `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core) plus `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/steps/beautify.md`. Legacy adapters without `steps/`: the **Beautify** sections live in `ADAPTER.md`. Use the beautify step file's commands and stack-specific review axes (monorepo: run commands from the resolved app's working directory).
 
 ### Step 1 - Read docs
 
@@ -87,7 +89,7 @@ Axes: correctness · readability/simplification · architecture compliance · se
 
 **UI consistency source:** `DESIGN.md` (or `docs/design.md`) present in project root → axis checks token compliance (palette, typography, spacing) against it instead of generic guidelines; hardcoded value with a DESIGN.md token equivalent = Required finding. Absent → generic guidelines, zero behavior change.
 
-**Depth profile:** read `**Complexity:**` from `plan.md` (per `@devflow/references/complexity-scoring.md`; missing → `standard`). `quick` → review only correctness + readability/simplification axes. `standard` / `thorough` → all 8 axes.
+**Depth profile:** read `**Complexity:**` from `plan.md` (per `${CLAUDE_PLUGIN_ROOT}/references/complexity-scoring.md`; missing → `standard`). `quick` → review only correctness + readability/simplification axes. `standard` / `thorough` → all 8 axes.
 
 Full per-axis checklist: `references/analysis-axes.md`.
 
@@ -121,7 +123,7 @@ Apply directly without asking:
 
 #### Opinable improvements
 
-**Run mode** (`.devflow-run.json` present): no approval channel exists — do not propose, do not apply. Log each opinable candidate as an entry in `plan.md` `## Decision flags` per `@devflow/references/run-mode.md` → **Decision flags** (decision: "not applied"), continue. Interactive mode below.
+**Run mode** (`.devflow-run.json` present): no approval channel exists — do not propose, do not apply. Log each opinable candidate as an entry in `plan.md` `## Decision flags` per `${CLAUDE_PLUGIN_ROOT}/references/run-mode.md` → **Decision flags** (decision: "not applied"), continue. Interactive mode below.
 
 Propose before applying:
 
@@ -164,13 +166,13 @@ After edits, check **only** implement-touched files for unused imports, unreacha
 
 After all approved and certain changes are applied, run the **format**, **analyze/typecheck**, and conditional **codegen** commands from the adapter beautify step file, in the order specified there.
 
-On error: resolve autonomously; max 3 attempts; then escalate per `@devflow/references/escalation-ladder.md` (debug mode → re-approach → block).
+On error: resolve autonomously; max 3 attempts; then escalate per `${CLAUDE_PLUGIN_ROOT}/references/escalation-ladder.md` (debug mode → re-approach → block).
 
 ### Step 6 - Notify user
 
-Set `plan.md` `**Status:** beautified`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
+Set `plan.md` `**Status:** beautified`; refresh `.devflow-state.json` per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **State update snippet**.
 
-**Run mode** (`.devflow-run.json` present): emit the block below but do not wait — control returns to the orchestrator (`@devflow/references/run-mode.md`).
+**Run mode** (`.devflow-run.json` present): emit the block below but do not wait — control returns to the orchestrator (`${CLAUDE_PLUGIN_ROOT}/references/run-mode.md`).
 
 Respond with:
 
@@ -239,10 +241,10 @@ Continue to testing? -> devflow.test
 | Reads | files from `devflow.implement` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md`, `registry.md` |
-| Reads | `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status), `@devflow/references/complexity-scoring.md` (depth profile) |
-| Reads (conditional) | `DESIGN.md` / `docs/design.md` — token source for UI consistency axis; `.devflow-run.json` (existence — run-mode switch, contract `@devflow/references/run-mode.md`) |
+| Reads | `${CLAUDE_PLUGIN_ROOT}/references/escalation-ladder.md` (failure handling), `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` (status), `${CLAUDE_PLUGIN_ROOT}/references/complexity-scoring.md` (depth profile) |
+| Reads (conditional) | `DESIGN.md` / `docs/design.md` — token source for UI consistency axis; `.devflow-run.json` (existence — run-mode switch, contract `${CLAUDE_PLUGIN_ROOT}/references/run-mode.md`) |
 | Writes | improvements to existing files only (no new files) |
 | Writes | `plan.md` — `**Status:** beautified`, `## Decision flags` (run mode — opinable candidates) |
 | Next step | `devflow.test` |
-| Reads (adapter) | `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/beautify.md` |
+| Reads (adapter) | `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`, `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core) + `steps/beautify.md` |
 | Related skills | Per active `ADAPTER.md` → **Technology skills** |

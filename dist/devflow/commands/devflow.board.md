@@ -5,6 +5,8 @@ argument-hint: "[--open] [--sync] [--port <port>] [--json]"
 disable-model-invocation: true
 ---
 
-Use `@devflow/skills/devflow-board/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
+Use `${CLAUDE_PLUGIN_ROOT}/skills/devflow-board/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
 
 If `$ARGUMENTS` is empty, generate the board without opening or syncing.

@@ -87,6 +87,6 @@ See `angular-forms` for schema/model conventions. See [references/aria-patterns.
 
 |            |                                                                   |
 | ---------- | ----------------------------------------------------------------- |
-| Reads      | Active component/template files, `@devflow/adapters/angular/ADAPTER.md` |
+| Reads      | Active component/template files, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/ADAPTER.md` |
 | Writes     | New or refactored accessible widget components, styles, harness tests |
 | Invoked by | `devflow.implement`, `devflow.beautify`                           |
