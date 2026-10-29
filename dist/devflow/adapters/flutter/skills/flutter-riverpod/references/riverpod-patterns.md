@@ -31,6 +31,7 @@ class Todos extends _$Todos {
   Future<void> addTodo(String title) async {
     final repo = ref.read(todoRepositoryProvider);
     await repo.createTodo(title);
+    if (!ref.mounted) return; // Riverpod 3 throws on a disposed Ref
     ref.invalidateSelf();
   }
 }
@@ -105,6 +106,7 @@ final userName = ref.watch(userProvider.select((u) => u.name));
 @riverpod
 Future<String> cachedValue(Ref ref) async {
   final value = await fetchValue();
+  if (!ref.mounted) return value; // disposed during the await — Ref unusable
   final link = ref.keepAlive();
   Timer(const Duration(minutes: 5), link.close);
   return value;

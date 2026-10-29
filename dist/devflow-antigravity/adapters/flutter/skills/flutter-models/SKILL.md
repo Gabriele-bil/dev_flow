@@ -12,15 +12,15 @@ Full code examples: `references/models-patterns.md`.
 - Keep all models immutable (`final` fields, no setters, update with `copyWith`).
 - Keep boundaries strict: domain has no JSON/Supabase concerns; data layer handles wire format.
 - Prefer explicit class modifiers:
-  - `@freezed class` for concrete immutable entities/DTOs.
+  - `@freezed abstract class` for single-constructor entities/DTOs (Freezed 3+ requires the keyword).
   - `@freezed sealed class` for union/failure/result states.
   - `abstract interface class` for repository contracts.
   - `final class` for concrete implementations you do not want externally subtype-able.
 
-## Why Not Abstract Entities?
+## Why `abstract` On Entities?
 
-Make entities/DTOs concrete immutable value types, not abstract classes.
-Use abstraction for behavior contracts (`abstract interface class PetRepository`), not data containers.
+Freezed 3+ generates the concrete class (`_Pet`); the annotated declaration must be `abstract` (one factory) or `sealed` (several factories), or codegen fails.
+Entities stay immutable value types — `abstract` here is a Freezed requirement, not a behavior contract (that is `abstract interface class PetRepository`).
 
 ## Required Setup
 

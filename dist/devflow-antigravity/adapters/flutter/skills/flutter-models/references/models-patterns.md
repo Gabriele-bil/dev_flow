@@ -25,7 +25,7 @@ Lives in `domain/`. Represents business meaning only.
 
 ```dart
 @freezed
-class Pet with _$Pet {
+abstract class Pet with _$Pet {
   const Pet._();
 
   const factory Pet({
@@ -100,7 +100,7 @@ Lives in `data/`. Maps the transport/storage schema.
 ```dart
 @freezed
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class PetDto with _$PetDto {
+abstract class PetDto with _$PetDto {
   const factory PetDto({
     required String id,
     required String name,

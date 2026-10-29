@@ -5,7 +5,7 @@ Loaded on demand from `../SKILL.md`.
 ## Riverpod (Flutter)
 
 ```dart
-// Provider definition with @riverpod codegen
+// Provider definition with @riverpod codegen (generated as `userProvider`: `Notifier` suffix stripped)
 @riverpod
 class UserNotifier extends _$UserNotifier {
   @override
@@ -17,13 +17,13 @@ class UserNotifier extends _$UserNotifier {
 }
 
 // Read (one-shot in callbacks)
-final user = ref.read(userNotifierProvider);
+final user = ref.read(userProvider);
 
 // Watch (rebuild on change)
-final user = ref.watch(userNotifierProvider);
+final user = ref.watch(userProvider);
 
 // Mutate
-ref.read(userNotifierProvider.notifier).updateName('Alice');
+ref.read(userProvider.notifier).updateName('Alice');
 ```
 
 **Pattern**: Notifier owns mutation; widget only reads/watches via `ref`.

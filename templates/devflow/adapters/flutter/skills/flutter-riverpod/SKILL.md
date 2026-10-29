@@ -22,9 +22,9 @@ Full code: `references/riverpod-patterns.md`.
 ## Core Rules
 
 1. Prefer `@riverpod` code generation for type-safe providers (`Notifier` and `AsyncNotifier`).
-2. Do not use legacy `StateNotifierProvider` or `StateProvider` (deprecated in Riverpod 3.0).
+2. Do not use legacy `StateNotifierProvider`, `StateProvider` or `ChangeNotifierProvider` (Riverpod 3.0 moved them to `flutter_riverpod/legacy.dart`).
 3. In Riverpod 3.0, use the unified `Ref` class (subclasses like `NotifierRef` are removed).
-4. Use `AsyncValue.value` instead of deprecated `valueOrNull` (returns null during loading/error).
+4. Use `AsyncValue.value` (returns null during loading/error); `valueOrNull` was removed in Riverpod 3.0.
 5. Keep a single source of truth in providers (avoid duplicated mutable widget state).
 6. In UI, use `ref.watch` for rendering, `ref.read` for actions, `ref.listen` for side effects.
 7. Use `select`/`selectAsync` when only a sub-field triggers rebuilds.

@@ -4,15 +4,15 @@
 
 ```dart
 // core/env/supabase_client_provider.dart
-@riverpod
-SupabaseClient supabaseClient(SupabaseClientRef ref) =>
+@Riverpod(keepAlive: true)
+SupabaseClient supabaseClient(Ref ref) =>
     Supabase.instance.client;
 ```
 
 ```dart
 // feature provider
 @riverpod
-PetRepository petRepository(PetRepositoryRef ref) {
+PetRepository petRepository(Ref ref) {
   final client = ref.watch(supabaseClientProvider);
   return PetRepositoryImpl(PetDatasource(client));
 }
@@ -159,7 +159,7 @@ Expose auth events via provider:
 
 ```dart
 @riverpod
-Stream<AuthState> authState(AuthStateRef ref) =>
+Stream<AuthState> authState(Ref ref) =>
     ref.watch(supabaseClientProvider).auth.onAuthStateChange;
 ```
 
@@ -200,7 +200,7 @@ Use realtime only for collaborative or multi-device live views.
 
 ```dart
 @riverpod
-Stream<List<LogEntry>> logEntries(LogEntriesRef ref, String petId) =>
+Stream<List<LogEntry>> logEntries(Ref ref, String petId) =>
     ref
         .watch(supabaseClientProvider)
         .from('log_entries')
