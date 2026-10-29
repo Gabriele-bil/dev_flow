@@ -12,7 +12,8 @@
 #     ogni comando riceve DEVFLOW_HOST/DEVFLOW_EVENT (il payload agy non
 #     contiene il nome evento) e gira dalla radice del plugin (cwd di agy).
 #   - niente commands/: agy non carica comandi; le skill sono già slash command.
-#   - frontmatter: via i campi solo-Claude Code da skill e agenti.
+#   - frontmatter: via i campi solo-Claude Code da skill e agenti;
+#     disable-model-invocation resta: agy 1.4.9 lo rispetta (non documentato).
 #   - rules/: orientamento statico (agy non inietta contesto da SessionStart).
 #   - ${CLAUDE_PLUGIN_ROOT} nelle skill → percorso di staging di agy.
 set -euo pipefail
@@ -106,11 +107,16 @@ strip_frontmatter_keys() {
 }
 
 step "Frontmatter skill e agenti"
-CLAUDE_ONLY_SKILL_KEYS="model effort allowed-tools context agent background disable-model-invocation"
+# disable-model-invocation non è qui: agy 1.4.9 lo rispetta (verificato: la skill
+# non si attiva da sola e resta invocabile come /<nome>), anche se non è documentato.
+CLAUDE_ONLY_SKILL_KEYS="model effort allowed-tools context agent background"
 while IFS= read -r f; do
   # shellcheck disable=SC2086
   strip_frontmatter_keys "$f" $CLAUDE_ONLY_SKILL_KEYS
 done < <(find "$AGY_DIR/skills" "$AGY_DIR/adapters" -name SKILL.md)
+USER_ONLY_CC="$(grep -l '^disable-model-invocation: true' "$DIST_DIR"/skills/*/SKILL.md | wc -l | tr -d ' ')"
+USER_ONLY_AGY="$(grep -l '^disable-model-invocation: true' "$AGY_DIR"/skills/*/SKILL.md | wc -l | tr -d ' ')"
+[ "$USER_ONLY_CC" = "$USER_ONLY_AGY" ] || fail "disable-model-invocation perso: $USER_ONLY_CC skill in Claude Code, $USER_ONLY_AGY in Antigravity"
 
 for f in "$AGY_DIR"/agents/*.md; do
   [ -f "$f" ] || continue

@@ -2,6 +2,7 @@
 name: devflow-test
 description: Writes/runs unit+integration tests via adapter targets, bounded retries. Use when user runs devflow.test, validates feature after beautify, or fifth pipeline step.
 argument-hint: "[optional-plan-path]"
+disable-model-invocation: true
 ---
 
 

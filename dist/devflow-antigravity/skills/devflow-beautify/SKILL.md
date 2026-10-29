@@ -2,6 +2,7 @@
 name: devflow-beautify
 description: "Reviews devflow.implement output: correctness, readability, security, performance, architecture, UI. Use when user runs devflow.beautify, reviews implementation output, or fourth pipeline step."
 argument-hint: "[optional-plan-path]"
+disable-model-invocation: true
 ---
 
 

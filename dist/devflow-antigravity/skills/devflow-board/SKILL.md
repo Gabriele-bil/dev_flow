@@ -2,6 +2,7 @@
 name: devflow-board
 description: "Generates and auto-syncs a deterministic, static, read-only HTML project board in devflow/board/index.html visualizing Kanban task stages, dependency DAG critical path, formatted Markdown specs, and per-command execution timings. Use when user runs devflow.board, opens the visual project kanban board, or inspects task lead times."
 argument-hint: "[--open] [--sync] [--port <port>] [--json]"
+disable-model-invocation: true
 ---
 
 

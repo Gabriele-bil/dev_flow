@@ -182,6 +182,7 @@ DevFlow ships one build per host, generated from the same source: [`dist/devflow
 | Feature | Claude Code | Antigravity CLI |
 | --- | --- | --- |
 | Pipeline skills, adapters, references | ✅ | ✅ (skills are slash commands; `commands/` not shipped) |
+| User-only skills (`disable-model-invocation`: pr, rollback, ship, auto, …) | ✅ run only on `/` | ✅ run only on `/` (honored by agy 1.4.9) |
 | Review subagents (`agents/`) | ✅ read-only tools, `model: sonnet` | ✅ host default tools/model (read-only rule in prompt) |
 | Destructive-command / config-protect / scope guards | ✅ | ✅ (`run_command`, file-write tools) |
 | Observe log, instincts, churn learning | ✅ | ✅ |
