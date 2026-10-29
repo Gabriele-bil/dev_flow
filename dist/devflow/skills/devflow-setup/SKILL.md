@@ -47,7 +47,7 @@ Never edit user content outside managed blocks unless `--force` is set.
 
 ### Step 1 - Resolve mode, apps, and adapter(s)
 
-1. Ask the user: "Single app, or multiple apps in this repo (monorepo)?" (`AskQuestion`, two options).
+1. Ask the user: "Single app, or multiple apps in this repo (monorepo)?" (`AskUserQuestion` / `ask_question`, two options).
 
 **Single app** (unchanged from pre-monorepo behavior):
 
@@ -96,7 +96,7 @@ Do not skip this step even if values can be inferred.
 
 Collection order:
 
-1. Prefer `AskQuestion` for structured choices.
+1. Prefer `AskUserQuestion` / `ask_question` for structured choices.
 2. Use concise chat questions for free text fields.
 3. Confirm ambiguous answers once, then proceed.
 

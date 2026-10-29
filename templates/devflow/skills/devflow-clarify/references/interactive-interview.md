@@ -13,7 +13,7 @@ DevFlow runs in multiple agentic hosts. Use the appropriate interactive question
 | Environment | Primary Tool | Tool Call Pattern |
 | ----------- | ------------ | ----------------- |
 | **Antigravity** | `ask_question` | `ask_question(questions=[{question: "...", options: ["(Recommended) ...", "..."], is_multi_select: false}])` |
-| **Claude Code** | `AskQuestion` | `AskQuestion(questions=[{question: "...", options: ["(Recommended) ...", "..."]}])` |
+| **Claude Code** | `AskUserQuestion` | `AskUserQuestion(questions=[{question: "...", header: "<≤12 chars>", multiSelect: false, options: [{label: "(Recommended) ...", description: "..."}, {label: "...", description: "..."}]}])` — 1–4 questions per call |
 | **CLI / Fallback** | Chat Prompt | Formatted markdown block with numbered choices, explicit recommendation, and write-in prompt |
 
 ### Core Questioning Rules

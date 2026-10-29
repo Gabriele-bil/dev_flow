@@ -75,9 +75,10 @@ In `plan.md` and `devflow.blueprint`, individual slices or File List entries can
 ---
 name: devflow-ship
 description: Pre-merge quality gate
-model: claude-opus-4-7
+model: sonnet
+effort: high
 ---
 ```
 
-Field is optional — omit if inheriting from session default is acceptable.
+Use aliases (`opus`, `sonnet`, `haiku`, `fable`), never full model IDs — aliases follow the current model generation and the provider. Field is optional — omit if inheriting from session default is acceptable. Claude Code only: the Antigravity build strips `model` and `effort`.
 Adapter skills: inherit from pipeline step that invokes them; explicit override only if cost-sensitive.
