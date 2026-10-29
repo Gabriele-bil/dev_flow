@@ -142,7 +142,8 @@ setInterval(async () => { await cleanupOldRecords(); }, 60000); // no error hand
 **Correct:**
 
 ```typescript
-import { BullModule } from '@nestjs/bullmq';
+import { BullModule, InjectQueue, Processor, WorkerHost, OnWorkerEvent } from '@nestjs/bullmq';
+import { Job, Queue } from 'bullmq';
 
 @Module({
   imports: [
@@ -181,11 +182,10 @@ export class ReportsService {
 
 // Consumer — reports progress for client polling
 @Processor('reports')
-export class ReportsProcessor {
+export class ReportsProcessor extends WorkerHost {
   private readonly logger = new Logger(ReportsProcessor.name);
 
-  @Process('generate')
-  async generateReport(job: Job<GenerateReportDto>): Promise<Report> {
+  async process(job: Job<GenerateReportDto>): Promise<Report> {
     await job.updateProgress(10);
     const data = await this.fetchData(job.data);
     await job.updateProgress(50);
@@ -196,7 +196,7 @@ export class ReportsProcessor {
     return report;
   }
 
-  @OnQueueFailed()
+  @OnWorkerEvent('failed')
   onFailed(job: Job, error: Error) {
     this.logger.error(`Job ${job.id} failed: ${error.message}`);
   }
@@ -216,21 +216,21 @@ export class NotificationService {
   }
 }
 
-// Scheduled/repeating jobs — stable jobId prevents duplicate registration on restart
+// Scheduled/repeating jobs — upsert by stable scheduler id prevents duplicates on restart
 @Injectable()
 export class ScheduledJobsService implements OnModuleInit {
   constructor(@InjectQueue('maintenance') private queue: Queue) {}
 
   async onModuleInit(): Promise<void> {
-    await this.queue.add('cleanup', {}, { repeat: { cron: '0 0 * * *' }, jobId: 'daily-cleanup' });
-    await this.queue.add('digest', {}, { repeat: { every: 60 * 60 * 1000 }, jobId: 'hourly-digest' });
+    await this.queue.upsertJobScheduler('daily-cleanup', { pattern: '0 0 * * *' }, { name: 'cleanup' });
+    await this.queue.upsertJobScheduler('hourly-digest', { every: 60 * 60 * 1000 }, { name: 'digest' });
   }
 }
 
 @Processor('maintenance')
-export class MaintenanceProcessor {
-  @Process('cleanup')
-  async cleanup(): Promise<void> {
+export class MaintenanceProcessor extends WorkerHost {
+  async process(job: Job): Promise<void> {
+    if (job.name !== 'cleanup') return; // one process() per queue — branch on job.name
     await this.cleanupOldReports();
     await this.cleanupExpiredSessions();
   }
@@ -265,13 +265,14 @@ export class HealthController {
 **Correct — separate liveness (process) from readiness (dependencies):**
 
 ```typescript
-import { HealthCheckService, HttpHealthIndicator, TypeOrmHealthIndicator, HealthCheck, DiskHealthIndicator, MemoryHealthIndicator } from '@nestjs/terminus';
+import { HealthCheckService, MicroserviceHealthIndicator, TypeOrmHealthIndicator, HealthCheck, DiskHealthIndicator, MemoryHealthIndicator, HealthIndicatorService } from '@nestjs/terminus';
+import { Transport } from '@nestjs/microservices';
 
 @Controller('health')
 export class HealthController {
   constructor(
     private health: HealthCheckService,
-    private http: HttpHealthIndicator,
+    private microservice: MicroserviceHealthIndicator,
     private db: TypeOrmHealthIndicator,
     private disk: DiskHealthIndicator,
     private memory: MemoryHealthIndicator,
@@ -290,7 +291,7 @@ export class HealthController {
   readiness() {
     return this.health.check([
       () => this.db.pingCheck('database'),
-      () => this.http.pingCheck('redis', 'http://redis:6379', { timeout: 1000 }),
+      () => this.microservice.pingCheck('redis', { transport: Transport.REDIS, options: { host: 'redis', port: 6379 } }).withTimeout(1000),
       () => this.disk.checkStorage('disk', { path: '/', thresholdPercent: 0.9 }),
     ]);
   }
@@ -298,15 +299,14 @@ export class HealthController {
 
 // Custom business-specific indicator
 @Injectable()
-export class QueueHealthIndicator extends HealthIndicator {
-  constructor(private queueService: QueueService) { super(); }
+export class QueueHealthIndicator {
+  constructor(private queueService: QueueService, private healthIndicatorService: HealthIndicatorService) {}
 
-  async isHealthy(key: string): Promise<HealthIndicatorResult> {
+  async isHealthy(key: string) {
+    const indicator = this.healthIndicatorService.check(key);
     const stats = await this.queueService.getStats();
-    const isHealthy = stats.failedCount < 100;
-    const result = this.getStatus(key, isHealthy, { waiting: stats.waitingCount, active: stats.activeCount, failed: stats.failedCount });
-    if (!isHealthy) throw new HealthCheckError('Queue unhealthy', result);
-    return result;
+    const details = { waiting: stats.waitingCount, active: stats.activeCount, failed: stats.failedCount };
+    return stats.failedCount < 100 ? indicator.up(details) : indicator.down(details); // return down(), never throw
   }
 }
 

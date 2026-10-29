@@ -227,7 +227,7 @@ export class ProductsService {
 @Injectable()
 export class UsersService {
   @CacheKey('users')
-  @CacheTTL(3600) // caching a frequently-changing list for 1h is wrong
+  @CacheTTL(60 * 60 * 1000) // 1h (ms) for a frequently-changing list is wrong
   @UseInterceptors(CacheInterceptor)
   async findAll(): Promise<User[]> { return this.usersRepo.find(); }
 }

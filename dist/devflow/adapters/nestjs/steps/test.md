@@ -34,7 +34,7 @@ npm run test:e2e
 Level-4 goal-backward verification target (`devflow.test` Step 6b). Run e2e specs covering the AC under verification — Supertest boots the real Nest application (all modules, guards, pipes, filters wired) and exercises it over HTTP in-process:
 
 ```bash
-npm run test:e2e -- --testPathPattern "[feature-name]"
+npm run test:e2e -- --testPathPatterns "[feature-name]"
 ```
 
 No e2e spec covering the AC → level 4 `N/A` (verdict PARTIAL).

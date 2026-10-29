@@ -276,7 +276,7 @@ describe('WeatherService', () => {
 
   it('should handle rate limiting', async () => {
     httpService.get.mockReturnValue(throwError(() => ({ response: { status: 429, data: { message: 'Rate limited' } } })));
-    await expect(service.getWeather('NYC')).rejects.toThrow(TooManyRequestsException);
+    await expect(service.getWeather('NYC')).rejects.toMatchObject({ status: HttpStatus.TOO_MANY_REQUESTS }); // service maps upstream 429 to HttpException
   });
 });
 

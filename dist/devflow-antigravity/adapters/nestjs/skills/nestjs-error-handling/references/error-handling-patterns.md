@@ -115,7 +115,7 @@ export class DomainExceptionFilter implements ExceptionFilter {
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
-  constructor(private readonly logger: Logger) {}
+  private readonly logger = new Logger(AllExceptionsFilter.name);
 
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -130,7 +130,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 }
 
 // main.ts
-app.useGlobalFilters(new AllExceptionsFilter(app.get(Logger)), new DomainExceptionFilter());
+app.useGlobalFilters(new AllExceptionsFilter(), new DomainExceptionFilter());
 
 // or module-scoped, DI-aware
 @Module({ providers: [{ provide: APP_FILTER, useClass: AllExceptionsFilter }] })

@@ -26,7 +26,7 @@ Full code examples: `references/microservices-patterns.md`.
 
 ## 2) Message Queues for Background Jobs (MEDIUM-HIGH)
 
-`@nestjs/bullmq` for anything that shouldn't block an HTTP response: report generation, bulk email, file processing, scheduled maintenance. Producer (`@InjectQueue('name') queue: Queue`) calls `.add()` and returns immediately with a job ID/handle — never `await` the actual work inline in the controller. Consumer is a `@Processor('name')` class with `@Process('jobName')` methods; report progress via `job.updateProgress()` for client polling. Configure `attempts` + `backoff: { type: 'exponential' }` per queue/job so transient failures retry automatically instead of silently dropping work. Repeating jobs (`repeat: { cron: ... }`) need a stable `jobId` to prevent duplicate registration on restart.
+`@nestjs/bullmq` for anything that shouldn't block an HTTP response: report generation, bulk email, file processing, scheduled maintenance. Producer (`@InjectQueue('name') queue: Queue`) calls `.add()` and returns immediately with a job ID/handle — never `await` the actual work inline in the controller. Consumer is a `@Processor('name')` class that `extends WorkerHost` and implements `process(job)` (branch on `job.name`), with `@OnWorkerEvent('failed')` for failure hooks; report progress via `job.updateProgress()` for client polling. Configure `attempts` + `backoff: { type: 'exponential' }` per queue/job so transient failures retry automatically instead of silently dropping work. Repeating jobs go through `queue.upsertJobScheduler(id, { pattern | every }, { name })` — the stable scheduler `id` prevents duplicate registration on restart.
 
 ## 3) Health Checks (MEDIUM-HIGH)
 
@@ -35,7 +35,7 @@ Full code examples: `references/microservices-patterns.md`.
 - **Liveness** (`/health/live`) — "is the process alive / needs Kubernetes restart": cheap, local checks only (memory heap), no calls to a downstream DB/API. Reflects the process, not its dependencies.
 - **Readiness** (`/health/ready`) — "can this instance accept traffic right now": checks real dependencies (`TypeOrmHealthIndicator.pingCheck`, Redis ping, critical downstream API), each with a short timeout so a slow dependency doesn't itself become a health-check timeout. Return `503` immediately once graceful shutdown starts (pairs with `nestjs-performance` §5) so the orchestrator stops routing new traffic before the process exits.
 
-Custom `HealthIndicator` subclasses for business-specific health (queue backlog, circuit-breaker state) — `throw new HealthCheckError(...)` on failure, otherwise return `this.getStatus(key, true, {...details})`.
+Custom indicators for business-specific health (queue backlog, circuit-breaker state) inject `HealthIndicatorService`: `const indicator = this.healthIndicatorService.check(key)`, then return `indicator.up({...details})` or `indicator.down({...details})` — the legacy `HealthIndicator` / `HealthCheckError` API is removed in current `@nestjs/terminus`.
 
 ## Microservices Review Checklist
 
@@ -43,7 +43,7 @@ Custom `HealthIndicator` subclasses for business-specific health (queue backlog,
 - [ ] `@EventPattern` handlers never return a value the caller depends on
 - [ ] `@EventPattern` handlers catch their own errors — never rethrow
 - [ ] No long-running work (report/bulk-email/file-processing) executed inline in an HTTP handler — moved to a BullMQ queue
-- [ ] Queue jobs configured with `attempts`/`backoff`; repeating jobs have a stable `jobId`
+- [ ] Queue jobs configured with `attempts`/`backoff`; repeating jobs use `upsertJobScheduler` with a stable id
 - [ ] `/health/live` checks only the process itself; `/health/ready` checks real dependencies with timeouts
 - [ ] Readiness returns `503` during graceful shutdown
 

@@ -189,14 +189,14 @@ export class AppModule {}
 // HTTP cache interceptor, GET-only, TTL from metadata
 @Injectable()
 export class HttpCacheInterceptor implements NestInterceptor {
-  constructor(private cacheManager: Cache, private reflector: Reflector) {}
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache, private reflector: Reflector) {}
 
   async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
     const request = context.switchToHttp().getRequest();
     if (request.method !== 'GET') return next.handle();
 
     const cacheKey = `cache:${request.url}:${JSON.stringify(request.query)}`;
-    const ttl = this.reflector.get<number>('cacheTTL', context.getHandler()) || 300;
+    const ttl = this.reflector.get<number>('cacheTTL', context.getHandler()) || 300_000; // ms — cache-manager TTLs are milliseconds
 
     const cached = await this.cacheManager.get(cacheKey);
     if (cached) return of(cached);
@@ -380,6 +380,7 @@ export class DeprecationInterceptor implements NestInterceptor {
     return next.handle();
   }
 }
+```
 
 ## Express v5 Route Path Patterns (NestJS 11+)
 
