@@ -253,10 +253,11 @@ import { Router } from "@angular/router";
 import { catchError, throwError } from "rxjs";
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
+  const router = inject(Router); // injection context: top of interceptor, not inside catchError
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401) {
-        inject(Router).navigate(["/login"]);
+        router.navigate(["/login"]);
       }
       return throwError(() => error);
     }),
@@ -809,8 +810,9 @@ results = toSignal(
     debounceTime(300),
     distinctUntilChanged(),
     filter(q => q.length >= 2),
-    switchMap(q => this.http.get<Result[]>(`/api/search?q=${q}`)),
-    catchError(() => of([]))
+    switchMap(q => this.http.get<Result[]>(`/api/search?q=${q}`).pipe(
+      catchError(() => of([])) // inside inner stream: one error doesn't kill search
+    ))
   ),
   { initialValue: [] }
 );
@@ -821,6 +823,7 @@ results = toSignal(
 ### Testing `httpResource`
 
 ```typescript
+import { ApplicationRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
@@ -837,10 +840,12 @@ describe('UserComponent', () => {
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  it('loads user', () => {
+  it('loads user', async () => {
     component.userId.set('123');
+    TestBed.tick(); // run resource effect -> request issued
     const req = httpMock.expectOne('/api/users/123');
     req.flush({ id: '123', name: 'Test User' });
+    await TestBed.inject(ApplicationRef).whenStable();
     expect(component.userResource.value()?.name).toBe('Test User');
   });
 });

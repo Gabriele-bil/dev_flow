@@ -260,7 +260,7 @@ export class Card {}
 ## Lifecycle Hooks
 
 ```typescript
-import { OnDestroy, OnInit, afterNextRender, afterRender } from "@angular/core";
+import { OnDestroy, OnInit, afterEveryRender, afterNextRender } from "@angular/core";
 
 export class MyComponent implements OnInit, OnDestroy {
   constructor() {
@@ -270,7 +270,7 @@ export class MyComponent implements OnInit, OnDestroy {
     });
 
     // Runs after every render.
-    afterRender(() => {
+    afterEveryRender(() => {
       // Sync side effects
     });
   }
@@ -287,7 +287,7 @@ export class MyComponent implements OnInit, OnDestroy {
 
 ### `afterRenderEffect()` — Phased Render Effects
 
-Reactive version of `afterRender` — reruns when read signals change, runs in defined phases for safe DOM read/write ordering. SSR-safe (no-op on server).
+Reactive version of `afterEveryRender` — reruns when read signals change, runs in defined phases for safe DOM read/write ordering. SSR-safe (no-op on server).
 
 ```typescript
 import { afterRenderEffect } from "@angular/core";
@@ -387,17 +387,19 @@ Use native control flow. Do NOT use `*ngIf`, `*ngFor`, `*ngSwitch`.
 
 <!-- Switch: multiple cases share one output -->
 @switch (status()) {
-  @case ('pending'), @case ('active') { <span>In progress</span> }
+  @case ('pending')
+  @case ('active') { <span>In progress</span> }
   @case ('done') { <span>Done</span> }
   @default { <span>Unknown</span> }
 }
 
-<!-- Switch: exhaustive check on union type — @default never errors at compile time
-     when a case is missing -->
-@switch (role()) {
+<!-- Switch: exhaustive check on union type — @default never; errors at compile time
+     when a case is missing. Narrowing works on variables only: read the signal into @let -->
+@let currentRole = role();
+@switch (currentRole) {
   @case ('admin') { <app-admin-panel /> }
   @case ('member') { <app-member-panel /> }
-  @default never
+  @default never;
 }
 ```
 

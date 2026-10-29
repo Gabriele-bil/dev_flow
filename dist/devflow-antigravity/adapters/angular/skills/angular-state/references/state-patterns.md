@@ -367,6 +367,9 @@ export class CheckoutPage {
 Test methods and derived state directly.
 
 ```typescript
+import { patchState } from '@ngrx/signals';
+import { unprotected } from '@ngrx/signals/testing';
+
 describe('OrdersStore', () => {
   let store: InstanceType<typeof OrdersStore>;
 
@@ -383,7 +386,7 @@ describe('OrdersStore', () => {
   });
 
   it('computes filtered orders', () => {
-    patchState(store, {
+    patchState(unprotected(store), { // store protected by default
       value: [
         { id: '1', customerName: 'John', status: 'open' },
         { id: '2', customerName: 'Ana', status: 'closed' },

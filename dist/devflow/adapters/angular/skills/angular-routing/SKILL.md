@@ -12,7 +12,7 @@ Configure routes, protect/prefetch with guards and resolvers, navigate, pick ren
 Root routes: `src/app/app.routes.ts`. Page-domain routes: colocate per feature, import into root.
 
 ```typescript
-import { Routes } from "@angular/core";
+import { Routes } from "@angular/router";
 
 export const routes: Routes = [
   { path: "", redirectTo: "dashboard", pathMatch: "full" },

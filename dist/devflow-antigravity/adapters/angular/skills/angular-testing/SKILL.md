@@ -73,7 +73,7 @@ npm install -D vitest jsdom
 ```bash
 ng test
 ng test --watch
-ng test --code-coverage
+ng test --coverage
 ```
 
 ## Coverage and Quality Rules

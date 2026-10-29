@@ -221,32 +221,34 @@ it("emits selected event on click", async () => {
 
 ## Testing Async Operations
 
-### `fakeAsync`
+No `fakeAsync`/`waitForAsync` — need zone.js. Zoneless: Vitest fake timers + native `async`.
+
+### Vitest fake timers
 
 ```typescript
-import { fakeAsync, flush, tick } from "@angular/core/testing";
+import { it, expect, vi } from "vitest";
 
-it("debounces search", fakeAsync(() => {
+it("debounces search", async () => {
+  vi.useFakeTimers();
   const fixture = TestBed.createComponent(SearchComponent);
   fixture.componentInstance.query.set("test");
 
-  tick(300);
-  flush();
+  await vi.advanceTimersByTimeAsync(300);
+  await fixture.whenStable();
 
   expect(fixture.componentInstance.results().length).toBeGreaterThan(0);
-}));
+  vi.useRealTimers();
+});
 ```
 
-### `waitForAsync`
+### Native `async`
 
 ```typescript
-import { waitForAsync } from "@angular/core/testing";
-
-it("loads async data", waitForAsync(async () => {
+it("loads async data", async () => {
   const fixture = TestBed.createComponent(DataComponent);
   await fixture.whenStable();
   expect(fixture.componentInstance.data()).toBeDefined();
-}));
+});
 ```
 
 ## Testing HTTP Resources
