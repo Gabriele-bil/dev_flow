@@ -141,7 +141,7 @@ import { profileSchema } from './schema'
 export async function updateProfile(data: unknown) {
   const parsed = profileSchema.safeParse(data)
   if (!parsed.success) {
-    return { success: false, error: parsed.error.errors[0].message }
+    return { success: false, error: parsed.error.issues[0].message }
   }
 
   // ... persist

@@ -17,7 +17,7 @@ const createJestConfig = nextJest({ dir: './' })
 
 const config: Config = {
   testEnvironment: 'jsdom',
-  setupFilesAfterFramework: ['<rootDir>/jest.setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
   },
@@ -56,19 +56,15 @@ describe('Counter', () => {
 
 ## Testing Server Components
 
+Jest does not support `async` Server Components — cover them with E2E (Playwright). Unit-test their synchronous children (data via props) and extracted data logic:
+
 ```tsx
 import { render, screen } from '@testing-library/react'
-import { ProductList } from './product-list'
+import { ProductListView } from './product-list-view' // sync child of async ProductList
 
-// Mock fetch for Server Component
-global.fetch = jest.fn().mockResolvedValue({
-  ok: true,
-  json: async () => [{ id: '1', name: 'Product A' }],
-})
-
-describe('ProductList', () => {
-  it('renders products', async () => {
-    render(await ProductList())  // await async component
+describe('ProductListView', () => {
+  it('renders products', () => {
+    render(<ProductListView products={[{ id: '1', name: 'Product A' }]} />)
     expect(screen.getByText('Product A')).toBeInTheDocument()
   })
 })

@@ -38,7 +38,7 @@ Pattern: Server Component fetches data → passes as props to Client Component (
 Cache strategies:
 
 - **UNCACHED (default in v16+):** standard `fetch()` or DB call with no caching.
-- **CACHED (opt-in):** `fetch(url, { next: { revalidate: N } })` for ISR, or `next: { tags: [...] }` + `revalidateTag()`.
+- **CACHED (opt-in):** `fetch(url, { next: { revalidate: N } })` for ISR, or `next: { tags: [...] }` + `revalidateTag(tag, 'max')`.
 - **`'use cache'` directive (Next.js 16+ stable):** For non-fetch caching (DB queries, ORMs; replaces `unstable_cache`). Configure `cacheLife()` and `cacheTag()`. Constraint: `cookies()`, `headers()`, `searchParams` cannot be read inside `'use cache'` — pass needed values as arguments.
 
 `fetch()` calls with identical URL + options dedupe automatically within a single request lifecycle. Use `React.cache()` to dedupe non-fetch functions (ORM/DB queries) within a request.
@@ -56,7 +56,7 @@ Async functions that run on the server, called from client or server. Add `'use 
 - Validate ALWAYS with Zod before any DB/IO operation.
 - Return typed discriminated union: `{ success: true, data }` | `{ success: false, error }`.
 - Never `throw` toward client — client cannot catch server exceptions.
-- Call `revalidatePath()` or `revalidateTag()` after mutations that affect cached data.
+- Call `revalidatePath()` or `revalidateTag(tag, 'max')` after mutations that affect cached data; `updateTag(tag)` when the user must see their own write immediately.
 - Use `redirect()` inside Server Actions for post-mutation navigation (throws internally — put after try/catch).
 
 Full code: file-level and inline Server Action, progressive-enhancement form with `useActionState` → `references/server-patterns.md`.
@@ -76,7 +76,7 @@ Do NOT:
 - Put `process.env` secrets in Client Components or client-importable files — they leak to browser bundle.
 - Use `fetch()` in Client Components when data can be fetched server-side and passed as props.
 - `throw` from Server Actions toward client — client cannot catch server-side exceptions.
-- Skip `revalidatePath()` / `revalidateTag()` after mutations — causes stale UI.
+- Skip `revalidatePath()` / `revalidateTag(tag, 'max')` / `updateTag(tag)` after mutations — causes stale UI.
 - Wrap `redirect()` or `notFound()` in try/catch — they throw intentionally.
 - Use `cache: 'no-store'` on every fetch by default — defeats the performance model.
 - Call Server Actions in `useEffect` — use `startTransition` or form `action` instead.

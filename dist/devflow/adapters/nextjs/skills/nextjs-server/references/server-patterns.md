@@ -66,10 +66,11 @@ export async function getCachedProducts() {
 Invalidate on mutation:
 
 ```ts
-import { revalidateTag } from 'next/cache'
+import { revalidateTag, updateTag } from 'next/cache'
 
 // inside a Server Action after DB write:
-revalidateTag('products')
+revalidateTag('products', 'max') // stale-while-revalidate
+// updateTag('products')         // Server Actions only: read-your-own-writes
 ```
 
 **Constraint:** `cookies()`, `headers()`, `searchParams` are NOT accessible inside `'use cache'`. Extract outside and pass as arguments:
@@ -177,7 +178,7 @@ const CreateItemSchema = z.object({
   description: z.string().optional(),
 })
 
-export async function createItem(formData: FormData) {
+export async function createItem(_prevState: unknown, formData: FormData) {
   const parsed = CreateItemSchema.safeParse({
     name: formData.get('name'),
     description: formData.get('description'),

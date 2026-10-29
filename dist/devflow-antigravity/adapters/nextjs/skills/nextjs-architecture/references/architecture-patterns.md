@@ -113,7 +113,7 @@ export function proxy(request: NextRequest) {
   return NextResponse.next()
 }
 
-export const proxyConfig = {
+export const config = {
   matcher: ['/app/:path*', '/dashboard/:path*'],
 }
 ```
@@ -236,7 +236,7 @@ Next.js 16+ renamed `middleware.ts` → `proxy.ts` (codemod: `npx @next/codemod@
 | Version | File | Export | Matcher config |
 | --- | --- | --- | --- |
 | 14–15 | `middleware.ts` | `middleware()` | `config` |
-| 16+ | `proxy.ts` | `proxy()` | `proxyConfig` |
+| 16+ | `proxy.ts` | `proxy()` | `config` |
 
 Full code for both versions → `references/architecture-patterns.md`.
 

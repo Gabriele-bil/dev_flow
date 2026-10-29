@@ -26,7 +26,7 @@ Full code: `references/testing-patterns.md`.
 - Always `userEvent.setup()` — never deprecated `userEvent.click()` direct call
 - Query priority: `getByRole` > `getByLabelText` > `getByText` > `getByTestId`
 - Use `waitFor` for async assertions
-- Server Components: `render(await ProductList())` — await async component before render
+- Async Server Components: not supported by Jest/RTL — cover them with E2E (Playwright); unit-test their sync children and extracted logic
 - Server Actions are pure functions — test directly; mock external dependencies (DB, fetch), not the action itself
 - Mock `next/navigation` (`useRouter`, `usePathname`, `useSearchParams`, `useParams`) for components using routing hooks
 
