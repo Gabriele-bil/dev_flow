@@ -39,7 +39,7 @@ Before proceeding, verify:
 
 - [ ] `devflow.implement` (and optionally `devflow.beautify`) has run for this feature
 - [ ] `plan.md` exists at `devflow/features/[NNN]_[feature-name]/plan.md`
-- [ ] Active adapter analyze/typecheck reports no errors
+- [ ] Analyze clean: `bash "@devflow/scripts/verify-stamp.sh" run analyze -- <adapter analyze cmd>` exits 0 (skipped while beautify's stamp is fresh)
 
 If any item fails → stop, report which check failed, do not write test files.
 
@@ -92,9 +92,9 @@ Read `task.md` **Acceptance criteria** section first — derive at least one tes
    - Web: write/execute Playwright specs or drive browser runner.
    - Mobile: write/execute Maestro flows (`.maestro/`) or Flutter `integration_test` on emulator/device.
    - Verify clean state transitions, absence of crashes or unhandled runtime errors, and report results.
-4. **Execute** — run exact commands from the adapter test step file; paste raw stdout/stderr in the Step 7 report. When `.devflow-test-summary.json` exists (written by `post-bash-output-filter.sh`), cross-check its `passed`/`failed`/`skipped` counts against raw output; raw stdout/stderr remains the evidence of record in Step 7.
+4. **Execute** — run the exact commands from the adapter test step file through the stamp: `bash "@devflow/scripts/verify-stamp.sh" run test -- <cmd>` for the whole unit suite, `test:<scope>` for a subset (never reused as the full suite), `e2e[:<scope>]` for integration/E2E targets (monorepo: `--cwd`, `@<app>`). The result line carries passed/failed/skipped counts and the log path; a failure prints its decisive lines. The full output stays in the log (`.devflow-verify/<name>.log`) — the evidence of record.
 
-**Output discipline (intermediate runs):** retry loops and analysis runs follow `@devflow/references/token-economy.md` → **Derive, don't dump** — filter at source, quote decisive failure lines, report delta on re-runs. Step 7 report still pastes mandated raw evidence.
+**Output discipline:** retry loops and analysis runs follow `@devflow/references/token-economy.md` → **Derive, don't dump** — quote decisive failure lines from the log, report delta on re-runs. Step 7 reports the stamp lines, never pasted output.
 
 Failure handling:
 
@@ -127,54 +127,18 @@ Passing tests do not skip this step — tests prove behavior forward; verificati
 
 If tests pass AND `verification.md` **Result** is not FAIL: `bash "@devflow/scripts/devflow-state.sh" set plan tested` (refuses a missing or FAIL `verification.md`).
 
-Include actual command output. Do NOT report "all tests passed" without raw evidence.
+Evidence = the stamp result lines (counts + log path), copied as printed — never "all tests passed" from memory.
 
 ```text
 ✅ Tests complete: [type]/[NNN]_[feature-name]
 
-### Unit tests
-[N] passed · [N] failed · [N] skipped
+Unit:          [stamp line — e.g. ✓ test: pass (41s) · 120 passed · 0 failed · 2 skipped · log: .devflow-verify/test.log]
+Integration:   [one stamp line per e2e target, or "no target defined"]
+Verification:  [PASS | FAIL | PARTIAL] — [N]/[N] ACs · devflow/features/[NNN]_[feature-name]/verification.md
+[FAIL verdicts with level + evidence]
 
-Output:
-```
-
-[paste actual unit test command output here]
-
-```text
-
-### Integration - Target 1
-[N] passed · [N] failed
-
-Output:
-```
-
-[paste actual integration test output here]
-
-```text
-
-### Integration - Target 2
-[N] passed · [N] failed
-
-Output:
-```
-
-[paste actual integration test output here]
-
-```text
-
-### Verification (goal-backward)
-Result: [PASS | FAIL | PARTIAL] — [N]/[N] ACs verified
-Report: devflow/features/[NNN]_[feature-name]/verification.md
-[FAIL verdicts listed here with level + evidence]
-
-[-- Failures --]
-(shown only if any test failed after 3 attempts)
-
-#### [test file path]
-- Test: [test name]
-- Error: [error message]
-- Attempts: 3/3 - unresolved
-- Notes: [what was tried]
+[Failures — only after 3 attempts]
+- [test file] :: [test name] — [decisive error line from the log] — 3/3 attempts: [what was tried]
 
 ---
 
@@ -199,7 +163,7 @@ Wait for user choice before continuing. **Run mode** (`.devflow-run.json` presen
 | 100% coverage with no assertions | Every test must assert at least one specific output |
 | Flaky test fixed with `retry(3)` | Fix root cause; use deterministic setup |
 | Happy-path-only tests | ≥1 error path per public function (`standard`+ profiles; `quick` = happy + regression per AC) |
-| Pasting full output of every retry attempt | Decisive lines only during retries; raw evidence in Step 7 report (`token-economy.md`) |
+| Pasting test output into the report | Stamp lines carry counts + log path; the log is the evidence (`token-economy.md`) |
 | Skipping `testing-patterns.md` for novel scenarios | Read `@devflow/references/testing-patterns.md` first |
 | Skipping verification because tests pass | Tests are forward-looking; Step 6b proves each AC exists, is real, is wired |
 | Setting `tested` with FAIL verdicts in verification.md | FAIL = not tested; fix or route to `devflow.backprop` |

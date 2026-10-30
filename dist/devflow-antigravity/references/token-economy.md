@@ -31,4 +31,4 @@ Applies to steps running builds, tests, diffs, or any verbose command.
 - State the derived answer ("3 tests fail, all in auth_test.py, same root cause"); quote only decisive lines.
 - Decision needs >200 lines of source → extract relevant section; never paste wholesale.
 - Re-run of same check → report delta only.
-- **Evidence rules win.** Where a skill mandates raw output (e.g. `devflow.test` notify report), paste required evidence exact. Derive-don't-dump governs intermediate runs and analysis, not mandated evidence.
+- **Evidence rules win.** Where a skill mandates evidence, cite it exactly — for checks, the `scripts/verify-stamp.sh` result line (counts + log path); the log holds the full output. Derive-don't-dump governs intermediate runs and analysis, not mandated evidence.

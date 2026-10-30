@@ -117,9 +117,7 @@ Rules:
 
 ## Step 3 - Pre-push verification
 
-Run **every command** in the adapter PR step file (usually analyze/typecheck, then project-wide tests). Confirm expected success output before push. Do NOT proceed if any command reports issues.
-
-If either command fails, stop and fix the issue before continuing to Step 4.
+Run **every command** in the adapter PR step file through the stamp — `bash "${CLAUDE_PLUGIN_ROOT}/scripts/verify-stamp.sh" run lint -- …`, `run analyze -- …`, `run test -- <whole unit suite>`, `run build -- …` (monorepo: `--cwd <app dir>`, `@<app>` suffix). Checks already passed on this exact tree print `fresh … skipped`, so after `devflow.test`/`devflow.ship` usually only `build` runs. Any ✗ → stop, fix, re-run before Step 4. Keep the result lines: they are the evidence for the PR body checklist (Step 5).
 
 ## Step 4 - Push branch
 

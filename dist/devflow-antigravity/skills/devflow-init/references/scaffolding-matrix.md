@@ -33,6 +33,8 @@ Ensure `.gitignore` includes stack-standard ignores plus DevFlow runtime state i
 # devflow runtime state
 .devflow-state.json
 .devflow-run.json
+.devflow-verify.json
+.devflow-verify/
 .devflow-fanout-state.json
 .devflow-worktrees.json
 .devflow-learnings.jsonl*

@@ -38,7 +38,7 @@ bash "$BUILDERS_DIR/build-claude.sh"
 
 # Ship runtime scripts in dist/devflow/scripts/ (the rest of scripts/ is dev-only)
 mkdir -p "$DIST_DIR/scripts"
-for RUNTIME_SH in board.sh metrics.sh doctor.sh devflow-state.sh; do
+for RUNTIME_SH in board.sh metrics.sh doctor.sh devflow-state.sh verify-stamp.sh; do
   if [ -f "$TEMPLATE_DIR/scripts/$RUNTIME_SH" ]; then
     cp "$TEMPLATE_DIR/scripts/$RUNTIME_SH" "$DIST_DIR/scripts/$RUNTIME_SH"
     chmod +x "$DIST_DIR/scripts/$RUNTIME_SH" 2>/dev/null || true

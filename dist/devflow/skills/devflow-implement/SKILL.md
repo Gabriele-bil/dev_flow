@@ -175,9 +175,9 @@ If the adapter implement step file defines a **codegen** step and implemented fi
 
 ### Step 6 - Format and analyze
 
-Run the **format** and **analyze/typecheck** commands from the adapter implement step file, in the order given there (monorepo: from the resolved app's working directory — see `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`).
+Run the **format** and **analyze/typecheck** commands from the adapter implement step file, in the order given there, each through the verification stamp: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/verify-stamp.sh" run format -- <cmd>`, then `bash "${CLAUDE_PLUGIN_ROOT}/scripts/verify-stamp.sh" run analyze -- <cmd>` (`lint` for a separate linter). Monorepo: `--cwd <app dir>` and an `@<app>` suffix (`analyze@web`); app dir per `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`. A pass is stamped on this exact tree — beautify, test, ship and pr skip the re-run while nothing changes, and the Stop hook stays silent.
 
-**Output discipline:** batch related commands; filter at source (`| tail`, `| grep -E 'error|FAIL'`); report derived answer + decisive lines only — per `${CLAUDE_PLUGIN_ROOT}/references/token-economy.md` → **Derive, don't dump**.
+**Output discipline:** the stamp prints one line per check, plus the decisive lines of a failure and its log path — open the log only for lines you need (`${CLAUDE_PLUGIN_ROOT}/references/token-economy.md` → **Derive, don't dump**).
 
 If errors are found:
 

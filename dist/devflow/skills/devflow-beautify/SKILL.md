@@ -41,7 +41,7 @@ Before proceeding, verify:
 
 - [ ] `devflow.implement` has run and its summary lists at least one file created/modified
 - [ ] `plan.md` exists at `devflow/features/[NNN]_[feature-name]/plan.md`
-- [ ] Active adapter analyze/typecheck reports no unresolved errors
+- [ ] Analyze clean: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/verify-stamp.sh" run analyze -- <adapter analyze cmd>` exits 0 (skipped while implement's stamp is fresh)
 
 If any item fails → stop, report which check failed, do not apply changes.
 
@@ -164,7 +164,7 @@ After edits, check **only** implement-touched files for unused imports, unreacha
 
 ### Step 5 - Run commands
 
-After all approved and certain changes are applied, run the **format**, **analyze/typecheck**, and conditional **codegen** commands from the adapter beautify step file, in the order specified there.
+After all approved and certain changes are applied, run the **format**, **analyze/typecheck**, and conditional **codegen** commands from the adapter beautify step file, in the order specified there, each as `bash "${CLAUDE_PLUGIN_ROOT}/scripts/verify-stamp.sh" run <format|analyze|codegen> -- <cmd>` (monorepo: `--cwd <app dir>`, `@<app>` suffix).
 
 On error: resolve autonomously; max 3 attempts; then escalate per `${CLAUDE_PLUGIN_ROOT}/references/escalation-ladder.md` (debug mode → re-approach → block).
 
@@ -231,7 +231,7 @@ Continue to testing? -> devflow.test
 - [ ] Performance: heuristics applied; profiling only when warranted
 - [ ] **Critical** and required issues fixed or explicitly escalated to the user
 - [ ] Dead code in scope handled or listed for user decision
-- [ ] Format and analyze/typecheck from the adapter beautify step file completed (or failure reported after retries)
+- [ ] Format and analyze/typecheck stamped pass on the final tree (`verify-stamp.sh check analyze`), or failure reported after retries
 - [ ] Codegen run only when the adapter beautify step file says to and annotations changed
 
 ## I/O Reference

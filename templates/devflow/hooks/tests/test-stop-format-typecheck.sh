@@ -140,6 +140,25 @@ out=$(RUN_PATH="$BARE_PATH" run_hook_with "lib/main.dart")
 [ -z "$out" ] && assert "dart absent: no message" pass || assert "dart absent: no message (got '$out')" fail
 rm -rf lib
 
+echo "--- T10: run armed -> silent (run-mode steps verify themselves) ---"
+mkdir -p devflow; printf '**Adapter:** nextjs\n' > devflow/config.md
+echo '{"active":true}' > .devflow-run.json
+out=$(run_hook_with "src/a.ts")
+[ -z "$out" ] && assert "run marker: no checks" pass || assert "run marker: no checks (got '$out')" fail
+rm -f .devflow-run.json
+
+echo "--- T11: fresh lint/analyze stamp on this tree -> silent; stale -> checks run ---"
+mkdir -p devflow; printf '**Adapter:** nextjs\n' > devflow/config.md
+git init -q . && git config user.email t@t && git config user.name t
+mkdir -p src && : > src/a.ts
+bash "$(dirname "$HOOK")/../scripts/verify-stamp.sh" run analyze -- true >/dev/null
+out=$(run_hook_with "src/a.ts")
+[ -z "$out" ] && assert "fresh stamp: checks skipped" pass || assert "fresh stamp: checks skipped (got '$out')" fail
+echo "changed" > src/a.ts; printf '%s\n' "$WORKDIR/src/a.ts" > .devflow-changed-files.tmp
+m=$(msg "$(printf '%s' "$PAYLOAD" | PATH="$STUB_PATH" bash "$HOOK")")
+echo "$m" | grep -q "STUB pnpm lint" && assert "stale stamp: checks run" pass || assert "stale stamp: checks run (got '$m')" fail
+rm -rf devflow src .git .devflow-verify .devflow-verify.json .gitignore
+
 echo ""
 echo "Results: $PASS passed, $FAIL failed"
 if [ ${#ERRORS[@]} -gt 0 ]; then

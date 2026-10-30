@@ -390,7 +390,7 @@ Anti-Patterns (22,8 KB) e I/O Reference (20,6 KB) si caricano a ogni invocazione
 La skill più pesante in ingresso (~20K token). Le stesse regole compaiono tre volte: Core Principles, checklist dello Step 8 e Anti-Patterns. Lo Step 5 carica 6 file (`refinement-hints.md`, `examples.md` da 8,2 KB, INVEST, story splitting, BDD, intervista). Proposta: un'unica checklist, con `examples.md` letto solo se il primo tentativo non supera la checklist. **Effetto stimato**: −15 KB.
 
 <a id="t-5"></a>
-### T-5 🟠 Output grezzo dei test fuori dal report
+### T-5 🟠 ✅ Output grezzo dei test fuori dal report
 
 Lo Step 7 di `skills/devflow-test/SKILL.md` incolla stdout e stderr di ogni target. Proposta: salvarli con `tee` in `devflow/features/NNN/test-output.log` come evidenza, e nel report mettere solo i conteggi e le righe decisive (principio "derive, don't dump" di `references/token-economy.md`). **Effetto stimato**: −5-50 KB per run, secondo lo stack.
 
@@ -442,7 +442,7 @@ Anche `adapters/common/skills/common-clean-code/SKILL.md` è quasi tutto SOLID d
 ## 5. Tempo
 
 <a id="l-1"></a>
-### L-1 🔴 Timbro di verifica: ogni controllo una volta sola
+### L-1 🔴 ✅ Timbro di verifica: ogni controllo una volta sola
 
 Oggi format e analyze girano in implement Step 6, poi nell'hook sincrono `hooks/stop-format-typecheck.sh` (timeout 90 s). I contratti di beautify, test e ship ricontrollano "analyze clean". Pr Step 3 rilancia lint, l'intera suite di test e il build.
 

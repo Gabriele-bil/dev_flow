@@ -4,6 +4,8 @@
 # a check reports issues — stderr from a Stop hook is never shown.
 # Formatters run on the changed files only, never on the whole project.
 # Timeouts use timeout / gtimeout (coreutils) when present, else no limit.
+# Silent when a run is armed (run-mode steps verify themselves) or when the
+# skills already stamped lint/analyze on this exact tree (scripts/verify-stamp.sh).
 
 HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
 . "$HOOK_DIR/lib/payload.sh"
@@ -29,6 +31,10 @@ done < "$TMP_FILE"
 rm -f "$TMP_FILE"
 df_unlock "$TMP_FILE"
 [[ ${#CHANGED_FILES[@]} -eq 0 ]] && exit 0
+
+[[ -f "$WORKSPACE_ROOT/.devflow-run.json" ]] && exit 0
+STAMP_SH="$HOOK_DIR/../scripts/verify-stamp.sh"
+[[ -f "$STAMP_SH" ]] && bash "$STAMP_SH" check >/dev/null 2>&1 && exit 0
 
 # Portable timeout: GNU timeout, Homebrew coreutils gtimeout, else none
 if command -v timeout >/dev/null 2>&1; then

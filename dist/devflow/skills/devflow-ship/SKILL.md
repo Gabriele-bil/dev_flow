@@ -36,11 +36,10 @@ Pre-merge fan-out gate. Dispatch specialist agents in parallel — count scaled 
 
 Before dispatching, verify all of the following. Stop and report which check failed if any item is unmet.
 
-- [ ] `plan.md` **Status** == `tested` (set by `devflow.test` after the last code edit)
-- [ ] `devflow.test` complete — all tests passing (or failures explicitly documented)
+- [ ] `plan.md` **Status** == `tested` — proves beautify ran (legal transitions; only the hotfix fast-track skips it)
+- [ ] Tests still valid: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/verify-stamp.sh" check 'test*'` — stale or failing → code changed after `devflow.test`; stop, route `devflow.test`
 - [ ] `verification.md` exists at `devflow/features/[NNN]_[feature-name]/verification.md` with zero FAIL verdicts (goal-backward verification from `devflow.test` Step 6b)
-- [ ] `devflow.beautify` complete
-- [ ] Active adapter analyze/typecheck clean
+- [ ] Analyze clean: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/verify-stamp.sh" run analyze -- <adapter analyze cmd>` (fresh since `devflow.test` → skipped)
 - [ ] `plan.md` exists at `devflow/features/[NNN]_[feature-name]/plan.md`
 - [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md`
 - [ ] Depth profile resolved from `plan.md` `**Complexity:**` per `${CLAUDE_PLUGIN_ROOT}/references/complexity-scoring.md` (missing → `standard`)
