@@ -5,78 +5,70 @@ description: Audit UI files against Vercel Web Interface Guidelines. Use when as
 
 # Web Interface Guidelines
 
-Audit files for compliance. Output terse, high signal. Group by file.
+Framework-neutral (Angular templates, React/Next.js JSX, plain HTML). Rules name HTML/CSS/ARIA; map to framework syntax (`for` ↔ `htmlFor`, `(click)` ↔ `onClick`). Semantic HTML first, ARIA second (WAI-ARIA "first rule of ARIA").
+
+## Purpose
+
+Audit web UI files for accessibility, forms, focus, motion, content. Output terse findings, grouped by file, `file:line`.
+
+## When NOT to Use
+
+- File matches no row of the active adapter's `steps/implement.md` → skill load decision matrix that names this skill (beautify steps may load it explicitly)
+- Non-web UI (Flutter widgets) — use the Flutter adapter's skills
+- Visual redesign / brand decisions — out of scope; audit only
 
 ## Rules
 
 ### Accessibility
 
-- Icon-only buttons: `aria-label` required
-- Form controls: `<label>` or `aria-label` required
-- Interactive elements: keyboard handlers required (`onKeyDown`/`onKeyUp`)
-- Actions → `<button>`; navigation → `<a>`/`<Link>` (no `<div onClick>`)
-- Images: `alt` required (or `alt=""` for decorative)
-- Decorative icons: `aria-hidden="true"` required
-- Async updates (toasts, validation): `aria-live="polite"` required
-- Semantic HTML first (`<button>`, `<a>`, `<label>`, `<table>`), then ARIA
-- Headings hierarchical `<h1>`–`<h6>`; include skip link for main content
-- `scroll-margin-top` on heading anchors
+- Actions → `<button type="button">`; navigation → `<a href>` (or router link). Never click handler on `<div>`/`<span>`
+- Native `<button>`/`<a>`: no key handler needed — `click` already fires on Enter (and Space for buttons)
+- Custom widget only when no native element fits: matching `role`, `tabindex="0"`, Enter/Space (or APG keys for the pattern) keydown handling, ARIA state (`aria-expanded`, `aria-selected`, …)
+- Icon-only buttons: accessible name (`aria-label` or visually hidden text); decorative icons `aria-hidden="true"`
+- Images: `alt` (`alt=""` for decorative)
+- Form controls: visible `<label>` (`for`/wrapping); `aria-label` only when no visible label fits
+- Async updates (toasts, inline validation): `aria-live="polite"` region present before update
+- Headings `<h1>`–`<h6>` in order; skip link to main content; `scroll-margin-top` on anchor targets
+- Never disable zoom (`user-scalable=no`, `maximum-scale=1`)
 
-### Focus States
+### Focus
 
-- Interactive elements: visible focus via `focus-visible:ring-*` or equivalent
-- Never `outline-none` / `outline: none` without focus replacement
-- `:focus-visible` over `:focus` (avoid focus ring on click)
-- Group focus: `:focus-within` for compound controls
+- Visible focus on every interactive element via `:focus-visible` (Tailwind `focus-visible:` variant)
+- Never `outline: none` / `outline-none` without replacement style
+- `:focus-within` for compound controls
+- Dialogs: focus moves in on open, returns to trigger on close
 
 ### Forms
 
-- Inputs: `autocomplete` + meaningful `name` required
+- `autocomplete` with specific token on personal/auth fields (`name`, `email`, `tel`, `street-address`, `username`, `current-password`, `new-password`, `one-time-code`) + meaningful `name` (WCAG 1.3.5)
+- `autocomplete="off"` only where browser autofill is wrong: search boxes with own suggestions, custom comboboxes, non-personal data. Never on login/personal fields — browsers ignore it there anyway
 - Correct `type` (`email`, `tel`, `url`, `number`) + `inputmode`
-- Never block paste (`onPaste` + `preventDefault`)
-- Labels clickable: `htmlFor` or wrapping control
-- Disable spellcheck on emails, codes, usernames (`spellCheck={false}`)
-- Checkboxes/radios: label + control share single hit target (no dead zones)
-- Submit button stays enabled until request starts; spinner during request
-- Errors inline next to fields; focus first error on submit
-- Placeholders end with `…`, show example pattern
-- `autocomplete="off"` on non-auth fields (avoid password manager triggers)
-- Warn before navigation with unsaved changes (`beforeunload` or router guard)
+- Never block paste
+- `spellcheck="false"` on emails, codes, usernames
+- Checkbox/radio: label + control one hit target
+- Submit enabled until request starts; busy indicator during request
+- Errors inline next to field, linked via `aria-describedby`; focus first invalid field on submit
+- Placeholder = example value ending `…`, never replaces label
+- Warn before leaving with unsaved changes (router guard / `beforeunload`)
 
 ### Animation
 
-- Honor `prefers-reduced-motion` (reduced variant or disable)
-- Animate `transform`/`opacity` only (compositor-friendly)
-- Never `transition: all` — list properties explicitly
-- Set correct `transform-origin`
-- SVG: transforms on `<g>` wrapper with `transform-box: fill-box; transform-origin: center`
-- Animations interruptible — respond to user input mid-animation
+- Honor `prefers-reduced-motion`
+- Animate `transform`/`opacity` only; never `transition: all`
+- Correct `transform-origin`; SVG: transform on `<g>` with `transform-box: fill-box`
+- Interruptible by user input
 
-Remaining rule groups (Typography, Content Handling, Images, Performance, Navigation & State, Touch & Interaction, Safe Areas & Layout, Dark Mode & Theming, Locale & i18n, Hydration Safety, Hover & Interactive States, Content & Copy): [references/guidelines-detail.md](references/guidelines-detail.md) — part of every full audit; read before reporting.
-
-### Anti-patterns (flag these)
-
-- `user-scalable=no` or `maximum-scale=1` disabling zoom
-- `onPaste` + `preventDefault`
-- `transition: all`
-- `outline-none` without `focus-visible` replacement
-- Inline `onClick` navigation without `<a>`
-- `<div>`/`<span>` with click handlers (use `<button>`)
-- Images without dimensions
-- Large arrays `.map()` without virtualization
-- Form inputs without labels
-- Icon buttons without `aria-label`
-- Hardcoded date/number formats (use `Intl.*`)
-- `autoFocus` without clear justification
+Remaining groups (Typography, Content, Images, Performance, Navigation & State, Touch, Layout, Theming, i18n, SSR/Hydration, Copy): [references/guidelines-detail.md](references/guidelines-detail.md) — part of every full audit; read before reporting.
 
 ## Output Format
 
-Group by file. `file:line` format (VS Code clickable). Terse.
+Group by file. `file:line — rule — fix`. Terse. No praise, no summary of passing rules.
 
 ## I/O Reference
 
 | | |
 | --- | --- |
-| Reads | UI source files passed by the user |
+| Reads | UI source files (templates, components, CSS) passed by the user or the invoking step |
 | Writes | Nothing — audit output only |
+| Invoked by | Adapter `steps/implement.md` matrix rows; adapter `steps/beautify.md` |
 | Next step | Apply fixes, then re-run if needed |

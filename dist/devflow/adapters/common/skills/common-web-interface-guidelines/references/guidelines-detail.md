@@ -1,89 +1,75 @@
 # Web Interface Guidelines — reference detail
 
-Loaded on demand from `../SKILL.md`.
+Loaded on demand from `../SKILL.md`. Framework-neutral; map to Angular/JSX syntax.
 
 ## Typography
 
-- `…` not `...`
-- Curly quotes `"` `"` not straight `"`
-- Non-breaking spaces: `10&nbsp;MB`, `⌘&nbsp;K`, brand names
-- Loading states end with `…`: `"Loading…"`, `"Saving…"`
-- `font-variant-numeric: tabular-nums` for number columns/comparisons
-- `text-wrap: balance` or `text-pretty` on headings (prevents widows)
+- `…` not `...`; loading labels end `…` (`Loading…`)
+- Curly quotes; `&nbsp;` in `10&nbsp;MB`, `⌘&nbsp;K`
+- `font-variant-numeric: tabular-nums` on number columns
+- `text-wrap: balance` (headings) / `pretty` (body)
 
-## Content Handling
+## Content
 
-- Text containers handle long content: `truncate`, `line-clamp-*`, or `break-words`
-- Flex children: `min-w-0` to allow text truncation
-- Handle empty states — no broken UI for empty strings/arrays
-- User-generated content: anticipate short, average, very long inputs
+- Long text: truncate / `line-clamp` / `overflow-wrap: anywhere`; flex children `min-width: 0`
+- Empty states for empty strings/lists; design for short, average, very long input
 
 ## Images
 
-- `<img>`: explicit `width` + `height` required (prevents CLS)
-- Below-fold: `loading="lazy"`
-- Above-fold critical: `priority` or `fetchpriority="high"`
+- Explicit `width` + `height` (prevents CLS)
+- Below fold: `loading="lazy"`; LCP image: not lazy, `fetchpriority="high"` (framework image component: its priority/preload option — check current docs with Context7)
 
 ## Performance
 
-- Lists >50 items: virtualize (`virtua`, `content-visibility: auto`)
-- No layout reads in render (`getBoundingClientRect`, `offsetHeight`, `offsetWidth`, `scrollTop`)
-- Batch DOM reads/writes; no interleaving
-- Prefer uncontrolled inputs; controlled inputs must be cheap per keystroke
-- `<link rel="preconnect">` for CDN/asset domains
-- Critical fonts: `<link rel="preload" as="font">` + `font-display: swap`
+- Lists >50 items: virtual scroll or `content-visibility: auto`
+- No layout reads (`getBoundingClientRect`, `offsetHeight`, `scrollTop`) during render; batch reads before writes
+- Per-keystroke work cheap
+- `<link rel="preconnect">` for asset domains; critical fonts preloaded + `font-display: swap`
 
 ## Navigation & State
 
-- URL reflects state — filters, tabs, pagination, expanded panels in query params
-- Links: `<a>`/`<Link>` (Cmd/Ctrl+click, middle-click support)
-- Deep-link all stateful UI (if uses `useState`, sync URL via nuqs or similar)
-- Destructive actions: confirmation modal or undo window — never immediate
+- URL holds shareable UI state: filters, tabs, pagination, open panels (query params)
+- Links are `<a href>` so Cmd/Ctrl/middle-click work
+- Destructive actions: confirmation or undo window, never immediate
 
-## Touch & Interaction
+## Touch
 
-- `touch-action: manipulation` (prevents double-tap zoom delay)
-- `-webkit-tap-highlight-color` set intentionally
+- `touch-action: manipulation`; `-webkit-tap-highlight-color` set deliberately
 - `overscroll-behavior: contain` in modals/drawers/sheets
-- During drag: disable text selection, `inert` on dragged elements
-- `autoFocus` sparingly — desktop only, single primary input; avoid on mobile
+- During drag: disable text selection
+- `autofocus` only for single primary input on desktop; never on mobile
 
-## Safe Areas & Layout
+## Layout
 
-- Full-bleed layouts: `env(safe-area-inset-*)` for notches
-- Avoid unwanted scrollbars: `overflow-x-hidden` on containers, fix content overflow
-- Flex/grid over JS measurement for layout
+- Full-bleed: `env(safe-area-inset-*)`
+- Fix overflow at source; no blanket `overflow-x: hidden` hiding bugs
+- CSS flex/grid over JS measurement
 
-## Dark Mode & Theming
+## Theming
 
-- `color-scheme: dark` on `<html>` for dark themes (fixes scrollbar, inputs)
-- `<meta name="theme-color">` matches page background
-- Native `<select>`: explicit `background-color` + `color` (Windows dark mode)
+- `color-scheme` on `<html>` matches theme (scrollbars, native inputs)
+- `<meta name="theme-color">` matches background
+- Native `<select>`: explicit `background-color` + `color`
 
-## Locale & i18n
+## i18n
 
-- Dates/times: `Intl.DateTimeFormat` — no hardcoded formats
-- Numbers/currency: `Intl.NumberFormat` — no hardcoded formats
-- Detect language via `Accept-Language` / `navigator.languages`, not IP
-- Brand names, code tokens, identifiers: `translate="no"` (prevents garbled auto-translation)
+- Dates/numbers/currency: `Intl.DateTimeFormat` / `Intl.NumberFormat` or framework pipe built on it — no hardcoded formats
+- Language from `Accept-Language` / `navigator.languages`, not IP
+- `translate="no"` on brand names, code, identifiers
 
-## Hydration Safety
+## SSR / Hydration (Next.js, Angular SSR)
 
-- Inputs with `value`: `onChange` required (or `defaultValue` for uncontrolled)
-- Date/time rendering: guard against hydration mismatch (server vs client)
-- `suppressHydrationWarning`: only where truly needed
+- Server and client render identical markup: no `Date.now()`, `Math.random()`, locale/timezone or `window` reads in first render
+- Suppress hydration warnings only on the single node that must differ
 
-## Hover & Interactive States
+## Hover & States
 
-- Buttons/links: `hover:` state required (visual feedback)
-- Interactive states increase contrast: hover/active/focus more prominent than rest
+- Hover, active, focus states on every interactive element; each more prominent than rest
+- Disabled: `disabled` attribute (not only styling)
 
-## Content & Copy
+## Copy
 
-- Active voice: "Install CLI" not "CLI will be installed"
-- Title Case for headings/buttons (Chicago style)
-- Numerals for counts: "8 deployments" not "eight"
-- Specific button labels: "Save API Key" not "Continue"
-- Error messages include fix/next step, not only problem
-- Second person; no first person
-- `&` over "and" where space-constrained
+- Active voice, second person; specific labels ("Save API key", not "Continue")
+- Numerals for counts ("8 deployments")
+- Error messages state fix / next step
+- Heading/button casing: one convention per product, applied everywhere

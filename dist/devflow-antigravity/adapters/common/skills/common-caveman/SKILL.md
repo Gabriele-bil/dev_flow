@@ -15,6 +15,9 @@ Compress response into caveman-speak. Drop fluff. Keep substance. ~75% token red
 - Irreversible destructive op (DROP TABLE, rm -rf, force push, branch delete) — confirm in normal prose
 - Multi-step sequence where compression creates ordering ambiguity
 - User asks clarification or repeats question
+- Code, config or file content being written — prose output only; no adapter `steps/implement.md` → skill load decision matrix row loads it
+
+Resume caveman right after a normal-prose exception.
 
 ## Rules
 
@@ -61,14 +64,11 @@ Compress response into caveman-speak. Drop fluff. Keep substance. ~75% token red
 | "The auth middleware fails because the token expiry check uses `<` instead of `<=`." | "Auth middleware: expiry check use `<` not `<=`." |
 | "Connection pooling reuses open connections instead of creating new ones per request." | "Pool reuse open DB connections. No new connection per request. Skip handshake overhead." |
 
-## Auto-Clarity Exceptions
-
-Normal prose for: security warnings, irreversible action confirmations, ordering-sensitive sequences. Resume caveman immediately after.
-
 ## I/O Reference
 
 | | |
 | --- | --- |
 | Reads | Current response / pending output |
+| Invoked by | User request; core skills' "caveman-compress" principle via `$HOME/.gemini/antigravity-cli/plugins/devflow/references/token-economy.md` |
 | Writes | Compressed rewrite — same content, ~75% fewer tokens |
 | Next step | None — single invocation |

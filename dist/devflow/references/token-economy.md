@@ -1,6 +1,6 @@
 # Token Economy — Exploration and Output Discipline
 
-Shared reference for pipeline skills. Two rule families: read less (index-first), emit less (derive-don't-dump). Ported from tokless gap analysis (`docs/tokless-gap-analysis.md` in plugin repo).
+Shared reference for pipeline skills. Two rule families: read less (index-first), emit less (derive-don't-dump). "Caveman-compress" in a skill's Core Principles = the rules of `@devflow/adapters/common/skills/common-caveman/SKILL.md`. Ported from tokless gap analysis (`docs/tokless-gap-analysis.md` in plugin repo).
 
 ## Index-first exploration
 
