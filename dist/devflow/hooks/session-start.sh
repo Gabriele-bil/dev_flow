@@ -98,7 +98,11 @@ if [ "$KNOWN_STEP" = true ]; then
     CTX_LINE="
 Load context: $CTX"
   fi
-  MSG="dev-flow active$FEATURE_LABEL. Next step: $NEXT_STEP — run /$NEXT_STEP, or /devflow:resume to re-orient after an interruption.$CTX_LINE
+  # Slash form per host (skills are the commands): /devflow:<step> on Claude
+  # Code, /devflow-<step> on Antigravity. The build rewrites literal names, not
+  # this one, which comes from the state file.
+  if [ "$DF_HOST" = "antigravity" ]; then RUN="/devflow-${NEXT_STEP#devflow.}"; else RUN="/devflow:${NEXT_STEP#devflow.}"; fi
+  MSG="dev-flow active$FEATURE_LABEL. Next step: $NEXT_STEP — run $RUN, or /devflow:resume to re-orient after an interruption.$CTX_LINE
 User orchestrates; only ship/run/auto/hotfix chain other steps. Full orientation: $PLUGIN_ROOT/references/orientation.md.$CONFIG_WARN"
   df_context "$MSG"
   exit 0

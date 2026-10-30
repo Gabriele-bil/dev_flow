@@ -79,6 +79,9 @@ jq -e '.hookSpecificOutput.hookEventName == "SessionStart"' "$OUT" >/dev/null 2>
 grep -q "devflow.implement" "$OUT" \
   && assert "next step named" pass \
   || assert "next step named" fail
+grep -q "run /devflow:implement" "$OUT" \
+  && assert "Claude Code slash form suggested" pass \
+  || assert "Claude Code slash form suggested" fail
 grep -q "001_login" "$OUT" \
   && assert "feature named" pass \
   || assert "feature named" fail
