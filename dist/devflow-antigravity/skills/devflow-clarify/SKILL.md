@@ -140,14 +140,9 @@ Audit trail only — do not reformat, compress, or omit after writing.
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Skipping unresolved markers | `devflow.plan` stops on them; resolve or explicitly waive first |
-| Asking dependent questions in one batch, or independent ones one by one | Batch what is independent (≤4 per call); chain what depends on an earlier answer |
-| Rewriting `## Summary` to absorb answers | Update target section + `## Clarifications`; preserve original wording |
-| Treating clarify as mandatory | Optional; skip if no markers and assumptions are low-risk |
 | Absorbing ambiguity into plan instead | Unresolved → silent assumptions → bugs in `devflow.test` |
-| Batch-updating `task.md` at Q&A end | Update after each accepted answer |
-| Skipping questions without recording them | Record every skip in `## Clarifications` with reason |
-| Asking >5 questions | Cap at 5; surface only highest-risk ambiguities |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 
@@ -156,6 +151,7 @@ Audit trail only — do not reformat, compress, or omit after writing.
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md` |
 | Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-task/refinement-hints.md` (8D scan framework) |
 | Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-clarify/references/interactive-interview.md` (structured interview standards) |
+| Reads (conditional) | `references/anti-patterns.md` (when unsure / retry) |
 | Writes | `devflow/features/[NNN]_[feature-name]/task.md` — inline marker removal, targeted section updates, `## Clarifications` section appended, `Status` → `clarified` |
 | Precedes | `devflow.plan` |
 | Follows | `devflow.task` |

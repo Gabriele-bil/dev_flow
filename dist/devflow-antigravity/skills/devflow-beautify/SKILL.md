@@ -189,14 +189,10 @@ Continue to testing? -> devflow.test
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Expanding scope beyond `devflow.implement` summary | Limit strictly to the implement summary |
 | Adding features during beautify ("while I'm here") | Log as new subtask; implement in next cycle |
-| Skipping security axis ("already reviewed") | Run all axes the depth profile requires; `quick` never applies to security-touching features (profile floor) |
 | Format/analyze only on new files | Run on the full changed set |
-| Treating Nit as mandatory | Fix Critical/Required; user decides Nit/Optional |
-| Applying opinable improvements while run mode active | Certain improvements only; opinable candidates → `## Decision flags`, not applied |
-| Flagging hardcoded style as Nit when DESIGN.md defines a token | Token equivalent exists → Required finding |
-| Profiling without confirmed bottleneck | Apply heuristics only; profile when benchmark confirms |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## Completion checklist
 
@@ -217,7 +213,7 @@ Continue to testing? -> devflow.test
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md`, `registry.md` |
 | Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/references/escalation-ladder.md` (failure handling), `$HOME/.gemini/antigravity-cli/plugins/devflow/references/complexity-scoring.md` (depth profile) |
-| Reads (conditional) | `DESIGN.md` / `docs/design.md` — token source for UI consistency axis; `.devflow-run.json` (existence — run-mode switch, contract `$HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md`) |
+| Reads (conditional) | `DESIGN.md` / `docs/design.md` — token source for UI consistency axis; `.devflow-run.json` (existence — run-mode switch, contract `$HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md`); `references/anti-patterns.md` (when unsure / retry) |
 | Writes | improvements to existing files only (no new files) |
 | Writes | `plan.md` — `**Status:** beautified`, `## Decision flags` (run mode — opinable candidates) |
 | Next step | `devflow.test` |

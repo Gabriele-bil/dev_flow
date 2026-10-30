@@ -217,15 +217,13 @@ Continue to implementation? -> devflow.implement
 
 ## Anti-Patterns
 
-Full catalog: `${CLAUDE_PLUGIN_ROOT}/skills/devflow-plan/references/plan-anti-patterns.md`.
+| Anti-Pattern | Fix |
+| --- | --- |
+| Open questions with Status `ready` | Leave open; escalate to user; never guess |
+| Architecture decisions made during implement | All decisions in `plan.md` before implement |
+| No implementation checkpoints on long plans | ≥2 checkpoints for plans >5 files |
 
-Critical checks:
-
-- No plan without reading `task.md` and active ADRs
-- File list ordered by vertical slice, not architectural layer
-- Every subtask mapped in Traceability (no gold-plating)
-- Architecture decisions (and ADR alignment) locked before implement
-- Complexity score scored per `complexity-scoring.md` signals in Step 4d
+Full catalog — read when unsure, or before retrying after a failed contract: `references/plan-anti-patterns.md`.
 
 ## I/O Reference
 
@@ -236,7 +234,7 @@ Critical checks:
 | Reads (adapter) | `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`, `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core) + `steps/plan.md`; technology skills per ADAPTER table |
 | Reads | `${CLAUDE_PLUGIN_ROOT}/references/complexity-scoring.md` (Step 4d — score + profile) |
 | Reads | `${CLAUDE_PLUGIN_ROOT}/references/token-economy.md` (Step 1 — index-first exploration) |
-| Reads | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-plan/references/plan-anti-patterns.md` (Anti-patterns catalog) |
+| Reads (conditional) | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-plan/references/plan-anti-patterns.md` (Anti-patterns catalog — when unsure / retry) |
 | Runs | `${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh` (`resolve`, `sync`) |
 | Writes | `devflow/features/[NNN]_[feature-name]/plan.md`, `.devflow-state.json` (merge) |
 | Writes (conditional) | `plan.md` `## Decision flags` (run mode — resolved Open questions) |

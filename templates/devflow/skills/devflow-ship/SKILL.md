@@ -178,22 +178,11 @@ Execute `@devflow/skills/devflow-pr/SKILL.md` exactly.
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Skipping ship gate ("tests passed") | Tests prove behavior; ship gate proves merge readiness across quality, security, coverage |
-| Running reviewers sequentially | Fan-out is the design; sequential loses independent perspectives |
-| Auto-proceeding on Critical issue | Critical = block; fix or escalate; never auto-proceed |
-| Merging reports mentally without synthesis | Written synthesis is the audit trail |
-| Dispatching fewer agents than profile requires | Fan-out per depth profile table: `quick` = 1, `standard` = 3, `thorough` = 5 |
 | Downgrading profile at ship to shrink fan-out | Profile fixed at plan; change requires plan.md edit + user confirmation |
-| Synthesizing before all agents complete | Wait for all dispatched reports before Step 3 |
 | Downgrading severity in synthesis | Report as declared; escalate if disputed |
-| Omitting decision flags from the report | Every `## Decision flags` entry surfaces in **Open Decision Flags** — autonomous decisions get human review before PR |
-| Auto-routing to `devflow.pr` under `devflow.run` | Run mode under `devflow.run` stops before PR; `devflow.auto` chains through `devflow.pr` |
 | Re-running after fixing only some Critical issues | Fix all Critical; re-run full gate from Step 1 |
-| Looping Step 4b without asking outside run mode | Interactive sessions ask per Step 4; loop only after user chooses fix |
-| Fixing findings then setting `shipped` on old `verification.md` | Every fix iteration re-runs implement → beautify → test (Step 6b) — `tested → shipped` needs fresh verification |
-| Grader loop bypassing the Critical hard-stop | Critical always stops immediately regardless of run mode or remaining iteration budget — Step 4b only ever engages for Required-only verdicts |
-| Unbounded grader retries | Respect `ship_grader_iterations` (default 2); reaching the cap surfaces the report instead of looping again |
-| Shrinking fan-out on a Step 4b re-run | Re-run uses the same depth profile as the original dispatch — same rule as any other re-run |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ---
 
@@ -204,7 +193,7 @@ Execute `@devflow/skills/devflow-pr/SKILL.md` exactly.
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md`, `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` |
 | Runs | `@devflow/scripts/review-packet.sh` (Step 1, every fan-out incl. Step 4b re-runs) → `.devflow-review-packet.md` |
 | Reads | `@devflow/references/complexity-scoring.md` (depth profile → fan-out), `@devflow/references/token-economy.md` (agent prompt rules) |
-| Reads (conditional) | `plan.md` `## Decision flags` (→ **Open Decision Flags** report section); `.devflow-run.json` (`until` field — stops before PR if `until: "ship"`, routes to `devflow.pr` if `until: "pr"`; `ship_grader_iterations`/`ship_grader_iteration_count` for Step 4b) |
+| Reads (conditional) | `plan.md` `## Decision flags` (→ **Open Decision Flags** report section); `.devflow-run.json` (`until` field — stops before PR if `until: "ship"`, routes to `devflow.pr` if `until: "pr"`; `ship_grader_iterations`/`ship_grader_iteration_count` for Step 4b); `references/anti-patterns.md` (when unsure / retry) |
 | Writes | `plan.md` — `**Status:** shipped` on gate pass; Step 4b statuses via the chained skills; `.devflow-state.json` (merge) |
 | Writes (conditional) | `.devflow-run.json` `ship_grader_iteration_count` — Step 4b, run mode only (`devflow-state.sh run bump`) |
 | Dispatches | review agents per depth profile — `quick`: `code-reviewer`; `standard`: + `security-auditor`, `test-engineer`; `thorough`: + `accessibility-auditor`, `docs-reviewer` (parallel); Step 4b fix loop re-runs `devflow.implement --fix` → `devflow.beautify` → `devflow.test` before re-running the fan-out |

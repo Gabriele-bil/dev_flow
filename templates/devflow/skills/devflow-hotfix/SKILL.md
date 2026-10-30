@@ -71,22 +71,14 @@ Dispatch `@devflow/agents/code-reviewer.md` (= `devflow.ship` `quick` profile) o
 
 Execute `@devflow/skills/devflow-pr/SKILL.md` exactly — base-branch detection, artifact cleanup, commit, push, PR body, `pr-opened` + task `done`. Never hand-roll `gh pr create`.
 
-## Common Rationalizations
-
-| Thought | Reality |
-| --- | --- |
-| "Tag after fix — same commit anyway" | Tag before first edit is the rollback point; after-fix tag restores the fix |
-| "Write test after fix, it passes, done" | Test never seen failing proves nothing — Prove-It |
-| "Hotfix spec can skip Traceability/Branch" | `devflow.backprop`, `devflow.analyze`, `devflow.rollback`, `devflow.pr` read them |
-
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Committing code without `task.md` or `plan.md` | Compact specs from real templates first |
 | Skipping regression test or writing it green-first | Failing test before fix, every time |
 | Expanding hotfix scope to unrelated refactors | Strictly scoped; separate tasks for cleanups |
-| Hardcoded `main` / own `gh pr create` | Hand off to `devflow-pr` (base detection, cleanup) |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 

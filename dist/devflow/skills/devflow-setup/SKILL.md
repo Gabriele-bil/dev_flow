@@ -226,23 +226,19 @@ Before final response:
 
 ## Anti-Patterns
 
-Key anti-patterns (full catalog: `${CLAUDE_PLUGIN_ROOT}/skills/devflow-setup/references/setup-anti-patterns.md`):
-
 | Anti-Pattern | Fix |
 | --- | --- |
 | Writing files inside `devflow/features/` | Write only to consumer root; `devflow/` is read-only. |
-| Skipping questionnaire and guessing adapter | Always run full questionnaire; no silent defaults. |
-| Regenerating files without `--force` | Check managed markers; preserve user content. |
 | Installing dependencies globally | Use project package manager (`pnpm add`, `flutter pub add`). |
-| Generating marker-less content | Wrap all managed content with `<!-- devflow-managed:start / :end -->`. |
-| Auto-scanning tree for apps in monorepo | Apps are declared explicitly by user — ask, never infer. |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/setup-anti-patterns.md`.
 
 ## I/O Reference
 
 | | |
 | --- | --- |
 | Reads | `@devflow/config.md`, `references/config-template.md`, `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core) + `steps/setup.md` (including `Setup dependencies`) — per declared app in monorepo mode, adapter + fallback templates |
-| Reads | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-setup/references/setup-anti-patterns.md` (Anti-patterns catalog) |
+| Reads (conditional) | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-setup/references/setup-anti-patterns.md` (Anti-patterns catalog — when unsure / retry) |
 | Writes | `AGENTS.md`, `REGISTRY.md`, `docs/product.md` (consumer project root); `@devflow/config.md`; `.gitignore` (appends `.devflow-state.json` if missing) |
 | Side effects | Installs adapter setup dependencies using project package manager or Flutter pub |
 | Next step | `devflow.task` |

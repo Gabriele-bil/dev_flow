@@ -572,7 +572,15 @@ Nessun intervento va considerato riuscito senza un numero prima e dopo, su Claud
 | 1 | fatta | Q-1, CC-1, AGY-1, AD-1, CC-4 | `124a177`…`644f630` |
 | 2 | fatta | AGY-3, T-1, L-1, T-5, T-7, T-8, Q-3, AGY-2 | `6ef76e6`…`8bcf7eb` |
 | 3 | fatta (release major 3.0.0) | CC-2, CC-3, L-3, AGY-4, Q-2 | `5098904`…`aa94710` |
-| 4 | fatta | AD-2, AD-3, Q-4, T-10, T-11, AD-4 — adapter da 523 KB a 286 KB | dopo `aa94710` |
+| 4 | fatta | AD-2, AD-3, Q-4, T-10, T-11, AD-4 — adapter da 523 KB a 286 KB | `9690008`…`e45adb0` |
+| 5 | fatta | T-2, T-3, T-4, T-6, T-9, L-2, L-4, L-5, L-6, CC-5 (in parte), Q-5 (trigger) | dopo `e45adb0` |
+
+Note sulla fase 5:
+
+- **CC-5, compattazione**: nessuna skill core supera i 5.000 token che Claude Code riallega dopo una compattazione (la più grande, implement, è ~18 KB), quindi riordinarle non cambia nulla.
+- **CC-5, iniezione dinamica e `paths:`**: non adottate. La prima non è documentata su Antigravity; la seconda richiederebbe di registrare le skill degli adapter come skill vere, e su Antigravity ne aggiungerebbe 39 alla lista. La matrice dei trigger (fase 4) resta il meccanismo.
+- **Q-5**: aggiunti i casi di trigger mancanti; le eval di comportamento restano per la fase 6 (M-1).
+- **L-5, lint in background durante i test**: realizzato in `devflow.pr` (controlli indipendenti in parallelo); nel passo di test analyze è già un timbro fresco, quindi non costa tempo.
 
 **Ordine**: la fase 1 viene prima perché corregge rotture reali. La fase 2 precede la 3 perché gli script (stato, timbro, pacchetto di review) sono il passaggio di consegne che rende possibili i subagent per passo. La fase 4 è indipendente e può procedere in parallelo, adapter per adapter.
 

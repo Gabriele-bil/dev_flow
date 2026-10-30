@@ -76,7 +76,8 @@ If any warnings or errors are found:
 | --- | --- |
 | Treating absent MCP servers as fatal errors | Mark as `DEGRADED (CLI fallback active)`; DevFlow is designed to degrade cleanly. |
 | Mutating files during diagnostic check without `--fix` | Read-only inspection by default; require explicit `--fix` flag for automatic repairs. |
-| Emitting vague error messages like "CLI missing" | Provide exact binary name, package manager install command, and documentation link. |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 

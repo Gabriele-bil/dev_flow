@@ -109,25 +109,13 @@ Generate 2–3 distinct, viable architectural options grounded in the confirmed 
   - Instruct user:
     "Feature architecture recorded in `docs/adr/ADR-[NNN]-[title-slug].md`. Run `/devflow:task [feature idea]` (referencing this ADR) to start implementation pipeline."
 
-## Common Rationalizations
-
-| Thought | Reality |
-| --- | --- |
-| "Skip discovery questions — infer context from prompt" | Inferred assumptions hide critical constraints. 2–3 targeted questions prevent costly architectural rework |
-| "Skip discovery — pick familiar stack immediately" | Familiarity traps produce architectural debt. Compare alternatives against project constraints before locking in |
-| "Only present one option to go faster" | One option is an ultimatum, not discovery. Minimum 2 distinct options required to expose trade-offs |
-| "Write code prototype during discovery" | Discovery decides architecture and boundaries. Code before spec violates spec-first principle |
-| "ADR is unnecessary bureaucracy for small decisions" | Undocumented decisions lead to architectural drift and repeated debates. ADR takes 2 minutes and preserves intent |
-
 ## Anti-Patterns
 
 | Anti-Pattern | Problem | Fix |
 | --- | --- | --- |
-| Asking open-ended essay questions | Paralyzes user and produces vague answers | Use bounded multi-choice questions with a recommended option |
-| Skipping multi-axis analysis | Misses critical non-functional constraints (scale, security, blast radius) | Systematically review the 6 discovery axes before formulating options |
-| Monolithic option dumping | Overwhelms user with unformatted text | Use structured comparison table followed by focused `AskUserQuestion` |
-| Skipping existing code inspection | Re-invents existing modules or violates constitution conventions | Read `constitution.md` and inspect codebase before proposing options |
 | Leaving ADR in draft without user decision | Unresolved decisions stall downstream pipeline | Run interactive Q&A loop to reach explicit Accepted status |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 
@@ -135,5 +123,6 @@ Generate 2–3 distinct, viable architectural options grounded in the confirmed 
 | --- | --- |
 | Reads | `docs/product.md`, `constitution.md`, `registry.md`, `devflow/config.md`, existing code modules |
 | Reads (references) | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-discover/references/discovery-axes.md`, `${CLAUDE_PLUGIN_ROOT}/skills/devflow-discover/references/adr-template.md` |
+| Reads (conditional) | `references/anti-patterns.md` (when unsure / retry) |
 | Writes | `docs/adr/ADR-[NNN]-[title-slug].md`, `docs/adr/README.md` |
 | Leads to | `devflow.setup` (greenfield app) or `devflow.task` (feature) |

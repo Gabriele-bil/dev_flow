@@ -163,21 +163,19 @@ Next: run devflow.plan for step [001] → [step title]
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Skip dependency graph — "deps obvious" | Implicit deps → merge conflicts. Always make explicit. |
-| Context brief not self-contained ("see step [NNN]") | Fresh agent in new session cannot proceed. Brief = files, contracts, constraints, full context. |
-| Skip/rush adversarial review | Wrong parallelization caught only during implement. Always run the gate. |
-| Mark all steps `parallel-safe: yes` by default | Concurrent edits → conflicts. Default `no`; prove `yes` only when no shared files. |
 | Edit steps after adversarial review without re-marking `draft` | Review gate bypassed. Mark `draft` → re-run adversarial → re-approve. |
-| Use blueprint for single-PR scope | Use `devflow.task` → `devflow.plan` directly. |
-| Step has no acceptance criteria | `devflow.implement` cannot prove completion. |
-| Step title is a layer ("add tests") not outcome increment | Layer-shaped → big-bang delivery. Reframe as increments. |
+| Mark all steps `parallel-safe: yes` by default | Concurrent edits → conflicts. Default `no`; prove `yes` only when no shared files. |
 | Two parallel-safe steps touch the same file / graph is straight line / missing transitive edges | Concurrent edits, wrong ordering, missed parallelism. Default `parallel-safe: no`; include all transitive deps; review straight-line graphs for parallel workstreams. |
+| Step title is a layer ("add tests") not outcome increment | Layer-shaped → big-bang delivery. Reframe as increments. |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 
 | | |
 | --- | --- |
 | Reads | `docs/product.md`, `constitution.md`, `registry.md`, `.devflow-state.json` |
+| Reads (conditional) | `references/anti-patterns.md` (when unsure / retry) |
 | Spawns | Opus subagent (adversarial review, Step 6) |
 | Writes | `devflow/plans/[slug]-blueprint.md` |
 | Next step | `devflow.plan` per step, in dependency order |

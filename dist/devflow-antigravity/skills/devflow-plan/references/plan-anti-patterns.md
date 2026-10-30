@@ -1,4 +1,4 @@
-# Plan Anti-Patterns Reference
+# devflow-plan — anti-patterns and rationalizations
 
 Full catalog of planning anti-patterns, symptoms, and required fixes.
 
@@ -18,3 +18,11 @@ Full catalog of planning anti-patterns, symptoms, and required fixes.
 | Adapter sections omitted | Apply every required section from the adapter plan step file |
 | No implementation checkpoints on long plans | ≥2 checkpoints for plans >5 files |
 | Complexity score skipped or guessed | Score per `complexity-scoring.md` signals in Step 4d; downstream steps default to `standard` without it |
+
+## Critical checks
+
+- No plan without reading `task.md` and active ADRs
+- File list ordered by vertical slice, not architectural layer
+- Every subtask mapped in Traceability (no gold-plating)
+- Architecture decisions (and ADR alignment) locked before implement
+- Complexity score scored per `complexity-scoring.md` signals in Step 4d

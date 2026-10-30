@@ -149,19 +149,12 @@ No menu: ship is the only next step (skipping it skips the review gate; the full
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Writing tests after PR is open | Tests are a pre-condition for `devflow.pr` |
-| Manual-only testing | Automated tests required for PR checklist |
-| Skipping trivial files | A trivial test beats no test; untestable → document why |
-| Skipping integration tests | They cover user flows unit tests can't |
-| Marking failing tests as passing after 3 retries | Stop and report; never falsify the summary |
 | Testing implementation internals | Test inputs → outputs; mock only system boundaries |
 | 100% coverage with no assertions | Every test must assert at least one specific output |
 | Flaky test fixed with `retry(3)` | Fix root cause; use deterministic setup |
-| Happy-path-only tests | ≥1 error path per public function (`standard`+ profiles; `quick` = happy + regression per AC) |
-| Pasting test output into the report | Stamp lines carry counts + log path; the log is the evidence (`token-economy.md`) |
-| Skipping `testing-patterns.md` for novel scenarios | Read `$HOME/.gemini/antigravity-cli/plugins/devflow/references/testing-patterns.md` first |
-| Skipping verification because tests pass | Tests are forward-looking; Step 6b proves each AC exists, is real, is wired |
-| Setting `tested` with FAIL verdicts in verification.md | FAIL = not tested; fix or route to `devflow.backprop` |
+| Manual-only testing | Automated tests required for PR checklist |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 
@@ -171,7 +164,7 @@ No menu: ship is the only next step (skipping it skips the review gate; the full
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md`, `registry.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/test.md` |
 | Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/references/verification-levels.md` (Step 6b), `$HOME/.gemini/antigravity-cli/plugins/devflow/references/escalation-ladder.md` (failure handling), `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` (handoff format, context pressure only), `$HOME/.gemini/antigravity-cli/plugins/devflow/references/complexity-scoring.md` (depth profile), `$HOME/.gemini/antigravity-cli/plugins/devflow/references/token-economy.md` (output discipline) |
-| Reads (conditional) | `.devflow-run.json` (existence — run-mode switch) |
+| Reads (conditional) | `.devflow-run.json` (existence — run-mode switch); `references/anti-patterns.md` (when unsure / retry) |
 | Reads (optional) | `$HOME/.gemini/antigravity-cli/plugins/devflow/references/testing-patterns.md` — stack-agnostic patterns reference |
 | Reads (optional) | `.devflow-test-summary.json` — structured pass/fail/skipped counts from the most recent recognized test-runner command (written by `post-bash-output-filter.sh`; cross-check only, not evidence of record) |
 | Writes | Test output paths per the adapter test step file |

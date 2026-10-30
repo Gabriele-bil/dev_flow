@@ -154,13 +154,10 @@ Blockers = Critical + Required findings.
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| "Traceability close enough" | Untraceable subtasks → silent bugs in `devflow.test` |
-| Vague acceptance criteria | `devflow.test` writes from ACs; vague ACs → untestable |
-| Skipping analyze ("plan looks fine") | 6-pass structural check; one read catches silent gaps |
-| Contradicting accepted ADRs | Plan re-introducing rejected alternative → Critical finding |
-| Running analyze mid-implementation | Run before `devflow.implement`; post-impl use `devflow.beautify` |
 | Waiving Critical findings without documentation | Document in `plan.md` Open questions |
 | Fixing findings in `plan.md` only | Check if root is in `task.md` first |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 
@@ -169,7 +166,7 @@ Blockers = Critical + Required findings.
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md` |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md` |
-| Reads (conditional) | `docs/adr/` (if present — active ADRs for Pass F check) |
+| Reads (conditional) | `docs/adr/` (if present — active ADRs for Pass F check); `references/anti-patterns.md` (when unsure / retry) |
 | Reads | `references/analyze-report-template.md` |
 | Writes | **Nothing** — strictly read-only |
 | Precedes | `devflow.implement` |
