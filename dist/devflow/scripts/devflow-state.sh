@@ -99,7 +99,8 @@ TASK_STATUSES="draft clarified done"
 next_step_for() {
   case "$1:$2" in
     plan:ready|plan:implementing) echo "devflow.implement" ;;
-    plan:implemented) echo "devflow.beautify" ;;
+    plan:implemented)  # quick profile skips beautify (implemented → tested is legal)
+      if grep -m1 '^\*\*Complexity:\*\*' "${3:-/dev/null}" 2>/dev/null | grep -q 'quick'; then echo "devflow.test"; else echo "devflow.beautify"; fi ;;
     plan:beautified) echo "devflow.test" ;;
     plan:tested) echo "devflow.ship" ;;
     plan:shipped) echo "devflow.pr" ;;
@@ -146,7 +147,7 @@ merge_state() {
   [ -n "$HAS_JQ" ] || return 0
   local ps ts ns branch app prog
   ps=$(_st "$FDIR/plan.md"); ts=$(_st "$FDIR/task.md")
-  if [ -n "$ps" ]; then ns=$(next_step_for plan "$ps"); else ns=$(next_step_for task "$ts"); fi
+  if [ -n "$ps" ]; then ns=$(next_step_for plan "$ps" "$FDIR/plan.md"); else ns=$(next_step_for task "$ts"); fi
   branch=$(_field "$FDIR/task.md" Branch)
   app=$(_field "$FDIR/plan.md" App); [ -n "$app" ] || app=$(_field "$FDIR/task.md" App)
   prog='null'; [ -f "$FDIR/plan.md" ] && prog=$(progress_json "$FDIR/plan.md")
@@ -167,7 +168,7 @@ merge_state() {
 status_line() {
   local ps ts ns prog=""
   ps=$(_st "$FDIR/plan.md"); ts=$(_st "$FDIR/task.md")
-  if [ -n "$ps" ]; then ns=$(next_step_for plan "$ps"); else ns=$(next_step_for task "$ts"); fi
+  if [ -n "$ps" ]; then ns=$(next_step_for plan "$ps" "$FDIR/plan.md"); else ns=$(next_step_for task "$ts"); fi
   if [ -f "$FDIR/plan.md" ]; then
     prog=$(progress_json "$FDIR/plan.md" | sed -E 's/.*"done":([0-9]+).*"total":([0-9]+).*/\1\/\2 files/')
   fi

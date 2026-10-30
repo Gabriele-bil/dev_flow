@@ -1,6 +1,6 @@
 ---
 name: devflow-beautify
-description: "Reviews devflow.implement output: correctness, readability, security, performance, architecture, UI. Use when user runs devflow.beautify, reviews implementation output, or fourth pipeline step."
+description: "Polishes devflow.implement output: readability, conventions, design tokens, layout, accessibility basics — correctness and security stay with devflow.ship. Use when user runs devflow.beautify, polishes implementation output, or fourth pipeline step."
 argument-hint: "[optional-plan-path]"
 disable-model-invocation: true
 ---
@@ -17,7 +17,7 @@ Run `/devflow-beautify [optional plan path]`.
 
 ## Purpose
 
-Review/improve `devflow.implement` output with **multi-axis** lens: correctness, readability/simplification, architecture, security, performance, UI consistency, responsive layout. Fourth DevFlow step.
+Polish `devflow.implement` output: readability/simplification, project conventions, design-token consistency, responsive layout, accessibility basics. Correctness, security and performance are `devflow.ship`'s review — not repeated here. Fourth DevFlow step; skipped in the `quick` profile.
 
 ## Core Principles
 
@@ -28,6 +28,7 @@ Review/improve `devflow.implement` output with **multi-axis** lens: correctness,
 - `devflow.implement` has not run for this feature — there is nothing to beautify
 - Active adapter analyze/typecheck still has errors from `devflow.implement` — fix before beautifying
 - Scope is pre-existing code not touched by this DevFlow run — open a separate task
+- `plan.md` depth profile is `quick` — skip to `devflow.test` (`implemented → tested` is legal; ship's `code-reviewer` covers readability)
 
 ## Input contract
 
@@ -75,15 +76,17 @@ result[1] = buf[1] ^ key[1];
 // devflow-beautify-ignore-end
 ```
 
-### Step 3 - Analysis areas (multi-axis review)
+### Step 3 - Analysis areas
 
-Stack-agnostic defaults below. For stack-specific checks follow the adapter beautify step file and technology skills. Review **every** in-scope file against all axes; collect all findings before applying changes.
+Beautify polishes; it does not review. Correctness, security and performance belong to `devflow.ship` (`code-reviewer`, `security-auditor`) — no axis here for them. A Critical correctness or security problem you happen to see is still fixed (Step 4), not hunted for.
 
-Axes: correctness · readability/simplification · architecture compliance · security · performance · UI consistency · responsiveness/layout · accessibility.
+Stack-specific checks: adapter beautify step file and technology skills. Review **every** in-scope file against all axes; collect all findings before applying changes.
+
+Axes: readability/simplification · conventions (naming, imports, layering per `constitution.md`) · UI consistency · responsiveness/layout · accessibility basics (labels, alt text, focus, semantics — the full WCAG audit is ship's `accessibility-auditor`, `thorough` only).
 
 **UI consistency source:** `DESIGN.md` (or `docs/design.md`) present in project root → axis checks token compliance (palette, typography, spacing) against it instead of generic guidelines; hardcoded value with a DESIGN.md token equivalent = Required finding. Absent → generic guidelines, zero behavior change.
 
-**Depth profile:** read `**Complexity:**` from `plan.md` (per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/complexity-scoring.md`; missing → `standard`). `quick` → review only correctness + readability/simplification axes. `standard` / `thorough` → all 8 axes.
+**Depth profile:** read `**Complexity:**` from `plan.md` (per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/complexity-scoring.md`; missing → `standard`). `quick` → beautify does not run (When NOT to Use). `standard` / `thorough` → all 5 axes.
 
 Full per-axis checklist: `references/analysis-axes.md`.
 
@@ -127,26 +130,7 @@ Propose before applying:
 - Any change that modifies public API signatures
 - Simplifications where behavior preservation is not obvious
 
-**Proposal grouping:** group proposals by type before presenting them. Same-type proposals (all naming changes together, all structural refactors together, all extract-component proposals together) share one approval request. Different types each get their own request.
-
-**Stall-out rule:** after 3 consecutive proposal rounds with no user approval on any item, stop proposing and emit:
-
-```text
-⚠️ Beautify stalled: [N] proposals pending without approval.
-Options: (1) approve all remaining, (2) skip all remaining, (3) continue one by one
-```
-
-Wait for user choice before continuing.
-
-**Chesterton + incrementality:** for structural or simplification proposals, state briefly why the code exists as-is, then the proposed change. If tests exist for the feature, run adapter test commands relevant to touched scope after substantive refactors when feasible.
-
-Use this format and wait for user response before each grouped proposal round:
-
-```text
-💡 [Optional: Nit / Optional / Consider] Proposed improvement: [file path]
-[Description of the change and why it improves the code.]
-Apply? [yes / no]
-```
+**One question for all proposals:** collect every opinable proposal first, then ask once with `ask_question`, `multiSelect: true` — one question per proposal type (structural, naming, API, simplification), up to 4 questions in the one call, each option `[file] — change — why the code is as it is today` (Chesterton). Apply exactly the selected options; unselected ones are listed as skipped in the notify block. No per-proposal rounds, no stall-out loop. If tests exist for the feature, run the relevant test command after substantive refactors when feasible.
 
 #### Dead code (scope-limited)
 
@@ -178,15 +162,12 @@ Respond with:
 - ...
 
 ### Improvements by area
-[`quick` profile: mark unreviewed axes as "skipped (quick profile)"]
-- **Correctness**: [brief summary, or "no changes"]
 - **Readability / simplification**: [brief summary, or "no changes"]
-- **Security**: [brief summary, or "no changes"]
-- **Performance**: [brief summary, or "no changes"]
-- **Architecture**: [brief summary, or "no changes"]
+- **Conventions**: [brief summary, or "no changes"]
 - **UI consistency**: [brief summary, or "no changes"]
 - **Responsive layout**: [brief summary, or "no changes"]
-- **Accessibility**: [brief summary, or "no changes"]
+- **Accessibility basics**: [brief summary, or "no changes"]
+- **Proposals**: [N applied · N skipped — omit if none]
 
 ### Findings by severity (if any)
 - **Critical**: [list or "none"]

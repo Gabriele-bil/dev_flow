@@ -69,7 +69,7 @@ On yes: `bash "@devflow/scripts/devflow-state.sh" run arm --orchestrator devflow
 Run each step from `--from` to `--until` in order, honoring each input contract. Implement, beautify and test each run in their own `step-runner` subagent per `@devflow/references/run-mode.md` → **Step dispatch**:
 
 1. `devflow-implement` — full workflow
-2. `devflow-beautify` — **certain improvements** only; opinable proposals become decision flags, never applied
+2. `devflow-beautify` — **certain improvements** only; opinable proposals become decision flags, never applied. `quick` profile (`plan.md` `**Complexity:**`) → skipped (⏭), test follows implement
 3. `devflow-test` — full workflow including Step 6b goal-backward verification
 4. `@devflow/skills/devflow-ship/SKILL.md` — only with `--until ship`, executed here (it dispatches the reviewers); fan-out + synthesis, never Step 5 route to `devflow.pr`
 
@@ -108,7 +108,7 @@ Next (human): devflow.ship — reviews code AND open flags
 | "User said run unattended, committing saves them a step" | Commit/push/PR never unattended — policy table; `devflow.pr` is a human gate |
 | "This ambiguity is too important to just flag" | Blocked run = zero progress overnight. Conservative default + flag; user overrides before PR |
 | "This opinable improvement is obviously right, apply it" | No approval channel in run mode. Certain improvements only; rest = flags |
-| "Skip beautify to reach tests faster" | Chain order fixed; every status boundary written — resume and ship depend on them |
+| "Skip beautify to reach tests faster" | Only the `quick` profile skips it; otherwise chain order is fixed and every status boundary written |
 | "Marker file is missing but user wanted autonomy earlier" | No marker = interactive rules. Only Step 0 confirmation arms run mode |
 
 ## Anti-Patterns

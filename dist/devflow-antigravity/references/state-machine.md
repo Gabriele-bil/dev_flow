@@ -86,7 +86,7 @@ draft → done          (clarify skipped)
 | --- | --- | --- | --- |
 | `ready` | Plan approved, not started | `devflow.plan` Step 5 | `devflow.implement` |
 | `implementing` | Implement in progress (first pass or `--fix` re-entry) | `devflow.implement` entry (Step 4) / re-entry mode | `devflow.implement` (resume) |
-| `implemented` | All File List entries `[done]` | `devflow.implement` exit (Step 8) | `devflow.beautify` |
+| `implemented` | All File List entries `[done]` | `devflow.implement` exit (Step 8) | `devflow.beautify` (`quick` profile: `devflow.test`) |
 | `beautified` | Multi-axis review applied | `devflow.beautify` exit (Step 6) | `devflow.test` |
 | `tested` | Tests pass + `verification.md` has no FAIL | `devflow.test` exit (Step 7) | `devflow.ship` |
 | `shipped` | Ship gate passed | `devflow.ship` Step 5 | `devflow.pr` |
@@ -97,7 +97,7 @@ draft → done          (clarify skipped)
 
 ```text
 ready → implementing → implemented → beautified → tested → shipped → pr-opened
-hotfix fast-track: ready → implementing → implemented → tested → shipped → pr-opened (beautify skipped, quick gate)
+hotfix fast-track and `quick` profile: ready → implementing → implemented → tested → shipped → pr-opened (beautify skipped)
 any active status → blocked          (escalation ladder Level 5)
 blocked → <pre-block status> | ready  (devflow.recovery, user-confirmed plan.md reset)
 implemented | beautified | tested | shipped → implementing   (devflow.implement --fix re-entry)

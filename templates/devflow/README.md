@@ -95,7 +95,7 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 | `devflow.analyze` | `task.md` + `plan.md` → consistency report (traceability, AC testability, terminology, constitution alignment, coverage balance) |
 | `devflow.blueprint` | Large idea → multi-PR blueprint with dependency graph + adversarial review |
 | `devflow.implement` | Execute `plan.md` step by step, vertical slice by slice |
-| `devflow.beautify` | 7-axis polish: correctness, readability, security, performance, architecture, UI, a11y |
+| `devflow.beautify` | Polish: readability, conventions, design tokens, layout, a11y basics (correctness/security → `devflow.ship`; skipped in `quick` profile) |
 | `devflow.test` | Write and run unit + integration tests; bounded retry; goal-backward per-AC verification (`verification.md`) |
 | `devflow.ship` | Pre-merge gate: 1–5 agents in parallel per depth profile → Ship Gate Report → route to PR |
 | `devflow.pr` | Commit, push branch, open PR to main |

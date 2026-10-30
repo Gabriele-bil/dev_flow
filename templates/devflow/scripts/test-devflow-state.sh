@@ -106,6 +106,15 @@ assert_equals "set: unknown keys preserved" "$(jq -r .custom .devflow-state.json
 assert_equals "set: legacy active_feature dropped" "$(jq -r '.active_feature // "gone"' .devflow-state.json)" "gone"
 teardown
 
+# ── quick profile skips beautify ─────────────────────────────────────────────
+setup
+feature 011_q clarified implementing
+sed -i.bak 's/^\*\*Complexity:\*\* 3 (standard)/**Complexity:** 2 (quick)/' devflow/features/011_q/plan.md
+assert_contains "quick: implemented → next devflow.test" "$(st set plan implemented)" "next: devflow.test"
+feature 012_s clarified implementing
+assert_contains "standard: implemented → next devflow.beautify" "$(st set plan implemented 012)" "next: devflow.beautify"
+teardown
+
 # ── mark-done ────────────────────────────────────────────────────────────────
 setup
 feature 005_feed clarified implementing
