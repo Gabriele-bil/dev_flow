@@ -124,6 +124,10 @@ assert_equals "mark-done: marker flipped, other markers kept" "$(grep -c '\[rout
 assert_equals "mark-done: entry is [done]" "$(grep -c '`src/c.ts`.*\[done\]' devflow/features/005_feed/plan.md)" "1"
 assert_contains "mark-done: idempotent" "$(st mark-done src/c.ts)" "already [done]"
 st mark-done src/zzz.ts >/dev/null; assert_equals "mark-done: unknown path → exit 1" "$?" "1"
+out=$(st mark-done src/b.ts src/zzz.ts); rc=$?
+assert_equals "mark-done: one unknown path → nothing written" "$(grep -c '`src/b.ts`.*\[pending\]' devflow/features/005_feed/plan.md)" "1"
+assert_contains "mark-done: several paths in one call" "$(st mark-done src/a.ts src/b.ts)" "[done] src/b.ts"
+assert_equals "mark-done: progress after slice" "$(jq -c .progress .devflow-state.json)" '{"done":3,"pending":0,"total":3}' 
 teardown
 
 # ── checkpoint ───────────────────────────────────────────────────────────────

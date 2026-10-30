@@ -97,7 +97,7 @@ Load only: plan (**File List** + decisions), `constitution.md`, `registry.md`, a
 
 **Large File Lists (>5 files):** emit a 3–5 bullet inline plan aligned with **File List** order before editing.
 
-**Long sessions / session resume:** after writing each file, mark its **File List** entry `[done]` with `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" mark-done <path>`. When resuming an interrupted session: run `devflow.resume` (first-class entry point — reads state, cross-checks markers, confirms position). Fallback without state: re-read `plan.md`, find the first `[pending]` entry, confirm resume position to the user before continuing. Never re-implement a `[done]` file unless explicitly asked.
+**Long sessions / session resume:** at each slice checkpoint (every 5 files on unsliced plans), mark the slice's **File List** entries `[done]` in one call: `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" mark-done <path> <path> …`; also before writing a handoff. A file written but not yet marked is re-checked, not rewritten, on resume. When resuming an interrupted session: run `devflow.resume` (first-class entry point — reads state, cross-checks markers, confirms position). Fallback without state: re-read `plan.md`, find the first `[pending]` entry, confirm resume position to the user before continuing. Never re-implement a `[done]` file unless explicitly asked.
 
 **Context-pressure handoff:** host compaction warning, or >20 files into a large plan → write `devflow/features/[NNN]_[feature-name]/handoff.md` per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **Handoff file** (current slice, next action, open decisions, errors tried), then tell user: restart session + `devflow.resume`. Cheap insurance — a handoff written one file early beats context death mid-file.
 
@@ -130,6 +130,10 @@ Each file must:
 - Be complete; do not leave placeholder comments such as `// TODO` or `// implement this`
 - **Trace to plan (scope fidelity):** every file and function traces to a **File List** or **Traceability** entry — build only what the acceptance criteria require. Urge to add a "while I'm here" improvement → log it via `devflow.learn`; do not write it
 - Satisfy **all implementation rules** in the adapter implement step file (responsive UI, localization, state architecture, accessibility, layout, contracts, data boundaries — load the referenced technology skills from the adapter table when touching those areas)
+
+#### Parallel leaf files (`[P]`)
+
+After the contracts slice (`Slice 1`) is `[done]`, File List entries marked `[P]` in the same batch are independent leaves. Interactive session: dispatch them together, one subagent each — Claude Code: Agent (general-purpose; `model` from the entry's `[route:]` tier per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/model-selection.md`, default `sonnet`); Antigravity: `invoke_subagent` with `Workspace: 'inherit'`. Prompt = the entry's 4-part brief (`Change`, `Contract`, `Test`, `Out of scope`), the files it may touch, the test command, and "reply `<path>: done` or `<path>: failed — <reason>`". Wait for all, run Step 6 checks once for the batch, retry a failed entry here. Run mode (this step is already a subagent, and subagents cannot dispatch subagents) or a host without subagents → implement `[P]` entries inline, in order.
 
 #### Build discipline (lazy ladder)
 

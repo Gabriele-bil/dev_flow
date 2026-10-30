@@ -38,7 +38,7 @@ Before dispatching, verify all of the following. Stop and report which check fai
 - [ ] `plan.md` exists at `devflow/features/[NNN]_[feature-name]/plan.md`
 - [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md`
 - [ ] Depth profile resolved from `plan.md` `**Complexity:**` per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/complexity-scoring.md` (missing → `standard`)
-- [ ] **Rigor Ratchet Checks (conditional):** if `.devflow-instincts.shared.yaml` contains entries with `check_cmd`, execute them (`devflow.learn check`). Any check exceeding its `ratchet_max` (or exiting non-zero when no ratchet is set) is recorded as a **Required** finding in Step 3.
+- [ ] **Rigor Ratchet Checks (conditional):** if `.devflow-instincts.shared.yaml` contains entries with `check_cmd`, start them (`devflow.learn check`) in the background and dispatch Step 1 without waiting; collect the result before Step 3. Any check exceeding its `ratchet_max` (or exiting non-zero when no ratchet is set) is recorded as a **Required** finding in Step 3.
 
 ---
 

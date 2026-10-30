@@ -108,7 +108,7 @@ Rules:
 
 ## Step 3 - Pre-push verification
 
-Run **every command** in the adapter PR step file through the stamp — `bash "${CLAUDE_PLUGIN_ROOT}/scripts/verify-stamp.sh" run lint -- …`, `run analyze -- …`, `run test -- <whole unit suite>`, `run build -- …` (monorepo: `--cwd <app dir>`, `@<app>` suffix). Checks already passed on this exact tree print `fresh … skipped`, so after `devflow.test`/`devflow.ship` usually only `build` runs. Any ✗ → stop, fix, re-run before Step 4. Keep the result lines: they are the evidence for the PR body checklist (Step 5).
+Run **every command** in the adapter PR step file through the stamp — `bash "${CLAUDE_PLUGIN_ROOT}/scripts/verify-stamp.sh" run lint -- …`, `run analyze -- …`, `run test -- <whole unit suite>`, `run build -- …` (monorepo: `--cwd <app dir>`, `@<app>` suffix). Checks already passed on this exact tree print `fresh … skipped`, so after `devflow.test`/`devflow.ship` usually only `build` runs. Independent checks run in parallel in one shell call — `bash vs run lint -- … & bash vs run analyze -- … & bash vs run build -- … & wait` (vs = the stamp script) — each prints its own result line. Any ✗ → stop, fix, re-run before Step 4. Keep the result lines: they are the evidence for the PR body checklist (Step 5).
 
 ## Step 4 - Push branch
 

@@ -11,7 +11,8 @@
 #   devflow-state.sh set plan|task <status> [F] [--force]
 #                                         write **Status:** + merge .devflow-state.json;
 #                                         refuses illegal transitions (--force: user-confirmed)
-#   devflow-state.sh mark-done <path> [F] File List entry [pending] → [done]
+#   devflow-state.sh mark-done <path>... [--feature F]
+#                                         File List entries [pending] → [done] (a whole slice in one call)
 #   devflow-state.sh checkpoint [F] [--step S] [--slice S] [--decision D]... [--constraint C]... [--error E]...
 #                                         append to .checkpoint.json (arrays never lose entries)
 #   devflow-state.sh sync [F]             rebuild .devflow-state.json from plan.md/task.md
@@ -212,21 +213,37 @@ cmd_set() {
 }
 
 cmd_mark_done() {
-  local path="$1"; shift
-  [ -n "$path" ] || die "usage: mark-done <path> [feature]"
-  need_feature "$1"
-  local plan="$FDIR/plan.md" tmp entry
+  local paths=() feat="" path entry tmp done_list="" already=""
+  while [ $# -gt 0 ]; do
+    case "$1" in --feature) feat="$2"; shift 2 ;; *) paths+=("$1"); shift ;; esac
+  done
+  [ ${#paths[@]} -gt 0 ] || die "usage: mark-done <path>... [--feature F]"
+  need_feature "$feat"
+  local plan="$FDIR/plan.md"
   [ -f "$plan" ] || die "$plan not found"
-  entry=$(grep -E '^###' "$plan" | grep -F "\`$path\`")
-  case "$entry" in
-    *"[pending]"*) ;;
-    *"[done]"*) echo "already [done]: $path"; return 0 ;;
-    *) die "no File List entry for \`$path\` in $plan" ;;
-  esac
+  # Check every path first: one unknown path → nothing is written
+  for path in "${paths[@]}"; do
+    entry=$(grep -E '^###' "$plan" | grep -F "\`$path\`")
+    case "$entry" in
+      *"[pending]"*|*"[done]"*) ;;
+      *) die "no File List entry for \`$path\` in $plan" ;;
+    esac
+  done
   tmp=$(mktemp "$plan.XXXXXX") || die "mktemp failed"
-  awk -v p="\`$path\`" '/^###/ && index($0, p) && /\[pending\]/ { sub(/\[pending\]/, "[done]") } { print }' "$plan" > "$tmp" && mv -f "$tmp" "$plan" || { rm -f "$tmp"; die "could not write $plan"; }
+  cp "$plan" "$tmp"
+  for path in "${paths[@]}"; do
+    if grep -E '^###' "$tmp" | grep -F "\`$path\`" | grep -q '\[pending\]'; then
+      awk -v p="\`$path\`" '/^###/ && index($0, p) && /\[pending\]/ { sub(/\[pending\]/, "[done]") } { print }' "$tmp" > "$tmp.n" && mv -f "$tmp.n" "$tmp"
+      done_list="$done_list $path"
+    else
+      already="$already $path"
+    fi
+  done
+  mv -f "$tmp" "$plan" || { rm -f "$tmp"; die "could not write $plan"; }
   merge_state
-  printf '[done] %s · ' "$path"; status_line
+  [ -n "$already" ] && echo "already [done]:$already"
+  [ -n "$done_list" ] && { printf '[done]%s · ' "$done_list"; status_line; }
+  return 0
 }
 
 cmd_checkpoint() {
