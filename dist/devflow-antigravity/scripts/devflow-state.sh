@@ -15,6 +15,10 @@
 #   devflow-state.sh checkpoint [F] [--step S] [--slice S] [--decision D]... [--constraint C]... [--error E]...
 #                                         append to .checkpoint.json (arrays never lose entries)
 #   devflow-state.sh sync [F]             rebuild .devflow-state.json from plan.md/task.md
+#   devflow-state.sh base                 base branch: origin/HEAD, else main|master|develop|next, else main
+#   devflow-state.sh branch <type>/<NNN>_<name>
+#                                         switch to the feature branch, creating it from
+#                                         origin/<base> (HEAD when offline — the line says so)
 #   devflow-state.sh run arm --orchestrator devflow.run|devflow.auto --from X --until Y [--feature F] [--iterations N]
 #   devflow-state.sh run feature <NNN_name> | bump | status | disarm
 #
@@ -280,6 +284,35 @@ cmd_report() {
   return 0
 }
 
+base_branch() {
+  local b c
+  b=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+  if [ -z "$b" ]; then
+    for c in main master develop next; do
+      git show-ref --verify --quiet "refs/remotes/origin/$c" && { b="$c"; break; }
+    done
+  fi
+  echo "${b:-main}"
+}
+
+cmd_branch() {
+  local name="$1" base
+  [ -n "$name" ] || die "usage: branch <type>/<NNN>_<name>"
+  if [ "$(git branch --show-current 2>/dev/null)" = "$name" ]; then echo "branch: on $name"; return 0; fi
+  if git show-ref --verify --quiet "refs/heads/$name"; then
+    git switch -q "$name" || die "could not switch to $name (uncommitted changes in the way?)" 2
+    echo "branch: switched to existing $name"; return 0
+  fi
+  base=$(base_branch)
+  git fetch -q origin "$base" 2>/dev/null || true
+  if git switch -q -c "$name" "origin/$base" 2>/dev/null; then
+    echo "branch: created $name from origin/$base"
+  else
+    git switch -q -c "$name" || die "could not create $name" 2
+    echo "branch: created $name from HEAD — origin/$base unavailable (offline or no remote); tell the user"
+  fi
+}
+
 cmd_run() {
   local sub="$1"; shift
   [ -n "$HAS_JQ" ] || die "run marker needs jq"
@@ -334,6 +367,8 @@ case "$1" in
   resolve) resolve_feature "$2" && echo || exit 1 ;;
   status) need_feature "$2"; status_line ;;
   report) cmd_report "$2" ;;
+  base) base_branch ;;
+  branch) cmd_branch "$2" ;;
   set) shift; cmd_set "$@" ;;
   mark-done) shift; cmd_mark_done "$@" ;;
   checkpoint) shift; cmd_checkpoint "$@" ;;

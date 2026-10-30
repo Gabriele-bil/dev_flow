@@ -31,7 +31,7 @@ Implement all files in `plan.md` per architecture conventions. Third DevFlow ste
 ## When NOT to Use
 
 - No `plan.md` exists — run `devflow.plan` first
-- The current branch was not created from `main` — switch to main and re-branch before starting
+- The current branch was not created from the base branch (`bash "@devflow/scripts/devflow-state.sh" base`) — switch to it and re-branch before starting
 - There are uncommitted changes unrelated to this feature on the current branch — stash or commit them first
 - Unresolved errors from a previous partial implementation — fix before continuing
 
@@ -114,12 +114,7 @@ Verify git branch against `task.md` `**Branch:**` or `.devflow-state.json` (conv
 
 - **Already on feature branch**: verify clean/allowed state and proceed directly to Step 4.
 - **On another branch**: switch to feature branch (`git switch <type>/<NNN>_<feature-name>`).
-- **Branch does not exist yet**: classify dirty changes (allowed: feature artifacts; blocking: unrelated app/source/config changes). If blocking changes exist, stop and ask user to stash/commit. Otherwise create branch:
-  ```bash
-  git fetch origin main 2>/dev/null || true
-  git switch -c <type>/<NNN>_<feature-name> origin/main 2>/dev/null || git switch -c <type>/<NNN>_<feature-name>
-  ```
-  Use `<type>` matching `task.md` (`feat`, `fix`, `chore`, `perf`, or `doc`) and later `devflow.pr`. Notify user if created from current `HEAD` fallback.
+- **Branch does not exist yet**: classify dirty changes (allowed: feature artifacts; blocking: unrelated app/source/config changes). If blocking changes exist, stop and ask user to stash/commit. Otherwise `bash "@devflow/scripts/devflow-state.sh" branch <type>/<NNN>_<feature-name>` — creates it from `origin/<base>` (base = repo default branch, not a hardcoded `main`). Use `<type>` matching `task.md` (`feat`, `fix`, `chore`, `perf`, or `doc`) and later `devflow.pr`. Its line says when it fell back to `HEAD` — tell the user.
 
 ### Step 4 - Implement files
 
@@ -172,7 +167,7 @@ If the adapter implement step file defines a **codegen** step and implemented fi
 
 ### Step 6 - Format and analyze
 
-Run the **format** and **analyze/typecheck** commands from the adapter implement step file, in the order given there, each through the verification stamp: `bash "@devflow/scripts/verify-stamp.sh" run format -- <cmd>`, then `bash "@devflow/scripts/verify-stamp.sh" run analyze -- <cmd>` (`lint` for a separate linter). Monorepo: `--cwd <app dir>` and an `@<app>` suffix (`analyze@web`); app dir per `@devflow/references/adapter-resolution.md`. A pass is stamped on this exact tree — beautify, test, ship and pr skip the re-run while nothing changes, and the Stop hook stays silent.
+At each vertical-slice checkpoint (every 5 files on unsliced plans) and once after the last file, run the **format** and **analyze/typecheck** commands from the adapter implement step file, in the order given there, each through the verification stamp: `bash "@devflow/scripts/verify-stamp.sh" run format -- <cmd>`, then `bash "@devflow/scripts/verify-stamp.sh" run analyze -- <cmd>` (`lint` for a separate linter). Monorepo: `--cwd <app dir>` and an `@<app>` suffix (`analyze@web`); app dir per `@devflow/references/adapter-resolution.md`. A pass is stamped on this exact tree — beautify, test, ship and pr skip the re-run while nothing changes, and the Stop hook stays silent.
 
 **Output discipline:** the stamp prints one line per check, plus the decisive lines of a failure and its log path — open the log only for lines you need (`@devflow/references/token-economy.md` → **Derive, don't dump**).
 
@@ -217,7 +212,7 @@ Respond using template in `references/notify-template.md`. **Run mode** (`.devfl
 | Loading full codebase "for context" | Load only `plan.md` files + one exemplar pattern per task |
 | Skipping codegen, localization, or loading/error states | Adapter rules apply from first line; hardcoded copy/colors fail beautify |
 | Deviating from plan without logging it | Report deviations in Step 7b summary |
-| Running analyze only at the end | Run after each vertical slice checkpoint |
+| Running analyze only at the end, or after every file | Once per vertical slice checkpoint + once after the last file (Step 6) |
 | Guessing unspecified behavior | Find repo precedent; if none → ask |
 | Pausing on ambiguity while run mode active | Defensible default + `## Decision flags` entry; interactive pause only without `.devflow-run.json` |
 | Pushing through host compaction warning | Write `handoff.md` first — orientation for next session costs 10 lines now |
@@ -225,8 +220,8 @@ Respond using template in `references/notify-template.md`. **Run mode** (`.devfl
 | Writing helper that stdlib/platform/installed dependency covers | Lazy ladder rungs 2–5: reuse > stdlib > platform > installed dep > new code |
 | Dumping full build/test output into response | Derive answer, quote decisive lines — `token-economy.md` |
 | grep→read chain when code-index MCP available | One semantic query first; trust result, no re-grep |
-| Skipping registry update for shared folder element | Anything in shared/ must be in `registry.md` before Step 7b |
-| Fixing beautify/test issues during implement | Log in Step 8 deviations; fix in `devflow.beautify` |
+| Skipping registry update for shared folder element | Anything in shared/ must be in `registry.md` by the end of Step 7 |
+| Fixing beautify/test issues during implement | Log in `## Deviations` (Step 7b); fix in `devflow.beautify` |
 
 ## I/O Reference
 

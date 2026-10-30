@@ -45,7 +45,7 @@ Precedence: repo precedent > `constitution.md` > adapter convention (`devflow.ta
 | --- | --- |
 | Constitution Gate Critical/Required (`devflow-plan` Step 0b) | Ambiguity / unspecified behavior |
 | `devflow.analyze` Critical | `devflow.analyze` Required / Nit (`auto`: waiver flag) |
-| `escalation-ladder.md` Level 5 block | Beautify opinable proposal |
+| `escalation-ladder.md` Level 4 (decompose needs approval → Level 5) and Level 5 block | Beautify opinable proposal |
 | `devflow.ship` Critical | Ship Required at loop cap — `run`: surface report; `auto`: exceptions flag → PR body |
 | Step input contract fails | Idea vs codebase mismatch → `## Deviations` + flag |
 | Missing monorepo App; brainstorm-scale idea (`auto`) | |

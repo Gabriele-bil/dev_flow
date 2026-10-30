@@ -124,13 +124,7 @@ Read **`refinement-hints.md`**, run pass:
    - Check if current branch is clean or only has allowed DevFlow artifacts.
 2. Switch to / create branch:
    - If git is already on the target branch `<type>/<NNN>_<name>`, proceed.
-   - Branch exists locally → `git switch <type>/<NNN>_<name>`.
-   - Otherwise create it from the up-to-date default branch, never from current `HEAD` (base detection per `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-pr/SKILL.md` Step 0):
-     ```bash
-     git fetch origin "$BASE_BRANCH" 2>/dev/null || true
-     git switch -c <type>/<NNN>_<name> "origin/$BASE_BRANCH" 2>/dev/null || git switch -c <type>/<NNN>_<name>
-     ```
-     Fallback (no remote / offline) creates from `HEAD` — tell the user.
+   - Otherwise `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" branch <type>/<NNN>_<name>` — switches to it when it exists, else creates it from the up-to-date base branch (never from current `HEAD`); when offline it falls back to `HEAD` and says so — tell the user.
 3. Keep resolved branch name for Step 8 (verification), Step 9 (`task.md`), and Step 11 (`notify`).
 
 ### Step 8 - Verification checklist (before write)

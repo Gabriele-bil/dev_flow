@@ -44,16 +44,8 @@ section() {
     on { print }' "$1" 2>/dev/null | sed -e '/./,$!d'
 }
 
-# ── Base branch (same order as devflow.pr Step 0) ─────────────────────────────
-if [ -z "$BASE" ]; then
-  BASE=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
-  if [ -z "$BASE" ]; then
-    for c in main master develop next; do
-      git show-ref --verify --quiet "refs/remotes/origin/$c" && { BASE="$c"; break; }
-    done
-  fi
-  BASE="${BASE:-main}"
-fi
+# ── Base branch (devflow-state.sh base, shared with every skill) ─────────────
+[ -n "$BASE" ] || BASE=$(bash "$SCRIPT_DIR/devflow-state.sh" base)
 BASE_REF=""
 for r in "origin/$BASE" "$BASE"; do git rev-parse --verify --quiet "$r^{commit}" >/dev/null && { BASE_REF="$r"; break; }; done
 MB=""

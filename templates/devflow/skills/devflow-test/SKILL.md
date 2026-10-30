@@ -54,10 +54,10 @@ Resolve adapter, adapter root, and app working directory per `@devflow/reference
 
 ### Step 1 - Read docs
 
-Always read before starting:
+Read before writing tests:
 
-- `constitution.md`
-- `registry.md`
+- `constitution.md` — test naming, file placement and layering rules the new tests must follow
+- `registry.md` — existing test helpers, fixtures and mocks to reuse instead of re-creating
 
 ### Step 2 - Scope
 
@@ -141,13 +141,10 @@ Verification:  [PASS | FAIL | PARTIAL] — [N]/[N] ACs · devflow/features/[NNN]
 
 ---
 
-All tests passing and verification clean? Choose how to continue:
-1. Run ship gate (multi-agent review) -> devflow.ship
-2. Run full project test suite before opening PR -> devflow.pr
-3. Skip full suite and open PR directly -> devflow.pr
+Next: /devflow.ship — multi-agent review gate before the PR (it reuses these stamps; devflow.pr runs the full suite and the build).
 ```
 
-Wait for user choice before continuing. **Run mode** (`.devflow-run.json` present): emit the block but do not wait — control returns to the orchestrator (`devflow.run` stops at its `--until` boundary, or `devflow.auto` continues to `devflow.ship`).
+No menu: ship is the only next step (skipping it skips the review gate; the full suite already runs in `devflow.pr` Step 3). **Run mode** (`.devflow-run.json` present): control returns to the orchestrator (`devflow.run` stops at its `--until` boundary, or `devflow.auto` continues to `devflow.ship`).
 
 ## Anti-Patterns
 

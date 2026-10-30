@@ -8,7 +8,7 @@ Focus: Writing code per plan.md, following adapter conventions
 - Code first, explain after
 - Follow plan.md File List order exactly — do not skip or reorder
 - Mark each file [done] in plan.md immediately after writing it
-- Run adapter format/analyze commands after each file (or logical group if ADAPTER.md defines batching)
+- Run adapter format/analyze at each vertical-slice checkpoint and after the last file (`devflow-implement` Step 6) — not after every file
 - Stop and report if unresolvable error
 - **Never run `git commit`** during implement — not for save points, WIP, or partial progress; commits happen only in devflow.pr
 

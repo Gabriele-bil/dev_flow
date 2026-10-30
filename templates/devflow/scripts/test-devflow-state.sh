@@ -143,6 +143,23 @@ assert_contains "report: flags and deviations counted" "$out" "decision flags: 2
 assert_contains "report: no stamps yet" "$out" "Checks:        no stamps"
 teardown
 
+# ── base / branch ────────────────────────────────────────────────────────────
+setup
+git config user.email t@t && git config user.name t && git commit -q --allow-empty -m base
+assert_equals "base: no remote → main" "$(st base)" "main"
+R=$(mktemp -d); git init -q --bare -b develop "$R" && git remote add origin "$R" && git push -q origin HEAD:develop 2>/dev/null
+git remote set-head origin develop >/dev/null 2>&1 || git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/develop
+git fetch -q origin
+assert_equals "base: origin/HEAD wins" "$(st base)" "develop"
+assert_contains "branch: created from origin/<base>" "$(st branch feat/009_x)" "created feat/009_x from origin/develop"
+assert_contains "branch: already on it" "$(st branch feat/009_x)" "on feat/009_x"
+git switch -q -c other
+assert_contains "branch: switches to existing" "$(st branch feat/009_x)" "switched to existing feat/009_x"
+git remote remove origin
+assert_contains "branch: offline falls back to HEAD and says so" "$(st branch fix/010_y)" "from HEAD"
+rm -rf "$R"
+teardown
+
 # ── run marker ───────────────────────────────────────────────────────────────
 setup
 out=$(st run arm --orchestrator devflow.auto --from task --until pr)

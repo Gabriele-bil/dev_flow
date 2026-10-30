@@ -47,7 +47,7 @@ Fast-track transitions: `ready → implementing → implemented → tested → s
 2. Diagnose root cause (file/function) before writing anything — read-only.
 3. `task.md` from `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-task/references/task-template.md`: full header (`**ID:**`, `**Date:**`, `**Status:** draft`, `**Branch:**`, `**App:**` monorepo only); Goal & Value (Problem = symptom, Objective = fixed behavior); `UC-1` fixed path; `AC-1 (UC-1)` fixed behavior (Gherkin); `AC-2 (UC-1)` regression test fails before fix, passes after; root cause in `## Notes`. Other template sections: one line or `none`.
 4. `plan.md` from `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-plan/references/plan-template.md`: header (`**Task:**`, `**App:**` copied, `**Status:** ready`, `**Complexity:** N (quick)`); Overview = root cause; **Traceability** row per AC → file(s); **File List** 1–3 entries `[pending]`, regression test file first; Implementation checkpoints = adapter test + analyze commands.
-5. Branch from up-to-date default branch — base detection per `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-pr/SKILL.md` Step 0, then `git fetch origin "$BASE_BRANCH" && git switch -c fix/[NNN]_hotfix-[name] "origin/$BASE_BRANCH"`.
+5. Branch from the up-to-date base branch: `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" branch fix/[NNN]_hotfix-[name]`.
 
 ### Step 2 - Checkpoint, then failing test first
 

@@ -571,7 +571,7 @@ Nessun intervento va considerato riuscito senza un numero prima e dopo, su Claud
 | --- | --- | --- | --- |
 | 1 | fatta | Q-1, CC-1, AGY-1, AD-1, CC-4 | `124a177`…`644f630` |
 | 2 | fatta | AGY-3, T-1, L-1, T-5, T-7, T-8, Q-3, AGY-2 | `6ef76e6`…`8bcf7eb` |
-| 3 | in corso | CC-2, CC-3, L-3, AGY-4, Q-2 | — |
+| 3 | fatta (release major 3.0.0) | CC-2, CC-3, L-3, AGY-4, Q-2 | dopo `8bcf7eb` |
 
 **Ordine**: la fase 1 viene prima perché corregge rotture reali. La fase 2 precede la 3 perché gli script (stato, timbro, pacchetto di review) sono il passaggio di consegne che rende possibili i subagent per passo. La fase 4 è indipendente e può procedere in parallelo, adapter per adapter.
 

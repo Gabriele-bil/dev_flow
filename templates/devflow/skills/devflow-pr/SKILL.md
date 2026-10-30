@@ -30,13 +30,7 @@ Resolve adapter, adapter root, and app working directory per `@devflow/reference
 Resolve the base branch instead of assuming `main` — repos also use `master`, `develop`, or `next` as their default:
 
 ```bash
-BASE_BRANCH="$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')"
-if [ -z "$BASE_BRANCH" ]; then
-  for candidate in main master develop next; do
-    git show-ref --verify --quiet "refs/remotes/origin/$candidate" && { BASE_BRANCH="$candidate"; break; }
-  done
-fi
-BASE_BRANCH="${BASE_BRANCH:-main}"
+BASE_BRANCH="$(bash "@devflow/scripts/devflow-state.sh" base)"   # origin/HEAD, else main|master|develop|next, else main
 ```
 
 Use `$BASE_BRANCH` in Step 5 and Step 6 below — never a hardcoded `main`.
