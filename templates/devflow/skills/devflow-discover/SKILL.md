@@ -61,7 +61,7 @@ Read existing project context (`docs/product.md`, `constitution.md`, `registry.m
 Formulate prioritized, high-impact questions targeting the most critical or ambiguous axes identified in Step 2:
 
 1. Cap question queue at **≤5 questions** — keep only high-impact architectural forks.
-2. Ask questions one at a time using `AskUserQuestion` / `ask_question` tool:
+2. Ask with `AskUserQuestion` / `ask_question` — independent axes batched in one call (1–4), an axis that depends on an earlier answer after it:
    - State the architectural axis and concrete operational consequence.
    - Provide a **recommended answer** with concise technical rationale.
    - Offer bounded, distinct multiple-choice options when possible.

@@ -62,7 +62,7 @@ Notice: Deep architectural and planning workflow. Takes all necessary time to ex
 
 Execute the 3-phase interview per `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-init/references/interview-protocol.md`:
 
-- Ask **one question at a time** via `ask_question` (2–4 options, first option prefixed `(Recommended)` with 1-sentence technical rationale).
+- Ask via `ask_question` — independent questions batched (1–4 per call), dependent ones after their answer (2–4 options, first option prefixed `(Recommended)` with 1-sentence technical rationale).
 - **Phase A (Product & Scope):** Project name/slug, domain, target personas (real human/external actors, never technical roles), primary outcome, complete feature inventory (core + secondary flows), async/edge expectations.
 - **Phase B (Architecture, Workspace & Technology Stack):**
   - Workspace topology: Single-app vs Monorepo (explicitly supporting **Nx workspace** orchestration alongside standard multi-app folders).
@@ -123,7 +123,7 @@ Emit consolidated initialization report: project root, topology & stack(s), scaf
 
 | Anti-Pattern | Problem | Fix |
 | --- | --- | --- |
-| Dumping all interview questions in one wall of text | Overwhelms user and skips adaptive follow-ups | Ask one bounded question at a time via `ask_question` with `(Recommended)` first |
+| Dumping all interview questions in one wall of text | Overwhelms user and skips adaptive follow-ups | Ask bounded questions via `ask_question` (independent ones batched, ≤4 per call) with `(Recommended)` first |
 | Using legacy stack flags (`--no-standalone`, Pages router, `.eslintrc.json`) | Violates adapter rules and modern stack baselines | Follow `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-init/references/scaffolding-matrix.md` and live `context7` docs |
 | Leaving circular blockers between tasks (`002` ↔ `003`) | Deadlocks planning and implementation order | Extract shared contracts/types into foundation task `001` before consumers |
 | Omitting `**Blockers:**` / `**Unlocks:**` in generated `task.md` files | Downstream `devflow.plan` cannot verify unblocked execution order | Populate explicit `**Blockers:**` and `**Unlocks:**` headers in every roadmap `task.md` |

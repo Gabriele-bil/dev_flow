@@ -77,7 +77,7 @@ Stop and ask before writing task if:
 
 Structured elicitation rules (per `${CLAUDE_PLUGIN_ROOT}/skills/devflow-clarify/references/interactive-interview.md`):
 
-- Max 5 questions, asked sequentially one at a time
+- Max 5 questions; independent ones batched in one call (1–4), dependent ones after the answer they depend on
 - **High-stakes filter:** ask ONLY when the answer changes user-visible behavior, scope, safety, or data/cost boundaries. If a sensible, cheap-to-reverse default exists, record it in `## Assumptions & Risks` instead of asking
 - Use **`AskUserQuestion`**: offer 2–4 options with first option marked `(Recommended)` and a 1-sentence rationale; fallback to chat prompt if tool unavailable
 - Skip entirely if idea is already clear enough

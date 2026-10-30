@@ -57,7 +57,7 @@ If any item fails → stop and report which check failed.
 
 Follow structured interview standards in `@devflow/skills/devflow-clarify/references/interactive-interview.md`.
 
-For each question in the prioritized queue, one at a time:
+Work through the prioritized queue in rounds — independent questions batched in one call (1–4), dependent ones after the answer they depend on:
 
 1. Formulate structured elicitation:
    - State the specific ambiguity, trigger, or failure boundary being resolved
@@ -141,7 +141,7 @@ Audit trail only — do not reformat, compress, or omit after writing.
 | Anti-Pattern | Fix |
 | --- | --- |
 | Skipping unresolved markers | `devflow.plan` stops on them; resolve or explicitly waive first |
-| Batch Q&A then update | One question at a time — each answer shapes the next |
+| Asking dependent questions in one batch, or independent ones one by one | Batch what is independent (≤4 per call); chain what depends on an earlier answer |
 | Rewriting `## Summary` to absorb answers | Update target section + `## Clarifications`; preserve original wording |
 | Treating clarify as mandatory | Optional; skip if no markers and assumptions are low-risk |
 | Absorbing ambiguity into plan instead | Unresolved → silent assumptions → bugs in `devflow.test` |
