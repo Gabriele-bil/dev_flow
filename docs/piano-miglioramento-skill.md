@@ -30,6 +30,8 @@ Il piano riprende `docs/miglioramenti-plugin.md` (hook, Antigravity, contratti d
 | *corsivo* | File nuovo, ancora da creare |
 | `CC` / `AGY` / `CC+AGY` | Host coinvolto: Claude Code, Antigravity CLI, entrambi |
 
+Lo stato di avanzamento delle voci è nella sezione 7 (**Avanzamento**): ✅ nei titoli indica solo un riscontro dell'analisi, non una voce chiusa.
+
 Le voci senza indicazione di host valgono per entrambi. Percorsi relativi a `templates/devflow/` salvo dove indicato. Le stime in byte e token sono approssimate (token ≈ byte / 4).
 
 ---
@@ -182,7 +184,7 @@ Su Antigravity le 15 skill con `disable-model-invocation: true`, tra cui pr, rol
 3. Accorciare le descrizioni di queste skill, che su Antigravity costano in ogni sessione.
 
 <a id="agy-2"></a>
-#### AGY-2 🟠 ✅ `AGY` Revisori in sola lettura solo sulla carta
+#### AGY-2 🟠 `AGY` Revisori in sola lettura solo sulla carta
 
 I revisori di ship girano in parallelo sullo stesso albero di lavoro. Su Claude Code `tools` e `disallowedTools` lo rendono sicuro, su Antigravity no.
 
@@ -192,7 +194,7 @@ I revisori di ship girano in parallelo sullo stesso albero di lavoro. Su Claude 
 - In mancanza di quel formato, un hook `PreToolUse` nega scritture e modifiche mentre è attivo il marcatore di fan-out di ship (`hooks/pre-agent-fanout-cap.sh` conosce già il fan-out).
 
 <a id="agy-3"></a>
-#### AGY-3 🟠 ✅ Script come strato comune ai due host
+#### AGY-3 🟠 Script come strato comune ai due host
 
 Su Antigravity mancano i campi che su Claude Code regolano modello, contesto e permessi, quindi la leva principale per qualità, token e tempo sono gli **script**. *scripts/devflow-state.sh* ([T-1](#t-1)), *scripts/verify-stamp.sh* ([L-1](#l-1)) e *scripts/review-packet.sh* ([T-7](#t-7)) devono:
 
@@ -251,7 +253,7 @@ In `skills/devflow-pr/SKILL.md`:
 | Riferimenti interni | implement rimanda a "Step 8 deviations" e "before Step 7b", ma le deviazioni sono lo Step 7b. test legge constitution e registry senza scopo dichiarato | Correggere i rimandi e togliere le letture senza scopo |
 
 <a id="q-3"></a>
-### Q-3 🟠 ✅ Verifiche dichiarate ma non dimostrate
+### Q-3 🟠 Verifiche dichiarate ma non dimostrate
 
 - La "Pre-handoff checklist" di implement non ha un campo per l'evidenza.
 - I contratti di ship "beautify complete" e "analyze clean" non hanno un controllo: il modello o li rilancia o li presume.
@@ -352,7 +354,7 @@ Il problema si ripresenterà alla prossima minor. Proposta:
 ## 4. Token
 
 <a id="t-1"></a>
-### T-1 🔴 ✅ Stato gestito da script, non da prosa
+### T-1 🔴 Stato gestito da script, non da prosa
 
 `references/state-machine.md` (15 KB) viene letto da 17 skill per eseguire il frammento jq di aggiornamento e il resolver della feature attiva. Il checkpoint "append" è composto a mano in jq.
 
@@ -390,7 +392,7 @@ Anti-Patterns (22,8 KB) e I/O Reference (20,6 KB) si caricano a ogni invocazione
 La skill più pesante in ingresso (~20K token). Le stesse regole compaiono tre volte: Core Principles, checklist dello Step 8 e Anti-Patterns. Lo Step 5 carica 6 file (`refinement-hints.md`, `examples.md` da 8,2 KB, INVEST, story splitting, BDD, intervista). Proposta: un'unica checklist, con `examples.md` letto solo se il primo tentativo non supera la checklist. **Effetto stimato**: −15 KB.
 
 <a id="t-5"></a>
-### T-5 🟠 ✅ Output grezzo dei test fuori dal report
+### T-5 🟠 Output grezzo dei test fuori dal report
 
 Lo Step 7 di `skills/devflow-test/SKILL.md` incolla stdout e stderr di ogni target. Proposta: salvarli con `tee` in `devflow/features/NNN/test-output.log` come evidenza, e nel report mettere solo i conteggi e le righe decisive (principio "derive, don't dump" di `references/token-economy.md`). **Effetto stimato**: −5-50 KB per run, secondo lo stack.
 
@@ -400,14 +402,14 @@ Lo Step 7 di `skills/devflow-test/SKILL.md` incolla stdout e stderr di ogni targ
 6,4 KB che l'hook di `SessionStart` invita a caricare. Duplicano le skill e sono superati: `contexts/implement.md` contraddice implement ([Q-2](#q-2)) e dice "stop and surface" anche in run mode. Eliminarli, oppure ridurli a 3 righe ciascuno.
 
 <a id="t-7"></a>
-### T-7 🟠 ✅ Pacchetto di review per gli agenti di ship
+### T-7 🟠 Pacchetto di review per gli agenti di ship
 
 Ogni agente rilegge task, plan, constitution e registry e lancia il proprio `git diff`. Proposta: *scripts/review-packet.sh* (nuovo) produce un unico file con file cambiati, diff stat, criteri di accettazione e le regole di constitution pertinenti. Gli agenti leggono quello.
 
 **Effetto stimato**: −56 KB per ship nel profilo standard, −112 KB nel profilo thorough. Gli agenti partono anche prima.
 
 <a id="t-8"></a>
-### T-8 🟡 ✅ Hook istinti senza deduplica
+### T-8 🟡 Hook istinti senza deduplica
 
 `hooks/post-edit-instinct-context.sh` reinietta gli stessi 3 istinti a ogni modifica, inclusa ogni marcatura `[done]` in plan.md. Proposta: tenere un registro per sessione degli istinti già inviati in `.devflow-observe-state.json`. **Effetto stimato**: −10-20 KB per implement.
 
@@ -442,7 +444,7 @@ Anche `adapters/common/skills/common-clean-code/SKILL.md` è quasi tutto SOLID d
 ## 5. Tempo
 
 <a id="l-1"></a>
-### L-1 🔴 ✅ Timbro di verifica: ogni controllo una volta sola
+### L-1 🔴 Timbro di verifica: ogni controllo una volta sola
 
 Oggi format e analyze girano in implement Step 6, poi nell'hook sincrono `hooks/stop-format-typecheck.sh` (timeout 90 s). I contratti di beautify, test e ship ricontrollano "analyze clean". Pr Step 3 rilancia lint, l'intera suite di test e il build.
 
@@ -562,6 +564,14 @@ Nessun intervento va considerato riuscito senza un numero prima e dopo, su Claud
 | **4. Adapter al 29 ottobre** | AD-2, AD-3, Q-4, T-10, T-11, AD-4 | Adapter coerenti, raggiungibili, aggiornati, −175 KB, controllo di freschezza in CI | minor |
 | **5. Snellimento e tempo** | T-2, T-3, T-4, T-6, T-9, L-2, L-4, L-5, L-6, CC-5, Q-5 | Meno boilerplate, meno domande, più parallelismo | minor |
 | **6. Verifica** | M-1 punti 2-4 sulla stessa feature di riferimento | Confronto con la baseline sugli obiettivi della sezione 6 | — |
+
+**Avanzamento**
+
+| Fase | Stato | Voci chiuse | Commit su `next` |
+| --- | --- | --- | --- |
+| 1 | fatta | Q-1, CC-1, AGY-1, AD-1, CC-4 | `124a177`…`644f630` |
+| 2 | fatta | AGY-3, T-1, L-1, T-5, T-7, T-8, Q-3, AGY-2 | `6ef76e6`…`8bcf7eb` |
+| 3 | in corso | CC-2, CC-3, L-3, AGY-4, Q-2 | — |
 
 **Ordine**: la fase 1 viene prima perché corregge rotture reali. La fase 2 precede la 3 perché gli script (stato, timbro, pacchetto di review) sono il passaggio di consegne che rende possibili i subagent per passo. La fase 4 è indipendente e può procedere in parallelo, adapter per adapter.
 
