@@ -19,10 +19,7 @@ Validate that the consumer environment satisfies all DevFlow operational prerequ
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 - **zero-hard-dependency** — MCP absences degrade cleanly to CLI fallback; doctor identifies degradation levels without blocking progress unless a required CLI tool is missing
 - **actionable-remediation** — every warning or failure includes an exact copy-paste command or config snippet
 - **idempotent-and-safe** — diagnostic inspections never mutate workspace state unless `--fix` is supplied

@@ -22,10 +22,7 @@ Transform a large objective into a multi-PR blueprint. Output: dependency graph,
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved; blueprint approved before any `devflow.plan` begins
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep paths, IDs, commands exact
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 - **self-contained briefs** — every step contains enough context for a fresh agent with zero prior-session knowledge
 - **explicit dependencies** — steps list their blockers; no implicit ordering
 - **adversarial gate** — Opus subagent critiques the draft before it is finalised

@@ -29,7 +29,7 @@ Required sections (in order):
 
 1. YAML frontmatter — `name`, `description` (+ optional `argument-hint`, `disable-model-invocation`, `model`, `effort`)
 2. `## Purpose` — one line; what it does, which pipeline step
-3. `## Core Principles` — copy exact 4-bullet block from `ETHOS.md`; do not paraphrase
+3. `## Core Principles` — first bullet is the one-line **Ethos** reference (`- **Ethos** — spec-first · traceability · vertical slices · token-lean …`), never the four `ETHOS.md` bullets copied; then only principles specific to the skill
 4. `## When NOT to Use` — conditions routing agent elsewhere
 5. `## Input contract` — checklist; fail-fast on any failure before touching files
 6. `## Workflow` — numbered steps, concrete actions

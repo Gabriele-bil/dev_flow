@@ -39,11 +39,8 @@ Order **File list** bottom-up per `constitution.md` and the adapter plan step fi
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 - **reuse-first** — always check `registry.md` and shared folders before planning new components; reuse or extend over duplicate
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## When NOT to Use
 

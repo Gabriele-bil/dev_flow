@@ -129,6 +129,12 @@ for FILE in "${SKILL_FILES[@]}"; do
 
   # ── Style checks (--strict only) ─────────────────────────────────────────────
   if [[ "$STRICT" == true ]]; then
+    # Core Principles: one Ethos line, never the four ETHOS.md bullets copied
+    if [[ "$REL" == skills/*/SKILL.md ]]; then
+      CP=$(sed -n '/^## Core Principles/,/^## [^C]/p' "$FILE")
+      printf '%s' "$CP" | grep -q '^- \*\*Ethos\*\*' || FILE_ERRORS+=("## Core Principles must start with the one-line '- **Ethos** — …' reference (CONTRIBUTING.md)")
+      printf '%s' "$CP" | grep -qE '^- \*\*(spec-first|traceability|vertical slices|token-lean)\*\*' && FILE_ERRORS+=("## Core Principles copies an ETHOS.md bullet — keep the one-line Ethos reference instead")
+    fi
     # Core skills run in the main context: a model: switch there drops the
     # prompt cache (references/model-selection.md → Rules)
     if [[ "$REL" == skills/*/SKILL.md ]] && awk '/^---/{c++; if(c==2) exit; next} c==1' "$FILE" | grep -qE '^model:'; then

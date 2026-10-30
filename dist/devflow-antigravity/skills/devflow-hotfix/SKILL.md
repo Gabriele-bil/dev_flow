@@ -16,10 +16,7 @@ Provides a streamlined, token-efficient pipeline for critical bugs, regressions,
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved (compact spec for hotfixes: problem statement, root cause, ACs)
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 - **regression-tested** — every hotfix includes at least one test proving the defect is resolved
 - **safe-acceleration** — skips `beautify` and multi-agent fan-out, while keeping linter/compiler checks, single-agent review, and PR traceability
 

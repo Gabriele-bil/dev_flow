@@ -17,10 +17,7 @@ Safely discard unwanted changes made during `devflow.implement` or `devflow.beau
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved; rollback preserves `task.md` and `plan.md` intact
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 - **state-safety** — git reset alone corrupts pipeline state; rollback atomically updates git files, `plan.md` status, and `.devflow-state.json`
 - **explicit-confirmation** — destructive operations warn before discarding edits unless `--force` is provided
 

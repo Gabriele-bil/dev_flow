@@ -16,12 +16,7 @@ Commit all changes, push feature branch, open PR to the repo's default branch. F
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
-
----
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 
 ## Step 0 - Resolve adapter and base branch
 

@@ -24,10 +24,7 @@ Bootstrap greenfield software projects end-to-end: structured discovery intervie
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` are written and approved
-- **traceability** — every subtask maps to an acceptance criterion; every acceptance criterion maps to one or more files
-- **vertical slices** — for plans with >5 files: implement end-to-end user-visible increments, never layers
-- **token-lean** — caveman-compress all written output: drop articles, hedging, filler, linking phrases; keep technical terms, file paths, commands, verbs, negations, conditions exact
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 
 ## When NOT to Use
 

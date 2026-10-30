@@ -16,12 +16,7 @@ Pre-merge fan-out gate. Dispatch specialist agents in parallel — count scaled 
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
-
----
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 
 ## When NOT to Use
 

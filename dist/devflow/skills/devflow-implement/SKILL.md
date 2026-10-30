@@ -24,11 +24,8 @@ Implement all files in `plan.md` per architecture conventions. Third DevFlow ste
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 - **reuse-first** — before writing any file, verify shared folder and `registry.md`; extend over duplicate, always
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## When NOT to Use
 

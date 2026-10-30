@@ -17,15 +17,12 @@ Turn raw idea into a lean, product-focused Agile task. Acts as Requirements Arch
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 - **product-only** — focus on user value, use cases, and behavior; zero technical implementation or file/class names
 - **invest-discipline** — Independent, Negotiable, Valuable, Estimable, Small, Testable per `references/invest-criteria.md`
 - **read-write-isolation** — separate view/list flows from transactional mutations per `references/story-splitting.md`
 - **explicit-async** — specify loading indicator, double-submit protection, error recovery, and empty states
 - **bdd-gherkin** — Given/When/Then with exactly one `When` per scenario per `references/bdd-acceptance-criteria.md`
-- **traceability** — use case (`UC-N`) → BDD acceptance criterion (`AC-N (UC-N)`) → file(s) in `plan.md`
-- **vertical slices** — end-to-end increments; strictly NO "Ghost UI" (dead placeholder elements)
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## When NOT to Use
 
