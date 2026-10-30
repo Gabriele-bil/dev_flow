@@ -52,16 +52,23 @@ Location: `devflow/adapters/<adapter>/skills/<adapter>-<domain>/SKILL.md`
 
 Additional requirements:
 
-- File path trigger documented in `ADAPTER.md` → **Technology skills** table
-- `## When NOT to Use` includes: "file does not match trigger pattern in `ADAPTER.md`"
+- Trigger (file path or content pattern) as a row of `adapters/<adapter>/steps/implement.md` → **skill load decision matrix** — the only place triggers live; `ADAPTER.md` → **Technology skills** is the index of what each skill covers. A skill no row names is never loaded (`validate-adapters.sh` fails)
+- Sections: `## Purpose`, `## When NOT to Use` (includes: file matches no row of `adapters/<adapter>/steps/implement.md` → skill load decision matrix), `## I/O Reference` (`validate-skills.sh` fails without them)
 - Content over 100 lines → extract to `references/<file>.md` in skill directory; link from `SKILL.md`
-- No duplication of `common-clean-code` or other common skills — reference them
+- References keep project decisions only — what to use, what to avoid and why, one short example; no tutorials the model already knows. APIs that change often → "check current docs (Context7) before writing X"
+- No duplication of `common-clean-code` or other common skills — reference them; a common skill needs a matrix row in some adapter (or a core reference) to be reachable
+
+## Keeping an Adapter Current
+
+- `ADAPTER.md` carries `**Verified against:** <pkg>@<major.minor>, … (YYYY-MM-DD)` under the title (`pub:<name>` for pub.dev, `sdk:<name>` for SDKs). `scripts/check-adapter-versions.sh` compares it with npm / pub.dev; CI runs it weekly (`.github/workflows/adapter-freshness.yml`, non-blocking)
+- `deprecated-apis.txt`: one `<extended regex><TAB><use instead>` per removed or replaced API. `validate-adapters.sh` fails when one reappears in the adapter, unless the same line says why (removed / deprecated / instead)
+- Update an adapter: verify every changed API with Context7, add what you replaced to `deprecated-apis.txt`, bump the `Verified against` line
 
 ## Adding a New Adapter
 
 1. Copy `adapters/flutter/` as template
 2. Rename to `adapters/<name>/`
-3. Rewrite `ADAPTER.md` (core: Technology skills table, MCP, step-files index) and the `steps/*.md` files (per-step commands, plan sections, checklists — one file per pipeline step: setup, plan, implement, beautify, test, pr)
+3. Rewrite `ADAPTER.md` (core: `**Verified against:**` line, Technology skills table, MCP, step-files index), add `deprecated-apis.txt`, and the `steps/*.md` files (per-step commands, plan sections, checklists — one file per pipeline step: setup, plan, implement, beautify, test, pr)
 4. Add technology skills under `adapters/<name>/skills/`
 5. Add setup templates under `adapters/<name>/templates/` (`AGENTS.template.md`, `REGISTRY.template.md`, `PRODUCT.template.md`)
 6. Document in root `README.md`

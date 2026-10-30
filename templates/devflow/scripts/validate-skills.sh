@@ -103,9 +103,12 @@ for FILE in "${SKILL_FILES[@]}"; do
   # Adapter skills (adapters/*/skills/) use numbered-section reference format:
   # only ## I/O Reference is required. Core skills (skills/) require full set.
   if echo "$REL" | grep -q "^adapters/"; then
-    # Adapter skill: require only I/O Reference
-    if ! grep -qF "## I/O Reference" "$FILE"; then
-      FILE_ERRORS+=("missing section \"## I/O Reference\"")
+    # Adapter skill: Purpose, When NOT to Use (with the trigger clause), I/O Reference
+    for SECTION in "## Purpose" "## When NOT to Use" "## I/O Reference"; do
+      grep -qF "$SECTION" "$FILE" || FILE_ERRORS+=("missing section \"$SECTION\"")
+    done
+    if grep -qF "## When NOT to Use" "$FILE" && ! sed -n '/^## When NOT to Use/,/^## /p' "$FILE" | grep -q 'steps/implement.md'; then
+      FILE_ERRORS+=("## When NOT to Use must say the skill does not apply when the file matches no row of steps/implement.md → skill load decision matrix")
     fi
   else
     # Core skill: require Purpose + Core Principles + I/O Reference; Workflow OR any Step heading

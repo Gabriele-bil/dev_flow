@@ -190,7 +190,37 @@ for ADAPTER_PATH in "${ADAPTER_DIRS[@]}"; do
     fi
   fi
 
-  # ── 9. Strict Mode Quality Checks ────────────────────────────────────────────
+  # ── 9. Triggers, version header, banned APIs ────────────────────────────────
+  # Single source for skill triggers: steps/implement.md → skill load decision
+  # matrix. A skill no row names is never loaded.
+  if [[ -d "$ADAPTER_PATH/skills" && -f "$IMPL_MD" ]]; then
+    while IFS= read -r SK; do
+      SK_NAME=$(basename "$SK")
+      grep -qF "\`$SK_NAME\`" "$IMPL_MD" \
+        || ADAPTER_ERRORS+=("skill $SK_NAME unreachable: no row in steps/implement.md → skill load decision matrix")
+    done < <(find "$ADAPTER_PATH/skills" -mindepth 1 -maxdepth 1 -type d | sort)
+  fi
+  # Version header: what the skills were last verified against (scripts/check-adapter-versions.sh reads it)
+  if [[ -f "$ADAPTER_MD" ]] && ! grep -qE '^\*\*Verified against:\*\* .+@[0-9]' "$ADAPTER_MD"; then
+    ADAPTER_ERRORS+=("ADAPTER.md missing '**Verified against:** <pkg>@<major.minor>, … (YYYY-MM-DD)' line")
+  fi
+  # Banned APIs: deprecated-apis.txt = "<ERE><TAB><use instead>" per line. A hit
+  # is allowed only on a line that says why (removed / deprecated / instead / ❌).
+  BANNED="$ADAPTER_PATH/deprecated-apis.txt"
+  if [[ ! -f "$BANNED" ]]; then
+    ADAPTER_ERRORS+=("missing deprecated-apis.txt (one '<ERE><TAB><use instead>' per line)")
+  else
+    while IFS=$'\t' read -r PAT HINT; do
+      [[ -z "$PAT" || "$PAT" == \#* ]] && continue
+      while IFS= read -r HIT; do
+        [[ -z "$HIT" ]] && continue
+        printf '%s' "${HIT#*:*:}" | grep -qiE 'removed|deprecated|instead|❌|never use|do not use|not supported' && continue
+        ADAPTER_ERRORS+=("banned API /$PAT/ at ${HIT%%:*}:$(printf '%s' "$HIT" | cut -d: -f2) → $HINT")
+      done < <(grep -rnE --include='*.md' -e "$PAT" -- "$ADAPTER_PATH" 2>/dev/null | sed "s#^$ADAPTER_PATH/##")
+    done < "$BANNED"
+  fi
+
+  # ── 10. Strict Mode Quality Checks ───────────────────────────────────────────
   if [[ "$STRICT" == true ]]; then
     # Verify templates have essential structure
     AGENTS_TMPL="$TEMPLATES_DIR/AGENTS.template.md"
@@ -236,6 +266,14 @@ done
 # ── Check common/ library ─────────────────────────────────────────────────────
 COMMON_DIR="$ADAPTERS_DIR/common"
 if [[ -d "$COMMON_DIR" ]]; then
+  # Every common skill must be named by some adapter's trigger matrix or a core skill
+  while IFS= read -r SK; do
+    SK_NAME=$(basename "$SK")
+    if ! grep -rqF "$SK_NAME" "$ADAPTERS_DIR"/*/steps/implement.md "$PLUGIN_ROOT/skills" "$PLUGIN_ROOT/references" 2>/dev/null; then
+      echo "✗ adapters/common: $SK_NAME unreachable — no adapter steps/implement.md, core skill or reference names it"
+      ERRORS=$((ERRORS + 1))
+    fi
+  done < <(find "$COMMON_DIR/skills" -mindepth 1 -maxdepth 1 -type d | sort)
   COMMON_SKILLS=$(find "$COMMON_DIR/skills" -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
   if [[ "$COMMON_SKILLS" -gt 0 ]]; then
     echo "✓ adapters/common (shared library: $COMMON_SKILLS skills)"

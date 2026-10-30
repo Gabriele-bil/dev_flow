@@ -14,6 +14,7 @@ Each adapter in `templates/devflow/adapters/<adapter>/` must follow the modular 
 ```text
 adapters/<adapter>/
 ├── ADAPTER.md                  # Core metadata (loaded by all steps)
+├── deprecated-apis.txt         # Banned APIs: <ERE><TAB><use instead> (checked by validate-adapters.sh)
 ├── steps/                      # Per-step contract files (loaded only for active step)
 │   ├── setup.md                # devflow.setup
 │   ├── plan.md                 # devflow.plan
@@ -40,6 +41,7 @@ Loaded by all pipeline skills immediately after adapter resolution.
 
 | Section / Element | Expected Heading / Key | Type | Consumer Skill | Notes |
 | --- | --- | :---: | --- | --- |
+| Version line | `**Verified against:** <pkg>@<x.y>, … (YYYY-MM-DD)` under the title | `[R]` | `scripts/check-adapter-versions.sh` | npm names; `pub:<name>` for pub.dev, `sdk:<name>` for SDKs (not checked) |
 | Technology skills table | `## Technology skills` | `[R]` | All steps | Table mapping feature type / concern → `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/skills/<skill>/SKILL.md` |
 | MCP baseline | `## MCP` | `[R]` | `devflow.setup`, `plan`, `implement` | Universal baseline + stack core tools + conditional infrastructure |
 | Step files index | `## Step files` | `[R]` | All steps | Table mapping step (`setup`, `plan`, `implement`, `beautify`, `test`, `pr`) → `steps/<step>.md` |
@@ -126,7 +128,8 @@ Applied by `devflow.setup` during consumer project initialization.
 Each adapter must provide focused technology skills referenced in its `ADAPTER.md` skills table and `steps/implement.md` decision matrix.
 
 - Every skill must reside in `adapters/<adapter>/skills/<skill-name>/SKILL.md`.
-- Skills must pass `validate-skills.sh` validation (valid YAML frontmatter with `name` and `description`, plus `## I/O Reference`).
+- Every skill must be named by a row of `steps/implement.md` → skill load decision matrix (the only trigger source); otherwise it is never loaded and `validate-adapters.sh` fails.
+- Skills must pass `validate-skills.sh` validation (valid YAML frontmatter with `name` and `description`, plus `## Purpose`, `## When NOT to Use` — naming the decision matrix — and `## I/O Reference`).
 - Every path referenced in `ADAPTER.md` must resolve to an existing file on disk (no dead links).
 
 ---

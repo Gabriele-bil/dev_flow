@@ -306,6 +306,7 @@ Baseline: **Flutter · Riverpod · Supabase**. Commands: `flutter analyze`, `flu
 
 | Skill | Purpose |
 | ------- | --------- |
+| `flutter-architecture` | Feature folders, layers, scaffold, cross-layer moves |
 | `flutter-supabase` | Database read/write/auth, schema, RLS |
 | `flutter-supabase-migrations` | Schema migrations, SQL |
 | `flutter-theme` | UI screens, visual styling |
@@ -314,7 +315,7 @@ Baseline: **Flutter · Riverpod · Supabase**. Commands: `flutter analyze`, `flu
 | `flutter-layout` | Layout, breakpoints, scrollables |
 | `flutter-form` | Form/wizard flows |
 
-Feature pages: use `lib/features/<feature>/pages/` with entry file named `page.dart`.
+Feature pages: `lib/features/<feature>/pages/<name>_page.dart` (one page) or `pages/<page>/` per page (several) — see `flutter-architecture`.
 
 ### Angular (`templates/devflow/adapters/angular/`)
 
@@ -332,7 +333,7 @@ Baseline: standalone + signals-first. Commands: `pnpm run lint`, `pnpm run test`
 
 ### Next.js (`templates/devflow/adapters/nextjs/`)
 
-Baseline: **Next.js 15+ App Router · Zustand · Tailwind CSS + shadcn/ui · Server Actions + API Routes · Jest + RTL**. Commands: `pnpm lint`, `pnpm test`, `pnpm build`.
+Baseline: **Next.js 16 App Router (Cache Components) · Zustand · Tailwind CSS 4 + shadcn/ui · Server Actions + API Routes · Jest + RTL · Playwright**. Commands: `pnpm lint`, `pnpm test`, `pnpm build`.
 
 | Skill | Purpose |
 | ------- | --------- |
@@ -348,7 +349,7 @@ Baseline: **Next.js 15+ App Router · Zustand · Tailwind CSS + shadcn/ui · Ser
 
 ### NestJS (`templates/devflow/adapters/nestjs/`)
 
-Baseline: **NestJS · TypeORM · class-validator/class-transformer · @nestjs/swagger · @nestjs/jwt + Passport · @nestjs/testing + Supertest**. Commands: `npm run lint`, `npm run test`, `npm run build`.
+Baseline: **NestJS 12 · TypeORM 1 or Prisma 7 · class-validator or Standard Schema · @nestjs/swagger · @nestjs/jwt + Passport · @nestjs/testing + Supertest**. Commands: `npm run lint`, `npm run test`, `npm run build`.
 
 | Skill | Purpose |
 | ------- | --------- |
@@ -356,7 +357,7 @@ Baseline: **NestJS · TypeORM · class-validator/class-transformer · @nestjs/sw
 | `nestjs-error-handling` | HTTP exceptions, exception filters, async error handling, structured logging |
 | `nestjs-security` | Input validation, guards, JWT auth, rate limiting, output sanitization |
 | `nestjs-performance` | Async lifecycle hooks, lazy loading, query optimization, caching, graceful shutdown |
-| `nestjs-database` | N+1 avoidance, migrations, transactions (TypeORM) |
+| `nestjs-database` | N+1 avoidance, migrations, transactions (TypeORM 1 or Prisma 7 — project choice) |
 | `nestjs-api-design` | DTOs/serialization, interceptors, pipes, versioning, API-consumer accessibility (OpenAPI, RFC 7807 errors) |
 | `nestjs-testing` | `TestingModule` unit tests, Supertest e2e, mocking external services |
 | `nestjs-microservices` | `@MessagePattern`/`@EventPattern`, BullMQ queues, Terminus health checks |
