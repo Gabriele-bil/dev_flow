@@ -1,0 +1,27 @@
+# Angular adapter — banned APIs. Format: <extended regex><TAB><use instead>.
+# validate-adapters.sh greps every .md here; a hit is allowed only on a line saying why (removed / deprecated / instead / never use / do not use / not supported).
+# Core
+afterRender\(	afterNextRender( / afterRenderEffect( / afterEveryRender( (afterRender removed)
+ChangeDetectionStrategy\.Default	ChangeDetectionStrategy.Eager (renamed in v22; OnPush is the default)
+standalone: *true	omit it — standalone is the default
+@HostBinding|@HostListener	host: {} metadata
+\*ngIf|\*ngFor|\*ngSwitch	@if / @for / @switch
+import \{[^}]*\bRoutes\b[^}]*\} from ["']@angular/core	import { Routes } from "@angular/router"
+# Animations (@angular/animations deprecated since 20.2, removal planned in v23)
+@angular/animations	animate.enter / animate.leave + native CSS
+provideAnimations(Async)?\(	remove — native CSS animations need no provider
+\[@[A-Za-z]+\]	animate.enter / animate.leave, [class.x] + CSS transitions
+# Signal Forms
+(hidden|disabled|readonly)\([A-Za-z_.]+, *\(	{ when: (ctx) => … } config object (positional logic fn deprecated)
+# HTTP / DI
+HTTP_INTERCEPTORS	functional HttpInterceptorFn + provideHttpClient(withInterceptors([...]))
+@Injectable\(\{ *providedIn: *["']root["'] *\}\)	@Service()
+# State
+@ngrx/store	@ngrx/signals signalStore
+# SSR
+prerender: *true	ServerRoute { renderMode: RenderMode.Prerender } in app.routes.server.ts
+# Testing (zoneless + Vitest)
+fakeAsync|waitForAsync	vi.useFakeTimers() + await vi.advanceTimersByTimeAsync(ms), await fixture.whenStable()
+toBeTrue\(|toBeFalse\(	toBe(true) / toBe(false) (Jasmine matchers)
+# Tooling (pnpm everywhere)
+(^|[^p])npm (install|run|i) 	pnpm add / pnpm run

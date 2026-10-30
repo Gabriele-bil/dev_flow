@@ -1,22 +1,30 @@
 # Angular adapter (DevFlow)
 
+**Verified against:** @angular/core@22.2, @angular/cli@22.2, @angular/aria@22.2, @angular/ssr@22.2, @ngrx/signals@22.0, tailwindcss@4.3, vitest@5.0, @playwright/test@1.64 (2026-10-30)
+
 Single source of truth for Angular behavior. Pipeline skills (`devflow-plan`, `devflow-implement`, `devflow-beautify`, `devflow-test`, `devflow-pr`) **must** read `@devflow/config.md`, resolve adapter, then load this core file **plus** the `steps/<step>.md` file for the active step (see **Step files** below). Do not load step files for other steps.
 
-Baseline: **standalone + signals-first**. Keep output token-lean and imperative.
+Baseline: **standalone + signals-first + zoneless**, NgRx Signal Store for state (no `@ngrx/store`), native CSS animations (`@angular/animations` deprecated), Vitest, pnpm. Keep output token-lean and imperative.
 
-## Technology skills (load by feature type)
+## Technology skills (what each skill covers)
 
-| When | Load | |
-|------|------| |
-| App structure, folder layout, boundaries, communication flow | `@devflow/adapters/angular/skills/angular-architecture/SKILL.md` | |
-| New components, refactor existing components, template/class split | `@devflow/adapters/angular/skills/angular-component/SKILL.md` | |
-| Reactive forms, validation, form UX, submit flows | `@devflow/adapters/angular/skills/angular-forms/SKILL.md` | |
-| API clients, HttpClient usage, interceptors, error mapping | `@devflow/adapters/angular/skills/angular-http/SKILL.md` | |
-| Global and local state management patterns | `@devflow/adapters/angular/skills/angular-state/SKILL.md` | |
-| Routes, guards, resolvers, navigation, rendering strategy | `@devflow/adapters/angular/skills/angular-routing/SKILL.md` | |
-| Accessible custom widgets (Accordion, Listbox, Combobox, Menu, Tabs, Tree, Grid, Toolbar) | `@devflow/adapters/angular/skills/angular-aria/SKILL.md` | |
-| Enter/leave animations, state transitions, route transitions | `@devflow/adapters/angular/skills/angular-animations/SKILL.md` | |
-| PR review, blast radius, architecture risk checks | `@code-review-graph/skills/code-review-graph/SKILL.md` | |
+Index only. Triggers (file path / content → skill) live in `steps/implement.md` → skill load decision matrix — the single source.
+
+| Skill | Covers |
+| --- | --- |
+| `@devflow/adapters/angular/skills/angular-architecture/SKILL.md` | Folder layout, `core`/`pages`/`shared` boundaries, page → state → service flow, root wiring |
+| `@devflow/adapters/angular/skills/angular-component/SKILL.md` | Standalone components, signal inputs/outputs/`model()`, `linkedSignal`, host metadata, control flow |
+| `@devflow/adapters/angular/skills/angular-forms/SKILL.md` | Signal Forms: model, schema rules (`{ when }`), async validation, custom controls, submit |
+| `@devflow/adapters/angular/skills/angular-http/SKILL.md` | Where HTTP lives, `httpResource`/`resource`/`HttpClient` choice, interceptors, upload progress |
+| `@devflow/adapters/angular/skills/angular-state/SKILL.md` | NgRx Signal Store: global vs page stores, `rxMethod` + `tapResponse`, entities |
+| `@devflow/adapters/angular/skills/angular-routing/SKILL.md` | Routes, functional guards/resolvers, navigation, server routes / render modes, view transitions |
+| `@devflow/adapters/angular/skills/angular-aria/SKILL.md` | Accessible composite widgets via `@angular/aria` (Combobox, Listbox, Menu, Tabs, Tree, Grid, …) |
+| `@devflow/adapters/angular/skills/angular-animations/SKILL.md` | `animate.enter`/`animate.leave`, CSS transitions, JS animation libs, legacy animation migration |
+| `@devflow/adapters/angular/skills/angular-theme/SKILL.md` | Tailwind v4 theme, `src/styles/` layers, tokens, dark mode, component stylesheets, encapsulation |
+| `@devflow/adapters/angular/skills/angular-testing/SKILL.md` | Zoneless Vitest + TestBed specs, timers, router/HTTP/store tests, harnesses, Playwright conventions |
+| `@code-review-graph/skills/code-review-graph/SKILL.md` | PR review, blast radius, architecture risk checks (ship/pr steps) |
+
+Common skills loaded by matrix rows: `common-state-patterns`, `common-web-interface-guidelines`, `common-clean-code` (`@devflow/adapters/common/skills/<name>/SKILL.md`).
 
 ## MCP (when available)
 

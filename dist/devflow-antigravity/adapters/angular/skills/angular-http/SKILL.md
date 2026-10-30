@@ -5,29 +5,33 @@ description: Angular v22+ HTTP with resource(), httpResource(), HttpClient. Use 
 
 # Angular HTTP & Data Fetching
 
-## Decision Guide
+## Purpose
 
-- **`httpResource()`**: signal-based HTTP, wraps `HttpClient` with `value/error/isLoading/status` state. Default choice for HTTP GET-driven UI.
-- **`resource()`**: non-HTTP async tasks or custom fetch logic (not tied to `HttpClient`).
-- **`HttpClient`** directly: Observable pipelines/operators needed. Use `@Service()` decorator for global singleton services in v22 — replaces `@Injectable({ providedIn: 'root' })`.
+Decide where HTTP lives and which API to use (`httpResource`, `resource`, `HttpClient`) in Angular v22 services and interceptors.
 
-Full code (options, resource state, HTTP methods, request options, interceptors, error handling, loading state, DI patterns) → [references/http-patterns.md](references/http-patterns.md).
+## When NOT to Use
 
-## Interceptors
+- File matches no row of `steps/implement.md` → skill load decision matrix (no service, interceptor or API client touched).
+- Store wiring around a service call (`rxMethod`, `tapResponse`) → `angular-state`.
+- Form async validation rules → `angular-forms` (only the `validators/` placement rule lives here).
 
-Functional interceptors recommended (`HttpInterceptorFn`), registered via `provideHttpClient(withInterceptors([...]))`.
+## Rules
 
-## Notes from Angular HTTP Docs
+- **No HTTP in components or `page.ts`** — `HttpClient` and `httpResource()` both live in `service.ts`. Flow: page → state → service → HTTP (`angular-architecture`).
+- **`httpResource()`**: signal-driven GETs. Return `undefined` from the request fn to skip the call.
+- **`HttpClient`**: mutations (POST/PUT/PATCH/DELETE) and RxJS pipelines. Never `httpResource` for mutations.
+- **`resource()`**: non-HTTP async work.
+- **`@Service()`** for root singletons, instead of `@Injectable({ providedIn: 'root' })`.
+- **Interceptors**: functional `HttpInterceptorFn` + `provideHttpClient(withInterceptors([...]))`; `inject()` at top of the interceptor, never inside `catchError`.
+- **Upload progress**: `withXhr()` + `reportUploadProgress: true` (fetch backend throws). Not in SSR apps.
+- **Errors**: `catchError` inside inner `switchMap` stream; map errors to typed domain errors in the service.
 
-- Configure once with `provideHttpClient`.
-- Prefer typed request/response models.
-- Use interceptors for cross-cutting concerns (auth, logging, error mapping).
-- Test HTTP with `provideHttpClientTesting` + `HttpTestingController`.
+Detail + examples (placement, API table, interceptor, upload, testing): [references/http-patterns.md](references/http-patterns.md). Check current docs with Context7 before writing `httpResource`/`resource` options.
 
 ## I/O Reference
 
 |            |                                                                   |
 | ---------- | ----------------------------------------------------------------- |
-| Reads      | Active HTTP/service files, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/ADAPTER.md` |
-| Writes     | New or refactored Angular HTTP resource and service files         |
+| Reads      | Active HTTP/service/interceptor files, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/ADAPTER.md` |
+| Writes     | New or refactored Angular HTTP services and interceptors          |
 | Invoked by | `devflow.implement`, `devflow.beautify`                           |

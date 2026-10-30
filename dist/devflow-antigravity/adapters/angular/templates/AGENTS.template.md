@@ -6,28 +6,28 @@
 
 <!-- devflow-managed:start:rules -->
 - Read `constitution.md` and `registry.md` before planning.
-- Load `angular-architecture` when work touches structure, boundaries, or page layout.
-- Respect boundaries: `core` (singleton infra), `pages` (feature domain), `shared` (cross-feature reuse).
-- State standard: Signal Store only (global + local). Do not add NgRx artifacts.
-- Load specialized skills by scope: component, forms, http, state, routing, aria, animations.
-- Routing: functional guards/resolvers only (`CanActivateFn`/`CanMatchFn`/`ResolveFn`); load `angular-routing` for `*.routes.ts`, guard/resolver, navigation work.
-- Accessible custom widgets: use `@angular/aria` headless directives (`ng*`), never native `<select>`/`<input list>`; load `angular-aria`.
-- Animations: native CSS `animate.enter`/`animate.leave` default (v20.2+); load `angular-animations` for enter/leave or route-transition work.
+- Respect boundaries: `core` (singleton infra), `pages` (feature domain), `shared` (cross-feature reuse). Flow: page → state → service → HTTP.
+- No HTTP in components: `HttpClient` and `httpResource()` live in `service.ts`.
+- State: NgRx Signal Store only (global + page). Do not use `@ngrx/store` (actions/reducers/effects/selectors).
+- Routing: functional guards/resolvers only (`CanActivateFn`/`CanMatchFn`/`ResolveFn`).
+- Accessible custom widgets: `@angular/aria` headless directives (`ng*`), never native `<select>`/`<input list>` for those patterns.
+- Animations: native CSS `animate.enter`/`animate.leave`; `@angular/animations` is deprecated — do not use it.
 - Run quality commands after edit batches: `pnpm run lint`, `pnpm run test -- --watch=false`, `pnpm run build`.
 - Required MCP baseline: {{mcp-baseline}}
 <!-- devflow-managed:end:rules -->
 
 <!-- devflow-managed:start:skills -->
-@devflow/skills/devflow-task/SKILL.md
-@devflow/skills/devflow-plan/SKILL.md
-@devflow/skills/devflow-implement/SKILL.md
-@devflow/adapters/angular/skills/angular-architecture/SKILL.md
-@devflow/adapters/angular/skills/angular-component/SKILL.md
-@devflow/adapters/angular/skills/angular-forms/SKILL.md
-@devflow/adapters/angular/skills/angular-http/SKILL.md
-@devflow/adapters/angular/skills/angular-state/SKILL.md
-@devflow/adapters/angular/skills/angular-routing/SKILL.md
-@devflow/adapters/angular/skills/angular-aria/SKILL.md
-@devflow/adapters/angular/skills/angular-animations/SKILL.md
-@code-review-graph/skills/code-review-graph/SKILL.md
+Read a skill only when the work touches its files (full matrix: `@devflow/adapters/angular/steps/implement.md`):
+
+- Barrels, `app.config*.ts`, new page/core folders, boundary moves → `angular-architecture`
+- `@Component`/`@Directive`/`@Pipe` files, templates → `angular-component`
+- `service.ts`, interceptors, `HttpClient`/`httpResource` → `angular-http`
+- Signal Forms, `validators/**` → `angular-forms`
+- `state.ts`, `*.store.ts`, `core/states/**` → `angular-state`
+- `*.routes.ts`, `app.routes.server.ts`, guards, resolvers → `angular-routing`
+- `@angular/aria` imports, custom select/menu/tabs/tree → `angular-aria`
+- `animate.enter`/`animate.leave`, transitions, legacy animation migration → `angular-animations`
+- `src/styles.css`, `src/styles/**`, component stylesheets, tokens → `angular-theme`
+- `*.spec.ts`, harnesses → `angular-testing`
+- Pipeline steps: `/devflow-task`, `/devflow-plan`, `/devflow-implement` — invoked on demand, not imported
 <!-- devflow-managed:end:skills -->

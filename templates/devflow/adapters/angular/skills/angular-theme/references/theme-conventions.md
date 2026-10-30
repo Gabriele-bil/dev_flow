@@ -2,16 +2,37 @@
 
 Loaded on demand from `../SKILL.md`.
 
-## 3) Component styling rules
+## Tailwind v4 entry
 
-- Do not write long Tailwind utility chains in templates.
-- Create semantic component class in CSS.
-- Apply utilities with `@apply` inside CSS class.
-- Add `@reference "#styles.css";` in each component stylesheet.
-
-Example:
+PostCSS: `.postcssrc.json` → `{ "plugins": { "@tailwindcss/postcss": {} } }`. No `tailwind.config.js`.
 
 ```css
+/* src/styles.css */
+@import "tailwindcss";
+@import "./styles/theme.css";
+@import "./styles/components.css";
+@import "./styles/utilities.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-primary-600: oklch(0.55 0.2 263);
+  --font-display: "Inter", sans-serif;
+}
+```
+
+Migrating v3: move `theme.extend` into `@theme` variables, replace `@tailwind base/components/utilities` with the single `@import`, delete `tailwind.config.js`.
+
+## Component stylesheets
+
+Component CSS is compiled separately — it sees tokens and `@apply` only through `@reference`. Alias once in `package.json`:
+
+```json
+{ "imports": { "#styles.css": "./src/styles.css" } }
+```
+
+```css
+/* user-card.css */
 @reference "#styles.css";
 
 .btn-primary {
@@ -24,25 +45,4 @@ Example:
 <button class="btn-primary">Save</button>
 ```
 
-## 5) Tailwind v4 conventions
-
-- Entry point uses `@import "tailwindcss";` — NOT legacy `@tailwind base; @tailwind components; @tailwind utilities;`.
-- No `tailwind.config.js`. Config is CSS-first via `@theme` blocks + PostCSS (`.postcssrc.json` + `@tailwindcss/postcss`).
-- Theme as CSS variables — define design tokens in `@theme`, consume as `var(--color-primary-600)` or Tailwind utilities that reference them.
-
-```css
-/* src/styles.css */
-@import "tailwindcss";
-
-@theme {
-  --color-primary-600: oklch(0.55 0.2 263);
-  --font-display: "Inter", sans-serif;
-}
-```
-
-```json
-// .postcssrc.json
-{ "plugins": { "@tailwindcss/postcss": {} } }
-```
-
-Migrating an existing v3 project: drop `tailwind.config.js`, move `theme.extend` values into `@theme` as CSS custom properties, replace `@tailwind` directives with the single `@import`.
+Simple token reads need no `@apply`: `color: var(--color-primary-600);`.

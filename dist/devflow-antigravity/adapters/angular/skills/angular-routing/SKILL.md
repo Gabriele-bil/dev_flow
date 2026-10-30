@@ -5,11 +5,19 @@ description: Angular v22+ routing — routes, guards, resolvers, navigation, SSR
 
 # Angular Routing
 
-Configure routes, protect/prefetch with guards and resolvers, navigate, pick rendering strategy. Functional style only — no class-based guards/resolvers.
+## Purpose
+
+Configure routes, functional guards/resolvers, navigation and per-route render mode (CSR / SSG / SSR) for Angular v22.
+
+## When NOT to Use
+
+- File matches no row of `steps/implement.md` → skill load decision matrix (no `*.routes.ts`, guard, resolver or navigation code touched).
+- Element enter/leave animations → `angular-animations` (route transitions stay here).
+- Data loading inside a page → `angular-http` / `angular-state` (resolvers only when navigation must wait).
 
 ## Route Definition
 
-Root routes: `src/app/app.routes.ts`. Page-domain routes: colocate per feature, import into root.
+Root routes: `src/app/app.routes.ts`. Page-domain routes: colocated `*.routes.ts`, imported via `loadChildren`.
 
 ```typescript
 import { Routes } from "@angular/router";
@@ -17,70 +25,51 @@ import { Routes } from "@angular/router";
 export const routes: Routes = [
   { path: "", redirectTo: "dashboard", pathMatch: "full" },
   { path: "dashboard", loadComponent: () => import("./pages/dashboard/page").then((m) => m.DashboardPage) },
-  { path: "users/:id", loadComponent: () => import("./pages/user-detail/page").then((m) => m.UserDetailPage) },
-  { path: "admin", loadChildren: () => import("./pages/admin/admin.routes").then((m) => m.adminRoutes) },
+  { path: "admin", canMatch: [adminGuard], loadChildren: () => import("./pages/admin/admin.routes").then((m) => m.adminRoutes) },
   { path: "**", loadComponent: () => import("./pages/not-found/page").then((m) => m.NotFoundPage) },
 ];
 ```
 
-Order: specific paths before generic, wildcard `**` last. `loadComponent`/`loadChildren` default for non-landing routes — minimize initial bundle.
+Specific paths before generic, `**` last. `loadComponent`/`loadChildren` for every non-landing route.
 
-## Functional Guards
+## Functional Guards and Resolvers
 
-Use functional guards (`CanActivateFn`, `CanMatchFn`, `CanDeactivateFn`). Do NOT use class-based guards.
+Functional only (`CanActivateFn`, `CanMatchFn`, `CanDeactivateFn`, `ResolveFn`). Do not use class-based guards/resolvers. Place in `core/guards`, `core/resolvers`.
 
 ```typescript
-import { inject } from "@angular/core";
-import { CanActivateFn, Router } from "@angular/router";
-
 export const authGuard: CanActivateFn = (route, state) => {
   const auth = inject(AuthStore);
   const router = inject(Router);
-
-  if (auth.isAuthenticated()) return true;
-  return router.createUrlTree(["/login"], { queryParams: { redirect: state.url } });
+  return auth.isAuthenticated() || router.createUrlTree(["/login"], { queryParams: { redirect: state.url } });
 };
 ```
 
-```typescript
-// Feature-flag gating with CanMatch — runs before lazy chunk loads
-export const betaFeatureGuard: CanMatchFn = () => {
-  const flags = inject(FeatureFlagsStore);
-  return flags.betaEnabled() || new RedirectCommand(inject(Router).parseUrl("/"));
-};
-```
-
-Place guards in `core/guards`. Return `boolean | UrlTree | RedirectCommand` (sync or async).
-
-## Reference detail
-
-Detail for Resolvers, Outlets, Router Lifecycle, Rendering Strategy, Route Transition Animations: [references/routing-patterns.md](references/routing-patterns.md) — load when touching those areas.
+- `CanMatchFn` for feature flags/roles — runs before the lazy chunk loads.
+- Return `boolean | UrlTree | RedirectCommand` (sync, Promise or Observable).
+- Resolved data → component `input()` via `withComponentInputBinding()`; do not read `ActivatedRoute.data` by hand.
 
 ## Navigation
 
-```html
-<!-- Declarative -->
-<a [routerLink]="['/users', user.id()]" routerLinkActive="active">{{ user.name() }}</a>
-<nav>
-  <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Dashboard</a>
-</nav>
-```
+`RouterLink` + `routerLinkActive` for declarative links; `Router.navigate()` only after an action (submit, guard result). Relative: `{ relativeTo: inject(ActivatedRoute) }`.
 
-```typescript
-// Programmatic
-private router = inject(Router);
+## Rendering Strategy
 
-goToUser(id: string) {
-  this.router.navigate(["/users", id], { queryParams: { tab: "profile" } });
-}
-```
+| Route kind | Render mode |
+| --- | --- |
+| Authenticated app / dashboard | `RenderMode.Client` |
+| Marketing / content, stable data | `RenderMode.Prerender` |
+| SEO-critical + dynamic data | `RenderMode.Server` + `provideClientHydration(withEventReplay())` |
 
-Prefer `RouterLink` for declarative nav, `Router.navigate()` for conditional/post-action nav.
+Set per route in `app.routes.server.ts` (`ServerRoute[]`), wired with `provideServerRendering(withRoutes(serverRoutes))`. Detail: [references/routing-patterns.md](references/routing-patterns.md).
+
+## Reference detail
+
+CanDeactivate, resolver errors, outlets, router events, render modes, view transitions: [references/routing-patterns.md](references/routing-patterns.md).
 
 ## I/O Reference
 
 |            |                                                                  |
 | ---------- | ---------------------------------------------------------------- |
-| Reads      | Active route/guard/resolver files, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/ADAPTER.md` |
-| Writes     | New or refactored route config, guard, resolver, navigation files |
+| Reads      | Active route/guard/resolver files, `app.routes.server.ts`, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/angular/ADAPTER.md` |
+| Writes     | New or refactored route config, guard, resolver, server route, navigation files |
 | Invoked by | `devflow.implement`, `devflow.beautify`                          |

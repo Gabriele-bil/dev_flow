@@ -5,34 +5,29 @@ description: Angular NgRx Signal Store — withState, withComputed, withMethods,
 
 # Angular State with NgRx Signal Store
 
-Build state with `signalStore`. Keep store explicit, typed, feature-focused.
+## Purpose
+
+Build global and page state with `@ngrx/signals` `signalStore` — explicit, typed, feature-scoped.
+
+## When NOT to Use
+
+- File matches no row of `steps/implement.md` → skill load decision matrix (no store, state or facade file touched).
+- Form state → `angular-forms` (model signal is the form state).
+- Choosing state scope across stacks → `common-state-patterns`; HTTP calls themselves → `angular-http`.
 
 ## Store Rules
 
-- Use Signal Store for global (`providedIn: 'root'`) and local stores.
-- Store called by pages/components. Services called by store, not by template.
-- Define state interface in same store file.
-- Define `initialState` constant in same store file.
+- Signal Store is the only state library. Do not use `@ngrx/store` (actions/reducers/effects/selectors) or `@ngrx/component-store`.
+- Global: `signalStore({ providedIn: 'root' }, …)` in `core/states`. Page: `pages/<page>/state.ts`, provided on `page.ts`.
+- Pages/components call the store; the store calls services. Templates never call services.
+- State interface + `initialState` constant in the store file.
 - Async flows always track `loading`, `error`, `value`.
-- Register services/dependencies in `withProps`.
-- Put derived state in `withComputed`.
-- Put mutation/commands in `withMethods`.
-- Use `rxMethod` for HTTP/service observable flows.
-- Use `tapResponse` from `@ngrx/operators` for `next/error/finalize`.
-- When store file grows too much, extract pure helpers to `utils` in feature folder.
-- For entity CRUD, use `withEntities` + entity updaters.
+- Dependencies in `withProps`; derived state in `withComputed`; commands in `withMethods`.
+- `rxMethod` for Observable flows, `tapResponse` from `@ngrx/operators` (`next`/`error`/`finalize`) inside the inner stream.
+- Entity CRUD → `withEntities` + entity updaters.
+- Growing store → pure helpers to page `utils/`, or `signalStoreFeature` split.
 
-Full store examples (base structure, global vs local, async `rxMethod`, entity CRUD, pure helpers, advanced composition) → [references/state-patterns.md](references/state-patterns.md).
-
-## Checklist
-
-- State interface + `initialState` in same file
-- `withProps` for deps
-- `withComputed` for derived values
-- `withMethods` for commands/mutations
-- Async always `loading/error/value`
-- `rxMethod` + `tapResponse` for HTTP flows
-- `withEntities` for entity CRUD
+Examples (base store, scope table, entities, testing with `unprotected`): [references/state-patterns.md](references/state-patterns.md).
 
 ## I/O Reference
 

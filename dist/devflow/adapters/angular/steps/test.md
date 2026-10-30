@@ -13,20 +13,21 @@ Any feature leaving public surfaces below this threshold must be called out expl
 ### Placement
 
 - Unit: colocated `*.spec.ts` or mirrored under `src/` by project convention.
-- Integration: feature-level flows in project’s selected framework (Angular TestBed / Cypress / Playwright).
+- Integration: feature-level TestBed specs (page + store + mocked HTTP), conventions in `angular-testing`.
+- E2E: Playwright specs in `e2e/` (`@playwright/test`, installed by setup).
 
 ### Commands
 
 Use project scripts first:
 
 ```bash
-npm run test -- --watch=false
+pnpm run test -- --watch=false
 ```
 
 If e2e exists:
 
 ```bash
-npm run e2e
+pnpm run e2e
 ```
 
 ### Required test focus
@@ -41,15 +42,15 @@ npm run e2e
 Level-4 goal-backward verification targets (`devflow.test` Step 6b):
 
 - **Level 4a (Services / HTTP):** Run integration tests covering HTTP and state layer.
-- **Level 4b (UI / Browser Workflow):** When project defines e2e (Cypress/Playwright), run specs covering the AC:
+- **Level 4b (UI / Browser Workflow):** When project defines Playwright e2e, run specs covering the AC:
 
 ```bash
-npm run e2e -- --grep "[feature-name]"
+pnpm run e2e -- --grep "[feature-name]"
 ```
 
 When running in an agentic environment with browser tools (e.g. `browser_subagent`):
 
-1. Start or verify dev server is running (`npm start` / `ng serve`).
+1. Start or verify dev server is running (`pnpm start` / `ng serve`).
 2. Navigate to feature route; verify component mounts without runtime console errors.
 3. Perform user flow (reactive form submission, route transition, state change).
 4. Verify expected DOM elements appear with correct accessibility semantics.

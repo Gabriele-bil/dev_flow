@@ -11,14 +11,14 @@ Same as implement pipeline: `lint`, `test`, `build`.
 Profile only when the plan calls out performance or a **Critical**-severity hotspot is flagged:
 
 - Use Angular DevTools (Component profiler, Change detection cycles) before refactoring rendering performance.
-- Investigate excessive change-detection cycles by checking signal/Observable scope before adding `OnPush` or `trackBy`.
+- Investigate excessive change-detection cycles: components set to `ChangeDetectionStrategy.Eager`, `@for` with a weak `track` expression, broad signal/Observable reads.
 - Heavy computation in templates or services called on every render cycle — move to computed signals or memoized pipes.
 
 Default beautify relies on heuristics (avoid unnecessary recalculations in getters, narrow RxJS subscriptions, avoid `combineLatest` with broad streams). Profile only when warranted.
 
 ### Beautify: Angular-specific review axes
 
-Apply core `devflow-beautify` axes, then evaluate touched code with relevant Angular skills:
+Apply core `devflow-beautify` axes, then evaluate touched code with the skills its files match in `steps/implement.md` → skill load decision matrix:
 
 - `angular-architecture`
 - `angular-component`
@@ -28,6 +28,7 @@ Apply core `devflow-beautify` axes, then evaluate touched code with relevant Ang
 - `angular-routing`
 - `angular-aria`
 - `angular-animations`
+- `angular-theme`
 
 ### Beautify: accessibility checks
 

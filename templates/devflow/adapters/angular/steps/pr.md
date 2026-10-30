@@ -7,9 +7,9 @@ Loaded by `devflow-pr` together with the adapter core (`ADAPTER.md`).
 Before push:
 
 ```bash
-npm run lint
-npm run test -- --watch=false
-npm run build
+pnpm run lint
+pnpm run test -- --watch=false
+pnpm run build
 ```
 
 ### PR body checklist (copy into PR description)
