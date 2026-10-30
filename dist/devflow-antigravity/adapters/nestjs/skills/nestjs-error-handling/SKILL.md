@@ -1,66 +1,33 @@
 ---
 name: nestjs-error-handling
-description: HTTP exceptions, exception filters, async error handling, structured logging. Load when creating or refactoring *.filter.ts, catch blocks, event handlers, scheduled tasks, or any file that throws/logs errors.
+description: HTTP exceptions, exception filters, async error handling in event/cron handlers, structured logging. Load when creating or refactoring *.filter.ts, catch blocks, event handlers, scheduled tasks, or any file that throws/logs errors.
 ---
 
 # Skill: NestJS Error Handling
 
-Use when writing service error paths, exception filters, async event/cron handlers, or structured logging.
+## Purpose
 
-Full code examples: `references/error-handling-patterns.md`.
+Project rules for throwing, mapping and logging errors so every response has one shape and no rejection crashes the process. Examples: `references/error-handling-patterns.md`.
 
 ## When NOT to Use
 
-- File does not match trigger pattern in `ADAPTER.md` (no error throwing/catching/logging)
-- Pure validation-shape work with no error path — use `nestjs-security` (class-validator DTOs)
+- File matches no row of `steps/implement.md` → skill load decision matrix that names `nestjs-error-handling`
+- Validation rules for request input — use `nestjs-security` / `nestjs-api-design`
+- RPC/event-transport errors between services — use `nestjs-microservices`
 
-## Objectives
+## Rules
 
-- Services throw `HttpException` subclasses directly — controllers stay thin.
-- Every response error shape centralized in exception filters, never formatted ad hoc in a controller.
-- Async errors (event handlers, `@Cron`, fire-and-forget promises) always explicitly handled — unhandled rejections crash the process.
-- Structured JSON logging via NestJS `Logger` (or Pino) with context — never `console.log`.
-
-## 1) Throw HTTP Exceptions from Services (HIGH)
-
-Services throw `NotFoundException`, `ConflictException`, etc. directly instead of returning `{ error }` objects for the controller to translate. Keeps controllers thin: `return this.usersService.findById(id)` — no manual `if (result.error)` branching. For layer-agnostic services, throw a domain exception and map it to HTTP status in a dedicated `@Catch(DomainException)` filter.
-
-## 2) Use Exception Filters (HIGH)
-
-Never `try/catch` + manually `res.status().json()` inside a controller. Register:
-
-- Domain-specific filters (`@Catch(DomainException)`) for expected error families.
-- One global `@Catch()` filter (`AllExceptionsFilter`) as the fallback — logs the exception, derives status from `HttpException.getStatus()` (500 otherwise), returns a consistent `{ statusCode, message, timestamp, path }` shape.
-
-Register via `APP_FILTER` provider (module-scoped, DI-aware) or `app.useGlobalFilters()` in `main.ts`.
-
-## 3) Handle Async Errors Explicitly (HIGH)
-
-NestJS only auto-catches errors from awaited route-handler promises. These do NOT get automatic handling and crash the process on rejection:
-
-- Fire-and-forget calls (`this.emailService.sendWelcome(...)` without `await` or `.catch()`)
-- `@OnEvent()` handlers that call an async function without `await`/`try-catch`
-- `@Cron()` tasks without `try-catch`
-
-Fix: `.catch(err => logger.error(...))` on fire-and-forget promises; `try/catch` inside every `@OnEvent`/`@Cron` handler body (never rethrow — that crashes the process, dead-letter-queue or log instead); register `process.on('unhandledRejection', ...)` and `process.on('uncaughtException', ...)` in `main.ts` as a last-resort safety net.
-
-## 4) Structured Logging (MEDIUM-HIGH)
-
-`new Logger(ClassName.name)` per class, never `console.log`. Log with context objects (`this.logger.error('msg', error.stack, { userId })`), never string concatenation. Never log secrets (passwords, tokens) — redact in Pino config (`redact: ['req.headers.authorization']`) if using `nestjs-pino`. Attach request-scoped context (request ID, user ID) via `nestjs-cls` middleware so every log line in a request is traceable together.
-
-## Error Handling Checklist
-
-- [ ] No `{ error: string }` return shape from a service — throw instead
-- [ ] No manual `try/catch` + `res.json()` in a controller — use exception filters
-- [ ] One global `AllExceptionsFilter` registered (`APP_FILTER` or `useGlobalFilters`)
-- [ ] Every `@OnEvent`/`@Cron` handler wraps its body in `try/catch`, never rethrows
-- [ ] Fire-and-forget promises have `.catch()`
-- [ ] No `console.log`/`console.error` — `Logger` only, no secrets in log payloads
+1. **Services throw, never return `{ error }`.** Throw `HttpException` subclasses (`NotFoundException`, `ConflictException`, …); controllers stay `return this.service.x()`. Layer-agnostic services throw a domain error mapped to HTTP in a `@Catch(DomainError)` filter.
+2. **One error shape, set by filters.** Never `try/catch` + `res.status().json()` in a controller. One global `@Catch()` filter (registered via `APP_FILTER` so it gets DI) logs and returns `{ statusCode, message, code?, timestamp, path }` — or RFC 7807 if `constitution.md` says so. Domain filters only for expected error families.
+3. **No internals in responses.** Unknown errors → `500` with a generic message; stack, SQL, paths only in logs.
+4. **Async outside the request is on you.** Nest catches only awaited handler promises. Fire-and-forget → `.catch(log)`. Every `@OnEvent` / `@Cron` / queue callback body → `try/catch`, log, dead-letter or retry; never rethrow.
+5. **Logger, not console.** `private readonly logger = new Logger(Cls.name)` per class — `Logger` is instantiated, never injected as a provider. Log context objects, not concatenated strings. Never log secrets; with `nestjs-pino` set `redact` for `authorization` and password fields.
+6. **Correlate.** Request id from `nestjs-cls` (`generateId: true`) on every log line and in the error body.
 
 ## I/O Reference
 
 | | |
 | --- | --- |
-| Invoked by | `devflow-implement` when file path matches `*.filter.ts`, or content has `catch`/`@OnEvent`/`@Cron`/`Logger`/`throw` |
-| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nestjs/ADAPTER.md` |
-| Related | `nestjs-api-design` (RFC7807-style error response shape), `nestjs-security` (input validation errors) |
+| Invoked by | `devflow-implement` / `devflow-beautify` per `steps/implement.md` → skill load decision matrix |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nestjs/ADAPTER.md`, `references/error-handling-patterns.md` |
+| Related | `nestjs-api-design` (consumer-facing error contract), `nestjs-architecture` (`nestjs-cls`) |

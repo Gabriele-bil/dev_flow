@@ -1,0 +1,35 @@
+# NestJS adapter — banned APIs. Format: <extended regex><TAB><use instead>. Checked by scripts/validate-adapters.sh
+# against every .md in this adapter; a hit passes only when the same line says why (removed / deprecated / instead / do not use).
+
+# NestJS 12 core
+helmet\(	app.useSecurityHeaders() (Nest 12 built-in, Helmet 8 defaults)
+csurf	app.enableCsrfProtection() (Nest 12 built-in, Fetch-Metadata/Origin check)
+@(Body|Query|Param)\([A-Za-z]+Schema\)	@Body({ schema: x }) + StandardSchemaValidationPipe
+process\.on\(['"]SIG(TERM|INT)	app.enableShutdownHooks() + TerminusModule.forRoot({ gracefulShutdownTimeoutMs }); Nest 12 drains in-flight requests
+swaggerUiEnabled	SwaggerCustomOptions.ui (@nestjs/swagger 12)
+# Express v5 routes
+:[A-Za-z_]+\?['"/]	optional segment in braces: users{/:id}
+# Terminus 12
+HealthCheckError	HealthIndicatorService.check(key) → indicator.up()/down()
+extends HealthIndicator([^S]|$)	inject HealthIndicatorService; return indicator.up()/down()
+pingCheck\([^)]*timeout	.pingCheck(key).withTimeout(ms)
+# BullMQ 6 / @nestjs/bullmq
+@nestjs/bull([^m]|$)	@nestjs/bullmq + WorkerHost
+@Process\(	@Processor class extends WorkerHost, process(job) branching on job.name
+repeat:[[:space:]]*\{	queue.upsertJobScheduler(id, { pattern | every }, template)
+getRepeatableJobs|removeRepeatable	getJobSchedulers() / removeJobScheduler(id)
+# TypeORM 1
+findByIds\(	findBy({ id: In(ids) })
+findOneById\(	findOneBy({ id })
+@EntityRepository|getCustomRepository	extend Repository<T> / wrap it in <feature>.repository.ts
+(createConnection|getConnection|getManager)\(	inject DataSource (@nestjs/typeorm)
+relations:[[:space:]]*\[	relations: { rel: true } (object form)
+select:[[:space:]]*\[	select: { col: true } (object form, find options)
+\.exist\(	.exists()
+# Prisma 7
+prisma-client-js	generator provider = "prisma-client" with output
+from ['"]@prisma/client['"]	import { PrismaClient } from the generated output path (…/generated/prisma/client)
+\$use\(	$extends({ query: … })
+# Jest 30 / RxJS
+--testPathPattern([^s]|$)	--testPathPatterns
+\.toPromise\(	firstValueFrom() / lastValueFrom()
