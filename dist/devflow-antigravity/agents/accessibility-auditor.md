@@ -1,5 +1,6 @@
 ---
 subagent: true
+tools: [view_file, grep_search, find_by_name, list_dir, run_command]
 name: accessibility-auditor
 description: Accessibility engineer perspective on WCAG 2.1 AA compliance. Five-axis audit across keyboard/focus, screen readers, visual contrast, touch targets, and forms. Use before merge or via devflow.ship fan-out.
 ---

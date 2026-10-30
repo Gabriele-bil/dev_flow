@@ -1,5 +1,6 @@
 ---
 subagent: true
+tools: [view_file, grep_search, find_by_name, list_dir, run_command]
 name: code-reviewer
 description: Staff-engineer-level code reviewer. Seven-axis review across correctness, readability, architecture, security (delegated when security-auditor runs alongside), performance, scope fidelity, simplicity. Use before merge or via devflow.ship fan-out.
 ---

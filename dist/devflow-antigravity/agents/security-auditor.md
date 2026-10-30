@@ -1,5 +1,6 @@
 ---
 subagent: true
+tools: [view_file, grep_search, find_by_name, list_dir, run_command]
 name: security-auditor
 description: Security engineer focused on exploitable vulnerabilities, threat modeling, and secure coding. Use for security-focused review or via devflow.ship fan-out.
 ---

@@ -13,7 +13,8 @@
 #     contiene il nome evento) e gira dalla radice del plugin (cwd di agy).
 #   - niente commands/: agy non carica comandi; le skill sono già slash command.
 #   - frontmatter: via i campi solo-Claude Code da skill e agenti;
-#     disable-model-invocation resta: agy 1.4.9 lo rispetta (non documentato).
+#     disable-model-invocation resta: agy 1.4.9 lo rispetta (non documentato);
+#     `tools` degli agenti tradotto nella lista di tool ammessi di agy.
 #   - rules/: orientamento statico (agy non inietta contesto da SessionStart).
 #   - ${CLAUDE_PLUGIN_ROOT} nelle skill → percorso di staging di agy.
 set -euo pipefail
@@ -118,13 +119,52 @@ USER_ONLY_CC="$(grep -l '^disable-model-invocation: true' "$DIST_DIR"/skills/*/S
 USER_ONLY_AGY="$(grep -l '^disable-model-invocation: true' "$AGY_DIR"/skills/*/SKILL.md | wc -l | tr -d ' ')"
 [ "$USER_ONLY_CC" = "$USER_ONLY_AGY" ] || fail "disable-model-invocation perso: $USER_ONLY_CC skill in Claude Code, $USER_ONLY_AGY in Antigravity"
 
+# agy_tools "Read, Grep, Bash" → "[view_file, grep_search, run_command]".
+# In agy `tools` è una lista di tool ammessi (verificato su agy 1.4.10: un agente
+# con [view_file, run_command] non ha tool di scrittura), quindi i revisori di
+# ship restano in sola lettura come su Claude Code; disallowedTools non serve.
+agy_tools() {
+  local out="" t m
+  for t in $(printf '%s' "$1" | tr ',[]' '   '); do
+    case "$t" in
+      Read) m="view_file" ;;
+      Grep) m="grep_search" ;;
+      Glob) m="find_by_name list_dir" ;;
+      Bash) m="run_command" ;;
+      Write) m="write_to_file" ;;
+      Edit|MultiEdit) m="replace_file_content multi_replace_file_content" ;;
+      WebFetch) m="read_url_content" ;;
+      WebSearch) m="search_web" ;;
+      Agent|Task) m="invoke_subagent" ;;
+      *) return 1 ;;
+    esac
+    out="$out $m"
+  done
+  printf '[%s]' "$(printf '%s\n' $out | awk '!seen[$0]++' | paste -sd, - | sed 's/,/, /g')"
+}
+
 for f in "$AGY_DIR"/agents/*.md; do
   [ -f "$f" ] || continue
+  CC_TOOLS="$(awk 'NR > 1 && /^---$/ { exit } /^tools:/ { sub(/^tools:[[:space:]]*/, ""); print }' "$f")"
   strip_frontmatter_keys "$f" tools disallowedTools model
-  # Subagente invocabile via invoke_subagent; tool di default dell'host
-  awk 'NR == 1 && $0 == "---" { print; print "subagent: true"; next } { print }' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+  TOOLS_LINE=""
+  if [ -n "$CC_TOOLS" ]; then
+    AGY_TOOLS="$(agy_tools "$CC_TOOLS")" || fail "$(basename "$f"): tool senza equivalente agy in '$CC_TOOLS' — aggiungerlo ad agy_tools"
+    TOOLS_LINE="tools: $AGY_TOOLS"
+  fi
+  # Subagente invocabile via invoke_subagent, con gli stessi tool di Claude Code
+  awk -v t="$TOOLS_LINE" 'NR == 1 && $0 == "---" { print; print "subagent: true"; if (t != "") print t; next } { print }' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
 done
-ok "Campi solo-Claude Code rimossi"
+# Un agente senza Write/Edit su Claude Code non deve averli su Antigravity
+for f in "$DIST_DIR"/agents/*.md; do
+  [ -f "$f" ] || continue
+  if awk 'NR > 1 && /^---$/ { exit } /^disallowedTools:/ && /Write/' "$f" | grep -q .; then
+    grep -qE '^tools: .*(write_to_file|replace_file_content)' "$AGY_DIR/agents/$(basename "$f")" \
+      && fail "$(basename "$f"): tool di scrittura nel build Antigravity"
+    grep -q '^tools: \[' "$AGY_DIR/agents/$(basename "$f")" || fail "$(basename "$f"): tools mancante nel build Antigravity (l'agente avrebbe i tool di scrittura di default)"
+  fi
+done
+ok "Campi solo-Claude Code rimossi, tools degli agenti tradotti"
 
 # Percorsi del plugin: agy installa in una cartella fissa, quindi anche i file
 # letti con Read possono usare il percorso assoluto e la nota "Plugin root"

@@ -1,5 +1,6 @@
 ---
 subagent: true
+tools: [view_file, grep_search, find_by_name, list_dir, run_command]
 name: docs-reviewer
 description: Documentation engineer perspective on doc coverage, accuracy, and drift. Five-axis review across public API coverage, signature accuracy, examples, README/CHANGELOG sync, and plan traceability. Use before merge or via devflow.ship fan-out.
 ---

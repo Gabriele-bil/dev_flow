@@ -1,5 +1,6 @@
 ---
 subagent: true
+tools: [view_file, grep_search, find_by_name, list_dir, run_command]
 name: test-engineer
 description: QA engineer focused on test strategy, coverage gap analysis, and test quality. Use for coverage review, test design, or via devflow.ship fan-out.
 ---

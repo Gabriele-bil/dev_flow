@@ -182,7 +182,7 @@ Su Antigravity le 15 skill con `disable-model-invocation: true`, tra cui pr, rol
 3. Accorciare le descrizioni di queste skill, che su Antigravity costano in ogni sessione.
 
 <a id="agy-2"></a>
-#### AGY-2 🟠 `AGY` Revisori in sola lettura solo sulla carta
+#### AGY-2 🟠 ✅ `AGY` Revisori in sola lettura solo sulla carta
 
 I revisori di ship girano in parallelo sullo stesso albero di lavoro. Su Claude Code `tools` e `disallowedTools` lo rendono sicuro, su Antigravity no.
 

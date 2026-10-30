@@ -183,7 +183,7 @@ DevFlow ships one build per host, generated from the same source: [`dist/devflow
 | --- | --- | --- |
 | Pipeline skills, adapters, references | ✅ | ✅ (skills are slash commands; `commands/` not shipped) |
 | User-only skills (`disable-model-invocation`: pr, rollback, ship, auto, …) | ✅ run only on `/` | ✅ run only on `/` (honored by agy 1.4.9) |
-| Review subagents (`agents/`) | ✅ read-only tools, `model: sonnet` | ✅ host default tools/model (read-only rule in prompt) |
+| Review subagents (`agents/`) | ✅ read-only tools, `model: sonnet` | ✅ read-only tools (`tools` translated to agy's allowlist, verified on agy 1.4.10), host default model |
 | Destructive-command / config-protect / scope guards | ✅ | ✅ (`run_command`, file-write tools) |
 | Observe log, instincts, churn learning | ✅ | ✅ |
 | Format + typecheck on Stop, debug-print check | ✅ (shown as `systemMessage`) | ✅ (results in the agy log only) |
