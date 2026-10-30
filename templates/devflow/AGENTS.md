@@ -33,7 +33,7 @@ Bracketed steps optional. Each step has a strict input contract; status lives in
 | Stuck, `blocked`, or inconsistent state | `devflow.recovery` | — |
 | Urgent bugfix | `devflow.hotfix` | small, root cause known |
 
-Active feature without explicit argument → `references/state-machine.md` → **Active feature resolution**. Session orientation → `references/orientation.md`.
+Active feature without explicit argument → `bash scripts/devflow-state.sh resolve` (rules: `references/state-machine.md` → **Active feature resolution**); status writes → `scripts/devflow-state.sh set`. Session orientation → `references/orientation.md`.
 
 ## Orchestration
 

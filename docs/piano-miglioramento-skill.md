@@ -352,7 +352,7 @@ Il problema si ripresenterà alla prossima minor. Proposta:
 ## 4. Token
 
 <a id="t-1"></a>
-### T-1 🔴 Stato gestito da script, non da prosa
+### T-1 🔴 ✅ Stato gestito da script, non da prosa
 
 `references/state-machine.md` (15 KB) viene letto da 17 skill per eseguire il frammento jq di aggiornamento e il resolver della feature attiva. Il checkpoint "append" è composto a mano in jq.
 

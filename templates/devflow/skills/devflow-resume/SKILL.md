@@ -37,7 +37,7 @@ Both absent → stop: "Nothing to resume. Start with `/devflow.task` (or `/devfl
 
 ### Step 1 — Read saved state
 
-Resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution** (explicit argument → state `.feature // .active_feature` → lowest open feature → ask). Read its `plan.md` `**Status:**`, map to `next_step` via the status table. State file (`plan_status`, `next_step`, `pending_files`) = hint only — Step 2 cross-checks it.
+Resolve feature with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask) (explicit argument → state `.feature // .active_feature` → lowest open feature → ask). Read its `plan.md` `**Status:**`, map to `next_step` via the status table. State file (`plan_status`, `next_step`, `pending_files`) = hint only — Step 2 cross-checks it.
 
 Also read the feature checkpoint when present — restores working context lost at compaction (`slice`, `decisions`, `constraints`, `errors_tried`; schema: `state-machine.md` → **Checkpoint file**):
 

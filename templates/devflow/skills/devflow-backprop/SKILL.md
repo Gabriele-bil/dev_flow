@@ -114,7 +114,7 @@ Instinct:   [id] logged ([N] total in family[; clarify question proposed])
 | | |
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md` (Traceability) |
-| Reads | `references/backprop-patterns.md`, `@devflow/references/state-machine.md`, `@devflow/adapters/<adapter>/steps/test.md` (Test conventions) |
+| Reads | `references/backprop-patterns.md`, `@devflow/adapters/<adapter>/steps/test.md` (Test conventions) |
 | Writes | `task.md` — AC added/tightened, `## Notes` backprop entry |
 | Writes | `plan.md` — Traceability row for changed AC |
 | Writes | regression test file per adapter conventions |

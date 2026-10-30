@@ -8,7 +8,7 @@ init ─────────────────────────
               blueprint (3+ PRs) ─────┘
 ```
 
-Statuses + transitions: `@devflow/references/state-machine.md`. Active feature: its **Active feature resolution**. `plan.md` Status wins over `.devflow-state.json`.
+Statuses + transitions: `@devflow/references/state-machine.md`. Active feature: `bash "@devflow/scripts/devflow-state.sh" resolve` (`status` for one line with next step). `plan.md` Status wins over `.devflow-state.json`.
 
 ## Decision tree (first match wins)
 

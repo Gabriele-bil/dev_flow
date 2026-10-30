@@ -117,18 +117,6 @@ Write `devflow/plans/project-blueprint.md` using this structure (adapted from `@
 
 Because the `PostToolUse` hook `hooks/post-task-create.sh` fires on every `Write` to `devflow/features/[NNN]_*/task.md` and sets `next_feature_number` to `NNN + 1`, writing `001` through `NNN` sequentially leaves `.devflow-state.json` without `feature` pointing to `001`.
 
-**Mandatory final step:** After ALL `task.md` files (`001..NNN`) and `docs/product.md` have been written, merge into `.devflow-state.json` at project root (schema: `@devflow/references/state-machine.md` → **State file schema**; keep keys you do not own; never write legacy `active_feature` — delete it if present):
-
-```json
-{
-  "feature": "001_<first-feature-slug>",
-  "feature_path": "devflow/features/001_<first-feature-slug>",
-  "branch": "feat/001_<first-feature-slug>",
-  "task_status": "draft",
-  "next_feature_number": 6,
-  "next_step": "devflow.plan",
-  "saved_at": "<ISO-8601 timestamp>"
-}
-```
+**Mandatory final step:** After ALL `task.md` files (`001..NNN`) and `docs/product.md` have been written, run `bash "@devflow/scripts/devflow-state.sh" sync 001` — sets `feature`/`feature_path`/`branch`/`task_status` to `001`, `next_step: devflow.plan`, `next_feature_number: NNN+1`; keeps keys it does not own, drops legacy `active_feature`.
 
 Remove temporary `.devflow-init-answers.tmp` if present.

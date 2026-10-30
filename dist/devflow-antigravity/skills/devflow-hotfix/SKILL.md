@@ -39,7 +39,7 @@ Any item fails → stop, report check, touch nothing.
 
 ## Workflow
 
-Fast-track transitions per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md`: `ready → implementing → implemented → tested → shipped → pr-opened` (beautify skipped). Every boundary: set `plan.md` `**Status:**` + **State update snippet**.
+Fast-track transitions: `ready → implementing → implemented → tested → shipped → pr-opened` (beautify skipped). Every boundary: `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set plan <status>` (legal for the fast-track).
 
 ### Step 1 - Compact task + plan from real templates
 
@@ -97,7 +97,7 @@ Execute `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-pr/SKILL.m
 | | |
 | --- | --- |
 | Reads | Bug report from `$ARGUMENTS`, codebase, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md`, adapter `steps/test.md` + `steps/implement.md` |
-| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-task/references/task-template.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-plan/references/plan-template.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/verification-levels.md` |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-task/references/task-template.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-plan/references/plan-template.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/verification-levels.md` |
 | Writes | `devflow/features/[NNN]_hotfix-[name]/task.md`, `plan.md`, `verification.md`, fix files, regression test, `.devflow-state.json` (merge) |
 | Side effects | Branch `fix/*` from `origin/<default>`, tag `devflow-checkpoint/<branch>/implement` |
 | Next step | `devflow-pr` (executed in Step 6) |

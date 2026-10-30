@@ -36,14 +36,21 @@ step "Build plugin: $NAME v$VERSION"
 
 bash "$BUILDERS_DIR/build-claude.sh"
 
-# Ship runtime utility scripts (board.sh, metrics.sh, doctor.sh) in dist/devflow/scripts/
+# Ship runtime scripts in dist/devflow/scripts/ (the rest of scripts/ is dev-only)
 mkdir -p "$DIST_DIR/scripts"
-for RUNTIME_SH in board.sh metrics.sh doctor.sh; do
+for RUNTIME_SH in board.sh metrics.sh doctor.sh devflow-state.sh; do
   if [ -f "$TEMPLATE_DIR/scripts/$RUNTIME_SH" ]; then
     cp "$TEMPLATE_DIR/scripts/$RUNTIME_SH" "$DIST_DIR/scripts/$RUNTIME_SH"
     chmod +x "$DIST_DIR/scripts/$RUNTIME_SH" 2>/dev/null || true
   fi
 done
+# Every script a skill, agent or reference calls must ship
+MISSING=""
+for REF in $(grep -rhoE '(CLAUDE_PLUGIN_ROOT\}|@devflow)/scripts/[A-Za-z0-9_.-]+\.sh' \
+    "$DIST_DIR/skills" "$DIST_DIR/agents" "$DIST_DIR/references" "$DIST_DIR/commands" 2>/dev/null | sed 's#.*/scripts/##' | sort -u); do
+  [ -f "$DIST_DIR/scripts/$REF" ] || MISSING="$MISSING $REF"
+done
+[ -z "$MISSING" ] || { echo "✗ scripts referenced but not shipped:$MISSING (add them to RUNTIME_SH)" >&2; exit 1; }
 
 if [ "$ANTIGRAVITY_SUPPORT" = "true" ]; then
   bash "$BUILDERS_DIR/build-antigravity.sh"

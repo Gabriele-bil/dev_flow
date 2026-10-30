@@ -40,7 +40,7 @@ Any item fails → stop, report check, touch nothing.
 
 ## Workflow
 
-Fast-track transitions per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md`: `ready → implementing → implemented → tested → shipped → pr-opened` (beautify skipped). Every boundary: set `plan.md` `**Status:**` + **State update snippet**.
+Fast-track transitions: `ready → implementing → implemented → tested → shipped → pr-opened` (beautify skipped). Every boundary: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" set plan <status>` (legal for the fast-track).
 
 ### Step 1 - Compact task + plan from real templates
 
@@ -98,7 +98,7 @@ Execute `${CLAUDE_PLUGIN_ROOT}/skills/devflow-pr/SKILL.md` exactly — base-bran
 | | |
 | --- | --- |
 | Reads | Bug report from `$ARGUMENTS`, codebase, `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`, adapter `steps/test.md` + `steps/implement.md` |
-| Reads | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-task/references/task-template.md`, `${CLAUDE_PLUGIN_ROOT}/skills/devflow-plan/references/plan-template.md`, `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md`, `${CLAUDE_PLUGIN_ROOT}/references/verification-levels.md` |
+| Reads | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-task/references/task-template.md`, `${CLAUDE_PLUGIN_ROOT}/skills/devflow-plan/references/plan-template.md`, `${CLAUDE_PLUGIN_ROOT}/references/verification-levels.md` |
 | Writes | `devflow/features/[NNN]_hotfix-[name]/task.md`, `plan.md`, `verification.md`, fix files, regression test, `.devflow-state.json` (merge) |
 | Side effects | Branch `fix/*` from `origin/<default>`, tag `devflow-checkpoint/<branch>/implement` |
 | Next step | `devflow-pr` (executed in Step 6) |

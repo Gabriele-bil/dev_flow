@@ -15,7 +15,7 @@ Run `/devflow.implement [optional plan path] [--fix <findings|files>]`.
 
 - If an argument is passed, use it as the `plan.md` path
 - `--fix` → **re-entry mode** (see below): targeted fixes only
-- If no argument is passed, resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**
+- If no argument is passed, resolve feature with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask)
 
 ## Purpose
 
@@ -51,14 +51,14 @@ If any item fails → stop, report which check failed, do not touch application 
 
 ## Input
 
-`devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**.
+`devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, resolve feature with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask).
 
 ## Re-entry mode (`--fix`)
 
 Targeted rework after the plan was already implemented. Callers: `devflow.ship` fix loop, `devflow.backprop` Step 5, `devflow.recovery`, user with explicit findings.
 
 - Input: list of findings (`file:line` + description) or File List paths. Empty list → stop.
-- Entry: set `plan.md` `**Status:** implementing` (documented backward transition — `@devflow/references/state-machine.md` → **Legal transitions**); refresh state per **State update snippet**.
+- Entry: `bash "@devflow/scripts/devflow-state.sh" set plan implementing` (documented backward transition).
 - Scope: edit only files named by the findings (+ their direct callers when the fix changes a contract). Never touch other `[done]` markers; never re-implement untouched files; new file needed → add File List entry `[done]` + **Traceability** row + `## Deviations` entry.
 - Skip Step 3 branch creation (verify only) and Step 7 registry unless a shared element changed.
 - Run Steps 5–6 (codegen, format, analyze) on touched files; exit via Step 8 (`**Status:** implemented`). Next step stays `devflow.beautify` → `devflow.test` — re-entry never skips them.
@@ -101,7 +101,7 @@ Load only: plan (**File List** + decisions), `constitution.md`, `registry.md`, a
 
 **Large File Lists (>5 files):** emit a 3–5 bullet inline plan aligned with **File List** order before editing.
 
-**Long sessions / session resume:** after writing each file, mark it `[done]` in `plan.md`'s **File List** entry (replace `[pending]` with `[done]`). When resuming an interrupted session: run `devflow.resume` (first-class entry point — reads state, cross-checks markers, confirms position). Fallback without state: re-read `plan.md`, find the first `[pending]` entry, confirm resume position to the user before continuing. Never re-implement a `[done]` file unless explicitly asked.
+**Long sessions / session resume:** after writing each file, mark its **File List** entry `[done]` with `bash "@devflow/scripts/devflow-state.sh" mark-done <path>`. When resuming an interrupted session: run `devflow.resume` (first-class entry point — reads state, cross-checks markers, confirms position). Fallback without state: re-read `plan.md`, find the first `[pending]` entry, confirm resume position to the user before continuing. Never re-implement a `[done]` file unless explicitly asked.
 
 **Context-pressure handoff:** host compaction warning, or >20 files into a large plan → write `devflow/features/[NNN]_[feature-name]/handoff.md` per `@devflow/references/state-machine.md` → **Handoff file** (current slice, next action, open decisions, errors tried), then tell user: restart session + `devflow.resume`. Cheap insurance — a handoff written one file early beats context death mid-file.
 
@@ -124,7 +124,7 @@ Verify git branch against `task.md` `**Branch:**` or `.devflow-state.json` (conv
 
 ### Step 4 - Implement files
 
-Before the first file (Status `ready` only — skip on `implementing` resume and re-entry): save git checkpoint tag (`git tag -f "devflow-checkpoint/$(git branch --show-current 2>/dev/null)/implement" HEAD 2>/dev/null || true`); set `plan.md` `**Status:** implementing`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
+Before the first file (Status `ready` only — skip on `implementing` resume and re-entry): save git checkpoint tag (`git tag -f "devflow-checkpoint/$(git branch --show-current 2>/dev/null)/implement" HEAD 2>/dev/null || true`); `bash "@devflow/scripts/devflow-state.sh" set plan implementing`.
 
 Implement all files from the plan in the exact order defined in the **File List**. Slice headings carrying `deps:` annotations: enter a slice only when every listed dep slice is fully `[done]` — File List order already satisfies this on sequential plans; the annotation matters when slices were reordered or a dep slice still has `[pending]` entries.
 
@@ -161,7 +161,7 @@ Supporting rules:
 
 ### Checkpoint at slice boundaries
 
-After completing each vertical slice (or every 5 files on unsliced plans), write `devflow/features/[NNN]_[feature-name]/.checkpoint.json` per `@devflow/references/state-machine.md` → **Checkpoint file**: current step, active slice, decisions made, constraints discovered, errors tried. Context `[done]` markers cannot hold — read by `devflow.resume` / `devflow.recovery` after crash or compaction. Append to arrays; do not overwrite prior entries.
+After completing each vertical slice (or every 5 files on unsliced plans), record working context `[done]` markers cannot hold — read by `devflow.resume` / `devflow.recovery` after crash or compaction: `bash "@devflow/scripts/devflow-state.sh" checkpoint --step devflow.implement --slice "<slice>" [--decision "…"] [--constraint "…"] [--error "…"]` (flags repeatable; arrays are appended).
 
 ### Save point (for large plans)
 
@@ -204,7 +204,7 @@ Read by `devflow.beautify` and `devflow.pr`. Omit if fully aligned.
 
 ### Step 8 - Notify user
 
-Set `plan.md` `**Status:** implemented`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
+`bash "@devflow/scripts/devflow-state.sh" set plan implemented`.
 
 Respond using template in `references/notify-template.md`. **Run mode** (`.devflow-run.json` present): emit the notify block but do not wait for user — control returns to the orchestrator (`devflow.run` or `devflow.auto`).
 
@@ -234,7 +234,7 @@ Respond using template in `references/notify-template.md`. **Run mode** (`.devfl
 | | |
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md`, `constitution.md`, `registry.md`, `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/implement.md`, `references/registry-update-template.md`, `references/notify-template.md` |
-| Reads | `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status transitions), `@devflow/references/token-economy.md` (index-first + derive-don't-dump) |
+| Reads | `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (handoff format, context pressure only), `@devflow/references/token-economy.md` (index-first + derive-don't-dump) |
 | Reads (conditional) | `DESIGN.md` / `docs/design.md` — UI constraints for `[ui]`-tagged batches; `.devflow-run.json` (existence — run-mode switch, contract `@devflow/references/run-mode.md`) |
 | Writes | all files defined in `plan.md` |
 | Writes | `plan.md` — `[done]` markers, `**Status:** implementing → implemented`, `## Deviations`, `## Decision flags` (run mode) |

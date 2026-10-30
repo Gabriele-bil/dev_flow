@@ -13,7 +13,7 @@ init ─────────────────────────
               blueprint (3+ PRs) ─────┘
 ```
 
-Statuses + transitions: `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md`. Active feature: its **Active feature resolution**. `plan.md` Status wins over `.devflow-state.json`.
+Statuses + transitions: `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md`. Active feature: `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" resolve` (`status` for one line with next step). `plan.md` Status wins over `.devflow-state.json`.
 
 ## Decision tree (first match wins)
 

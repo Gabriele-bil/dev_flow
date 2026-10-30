@@ -50,7 +50,7 @@ Machine-readable pipeline status for CI and scripts. `devflow.status --json` run
 
 ## Emitter snippet
 
-Run by `devflow.status` Step 3-JSON. Requires `jq`. Prepend the **Shell form** from `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **Active feature resolution** (sets `$FEATURE`); explicit feature argument overrides it.
+Run by `devflow.status` Step 3-JSON. Requires `jq`. `$1` = optional explicit feature; `$DEVFLOW_STATE` = the `$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh` path.
 
 ```bash
 #!/bin/bash
@@ -63,7 +63,7 @@ grep -q '^## Apps' devflow/config.md 2>/dev/null && IS_MONOREPO=true
 ADAPTER=$(grep -m1 '^\*\*Adapter:\*\*' devflow/config.md 2>/dev/null | sed 's/^\*\*Adapter:\*\*[[:space:]]*//' | tr -d '\r' | sed 's/[[:space:]]*$//')
 [ -z "$ADAPTER" ] && ADAPTER="unknown"
 
-[ -n "$1" ] && FEATURE="$1"   # $FEATURE set by Active feature resolution (prepended)
+FEATURE=$(bash "$DEVFLOW_STATE" resolve "$1" 2>/dev/null)
 PLAN_FILE="devflow/features/$FEATURE/plan.md"
 { [ -n "$FEATURE" ] && [ -f "$PLAN_FILE" ]; } || { jq -n --arg a "$ADAPTER" '{schema_version:1, adapter:$a, health:"no-pipeline"}'; exit 1; }
 

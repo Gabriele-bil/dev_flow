@@ -188,7 +188,7 @@ Closes TASK-[NNN]
 
 ## Step 6 - Notify user
 
-After successful `gh pr create`: set `plan.md` `**Status:** pr-opened` and `task.md` `**Status:** done`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
+After successful `gh pr create`: `bash "@devflow/scripts/devflow-state.sh" set plan pr-opened && bash "@devflow/scripts/devflow-state.sh" set task done`.
 
 ```text
 ✅ Pull request opened: [type]/[NNN]_[feature-name] -> $BASE_BRANCH

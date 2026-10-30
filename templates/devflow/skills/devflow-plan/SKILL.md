@@ -14,7 +14,7 @@ effort: high
 Run `/devflow.plan [optional task path]`.
 
 - If an argument is passed, use it as the `task.md` path
-- If no argument is passed, resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**
+- If no argument is passed, resolve feature with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask)
 - Produce `plan.md` in the same feature directory
 
 ## Purpose
@@ -64,7 +64,7 @@ If any item fails → stop, report which check failed, do not write `plan.md`.
 
 ## Input
 
-Path: `devflow/features/[NNN]_[feature-name]/task.md` — if no arg, resolve per `@devflow/references/state-machine.md` → **Active feature resolution** (never highest `NNN`). Resolved feature already has `plan.md` past `ready` → stop, report status; re-plan only on explicit argument.
+Path: `devflow/features/[NNN]_[feature-name]/task.md` — if no arg, resolve with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask) (never highest `NNN`). Resolved feature already has `plan.md` past `ready` → stop, report status; re-plan only on explicit argument.
 
 ## Workflow
 
@@ -187,7 +187,7 @@ Read by `devflow.implement` (loads DESIGN.md for `[ui]` batches) and `devflow.be
 
 ### Step 5 - Write plan file
 
-Create `devflow/features/[NNN]_[feature-name]/plan.md` using the template in `references/plan-template.md`. After write: `**Status:** ready`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet** (`next_step: devflow.implement`). Sections in order: Overview, Architecture decisions, Risks and mitigations, Open questions, Traceability, File List, Implementation checkpoints, Adapter-specific sections, Edge Cases & Error Handling, Pre-implement checklist.
+Create `devflow/features/[NNN]_[feature-name]/plan.md` using the template in `references/plan-template.md`. After write (`**Status:** ready`): `bash "@devflow/scripts/devflow-state.sh" sync [NNN]` refreshes the state cache. Sections in order: Overview, Architecture decisions, Risks and mitigations, Open questions, Traceability, File List, Implementation checkpoints, Adapter-specific sections, Edge Cases & Error Handling, Pre-implement checklist.
 
 Header: copy `**App:**` from `task.md` verbatim when present; omit the line entirely when absent (single-app repos) — never invent it.
 
@@ -239,7 +239,7 @@ Critical checks:
 | Reads | `@devflow/references/complexity-scoring.md` (Step 4d — score + profile) |
 | Reads | `@devflow/references/token-economy.md` (Step 1 — index-first exploration) |
 | Reads | `@devflow/skills/devflow-plan/references/plan-anti-patterns.md` (Anti-patterns catalog) |
-| Reads | `@devflow/references/state-machine.md` (Active feature resolution, State update snippet) |
+| Runs | `@devflow/scripts/devflow-state.sh` (`resolve`, `sync`) |
 | Writes | `devflow/features/[NNN]_[feature-name]/plan.md`, `.devflow-state.json` (merge) |
 | Writes (conditional) | `plan.md` `## Decision flags` (run mode — resolved Open questions) |
 | Reads (conditional) | `docs/adr/` (if present — active ADRs referenced in `task.md`); `.devflow-run.json` (existence — run-mode switch, `@devflow/references/run-mode.md`) |

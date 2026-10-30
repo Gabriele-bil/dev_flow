@@ -47,7 +47,7 @@ Extract:
 - `next_step` — last recorded step
 - `next_feature_number` — NNN counter
 
-No explicit feature argument → resolve per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **Active feature resolution**; also list every feature whose `plan.md` Status is `blocked` (step 3 of that resolution skips them — recovery is where they surface).
+No explicit feature argument → resolve with `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask); also list every feature whose `plan.md` Status is `blocked` (step 3 of that resolution skips them — recovery is where they surface).
 
 If `STATE_MISSING`: proceed to **Recovery path C**.
 
@@ -153,13 +153,12 @@ Execute only the user-chosen option.
 
 **Unblock** (Category G, after user confirms the reset status from the Step 3 table):
 
-1. Set `plan.md` `**Status:**` to the confirmed status (backward transition per `state-machine.md` — never silent).
-2. Merge `plan_status` + `next_step` into `.devflow-state.json` via **State update snippet**.
-3. Route to the resume step.
+1. `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set plan <confirmed-status> --force` — user-confirmed backward transition, never silent; writes `plan.md` and the state cache.
+2. Route to the resume step.
 
 **Resync state** (Option 2 typical):
 
-Merge (never overwrite) via `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **State update snippet**, values derived from `plan.md`: `feature`, `plan_status` (= `plan.md` Status), `next_step` (status table), `next_feature_number` (int, highest `devflow/features/` prefix + 1). Unknown keys preserved; legacy `active_feature` dropped by the snippet.
+`bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" sync [NNN]` — rebuilds `feature`, `plan_status`, `task_status`, `next_step`, `progress`, `next_feature_number` from `plan.md`/`task.md`; unknown keys preserved, legacy `active_feature` dropped.
 
 **Nuclear reset** (Option 3):
 

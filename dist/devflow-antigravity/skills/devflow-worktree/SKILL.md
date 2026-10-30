@@ -42,7 +42,7 @@ Any item fails → stop, report which check failed.
 
 ### Step 1 - Parse arguments
 
-Parse `$ARGUMENTS` as `[create|remove|list] [feature-name]`. Default subcommand: `create`. `feature-name` omitted → feature resolved per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **Active feature resolution**.
+Parse `$ARGUMENTS` as `[create|remove|list] [feature-name]`. Default subcommand: `create`. `feature-name` omitted → feature resolved with `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" resolve`.
 
 ### Step 2 - List (early exit)
 

@@ -42,7 +42,7 @@ Run-mode contract (marker, autonomy table `run` column, decision flags, discrepa
 
 ## Input contract
 
-- [ ] Feature resolved — explicit `NNN_name` argument, else `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Active feature resolution**
+- [ ] Feature resolved — explicit `NNN_name` argument, else `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve` (exit 1 → ask)
 - [ ] `task.md` + `plan.md` exist at `devflow/features/[NNN]_[feature-name]/`
 - [ ] `plan.md` **Status** satisfies the `--from` step's input contract (`implement` → `ready`; `beautify` → `implemented`; `test` → `beautified` or `implemented`)
 - [ ] No active `.devflow-run.json` (stale marker from crashed run → confirm deletion with user, or route `devflow.recovery`)
@@ -65,7 +65,7 @@ Ambiguity → defensible default + flag in plan.md ## Decision flags (you review
 Proceed? (yes / no)
 ```
 
-On yes: arm per `${CLAUDE_PLUGIN_ROOT}/references/run-mode.md` → **Marker** (`orchestrator: "devflow.run"`, `from`/`until` from flags; schema `state-machine.md` → **Run marker**).
+On yes: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" run arm --orchestrator devflow.run --from <from> --until <until> --feature <NNN_name>` (exit 2 = stale marker → ask the user: delete or `devflow.recovery`).
 
 ### Step 1 - Chain steps
 
@@ -89,7 +89,7 @@ Never block on ambiguity while armed — defensible default + `plan.md` `## Deci
 
 ### Step 3 - Disarm + consolidated report
 
-Disarm per `${CLAUDE_PLUGIN_ROOT}/references/run-mode.md` → **Disarm** (every exit path). Report:
+Disarm on every exit path: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" run disarm`. Report:
 
 ```text
 🤖 devflow.run complete: [from] → [last step executed]
@@ -133,7 +133,7 @@ Next (human): devflow.ship — reviews code AND open flags
 | | |
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `plan.md`, `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`, `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` |
-| Reads | `${CLAUDE_PLUGIN_ROOT}/references/run-mode.md` (run-mode contract), `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` (run marker + handoff schemas), `${CLAUDE_PLUGIN_ROOT}/references/escalation-ladder.md` (failure bounds) |
+| Reads | `${CLAUDE_PLUGIN_ROOT}/references/run-mode.md` (run-mode contract), `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` (handoff format), `${CLAUDE_PLUGIN_ROOT}/references/escalation-ladder.md` (failure bounds) |
 | Writes | `.devflow-run.json` — armed Step 0, deleted Step 3 (every exit path) |
 | Writes | `plan.md` — `## Decision flags` entries |
 | Executes | `devflow-implement`, `devflow-beautify`, `devflow-test` skills in order (+ `devflow-ship` with `--until ship`) |

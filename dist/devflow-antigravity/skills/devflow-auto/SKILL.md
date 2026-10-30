@@ -47,13 +47,13 @@ Any item fails → stop, report, do not arm.
 
 ### Step 0 - Arm
 
-Arm per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md` → **Marker**, immediately (no confirmation): `feature: null`, `from: "task"`, `until: "pr"`, `orchestrator: "devflow.auto"`, `ship_grader_iterations: 2`, `ship_grader_iteration_count: 0`. Announce: `🤖 devflow.auto: task → plan → analyze → implement → beautify → test → ship → pr (unattended; halts only on major discrepancies)`.
+Arm immediately (no confirmation): `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" run arm --orchestrator devflow.auto --from task --until pr` (`feature: null`, grader cap 2; exit 2 = stale marker → stop, ask). Announce: `🤖 devflow.auto: task → plan → analyze → implement → beautify → test → ship → pr (unattended; halts only on major discrepancies)`.
 
 ### Step 1 - Chain
 
 Every step: full skill workflow, run-mode clauses active, status boundaries written. Stop/continue per **Discrepancy classes** in `run-mode.md`.
 
-1. `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-task/SKILL.md` — after Step 9 writes `task.md`, set marker `feature` to `NNN_name`.
+1. `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-task/SKILL.md` — after Step 9 writes `task.md`: `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" run feature <NNN_name>`.
 2. `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-plan/SKILL.md`.
 3. `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-analyze/SKILL.md` — Critical → stop; Required/Nit → plan adjustment or waiver flag.
 4. Middle pipeline — `devflow-run` Step 1 chain rules, `--from implement --until ship`: implement → beautify → test (incl. Step 6b) → ship.
@@ -61,7 +61,7 @@ Every step: full skill workflow, run-mode clauses active, status boundaries writ
 
 ### Step 2 - Disarm + report
 
-Disarm per `run-mode.md` → **Disarm** (every exit path). Report:
+Disarm on every exit path: `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" run disarm`. Report:
 
 ```text
 🤖 devflow.auto [complete: idea → PR opened | stopped at <step>: <major discrepancy>]
@@ -94,7 +94,7 @@ Flags:    [N] decision flags / discrepancies (in PR body when opened)
 
 | | |
 | --- | --- |
-| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` (run marker, handoff), `$HOME/.gemini/antigravity-cli/plugins/devflow/references/escalation-ladder.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md` |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` (handoff format), `$HOME/.gemini/antigravity-cli/plugins/devflow/references/escalation-ladder.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md` |
 | Executes | `devflow-task`, `devflow-plan`, `devflow-analyze`, then `devflow-run` chain (`devflow-implement`, `devflow-beautify`, `devflow-test`, `devflow-ship`) → `devflow-pr` |
 | Writes | `.devflow-run.json` (armed Step 0, `feature` set after task, deleted Step 2); feature artifacts via chained skills |
 | Output | Opened PR with autonomous decisions & discrepancies section |

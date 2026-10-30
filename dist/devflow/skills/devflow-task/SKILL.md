@@ -157,7 +157,7 @@ If any item fails, fix task content before writing file.
 
 ### Step 9 - Write task file
 
-Create `devflow/features/[NNN]_[feature-name]/task.md` using template + format rules in `references/task-template.md`. Write `**Branch:**` with the resolved branch name (`[type]/[number-of-task-is-present]_[feature-name]`), `**App:**` frontmatter field with Step 1 resolution when `config.md` has `## Apps`; include `**ADRs:**` if applicable; omit when absent. Merge into `.devflow-state.json` per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **State update snippet**: `feature`, `feature_path`, `branch`, `task_status: draft`, `next_step: devflow.plan` (+ `app` in monorepo); never write `active_feature`. See **`examples.md`** for worked examples.
+Create `devflow/features/[NNN]_[feature-name]/task.md` using template + format rules in `references/task-template.md`. Write `**Branch:**` with the resolved branch name (`[type]/[number-of-task-is-present]_[feature-name]`), `**App:**` frontmatter field with Step 1 resolution when `config.md` has `## Apps`; include `**ADRs:**` if applicable; omit when absent. Then `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" sync [NNN]` (state cache: `feature`, `branch`, `task_status`, `next_step`, `app`). See **`examples.md`** for worked examples.
 
 ### Step 10 - Update docs/product.md feature status
 

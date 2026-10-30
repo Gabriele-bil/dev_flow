@@ -7,4 +7,4 @@ disable-model-invocation: true
 
 Use `@devflow/skills/devflow-clarify/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
 
-If `$ARGUMENTS` is empty, resolve the feature per `@devflow/references/state-machine.md` → **Active feature resolution**.
+If `$ARGUMENTS` is empty, resolve the feature with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask the user).

@@ -35,7 +35,7 @@ Run when either condition is true:
 
 Before running, verify:
 
-- [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md` — no path argument → resolve feature per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **Active feature resolution**
+- [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md` — no path argument → resolve feature with `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask)
 - [ ] `task.md` Status is not `done`
 
 If any item fails → stop and report which check failed.
@@ -99,7 +99,7 @@ After the Q&A loop completes:
 1. Scan `task.md` for remaining `[NEEDS CLARIFICATION: ...]` markers.
    - Resolved markers: already removed inline during Step 2.
    - Skipped markers: leave in place — they represent accepted risk.
-2. Update `task.md` header: set `**Status:** clarified`; refresh `.devflow-state.json` (`task_status: clarified`, `next_step: devflow.plan`) per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **State update snippet**.
+2. `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set task clarified` (writes `task.md` header + state cache).
 3. Output a **Clarification Summary** in the response:
 
 ```text

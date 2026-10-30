@@ -9,4 +9,4 @@ disable-model-invocation: true
 
 Use `${CLAUDE_PLUGIN_ROOT}/skills/devflow-test/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
 
-If `$ARGUMENTS` is empty, resolve the feature per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Active feature resolution**.
+If `$ARGUMENTS` is empty, resolve the feature with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve` (exit 1 → ask the user).

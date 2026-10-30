@@ -47,7 +47,7 @@ Read in order:
 3. `constitution.md` — extract: layer ordering rules and naming conventions
 4. `docs/adr/` (if referenced in `task.md`/`plan.md` or `docs/adr/README.md` exists) — extract accepted architectural decisions, rejected alternatives, and boundaries
 
-If no path is provided, resolve feature per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Active feature resolution**.
+If no path is provided, resolve feature with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve` (exit 1 → ask).
 
 ### Step 2 — Run 7 detection passes
 

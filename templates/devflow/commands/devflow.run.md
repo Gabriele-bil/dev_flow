@@ -7,4 +7,4 @@ disable-model-invocation: true
 
 Use `@devflow/skills/devflow-run/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
 
-If `$ARGUMENTS` is empty, use `--from implement --until test` on the feature resolved per `@devflow/references/state-machine.md` → **Active feature resolution**.
+If `$ARGUMENTS` is empty, use `--from implement --until test` on the feature resolved with `bash "@devflow/scripts/devflow-state.sh" resolve`.

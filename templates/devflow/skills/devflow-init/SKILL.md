@@ -105,13 +105,7 @@ Decompose project and generate all tasks on `main` per `@devflow/skills/devflow-
    - Pre-populate `**Branch:** feat/[NNN]_[feature-name]` in each `task.md` header (`devflow.implement` creates/switches to the branch when that task executes).
    - For every feature `001` through `NNN` in ascending topological order, write `devflow/features/[NNN]_[feature-name]/task.md` following `@devflow/skills/devflow-task/references/task-template.md`, including `**ADRs:** docs/adr/ADR-001-initial-architecture.md`, `**Blockers:**`, `**Unlocks:**`, Connextra User Story, Read/Write isolated `UC-1..UC-N`, single-`When` BDD Gherkin `AC-1..AC-N` with explicit async states, Scope Boundaries, and Assumptions & Risks.
 5. **Populate `docs/product.md`:** Fill the `devflow-managed:feature-status` table with all tasks `001..NNN` in topological order (`status: planned`, blocker notes, and `App` column in monorepo mode).
-6. **Final State Initialization (MUST run after all `task.md` writes):** Because `post-task-create.sh` updates `.devflow-state.json` on each `task.md` write, merge into `.devflow-state.json` one final time after `NNN` finishes (schema: `@devflow/references/state-machine.md` → **State file schema**; never write `active_feature`):
-   - `feature`: `"001_<first-feature>"`
-   - `feature_path`: `"devflow/features/001_<first-feature>"`
-   - `branch`: `"feat/001_<first-feature>"`
-   - `task_status`: `"draft"`
-   - `next_feature_number`: `<NNN+1>` (int)
-   - `next_step`: `"devflow.plan"`
+6. **Final State Initialization (MUST run after all `task.md` writes):** `post-task-create.sh` updates `.devflow-state.json` on each `task.md` write, so point the cache back at the first feature once `NNN` finishes: `bash "@devflow/scripts/devflow-state.sh" sync 001`.
 
 ### Step 5 — Completion Summary & Handoff
 

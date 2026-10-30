@@ -6,4 +6,4 @@ argument-hint: "[optional-feature]"
 
 Use `@devflow/skills/devflow-recovery/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
 
-If `$ARGUMENTS` is empty, diagnose the feature resolved per `@devflow/references/state-machine.md` → **Active feature resolution**, plus every `blocked` feature.
+If `$ARGUMENTS` is empty, diagnose the feature resolved with `bash "@devflow/scripts/devflow-state.sh" resolve`, plus every `blocked` feature.

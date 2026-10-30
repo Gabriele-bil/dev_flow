@@ -187,7 +187,7 @@ Closes TASK-[NNN]
 
 ## Step 6 - Notify user
 
-After successful `gh pr create`: set `plan.md` `**Status:** pr-opened` and `task.md` `**Status:** done`; refresh `.devflow-state.json` per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **State update snippet**.
+After successful `gh pr create`: `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set plan pr-opened && bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set task done`.
 
 ```text
 ✅ Pull request opened: [type]/[NNN]_[feature-name] -> $BASE_BRANCH

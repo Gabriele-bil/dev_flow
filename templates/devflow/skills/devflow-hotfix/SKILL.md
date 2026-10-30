@@ -38,7 +38,7 @@ Any item fails → stop, report check, touch nothing.
 
 ## Workflow
 
-Fast-track transitions per `@devflow/references/state-machine.md`: `ready → implementing → implemented → tested → shipped → pr-opened` (beautify skipped). Every boundary: set `plan.md` `**Status:**` + **State update snippet**.
+Fast-track transitions: `ready → implementing → implemented → tested → shipped → pr-opened` (beautify skipped). Every boundary: `bash "@devflow/scripts/devflow-state.sh" set plan <status>` (legal for the fast-track).
 
 ### Step 1 - Compact task + plan from real templates
 
@@ -96,7 +96,7 @@ Execute `@devflow/skills/devflow-pr/SKILL.md` exactly — base-branch detection,
 | | |
 | --- | --- |
 | Reads | Bug report from `$ARGUMENTS`, codebase, `@devflow/references/adapter-resolution.md`, adapter `steps/test.md` + `steps/implement.md` |
-| Reads | `@devflow/skills/devflow-task/references/task-template.md`, `@devflow/skills/devflow-plan/references/plan-template.md`, `@devflow/references/state-machine.md`, `@devflow/references/verification-levels.md` |
+| Reads | `@devflow/skills/devflow-task/references/task-template.md`, `@devflow/skills/devflow-plan/references/plan-template.md`, `@devflow/references/verification-levels.md` |
 | Writes | `devflow/features/[NNN]_hotfix-[name]/task.md`, `plan.md`, `verification.md`, fix files, regression test, `.devflow-state.json` (merge) |
 | Side effects | Branch `fix/*` from `origin/<default>`, tag `devflow-checkpoint/<branch>/implement` |
 | Next step | `devflow-pr` (executed in Step 6) |

@@ -32,7 +32,7 @@ Safely discard unwanted changes made during `devflow.implement` or `devflow.beau
 
 ### Step 1 - Resolve Active Feature and Target Step
 
-1. Resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**; read current Status from its `plan.md` (authoritative — never from the state file).
+1. Resolve feature with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask); read current Status from its `plan.md` (authoritative — never from the state file).
 2. Determine target rollback destination:
    - If `$ARGUMENTS` contains `--to <step>`: use the specified step (`implement` or `beautify`).
    - If unspecified:
@@ -63,11 +63,9 @@ Safely discard unwanted changes made during `devflow.implement` or `devflow.beau
    - Ensure `devflow/features/[NNN]_[name]/task.md` and `plan.md` are preserved.
    - If rolling back from `implement`:
      - In `plan.md`: replace all `- [x] \` or `### [done]` markers in `## File List` with `### [pending]`.
-     - In `plan.md`: set `**Status:** ready`.
-     - In `.devflow-state.json`: merge `plan_status: "ready"`, `next_step: "devflow.implement"` per `state-machine.md` → **State update snippet**.
+     - `bash "@devflow/scripts/devflow-state.sh" set plan ready`.
    - If rolling back from `beautify`:
-     - In `plan.md`: set `**Status:** implemented`.
-     - In `.devflow-state.json`: merge `plan_status: "implemented"`, `next_step: "devflow.beautify"` per `state-machine.md` → **State update snippet**.
+     - `bash "@devflow/scripts/devflow-state.sh" set plan implemented`.
 3. Remove stale `.checkpoint.json` and `.handoff.md` from the feature directory if present:
 
    ```bash

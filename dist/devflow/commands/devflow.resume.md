@@ -8,4 +8,4 @@ argument-hint: "[optional-feature]"
 
 Use `${CLAUDE_PLUGIN_ROOT}/skills/devflow-resume/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
 
-If `$ARGUMENTS` is empty, resume the feature resolved per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Active feature resolution**.
+If `$ARGUMENTS` is empty, resume the feature resolved with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve`.

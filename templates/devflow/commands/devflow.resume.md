@@ -6,4 +6,4 @@ argument-hint: "[optional-feature]"
 
 Use `@devflow/skills/devflow-resume/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
 
-If `$ARGUMENTS` is empty, resume the feature resolved per `@devflow/references/state-machine.md` → **Active feature resolution**.
+If `$ARGUMENTS` is empty, resume the feature resolved with `bash "@devflow/scripts/devflow-state.sh" resolve`.

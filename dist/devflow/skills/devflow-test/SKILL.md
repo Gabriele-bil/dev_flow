@@ -16,7 +16,7 @@ effort: medium
 Run `/devflow.test [optional plan path]`.
 
 - If an argument is passed, use it as the `plan.md` path
-- If no argument is passed, resolve feature per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Active feature resolution**
+- If no argument is passed, resolve feature with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve` (exit 1 → ask)
 
 ## Purpose
 
@@ -47,7 +47,7 @@ If any item fails → stop, report which check failed, do not write test files.
 
 ## Input
 
-Files from `devflow.implement` + `devflow.beautify` + `devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, resolve feature per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Active feature resolution**.
+Files from `devflow.implement` + `devflow.beautify` + `devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, resolve feature with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve` (exit 1 → ask).
 
 ## Workflow
 
@@ -104,7 +104,7 @@ Failure handling:
 - Attempt 1: analyze failure output and fix the test or implementation (if failure is in an untouched module or intermittent, run the **Paired Control** isolation check per `${CLAUDE_PLUGIN_ROOT}/references/testing-patterns.md` before patching)
 - Attempt 2: verify mocks and dependencies are correctly set up
 - Attempt 3: isolate and fix root cause
-- After each failed attempt: append error + what was tried to `.checkpoint.json` `errors_tried` per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Checkpoint file** — resume/recovery skip already-tried fixes
+- After each failed attempt: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" checkpoint --step devflow.test --error "<error> — <what was tried>"` — resume/recovery skip already-tried fixes
 - After 3 attempts: escalate per `${CLAUDE_PLUGIN_ROOT}/references/escalation-ladder.md` — Level 2 debug mode (one hypothesis, minimal probe), Level 3 re-approach (question the plan step), Level 5 block with stuck-report. Never mark a failing test as passing
 - Context pressure (host compaction warning, long retry session) → write `devflow/features/[NNN]_[feature-name]/handoff.md` per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Handoff file**, stop, tell user: restart session + `devflow.resume`
 
@@ -127,7 +127,7 @@ Passing tests do not skip this step — tests prove behavior forward; verificati
 
 ### Step 7 - Notify user
 
-If tests pass AND `verification.md` **Result** is not FAIL: set `plan.md` `**Status:** tested`; refresh `.devflow-state.json` per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **State update snippet**.
+If tests pass AND `verification.md` **Result** is not FAIL: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" set plan tested` (refuses a missing or FAIL `verification.md`).
 
 Include actual command output. Do NOT report "all tests passed" without raw evidence.
 
@@ -213,13 +213,13 @@ Wait for user choice before continuing. **Run mode** (`.devflow-run.json` presen
 | Reads | files from `devflow.implement` / `devflow.beautify` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md`, `registry.md`, `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`, `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core) + `steps/test.md` |
-| Reads | `${CLAUDE_PLUGIN_ROOT}/references/verification-levels.md` (Step 6b), `${CLAUDE_PLUGIN_ROOT}/references/escalation-ladder.md` (failure handling), `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` (status), `${CLAUDE_PLUGIN_ROOT}/references/complexity-scoring.md` (depth profile), `${CLAUDE_PLUGIN_ROOT}/references/token-economy.md` (output discipline) |
+| Reads | `${CLAUDE_PLUGIN_ROOT}/references/verification-levels.md` (Step 6b), `${CLAUDE_PLUGIN_ROOT}/references/escalation-ladder.md` (failure handling), `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` (handoff format, context pressure only), `${CLAUDE_PLUGIN_ROOT}/references/complexity-scoring.md` (depth profile), `${CLAUDE_PLUGIN_ROOT}/references/token-economy.md` (output discipline) |
 | Reads (conditional) | `.devflow-run.json` (existence — run-mode switch) |
 | Reads (optional) | `${CLAUDE_PLUGIN_ROOT}/references/testing-patterns.md` — stack-agnostic patterns reference |
 | Reads (optional) | `.devflow-test-summary.json` — structured pass/fail/skipped counts from the most recent recognized test-runner command (written by `post-bash-output-filter.sh`; cross-check only, not evidence of record) |
 | Writes | Test output paths per the adapter test step file |
 | Writes | `devflow/features/[NNN]_[feature-name]/verification.md` — per-AC verdict table |
-| Writes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json` — `errors_tried` on retry loops (state-machine.md → Checkpoint file) |
+| Writes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json` — `errors_tried` on retry loops, via `${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh` |
 | Writes (conditional) | `devflow/features/[NNN]_[feature-name]/handoff.md` — on context pressure (state-machine.md → Handoff file) |
 | Writes | `plan.md` — `**Status:** tested` (only when tests pass + verification has no FAIL) |
 | Next step | `devflow.ship` (or `devflow.pr` directly for solo quick changes) |

@@ -14,7 +14,7 @@ effort: medium
 Run `/devflow.beautify [optional plan path]`.
 
 - If an argument is passed, use it as the `plan.md` path
-- If no argument is passed, resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**
+- If no argument is passed, resolve feature with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask)
 
 ## Purpose
 
@@ -45,7 +45,7 @@ If any item fails → stop, report which check failed, do not apply changes.
 
 ## Input
 
-Files from `devflow.implement` summary + `devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, resolve feature per `@devflow/references/state-machine.md` → **Active feature resolution**. Summary unavailable (new session) → `plan.md` File List `[done]` entries are the scope.
+Files from `devflow.implement` summary + `devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, resolve feature with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask). Summary unavailable (new session) → `plan.md` File List `[done]` entries are the scope.
 
 ## Workflow
 
@@ -168,7 +168,7 @@ On error: resolve autonomously; max 3 attempts; then escalate per `@devflow/refe
 
 ### Step 6 - Notify user
 
-Set `plan.md` `**Status:** beautified`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
+`bash "@devflow/scripts/devflow-state.sh" set plan beautified`.
 
 **Run mode** (`.devflow-run.json` present): emit the block below but do not wait — control returns to the orchestrator (`@devflow/references/run-mode.md`).
 
@@ -239,7 +239,7 @@ Continue to testing? -> devflow.test
 | Reads | files from `devflow.implement` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md`, `registry.md` |
-| Reads | `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status), `@devflow/references/complexity-scoring.md` (depth profile) |
+| Reads | `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/complexity-scoring.md` (depth profile) |
 | Reads (conditional) | `DESIGN.md` / `docs/design.md` — token source for UI consistency axis; `.devflow-run.json` (existence — run-mode switch, contract `@devflow/references/run-mode.md`) |
 | Writes | improvements to existing files only (no new files) |
 | Writes | `plan.md` — `**Status:** beautified`, `## Decision flags` (run mode — opinable candidates) |

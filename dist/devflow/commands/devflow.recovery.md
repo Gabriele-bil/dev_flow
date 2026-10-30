@@ -8,4 +8,4 @@ argument-hint: "[optional-feature]"
 
 Use `${CLAUDE_PLUGIN_ROOT}/skills/devflow-recovery/SKILL.md` and execute it exactly. Input: `$ARGUMENTS`
 
-If `$ARGUMENTS` is empty, diagnose the feature resolved per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` → **Active feature resolution**, plus every `blocked` feature.
+If `$ARGUMENTS` is empty, diagnose the feature resolved with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve`, plus every `blocked` feature.

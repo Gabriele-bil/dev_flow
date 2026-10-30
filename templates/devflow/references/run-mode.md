@@ -10,7 +10,7 @@ Single source for unattended execution. Orchestrators: `devflow.run` (middle pip
 - `devflow.run`: armed after one explicit user confirmation.
 - `devflow.auto`: armed immediately; every input needing the user (idea text, monorepo `--app`, stale-marker cleanup) collected **before** arming.
 - Stale marker found before arming → ask user: delete, or route `devflow.recovery`.
-- Arming orchestrator appends `.devflow-run.json` to `.gitignore` when present and missing.
+- Arm with `bash "@devflow/scripts/devflow-state.sh" run arm …` (refuses a stale marker, appends `.devflow-run.json` to `.gitignore`); disarm with `run disarm`.
 
 ## Autonomy policy
 
