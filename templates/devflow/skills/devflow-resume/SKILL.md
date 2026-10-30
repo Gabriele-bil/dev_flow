@@ -6,6 +6,8 @@ argument-hint: "[optional-feature]"
 
 # Skill: devflow.resume
 
+**Arguments:** `$ARGUMENTS` — empty → resume the feature resolved with `bash "@devflow/scripts/devflow-state.sh" resolve`.
+
 First-class session re-entry. Reads state, validates it against files, routes to the correct pipeline step — no re-deriving from scratch, no re-implementing `[done]` work.
 
 ## Purpose

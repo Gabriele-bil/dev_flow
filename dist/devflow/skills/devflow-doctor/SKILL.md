@@ -1,5 +1,5 @@
 ---
-name: devflow-doctor
+name: doctor
 description: "Pre-flight diagnostic tool for DevFlow. Checks MCP server reachability, CLI toolchains, active adapter configuration, and pipeline state integrity. Supports --json and --fix. Use when user runs devflow.doctor, asks to diagnose the environment, check MCP servers, or troubleshoot pipeline prerequisites."
 argument-hint: "[--json] [--fix]"
 disable-model-invocation: true
@@ -8,6 +8,8 @@ disable-model-invocation: true
 > **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
 
 # Skill: devflow.doctor
+
+**Arguments:** `$ARGUMENTS` — empty → run diagnostics read-only (no `--json`, no `--fix`).
 
 Pre-flight diagnostic health check for DevFlow. Assesses environment readiness across MCP servers, CLI toolchains, project configuration, and pipeline state.
 

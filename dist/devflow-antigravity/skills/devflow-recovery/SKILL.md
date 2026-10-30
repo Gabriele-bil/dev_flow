@@ -7,6 +7,8 @@ argument-hint: "[optional-feature]"
 
 # Skill: devflow-recovery
 
+**Arguments:** `$ARGUMENTS` — empty → diagnose the feature resolved with `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" resolve`, plus every `blocked` feature.
+
 Pipeline rescue. Diagnoses state, identifies failure point, proposes recovery path — no guessing.
 
 ## Purpose
@@ -31,7 +33,7 @@ Recover a blocked or corrupted pipeline: read `plan.md` (authoritative) + `.devf
 
 - [ ] `.devflow-state.json` exists (or explicitly missing — that is the failure)
 - [ ] `devflow/config.md` present (adapter known; monorepo: `plan.md`'s App resolves in the `## Apps` table)
-- Failure condition: both files absent → inform user: "DevFlow not initialized. Run `/devflow.setup`"
+- Failure condition: both files absent → inform user: "DevFlow not initialized. Run `/devflow-setup`"
 
 ## Workflow
 

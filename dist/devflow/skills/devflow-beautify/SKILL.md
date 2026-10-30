@@ -1,5 +1,5 @@
 ---
-name: devflow-beautify
+name: beautify
 description: "Reviews devflow.implement output: correctness, readability, security, performance, architecture, UI. Use when user runs devflow.beautify, reviews implementation output, or fourth pipeline step."
 argument-hint: "[optional-plan-path]"
 disable-model-invocation: true
@@ -13,7 +13,7 @@ effort: medium
 
 ## Quick Start
 
-Run `/devflow.beautify [optional plan path]`.
+Run `/devflow:beautify [optional plan path]`.
 
 - If an argument is passed, use it as the `plan.md` path
 - If no argument is passed, resolve feature with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve` (exit 1 → ask)

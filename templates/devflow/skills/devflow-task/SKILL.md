@@ -8,6 +8,8 @@ effort: low
 
 # Skill: devflow.task
 
+**Arguments:** `$ARGUMENTS` — empty → ask the user for the feature idea before proceeding.
+
 ## Purpose
 
 Turn raw idea into a lean, product-focused Agile task. Acts as Requirements Architect: applies INVEST criteria, Connextra user story format, vertical splitting (Read vs Write isolation), and BDD Gherkin acceptance criteria. First DevFlow step and primary entry point for `devflow.plan`.

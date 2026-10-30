@@ -8,9 +8,11 @@ disable-model-invocation: true
 
 # Skill: devflow.run
 
+**Arguments:** `$ARGUMENTS` — empty → use `--from implement --until test` on the feature resolved with `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" resolve`.
+
 ## Quick Start
 
-Run `/devflow.run [--from implement] [--until test]`.
+Run `/devflow-run [--from implement] [--until test]`.
 
 - Defaults: `--from implement --until test`
 - `--from` ∈ `implement` | `beautify` | `test`; `--until` ∈ `beautify` | `test` | `ship`

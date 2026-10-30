@@ -8,6 +8,8 @@ disable-model-invocation: true
 
 # Skill: devflow.doctor
 
+**Arguments:** `$ARGUMENTS` — empty → run diagnostics read-only (no `--json`, no `--fix`).
+
 Pre-flight diagnostic health check for DevFlow. Assesses environment readiness across MCP servers, CLI toolchains, project configuration, and pipeline state.
 
 ## Purpose

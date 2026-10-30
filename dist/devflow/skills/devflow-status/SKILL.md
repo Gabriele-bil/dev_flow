@@ -1,5 +1,5 @@
 ---
-name: devflow-status
+name: status
 description: Shows current DevFlow pipeline state (read-only) — active feature, plan status, progress, next step, adapter. Supports --json with stable exit codes. Use when the user asks where they are in the pipeline, what to run next, or to show the current state.
 argument-hint: "[--json]"
 ---
@@ -7,6 +7,8 @@ argument-hint: "[--json]"
 > **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
 
 # Skill: devflow-status
+
+**Arguments:** `$ARGUMENTS` — empty → show the dashboard (not `--json`).
 
 Pipeline dashboard. Shows current state without advancing the pipeline. `--json` → machine-readable output for CI/scripts.
 
@@ -97,7 +99,7 @@ Start a feature: devflow.task   <!-- blocked features listed → devflow.recover
 **Case C — no `devflow/config.md`:**
 
 ```text
-DevFlow not configured. Run: /devflow.setup
+DevFlow not configured. Run: /devflow:setup
 ```
 
 ## Metrics pointer (optional)

@@ -1,5 +1,5 @@
 ---
-name: devflow-recovery
+name: recovery
 description: Diagnoses and repairs a stuck, blocked, or corrupted DevFlow pipeline. Use when a pipeline step fails repeatedly, plan.md is blocked, or state files are inconsistent or corrupted.
 argument-hint: "[optional-feature]"
 ---
@@ -7,6 +7,8 @@ argument-hint: "[optional-feature]"
 > **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
 
 # Skill: devflow-recovery
+
+**Arguments:** `$ARGUMENTS` — empty → diagnose the feature resolved with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve`, plus every `blocked` feature.
 
 Pipeline rescue. Diagnoses state, identifies failure point, proposes recovery path — no guessing.
 
@@ -32,7 +34,7 @@ Recover a blocked or corrupted pipeline: read `plan.md` (authoritative) + `.devf
 
 - [ ] `.devflow-state.json` exists (or explicitly missing — that is the failure)
 - [ ] `devflow/config.md` present (adapter known; monorepo: `plan.md`'s App resolves in the `## Apps` table)
-- Failure condition: both files absent → inform user: "DevFlow not initialized. Run `/devflow.setup`"
+- Failure condition: both files absent → inform user: "DevFlow not initialized. Run `/devflow:setup`"
 
 ## Workflow
 

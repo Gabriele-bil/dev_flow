@@ -1,5 +1,5 @@
 ---
-name: devflow-discover
+name: discover
 description: "Guides architectural discovery for greenfield applications or complex features, compares technical options, and records decisions in ADRs. Use when exploring architecture choices, evaluating trade-offs, or before devflow.setup or devflow.task."
 argument-hint: "[--app <name>] [--feature <slug>] [topic-or-scope]"
 model: sonnet
@@ -9,6 +9,8 @@ effort: high
 > **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
 
 # Skill: devflow.discover
+
+**Arguments:** `$ARGUMENTS` — empty → ask the user which architectural choice or feature to explore.
 
 ## Purpose
 
@@ -106,10 +108,10 @@ Generate 2–3 distinct, viable architectural options grounded in the confirmed 
 
 - **Greenfield App Mode:**
   - If chosen stack matches an adapter (Angular, Flutter, Next.js, NestJS), instruct user:
-    "Baseline architecture recorded in `docs/adr/ADR-[NNN]-[title-slug].md`. Run `/devflow.setup` to initialize project context and adapters."
+    "Baseline architecture recorded in `docs/adr/ADR-[NNN]-[title-slug].md`. Run `/devflow:setup` to initialize project context and adapters."
 - **Feature Architecture Mode:**
   - Instruct user:
-    "Feature architecture recorded in `docs/adr/ADR-[NNN]-[title-slug].md`. Run `/devflow.task [feature idea]` (referencing this ADR) to start implementation pipeline."
+    "Feature architecture recorded in `docs/adr/ADR-[NNN]-[title-slug].md`. Run `/devflow:task [feature idea]` (referencing this ADR) to start implementation pipeline."
 
 ## Common Rationalizations
 

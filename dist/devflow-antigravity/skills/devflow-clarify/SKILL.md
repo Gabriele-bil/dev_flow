@@ -1,10 +1,13 @@
 ---
 name: devflow-clarify
 description: "Resolves [NEEDS CLARIFICATION: ...] markers in task.md via incremental Q&A. 8D scan → up to 5 questions → updates task.md → sets Status clarified. Use when task.md has open markers or high-risk assumptions before devflow.plan."
+argument-hint: "[optional-task-path]"
 ---
 
 
 # Skill: devflow.clarify
+
+**Arguments:** `$ARGUMENTS` — empty → resolve the feature with `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask the user).
 
 ## Purpose
 

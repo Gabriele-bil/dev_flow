@@ -436,8 +436,8 @@ Il problema di fondo è uno solo: **c'è un solo `hooks.json`, scritto per Claud
 🟠 `CC` 📄 **I comandi contraddicono le skill che chiamano.**
 
 - **Contraddizioni:**
-  - `commands/devflow.ship.md` lancia sempre 3 agenti; la skill ne lancia 1, 3 o 5 secondo la complessità.
-  - `commands/devflow.analyze.md` dichiara 5 passate; la skill ne esegue 7.
+  - commands/devflow.ship.md (rimosso in 3.0.0) lancia sempre 3 agenti; la skill ne lancia 1, 3 o 5 secondo la complessità.
+  - commands/devflow.analyze.md (rimosso in 3.0.0) dichiara 5 passate; la skill ne esegue 7.
   - Il comando metrics parla di pass@1, la skill di pass@k.
   - L'`argument-hint` di learn non include `check`.
 - **Modelli incoerenti:**
@@ -531,7 +531,7 @@ Il problema di fondo è uno solo: **c'è un solo `hooks.json`, scritto per Claud
 
 🟡 `CC` 📄 **`dist/` contiene file inutili.**
 
-- **Problema:** il build per Claude Code include `hooks/tests/` (108K) e la variante `hooks.antigravity.json`; `hooks.cursor.json` sparisce con [C-7](#c-7). Anche `commands/devflow.lint-skills.md` è uno strumento per chi mantiene il plugin, non per chi lo usa. Inoltre usa una sintassi non valida (`${ $ARGUMENTS ? … }`).
+- **Problema:** il build per Claude Code include `hooks/tests/` (108K) e la variante `hooks.antigravity.json`; `hooks.cursor.json` sparisce con [C-7](#c-7). Anche il comando lint-skills (rimosso in 3.0.0) è uno strumento per chi mantiene il plugin, non per chi lo usa. Inoltre usa una sintassi non valida (`${ $ARGUMENTS ? … }`).
 - **Correzione:** escludere questi file dal build.
 
 ### C-7

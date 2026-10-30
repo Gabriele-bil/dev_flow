@@ -6,6 +6,8 @@ argument-hint: "[log, search <query>, list, check, prune, boost <id>, promote <i
 
 # Skill: devflow.learn
 
+**Arguments:** `$ARGUMENTS` — empty → run `list`.
+
 ## Purpose
 
 Read, write, and maintain persistent instincts across local and team stores:

@@ -6,7 +6,7 @@ AI agents write code fast and forget faster. Ask for a feature and you get files
 
 DevFlow turns that into a pipeline. Every feature starts as a **spec** (`task.md`), becomes a **file-ordered plan** with a traceability table (every subtask → acceptance criterion → file), gets implemented in **vertical slices**, then passes **explicit gates**: multi-axis review, tests, goal-backward verification of every acceptance criterion, and a parallel multi-agent ship gate — before a PR is opened. **You stay the orchestrator**: each step is a command you invoke, with an input contract that refuses to run on bad state. Stack knowledge comes from **adapters** (Flutter, Angular, Next.js) so the agent follows *your* stack's rules, not generic ones.
 
-This directory is the installable package: core pipeline skills, slash commands, hooks, references, and adapters.
+This directory is the installable package: core pipeline skills (the slash commands), hooks, references, and adapters.
 
 ## Quick start
 
@@ -33,7 +33,7 @@ Full setup:
 
 1. **Active stack** — edit [`config.md`](config.md); set **Adapter** to `flutter`, `angular`, `nextjs`, or `nestjs`.
 2. **Run setup once** — execute `devflow.setup` to generate root `AGENTS.md` and `REGISTRY.md` for the consumer project.
-3. **Run the pipeline** — invoke commands under [`commands/`](commands/) (e.g. `devflow.task`) or load as a plugin and use your host’s namespaced invocations.
+3. **Run the pipeline** — each step is a skill: `/devflow:<step>` on Claude Code (e.g. `/devflow:task`), `/devflow-<step>` on Antigravity CLI.
 4. **Enable code-review-graph** — install and configure once for all detected hosts:
    - `pipx install code-review-graph` (or `pip install code-review-graph`)
    - `code-review-graph install`

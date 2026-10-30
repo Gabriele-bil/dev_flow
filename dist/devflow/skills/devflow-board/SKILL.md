@@ -1,5 +1,5 @@
 ---
-name: devflow-board
+name: board
 description: "Generates and auto-syncs a deterministic, static, read-only HTML project board in devflow/board/index.html visualizing Kanban task stages, dependency DAG critical path, formatted Markdown specs, and per-command execution timings. Use when user runs devflow.board, opens the visual project kanban board, or inspects task lead times."
 argument-hint: "[--open] [--sync] [--port <port>] [--json]"
 disable-model-invocation: true
@@ -9,9 +9,11 @@ disable-model-invocation: true
 
 # Skill: devflow.board
 
+**Arguments:** `$ARGUMENTS` — empty → generate the board without opening or syncing.
+
 ## Quick Start
 
-Run `/devflow.board [--open] [--sync] [--port <port>] [--json]`.
+Run `/devflow:board [--open] [--sync] [--port <port>] [--json]`.
 
 - First run initializes `devflow/board/index.html` from `${CLAUDE_PLUGIN_ROOT}/skills/devflow-board/assets/board-template.html` and writes `devflow/board/board-data.js` + `devflow/board/board-data.json`
 - Subsequent runs or hook invocations (`board.sh --sync`) refresh `devflow/board/board-data.js` in place without recreating `index.html`

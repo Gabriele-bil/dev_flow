@@ -8,6 +8,8 @@ init ─────────────────────────
               blueprint (3+ PRs) ─────┘
 ```
 
+Each step `devflow.<step>` is a skill the user runs as a slash command: `devflow.plan` is `/devflow.plan`, `devflow.ship` is `/devflow.ship` — suggest steps in that form.
+
 Statuses + transitions: `@devflow/references/state-machine.md`. Active feature: `bash "@devflow/scripts/devflow-state.sh" resolve` (`status` for one line with next step). `plan.md` Status wins over `.devflow-state.json`.
 
 ## Decision tree (first match wins)

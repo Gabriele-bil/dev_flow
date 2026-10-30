@@ -119,7 +119,7 @@ Findings are grouped by theme, each with: the gap, the reference tool(s), and a 
 | 2 | No generic destructive-command hook | Claude Code Safety Net, GouvernAI, Agent Guard | `hooks/pre-bash-destructive-guard.sh` (new), `hooks/hooks.json` | Medium | ✅ Applied |
 | 3 | Learnings never decay on revert | presence, roampal-core | `skills/devflow-learn/SKILL.md`, `hooks/observe.sh` | Medium | ✅ Applied |
 | 4 | Ship-gate conflict resolution undocumented | Agent Collab Skills | `skills/devflow-ship/SKILL.md` | Medium | ✅ Applied |
-| 5 | JSONL logs are headless | Multi-Agent Observability | `commands/devflow.status.md` | Low | ✅ Applied |
+| 5 | JSONL logs are headless | Multi-Agent Observability | commands/devflow.status.md (rimosso in 3.0.0) | Low | ✅ Applied |
 | 6 | No documented skill/hook/rule decision rule | Anthropic "Steering Claude Code" | `CONTRIBUTING.md` | Low | ✅ Applied |
 
 ## Explicitly not recommended

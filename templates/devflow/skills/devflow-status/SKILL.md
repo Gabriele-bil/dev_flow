@@ -6,6 +6,8 @@ argument-hint: "[--json]"
 
 # Skill: devflow-status
 
+**Arguments:** `$ARGUMENTS` — empty → show the dashboard (not `--json`).
+
 Pipeline dashboard. Shows current state without advancing the pipeline. `--json` → machine-readable output for CI/scripts.
 
 ## Purpose

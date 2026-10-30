@@ -10,7 +10,7 @@ disable-model-invocation: true
 
 ## Quick Start
 
-Run `/devflow.auto <idea> [--app <name>]`.
+Run `/devflow-auto <idea> [--app <name>]`.
 
 - `devflow.run` with the `task → pr` preset: `task → plan → analyze → implement → beautify → test → ship → pr`, unattended from raw idea to opened PR
 - `--app <name>`: required only when `devflow/config.md` has a `## Apps` table (monorepo)

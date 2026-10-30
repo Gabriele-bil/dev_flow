@@ -1,10 +1,13 @@
 ---
 name: devflow-analyze
 description: "Read-only check: task.md+plan.md+constitution.md+ADRs consistency. Flags traceability gaps, untestable ACs, terminology drift, layer violations, ADR misalignment. Use when user runs devflow.analyze — after devflow.plan (ready), before devflow.implement."
+argument-hint: "[optional-feature-path]"
 ---
 
 
 # Skill: devflow.analyze
+
+**Arguments:** `$ARGUMENTS` — empty → resolve the feature with `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask the user).
 
 ## Purpose
 

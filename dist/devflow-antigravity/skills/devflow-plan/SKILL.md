@@ -10,7 +10,7 @@ disable-model-invocation: true
 
 ## Quick Start
 
-Run `/devflow.plan [optional task path]`.
+Run `/devflow-plan [optional task path]`.
 
 - If an argument is passed, use it as the `task.md` path
 - If no argument is passed, resolve feature with `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask)

@@ -1,5 +1,5 @@
 ---
-name: devflow-init
+name: init
 description: "Bootstraps greenfield projects end-to-end: conducts a multi-phase interview, scaffolds evergreen workspaces (Nx, Angular, Next.js, Flutter, NestJS), generates plugin context and ADR-001, and writes an ordered multi-task roadmap with inter-task dependencies. Use when user runs devflow.init or starts a brand-new project from scratch."
 argument-hint: "[optional-project-name-or-brief] [--mcp]"
 disable-model-invocation: true
@@ -11,9 +11,11 @@ effort: high
 
 # Skill: devflow.init
 
+**Arguments:** `$ARGUMENTS` — empty → start the interview (project name/brief asked there).
+
 ## Quick Start
 
-Run `/devflow.init [optional-project-name-or-brief] [--mcp]`.
+Run `/devflow:init [optional-project-name-or-brief] [--mcp]`.
 
 - Emits upfront long-process notice and runs 3-phase interview (Product → Topology/Stack → Conventions)
 - Optionally scaffolds evergreen technology files (Nx, Angular, Next.js, Flutter, NestJS) via live registry lookup + `@latest` CLIs
@@ -111,7 +113,7 @@ Decompose project and generate all tasks on `main` per `${CLAUDE_PLUGIN_ROOT}/sk
 
 ### Step 5 — Completion Summary & Handoff
 
-Emit consolidated initialization report: project root, topology & stack(s), scaffolded apps + analysis verdict, generated context/ADR files, total tasks (`001..NNN`) + parallel-safe count in `devflow/plans/project-blueprint.md`, and next step (`/devflow.plan` — automatically resolves `001_<first-feature>`).
+Emit consolidated initialization report: project root, topology & stack(s), scaffolded apps + analysis verdict, generated context/ADR files, total tasks (`001..NNN`) + parallel-safe count in `devflow/plans/project-blueprint.md`, and next step (`/devflow:plan` — automatically resolves `001_<first-feature>`).
 
 ## Common Rationalizations
 

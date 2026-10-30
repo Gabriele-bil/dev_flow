@@ -7,6 +7,8 @@ argument-hint: "[optional-feature]"
 
 # Skill: devflow.resume
 
+**Arguments:** `$ARGUMENTS` — empty → resume the feature resolved with `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" resolve`.
+
 First-class session re-entry. Reads state, validates it against files, routes to the correct pipeline step — no re-deriving from scratch, no re-implementing `[done]` work.
 
 ## Purpose
@@ -32,7 +34,7 @@ Resume an interrupted pipeline at the exact position it stopped. Promotes the re
 - [ ] `devflow/config.md` exists (adapter known; monorepo: `plan.md`'s App resolves in the `## Apps` table — see `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md`)
 - [ ] `.devflow-state.json` exists OR at least one `devflow/features/*/plan.md` exists
 
-Both absent → stop: "Nothing to resume. Start with `/devflow.task` (or `/devflow.setup` on a new project)."
+Both absent → stop: "Nothing to resume. Start with `/devflow-task` (or `/devflow-setup` on a new project)."
 
 ## Workflow
 

@@ -1,5 +1,5 @@
 ---
-name: devflow-backprop
+name: backprop
 description: Backpropagates a bug or failing test into the spec — traces failure to its acceptance criterion via traceability, classifies the gap, tightens task.md, adds regression test. Use when a bug found after implement reveals a spec gap.
 argument-hint: "[bug-description-or-test-path]"
 ---
@@ -7,6 +7,8 @@ argument-hint: "[bug-description-or-test-path]"
 > **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
 
 # Skill: devflow.backprop
+
+**Arguments:** `$ARGUMENTS` — empty → ask the user for the observed failure before Step 1.
 
 Spec backpropagation. A bug that escaped the pipeline means the spec was wrong, not only the code. Fix the spec, add a regression test, log the gap category — the next feature must not repeat it.
 

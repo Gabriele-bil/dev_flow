@@ -1,5 +1,5 @@
 ---
-name: devflow-setup
+name: setup
 description: "Generates AGENTS.md, REGISTRY.md, docs/product.md via adapter templates + questionnaire. Use when running devflow.setup post-install, or adapter/stack/product context changes."
 argument-hint: "[--force] [--mcp]"
 disable-model-invocation: true
@@ -10,6 +10,8 @@ effort: medium
 > **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
 
 # Skill: devflow.setup
+
+**Arguments:** `$ARGUMENTS` — empty → run without `--force`/`--mcp` (managed sections only).
 
 ## Purpose
 

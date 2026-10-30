@@ -8,6 +8,8 @@ disable-model-invocation: true
 
 # Skill: devflow.setup
 
+**Arguments:** `$ARGUMENTS` — empty → run without `--force`/`--mcp` (managed sections only).
+
 ## Purpose
 
 Create or refresh global AI context files (`AGENTS.md`, `REGISTRY.md`) and product context (`docs/product.md`) in the consumer project root.

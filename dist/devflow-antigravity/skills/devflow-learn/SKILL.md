@@ -7,6 +7,8 @@ argument-hint: "[log, search <query>, list, check, prune, boost <id>, promote <i
 
 # Skill: devflow.learn
 
+**Arguments:** `$ARGUMENTS` — empty → run `list`.
+
 ## Purpose
 
 Read, write, and maintain persistent instincts across local and team stores:
@@ -128,7 +130,7 @@ jq -r --argjson shared "$SHARED_JSON" --argjson local "$LOCAL_JSON" '
     + "[" + (.confidence | tostring) + " " + (.domain // "general")
     + (if .scope == "team" then " 👥 team" else " 🏠 local" end)
     + "] " + .trigger + " → " + .action
-    + (if .scope == "local" and .confidence >= 0.85 then " (⭐ eligible: /devflow.learn promote " + .id + ")" else "" end)
+    + (if .scope == "local" and .confidence >= 0.85 then " (⭐ eligible: /devflow-learn promote " + .id + ")" else "" end)
 ' 2>/dev/null
 ```
 
@@ -148,7 +150,7 @@ Promote a high-confidence local instinct to `.devflow-instincts.shared.yaml` (co
 ENTRY=$(yq -o=json ".instincts[] | select(.id == \"<ID>\")" .devflow-instincts.yaml 2>/dev/null)
 ```
 
-If empty: "No local instinct with id `<ID>`. Use `/devflow.learn list`."
+If empty: "No local instinct with id `<ID>`. Use `/devflow-learn list`."
 
 #### Step 2 — Verify confidence threshold
 

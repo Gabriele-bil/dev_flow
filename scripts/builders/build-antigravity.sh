@@ -11,7 +11,8 @@
 #     PostToolUseFailure) esclusi; matcher tradotti nei nomi tool di agy;
 #     ogni comando riceve DEVFLOW_HOST/DEVFLOW_EVENT (il payload agy non
 #     contiene il nome evento) e gira dalla radice del plugin (cwd di agy).
-#   - niente commands/: agy non carica comandi; le skill sono già slash command.
+#   - le skill sono i comandi slash: name = nome della cartella (devflow-<passo>,
+#     /devflow-<passo>), e /devflow:<passo> del build Claude Code → /devflow-<passo>.
 #   - frontmatter: via i campi solo-Claude Code da skill e agenti;
 #     disable-model-invocation resta: agy 1.4.9 lo rispetta (non documentato);
 #     `tools` degli agenti tradotto nella lista di tool ammessi di agy.
@@ -182,6 +183,24 @@ LEFT="$(find "$AGY_DIR/skills" "$AGY_DIR/references" "$AGY_DIR/agents" "$AGY_DIR
   -name '*.md' ! -path '*/templates/*' -exec grep -lE "@devflow/${PLUGIN_DIRS_RE}/|CLAUDE_PLUGIN_ROOT|Plugin root:" {} + 2>/dev/null || true)"
 [ -z "$LEFT" ] || fail "percorsi non tradotti in: $LEFT"
 ok "Percorsi del plugin risolti"
+
+# ── Nomi slash ────────────────────────────────────────────────────────────────
+# Il build Claude Code accorcia name: devflow-<passo> in name: <passo> (comando
+# /devflow:<passo>). agy non mette prefissi di plugin e vuole name uguale alla
+# cartella: qui il comando resta /devflow-<passo>, che non collide con /plan & co.
+step "Nomi slash → /$NAME-<passo>"
+for d in "$AGY_DIR"/skills/*/; do
+  f="$d/SKILL.md"; [ -f "$f" ] || continue
+  dir_name="$(basename "$d")"
+  awk -v n="$dir_name" 'NR > 1 && /^---$/ { fm = 1 } !fm && !done && /^name:/ { print "name: " n; done = 1; next } { print }' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+done
+AGY_STEPS_RE="$(find "$AGY_DIR/skills" -mindepth 1 -maxdepth 1 -type d -name "$NAME-*" | sed "s#.*/$NAME-##" | sort -r | paste -sd'|' -)"
+while IFS= read -r f; do
+  sed -E "s#/${NAME}:(${AGY_STEPS_RE})([^a-z-]|\$)#/${NAME}-\1\2#g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+done < <(grep -rlE "/${NAME}:(${AGY_STEPS_RE})" "$AGY_DIR" --include='*.md' --include='*.sh' --include='*.yaml' --include='*.html' --include='*.json' 2>/dev/null)
+LEFT="$(grep -rlE "/${NAME}:(${AGY_STEPS_RE})([^a-z-]|\$)" "$AGY_DIR" 2>/dev/null || true)"
+[ -z "$LEFT" ] || fail "/$NAME:<passo> non tradotto in: $LEFT"
+ok "Skill invocabili come /$NAME-<passo>"
 
 # ── rules/ ────────────────────────────────────────────────────────────────────
 step "rules/devflow-orientation.md"

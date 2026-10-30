@@ -1,6 +1,7 @@
 ---
-name: devflow-clarify
+name: clarify
 description: "Resolves [NEEDS CLARIFICATION: ...] markers in task.md via incremental Q&A. 8D scan → up to 5 questions → updates task.md → sets Status clarified. Use when task.md has open markers or high-risk assumptions before devflow.plan."
+argument-hint: "[optional-task-path]"
 model: haiku
 effort: low
 ---
@@ -8,6 +9,8 @@ effort: low
 > **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
 
 # Skill: devflow.clarify
+
+**Arguments:** `$ARGUMENTS` — empty → resolve the feature with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve` (exit 1 → ask the user).
 
 ## Purpose
 

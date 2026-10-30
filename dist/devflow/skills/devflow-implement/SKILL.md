@@ -1,5 +1,5 @@
 ---
-name: devflow-implement
+name: implement
 description: Implements DevFlow plan files per architecture conventions, MCP-assisted validation. Use when user runs devflow.implement, executes plan.md, or third pipeline step.
 argument-hint: "[optional-plan-path] [--fix <findings|files>]"
 disable-model-invocation: true
@@ -13,7 +13,7 @@ effort: medium
 
 ## Quick Start
 
-Run `/devflow.implement [optional plan path] [--fix <findings|files>]`.
+Run `/devflow:implement [optional plan path] [--fix <findings|files>]`.
 
 - If an argument is passed, use it as the `plan.md` path
 - `--fix` → **re-entry mode** (see below): targeted fixes only

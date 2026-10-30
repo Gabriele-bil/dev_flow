@@ -1,5 +1,5 @@
 ---
-name: devflow-plan
+name: plan
 description: Transforms DevFlow task into file-oriented implementation plan. Use when user runs devflow.plan, creates planning artifact from task, or plan.md for feature.
 argument-hint: "[optional-task-path]"
 disable-model-invocation: true
@@ -13,7 +13,7 @@ effort: high
 
 ## Quick Start
 
-Run `/devflow.plan [optional task path]`.
+Run `/devflow:plan [optional task path]`.
 
 - If an argument is passed, use it as the `task.md` path
 - If no argument is passed, resolve feature with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve` (exit 1 → ask)

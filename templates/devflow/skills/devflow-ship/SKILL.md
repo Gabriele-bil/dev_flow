@@ -1,12 +1,15 @@
 ---
 name: devflow-ship
 description: 'Pre-merge fan-out gate: dispatches 1–5 review agents (code-reviewer, security-auditor, test-engineer, +2) per complexity profile, routes devflow.pr if clean. Use when user runs devflow.ship, wants pre-merge gate, or asks "ready to ship?" — after devflow.test, before devflow.pr.'
+argument-hint: "[optional notes for reviewers]"
 disable-model-invocation: true
 model: sonnet
 effort: high
 ---
 
 # Skill: devflow.ship
+
+**Arguments:** `$ARGUMENTS` — empty → dispatch without reviewer notes.
 
 ## Purpose
 

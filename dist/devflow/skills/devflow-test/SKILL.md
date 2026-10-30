@@ -1,5 +1,5 @@
 ---
-name: devflow-test
+name: test
 description: Writes/runs unit+integration tests via adapter targets, bounded retries. Use when user runs devflow.test, validates feature after beautify, or fifth pipeline step.
 argument-hint: "[optional-plan-path]"
 disable-model-invocation: true
@@ -13,7 +13,7 @@ effort: medium
 
 ## Quick Start
 
-Run `/devflow.test [optional plan path]`.
+Run `/devflow:test [optional plan path]`.
 
 - If an argument is passed, use it as the `plan.md` path
 - If no argument is passed, resolve feature with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve` (exit 1 → ask)

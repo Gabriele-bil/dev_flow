@@ -1,6 +1,7 @@
 ---
-name: devflow-pr
+name: pr
 description: Commits all changes, pushes the current DevFlow feature branch, and opens a pull request toward the repo's default branch. Use at the final step of the DevFlow pipeline or when the user asks to run devflow.pr.
+argument-hint: "[optional notes for PR body]"
 disable-model-invocation: true
 model: haiku
 effort: low
@@ -9,6 +10,8 @@ effort: low
 > **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
 
 # Skill: devflow.pr
+
+**Arguments:** `$ARGUMENTS` — empty → derive PR title/body from `task.md` + `plan.md`.
 
 ## Purpose
 

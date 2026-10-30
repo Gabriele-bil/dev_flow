@@ -8,6 +8,8 @@ disable-model-invocation: true
 
 # Skill: devflow.rollback
 
+**Arguments:** `$ARGUMENTS` — empty → roll back the active feature's last step (skill Step 1 defaults).
+
 Reverts the active DevFlow step to its clean pre-step checkpoint, restoring code and state machine synchronization.
 
 ## Purpose

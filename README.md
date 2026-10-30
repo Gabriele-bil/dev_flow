@@ -27,9 +27,9 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 
 ---
 
-## Commands (entry points)
+## Pipeline steps (entry points)
 
-| Command | Skill | Input → Output |
+| Step | Skill | Input → Output |
 | -------- | -------- | ---------------- |
 | `devflow.init` | [`templates/devflow/skills/devflow-init/SKILL.md`](templates/devflow/skills/devflow-init/SKILL.md) | Project brief + interview → greenfield repo + live tech scaffold (Nx, Angular, Next.js, Flutter, NestJS) + `AGENTS.md` + `REGISTRY.md` + `constitution.md` + `ADR-001` + `project-blueprint.md` + ordered `001..NNN` `task.md` files |
 | `devflow.setup` | [`templates/devflow/skills/devflow-setup/SKILL.md`](templates/devflow/skills/devflow-setup/SKILL.md) | Consumer repo context + adapter templates → root `AGENTS.md` + `REGISTRY.md` |
@@ -42,7 +42,7 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 | `devflow.implement` | [`templates/devflow/skills/devflow-implement/SKILL.md`](templates/devflow/skills/devflow-implement/SKILL.md) | `plan.md` → code on `feat \| fix \| …/[NNN]_[name]` |
 | `devflow.beautify` | [`templates/devflow/skills/devflow-beautify/SKILL.md`](templates/devflow/skills/devflow-beautify/SKILL.md) | Implemented files → polished code |
 | `devflow.test` | [`templates/devflow/skills/devflow-test/SKILL.md`](templates/devflow/skills/devflow-test/SKILL.md) | Feature → unit + integration tests |
-| `devflow.ship` | [`templates/devflow/commands/devflow.ship.md`](templates/devflow/commands/devflow.ship.md) | Feature → parallel review (code + security + tests + a11y + docs) → gate before PR |
+| `devflow.ship` | [`templates/devflow/skills/devflow-ship/SKILL.md`](templates/devflow/skills/devflow-ship/SKILL.md) | Feature → parallel review (code + security + tests + a11y + docs) → gate before PR |
 | `devflow.pr` | [`templates/devflow/skills/devflow-pr/SKILL.md`](templates/devflow/skills/devflow-pr/SKILL.md) | Branch → PR to `main` |
 | `devflow.status` | [`templates/devflow/skills/devflow-status/SKILL.md`](templates/devflow/skills/devflow-status/SKILL.md) | — → current pipeline state dashboard |
 | `devflow.doctor` | [`templates/devflow/skills/devflow-doctor/SKILL.md`](templates/devflow/skills/devflow-doctor/SKILL.md) | — → pre-flight diagnostic (MCP reachability, CLI tools, pipeline state) |
@@ -53,7 +53,14 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 | `devflow.board` | [`templates/devflow/skills/devflow-board/SKILL.md`](templates/devflow/skills/devflow-board/SKILL.md) | — → static, read-only, auto-updating HTML project board (`devflow/board/index.html`) with Kanban, Dependency DAG, Markdown viewer, and command timings |
 | `devflow.recovery` | [`templates/devflow/skills/devflow-recovery/SKILL.md`](templates/devflow/skills/devflow-recovery/SKILL.md) | Stuck pipeline → diagnosis + targeted recovery path |
 
-Command wrappers live in [`templates/devflow/commands/`](templates/devflow/commands/).
+Skills are the only entry point (3.0.0): there are no command wrappers. Each step `devflow.<step>` is invoked as:
+
+| Host | Slash name | Example |
+| --- | --- | --- |
+| Claude Code | `/devflow:<step>` | `/devflow:plan 003` |
+| Antigravity CLI | `/devflow-<step>` | `/devflow-plan 003` |
+
+**Migrating from 2.x (Claude Code):** `/devflow:devflow.<step>` (command) and `/devflow:devflow-<step>` (skill) both become `/devflow:<step>` — e.g. `/devflow:devflow.ship` → `/devflow:ship`. The skill now runs with its own frontmatter (`effort`, `disable-model-invocation`) instead of being read as text by a command. Antigravity CLI names are unchanged (`/devflow-<step>`).
 
 ---
 
@@ -85,7 +92,6 @@ dev_flow/
 │       ├── hooks/
 │       │   ├── hooks.json           # Lifecycle hook config
 │       │   └── *.sh                 # Hook scripts
-│       ├── commands/                # Slash-command entry points
 │       ├── skills/                  # Core pipeline skills (devflow-*)
 │       │   ├── devflow-analyze/
 │       │   ├── devflow-beautify/
@@ -134,7 +140,7 @@ dev_flow/
 │       ├── .antigravity-plugin/     # plugin.json (generated)
 │       ├── hooks.json               # hooks/hooks.json translated to agy events/tools
 │       ├── rules/                   # devflow-orientation.md (static routing rule)
-│       └── ...                      # skills/agents with Claude-only frontmatter removed; no commands/
+│       └── ...                      # skills/agents with Claude-only frontmatter removed
 ├── scripts/
 │   ├── build-plugin.sh              # Orchestrator: reads manifest.json, calls builders
 │   └── builders/
@@ -181,7 +187,7 @@ DevFlow ships one build per host, generated from the same source: [`dist/devflow
 
 | Feature | Claude Code | Antigravity CLI |
 | --- | --- | --- |
-| Pipeline skills, adapters, references | ✅ | ✅ (skills are slash commands; `commands/` not shipped) |
+| Pipeline skills, adapters, references | ✅ `/devflow:<step>` | ✅ `/devflow-<step>` |
 | User-only skills (`disable-model-invocation`: pr, rollback, ship, auto, …) | ✅ run only on `/` | ✅ run only on `/` (honored by agy 1.4.9) |
 | Review subagents (`agents/`) | ✅ read-only tools, `model: sonnet` | ✅ read-only tools (`tools` translated to agy's allowlist, verified on agy 1.4.10), host default model |
 | Destructive-command / config-protect / scope guards | ✅ | ✅ (`run_command`, file-write tools) |

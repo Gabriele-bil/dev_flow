@@ -7,6 +7,8 @@ disable-model-invocation: true
 
 # Skill: devflow.run
 
+**Arguments:** `$ARGUMENTS` — empty → use `--from implement --until test` on the feature resolved with `bash "@devflow/scripts/devflow-state.sh" resolve`.
+
 ## Quick Start
 
 Run `/devflow.run [--from implement] [--until test]`.

@@ -8,6 +8,8 @@ disable-model-invocation: true
 
 # Skill: devflow.worktree
 
+**Arguments:** `$ARGUMENTS` — empty → run `create` for the active feature.
+
 ## Purpose
 
 Create, list, or remove isolated git worktrees for parallel feature development. Each worktree gets its own checkout, branch, and dev-server port offset — no manual port juggling, no colliding on the same files across parallel sessions.

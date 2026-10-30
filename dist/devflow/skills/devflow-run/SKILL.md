@@ -1,5 +1,5 @@
 ---
-name: devflow-run
+name: run
 description: "Middle pipeline batch executor: chains implement → beautify → test for an approved plan in one unattended session with a consolidated report; stops before ship. Use when user runs devflow.run or asks to execute the middle pipeline autonomously without pausing at each step gate, or take plan through review and tests."
 argument-hint: "[--from implement|beautify|test] [--until beautify|test|ship]"
 disable-model-invocation: true
@@ -9,9 +9,11 @@ disable-model-invocation: true
 
 # Skill: devflow.run
 
+**Arguments:** `$ARGUMENTS` — empty → use `--from implement --until test` on the feature resolved with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve`.
+
 ## Quick Start
 
-Run `/devflow.run [--from implement] [--until test]`.
+Run `/devflow:run [--from implement] [--until test]`.
 
 - Defaults: `--from implement --until test`
 - `--from` ∈ `implement` | `beautify` | `test`; `--until` ∈ `beautify` | `test` | `ship`

@@ -8,9 +8,11 @@ disable-model-invocation: true
 
 # Skill: devflow.init
 
+**Arguments:** `$ARGUMENTS` — empty → start the interview (project name/brief asked there).
+
 ## Quick Start
 
-Run `/devflow.init [optional-project-name-or-brief] [--mcp]`.
+Run `/devflow-init [optional-project-name-or-brief] [--mcp]`.
 
 - Emits upfront long-process notice and runs 3-phase interview (Product → Topology/Stack → Conventions)
 - Optionally scaffolds evergreen technology files (Nx, Angular, Next.js, Flutter, NestJS) via live registry lookup + `@latest` CLIs
@@ -108,7 +110,7 @@ Decompose project and generate all tasks on `main` per `$HOME/.gemini/antigravit
 
 ### Step 5 — Completion Summary & Handoff
 
-Emit consolidated initialization report: project root, topology & stack(s), scaffolded apps + analysis verdict, generated context/ADR files, total tasks (`001..NNN`) + parallel-safe count in `devflow/plans/project-blueprint.md`, and next step (`/devflow.plan` — automatically resolves `001_<first-feature>`).
+Emit consolidated initialization report: project root, topology & stack(s), scaffolded apps + analysis verdict, generated context/ADR files, total tasks (`001..NNN`) + parallel-safe count in `devflow/plans/project-blueprint.md`, and next step (`/devflow-plan` — automatically resolves `001_<first-feature>`).
 
 ## Common Rationalizations
 

@@ -9,7 +9,7 @@ argument-hint: "[objective or path-to-brief]"
 
 ## Quick Start
 
-Run `/devflow.blueprint [objective or path to brief]`.
+Run `/devflow-blueprint [objective or path to brief]`.
 
 - If an argument is passed and it is a file path, read it as the objective brief
 - If free text is passed, use it as the objective

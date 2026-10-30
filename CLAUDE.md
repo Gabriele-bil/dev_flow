@@ -12,7 +12,6 @@ Read `templates/devflow/CONTRIBUTING.md` for quality bar and style guidelines be
 - `templates/devflow/skills/<name>/SKILL.md` — core pipeline skills
 - `templates/devflow/adapters/<stack>/skills/<name>/SKILL.md` — adapter-specific skills
 - `templates/devflow/hooks/` — shell scripts + `hooks.json` (lifecycle hooks)
-- `templates/devflow/commands/` — slash command entry points
 
 ## Operational rules
 

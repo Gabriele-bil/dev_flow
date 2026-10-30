@@ -7,6 +7,8 @@ argument-hint: "[--json] [--feature <name>]"
 
 # Skill: devflow.metrics
 
+**Arguments:** `$ARGUMENTS` — empty → show the dashboard for all features.
+
 ## Purpose
 
 Aggregate and visualize local telemetry across token optimization, estimated LLM costs, first-pass success rate, and step durations:

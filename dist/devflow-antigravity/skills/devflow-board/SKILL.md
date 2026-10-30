@@ -8,9 +8,11 @@ disable-model-invocation: true
 
 # Skill: devflow.board
 
+**Arguments:** `$ARGUMENTS` — empty → generate the board without opening or syncing.
+
 ## Quick Start
 
-Run `/devflow.board [--open] [--sync] [--port <port>] [--json]`.
+Run `/devflow-board [--open] [--sync] [--port <port>] [--json]`.
 
 - First run initializes `devflow/board/index.html` from `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-board/assets/board-template.html` and writes `devflow/board/board-data.js` + `devflow/board/board-data.json`
 - Subsequent runs or hook invocations (`board.sh --sync`) refresh `devflow/board/board-data.js` in place without recreating `index.html`

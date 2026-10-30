@@ -47,7 +47,7 @@ done
 # Every script a skill, agent or reference calls must ship
 MISSING=""
 for REF in $(grep -rhoE '(CLAUDE_PLUGIN_ROOT\}|@devflow)/scripts/[A-Za-z0-9_.-]+\.sh' \
-    "$DIST_DIR/skills" "$DIST_DIR/agents" "$DIST_DIR/references" "$DIST_DIR/commands" 2>/dev/null | sed 's#.*/scripts/##' | sort -u); do
+    "$DIST_DIR/skills" "$DIST_DIR/agents" "$DIST_DIR/references" 2>/dev/null | sed 's#.*/scripts/##' | sort -u); do
   [ -f "$DIST_DIR/scripts/$REF" ] || MISSING="$MISSING $REF"
 done
 [ -z "$MISSING" ] || { echo "✗ scripts referenced but not shipped:$MISSING (add them to RUNTIME_SH)" >&2; exit 1; }

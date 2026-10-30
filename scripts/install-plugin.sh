@@ -183,7 +183,7 @@ validate_plugin() {
 # ── Install / Uninstall: Antigravity ─────────────────────────────────────────
 install_antigravity() {
   # dist/devflow-antigravity/ is the Antigravity build (root hooks.json,
-  # rules/, no commands/). Global scope goes through agy itself, which stages
+  # rules/). Global scope goes through agy itself, which stages
   # plugins under ~/.gemini/antigravity-cli/plugins/<name>/.
   local TARGET_DIR
   if [ "$SCOPE" = "workspace" ]; then

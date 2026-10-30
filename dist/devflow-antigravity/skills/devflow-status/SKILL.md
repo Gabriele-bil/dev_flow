@@ -7,6 +7,8 @@ argument-hint: "[--json]"
 
 # Skill: devflow-status
 
+**Arguments:** `$ARGUMENTS` — empty → show the dashboard (not `--json`).
+
 Pipeline dashboard. Shows current state without advancing the pipeline. `--json` → machine-readable output for CI/scripts.
 
 ## Purpose
@@ -96,7 +98,7 @@ Start a feature: devflow.task   <!-- blocked features listed → devflow.recover
 **Case C — no `devflow/config.md`:**
 
 ```text
-DevFlow not configured. Run: /devflow.setup
+DevFlow not configured. Run: /devflow-setup
 ```
 
 ## Metrics pointer (optional)

@@ -8,6 +8,8 @@ effort: high
 
 # Skill: devflow.discover
 
+**Arguments:** `$ARGUMENTS` — empty → ask the user which architectural choice or feature to explore.
+
 ## Purpose
 
 Interactive architectural discovery for greenfield applications or complex features. Analyzes problems across six architectural axes, asks targeted context questions, compares technical options, and records decisions in `docs/adr/ADR-NNN-[title].md`.

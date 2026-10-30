@@ -131,6 +131,6 @@ df_context "🧠 Project instincts (confidence ≥ 0.4):
 
 $ENTRIES
 
-Use /devflow.learn to manage instincts (log, search, list, prune, boost, promote)."
+Use /devflow:learn to manage instincts (log, search, list, prune, boost, promote)."
 
 exit 0

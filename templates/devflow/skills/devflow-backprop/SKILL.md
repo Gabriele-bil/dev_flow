@@ -6,6 +6,8 @@ argument-hint: "[bug-description-or-test-path]"
 
 # Skill: devflow.backprop
 
+**Arguments:** `$ARGUMENTS` — empty → ask the user for the observed failure before Step 1.
+
 Spec backpropagation. A bug that escaped the pipeline means the spec was wrong, not only the code. Fix the spec, add a regression test, log the gap category — the next feature must not repeat it.
 
 ## Purpose

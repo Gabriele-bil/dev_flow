@@ -1,5 +1,5 @@
 ---
-name: devflow-blueprint
+name: blueprint
 description: Transforms large objective into multi-PR blueprint with dependency graph and parallel-step detection. Use when feature requires 3+ PRs, spans sessions, or needs parallel workstreams.
 argument-hint: "[objective or path-to-brief]"
 model: opus
@@ -12,7 +12,7 @@ effort: high
 
 ## Quick Start
 
-Run `/devflow.blueprint [objective or path to brief]`.
+Run `/devflow:blueprint [objective or path to brief]`.
 
 - If an argument is passed and it is a file path, read it as the objective brief
 - If free text is passed, use it as the objective

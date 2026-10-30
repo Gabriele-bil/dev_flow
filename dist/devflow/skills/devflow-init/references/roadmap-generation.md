@@ -86,9 +86,9 @@ Write `devflow/plans/project-blueprint.md` using this structure (adapted from `@
 ## Execution Guide
 
 1. All `task.md` specifications (`001` to `[NNN]`) are pre-generated on `main`.
-2. Run `/devflow.plan` (with no arguments) to plan `TASK-001` (`001_[first-feature]`), or run `/devflow.run` / `/devflow.auto` per task.
-3. When `TASK-001` merges to `main`, `/devflow.plan` automatically resolves the next unblocked un-planned task in topological order (`TASK-002`).
-4. For `[parallel-safe]` waves, use `/devflow.worktree` to run concurrent sessions safely in isolated git worktrees.
+2. Run `/devflow:plan` (with no arguments) to plan `TASK-001` (`001_[first-feature]`), or run `/devflow:run` / `/devflow:auto` per task.
+3. When `TASK-001` merges to `main`, `/devflow:plan` automatically resolves the next unblocked un-planned task in topological order (`TASK-002`).
+4. For `[parallel-safe]` waves, use `/devflow:worktree` to run concurrent sessions safely in isolated git worktrees.
 ```
 
 ---

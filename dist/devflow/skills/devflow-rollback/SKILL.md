@@ -1,5 +1,5 @@
 ---
-name: devflow-rollback
+name: rollback
 description: "Roll back the active DevFlow step (implement or beautify) to its pre-step checkpoint without corrupting pipeline state. Use when user runs devflow.rollback, wants to undo an implementation or beautification, or revert an agent hallucination."
 argument-hint: "[--to <step>] [--force]"
 disable-model-invocation: true
@@ -8,6 +8,8 @@ disable-model-invocation: true
 > **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
 
 # Skill: devflow.rollback
+
+**Arguments:** `$ARGUMENTS` — empty → roll back the active feature's last step (skill Step 1 defaults).
 
 Reverts the active DevFlow step to its clean pre-step checkpoint, restoring code and state machine synchronization.
 

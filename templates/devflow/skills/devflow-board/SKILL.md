@@ -7,6 +7,8 @@ disable-model-invocation: true
 
 # Skill: devflow.board
 
+**Arguments:** `$ARGUMENTS` — empty → generate the board without opening or syncing.
+
 ## Quick Start
 
 Run `/devflow.board [--open] [--sync] [--port <port>] [--json]`.

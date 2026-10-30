@@ -9,6 +9,8 @@ effort: high
 
 # Skill: devflow.init
 
+**Arguments:** `$ARGUMENTS` — empty → start the interview (project name/brief asked there).
+
 ## Quick Start
 
 Run `/devflow.init [optional-project-name-or-brief] [--mcp]`.

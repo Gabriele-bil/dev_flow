@@ -10,7 +10,7 @@ disable-model-invocation: true
 
 ## Quick Start
 
-Run `/devflow.beautify [optional plan path]`.
+Run `/devflow-beautify [optional plan path]`.
 
 - If an argument is passed, use it as the `plan.md` path
 - If no argument is passed, resolve feature with `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask)

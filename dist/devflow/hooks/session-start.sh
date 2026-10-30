@@ -39,7 +39,7 @@ elif [ -f "$CONFIG_FILE" ] && ! grep -q "\[TODO" "$CONFIG_FILE"; then
 fi
 
 if [ "$PROJECT_ACTIVE" != true ]; then
-  df_context "dev-flow available but not set up in this project. Run /devflow.setup to start a spec-driven pipeline."
+  df_context "dev-flow available but not set up in this project. Run /devflow:setup to start a spec-driven pipeline."
   exit 0
 fi
 
@@ -49,7 +49,7 @@ if [ -f "$CONFIG_FILE" ] && grep -q "\[TODO" "$CONFIG_FILE"; then
   CONFIG_WARN="
 
 ---
-⚠️  devflow not configured: run /devflow.setup before any pipeline command.
+⚠️  devflow not configured: run /devflow:setup before any pipeline command.
 Adapter is not set — config.md still has placeholder values."
 fi
 
@@ -98,7 +98,7 @@ if [ "$KNOWN_STEP" = true ]; then
     CTX_LINE="
 Load context: $CTX"
   fi
-  MSG="dev-flow active$FEATURE_LABEL. Next step: $NEXT_STEP — run /$NEXT_STEP, or /devflow.resume to re-orient after an interruption.$CTX_LINE
+  MSG="dev-flow active$FEATURE_LABEL. Next step: $NEXT_STEP — run /$NEXT_STEP, or /devflow:resume to re-orient after an interruption.$CTX_LINE
 User orchestrates; only ship/run/auto/hotfix chain other steps. Full orientation: $PLUGIN_ROOT/references/orientation.md.$CONFIG_WARN"
   df_context "$MSG"
   exit 0

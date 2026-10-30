@@ -77,7 +77,7 @@ Le skill sono ben strutturate. I problemi stanno in quattro punti:
 <a id="cc-1"></a>
 ### CC-1 🔴 ✅ I percorsi `@devflow/...` non si risolvono
 
-Skill, comandi, agenti e template (ad esempio `commands/devflow.plan.md`, `skills/devflow-plan/SKILL.md` con 19 occorrenze) usano `@devflow/references/...` e `@devflow/skills/...`. Nel progetto consumer la cartella `devflow/` contiene solo `config.md` e `features/`. Il build copia questi percorsi invariati in `dist/devflow/`.
+Skill, comandi, agenti e template (ad esempio commands/devflow.plan.md (rimosso in 3.0.0), `skills/devflow-plan/SKILL.md` con 19 occorrenze) usano `@devflow/references/...` e `@devflow/skills/...`. Nel progetto consumer la cartella `devflow/` contiene solo `config.md` e `features/`. Il build copia questi percorsi invariati in `dist/devflow/`.
 
 - La documentazione non garantisce che un `@path` nel corpo di una skill o di un comando venga espanso. Il modello deve cercare il file (round-trip in più), indovinarne la posizione dalla "base directory" della skill, oppure procedere senza.
 - `${CLAUDE_PLUGIN_ROOT}` e `${CLAUDE_SKILL_DIR}` invece vengono sostituiti in skill, comandi e agenti (code.claude.com/docs/en/plugins/components.md#reference-plugin-paths-and-store-data).

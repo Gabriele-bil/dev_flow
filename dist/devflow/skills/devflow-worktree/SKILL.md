@@ -1,5 +1,5 @@
 ---
-name: devflow-worktree
+name: worktree
 description: "Creates, lists, or removes isolated git worktrees for parallel feature development, with automatic dev-server port-offset assignment and overlap detection. Use when the user asks to work on a feature in a separate worktree, run two features in parallel, or run devflow.worktree."
 argument-hint: "[create|remove|list] [feature-name]"
 disable-model-invocation: true
@@ -11,6 +11,8 @@ allowed-tools: "Bash(git worktree*) Bash(git branch*) Bash(git status*) Bash(git
 > **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
 
 # Skill: devflow.worktree
+
+**Arguments:** `$ARGUMENTS` — empty → run `create` for the active feature.
 
 ## Purpose
 

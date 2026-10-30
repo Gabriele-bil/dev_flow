@@ -1,5 +1,5 @@
 ---
-name: devflow-resume
+name: resume
 description: Resumes an interrupted DevFlow session — reads saved state, cross-checks plan.md markers, confirms resume position, re-enters correct pipeline skill. Use when returning after session restart, compaction, or break to continue work where it left off.
 argument-hint: "[optional-feature]"
 ---
@@ -7,6 +7,8 @@ argument-hint: "[optional-feature]"
 > **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
 
 # Skill: devflow.resume
+
+**Arguments:** `$ARGUMENTS` — empty → resume the feature resolved with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve`.
 
 First-class session re-entry. Reads state, validates it against files, routes to the correct pipeline step — no re-deriving from scratch, no re-implementing `[done]` work.
 
@@ -33,7 +35,7 @@ Resume an interrupted pipeline at the exact position it stopped. Promotes the re
 - [ ] `devflow/config.md` exists (adapter known; monorepo: `plan.md`'s App resolves in the `## Apps` table — see `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`)
 - [ ] `.devflow-state.json` exists OR at least one `devflow/features/*/plan.md` exists
 
-Both absent → stop: "Nothing to resume. Start with `/devflow.task` (or `/devflow.setup` on a new project)."
+Both absent → stop: "Nothing to resume. Start with `/devflow:task` (or `/devflow:setup` on a new project)."
 
 ## Workflow
 

@@ -1,5 +1,5 @@
 ---
-name: devflow-task
+name: task
 description: Transforms raw idea into Agile product task.md with goal, Connextra user story, INVEST-checked vertical use cases (Read/Write separated), BDD Gherkin acceptance criteria, and explicit async states. Use when user runs devflow.task, asks to write a task spec or user story for a new feature, or starts a new DevFlow pipeline. Not for direct code-change requests ("add X to file Y").
 argument-hint: "[--app <name>]"
 model: haiku
@@ -9,6 +9,8 @@ effort: low
 > **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
 
 # Skill: devflow.task
+
+**Arguments:** `$ARGUMENTS` — empty → ask the user for the feature idea before proceeding.
 
 ## Purpose
 

@@ -1,8 +1,9 @@
 # DevFlow Plugin Catalog
 # Machine-readable index of all pipeline components.
-# Updated manually when commands/skills/agents are added or removed.
-# Drift guard: scripts/run-evals.sh check 3 diffs catalog IDs/paths against the
-# filesystem (skills, adapters, agents, references, commands) and fails on mismatch.
+# Updated manually when skills/agents are added or removed. `command:` is the
+# author notation /devflow.<step>; the build writes /devflow:<step> (Claude Code)
+# or /devflow-<step> (Antigravity CLI). Drift guard: scripts/run-evals.sh check 3
+# diffs catalog IDs/paths against the filesystem and fails on mismatch.
 
 name: devflow
 version: "1.19.0"
@@ -71,9 +72,6 @@ pipeline:
     - command: /devflow.learn
       skill: devflow-learn
       description: "Manage local and team instincts — log, search, list, check (Rigor check_cmd/ratchet), prune, boost, promote to team store and REGISTRY.md"
-    - command: /devflow.lint-skills
-      script: scripts/validate-skills.sh
-      description: "Validate all SKILL.md files for required structure (frontmatter, sections, style)"
     - command: /devflow.recovery
       skill: devflow-recovery
       description: "Diagnose and recover a stuck or corrupted DevFlow pipeline — reads state, observe log, and feature files to identify failure and propose a targeted recovery"

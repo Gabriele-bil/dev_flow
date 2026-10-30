@@ -81,5 +81,5 @@ Chosen option: **[Option N: Name]**, because [justification directly linking cho
 
 ## Next Steps in DevFlow
 
-- [ ] For greenfield app: Run `/devflow.setup` using the chosen stack configuration
-- [ ] For feature: Run `/devflow.task` referencing `docs/adr/ADR-[NNN]-[slug].md`
+- [ ] For greenfield app: Run `/devflow-setup` using the chosen stack configuration
+- [ ] For feature: Run `/devflow-task` referencing `docs/adr/ADR-[NNN]-[slug].md`

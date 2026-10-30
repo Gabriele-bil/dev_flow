@@ -10,7 +10,7 @@ disable-model-invocation: true
 
 ## Quick Start
 
-Run `/devflow.implement [optional plan path] [--fix <findings|files>]`.
+Run `/devflow-implement [optional plan path] [--fix <findings|files>]`.
 
 - If an argument is passed, use it as the `plan.md` path
 - `--fix` → **re-entry mode** (see below): targeted fixes only

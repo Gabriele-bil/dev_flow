@@ -6,6 +6,8 @@ argument-hint: "[optional-feature]"
 
 # Skill: devflow-recovery
 
+**Arguments:** `$ARGUMENTS` — empty → diagnose the feature resolved with `bash "@devflow/scripts/devflow-state.sh" resolve`, plus every `blocked` feature.
+
 Pipeline rescue. Diagnoses state, identifies failure point, proposes recovery path — no guessing.
 
 ## Purpose

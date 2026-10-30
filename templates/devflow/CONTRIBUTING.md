@@ -18,7 +18,6 @@ Three mechanisms, three jobs. Don't blur them.
 | --- | --- | --- | --- |
 | **Hook** | Must run every time, no exceptions — safety, formatting, config protection | Deterministic — shell script, exit code decides | `pre-bash-destructive-guard.sh` blocks `rm -rf /` unconditionally |
 | **Skill** | Needs judgment, context, multi-step reasoning | Probabilistic — Claude follows workflow guidance | `devflow-ship` weighs findings, asks user on Critical |
-| **Command** | Thin entry point, no logic of its own | N/A — dispatches only | `devflow.ship.md`: "Use `@devflow/skills/devflow-ship/SKILL.md` and execute it exactly" |
 
 Rule of thumb: if skipping the check even once is unacceptable, it's a hook, not a skill instruction. Skills can be misread or rationalized around; hooks can't. Never put a hard safety rule only in skill prose — a determined agent (or a bad day) will talk itself past it. See Anthropic's "Steering Claude Code: Skills, Hooks, Rules, Subagents and More" for the underlying deterministic-vs-probabilistic framework.
 
@@ -86,7 +85,6 @@ DevFlow supports monorepos with multiple applications, each on its own adapter. 
 | Pipeline skill dir | `devflow-<name>` | `devflow-task` |
 | Adapter skill dir | `<adapter>-<domain>` | `angular-forms` |
 | Common skill dir | `common-<domain>` | `common-clean-code` |
-| Command file | `devflow.<step>.md` | `devflow.task.md` |
 | `SKILL.md` | Always uppercase | `SKILL.md` |
 | `ADAPTER.md` | Always uppercase | `ADAPTER.md` |
 | Feature directories | `NNN_<kebab-name>` | `003_user-profile` |
@@ -128,7 +126,7 @@ Keep: technical terms exact, file paths exact, commands exact, all verbs, negati
 
 ## Adding Hooks
 
-Hook vs skill vs command — see **Choosing a Mechanism** above.
+Hook vs skill — see **Choosing a Mechanism** above. There are no command files: a skill is its own slash command (`/devflow:<step>` on Claude Code, `/devflow-<step>` on Antigravity); write `/devflow.<step>` in sources and the build translates it.
 
 **Two hosts, one script.** `hooks/hooks.json` (Claude Code format) is the single source; `scripts/builders/build-antigravity.sh` translates it into the root `hooks.json` Antigravity CLI reads (event and tool-name mapping, events Antigravity lacks dropped). Never parse stdin or print control JSON by hand — source the shared library:
 
