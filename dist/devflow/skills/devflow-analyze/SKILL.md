@@ -3,6 +3,7 @@ name: analyze
 description: "Read-only check: task.md+plan.md+constitution.md+ADRs consistency. Flags traceability gaps, untestable ACs, terminology drift, layer violations, ADR misalignment. Use when user runs devflow.analyze — after devflow.plan (ready), before devflow.implement."
 argument-hint: "[optional-feature-path]"
 effort: low
+disallowed-tools: Write, Edit, NotebookEdit
 ---
 
 > **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.

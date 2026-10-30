@@ -2,6 +2,7 @@
 name: resume
 description: Resumes an interrupted DevFlow session — reads saved state, cross-checks plan.md markers, confirms resume position, re-enters correct pipeline skill. Use when returning after session restart, compaction, or break to continue work where it left off.
 argument-hint: "[optional-feature]"
+disallowed-tools: Write, Edit, NotebookEdit
 ---
 
 > **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.

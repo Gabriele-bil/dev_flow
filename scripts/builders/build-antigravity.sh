@@ -111,7 +111,7 @@ strip_frontmatter_keys() {
 step "Frontmatter skill e agenti"
 # disable-model-invocation non è qui: agy 1.4.9 lo rispetta (verificato: la skill
 # non si attiva da sola e resta invocabile come /<nome>), anche se non è documentato.
-CLAUDE_ONLY_SKILL_KEYS="model effort allowed-tools context agent background"
+CLAUDE_ONLY_SKILL_KEYS="model effort allowed-tools disallowed-tools context agent background"
 while IFS= read -r f; do
   # shellcheck disable=SC2086
   strip_frontmatter_keys "$f" $CLAUDE_ONLY_SKILL_KEYS

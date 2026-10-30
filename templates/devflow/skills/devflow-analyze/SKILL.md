@@ -3,6 +3,7 @@ name: devflow-analyze
 description: "Read-only check: task.md+plan.md+constitution.md+ADRs consistency. Flags traceability gaps, untestable ACs, terminology drift, layer violations, ADR misalignment. Use when user runs devflow.analyze — after devflow.plan (ready), before devflow.implement."
 argument-hint: "[optional-feature-path]"
 effort: low
+disallowed-tools: Write, Edit, NotebookEdit
 ---
 
 # Skill: devflow.analyze

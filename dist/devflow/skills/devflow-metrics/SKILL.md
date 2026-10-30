@@ -2,6 +2,7 @@
 name: metrics
 description: Display token savings dashboard, estimated cost per feature, pass@1 first-pass success rate, and step durations. Use when inspecting pipeline metrics, token consumption, or running devflow.metrics.
 argument-hint: "[--json] [--feature <name>]"
+disallowed-tools: Write, Edit, NotebookEdit
 ---
 
 > **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
