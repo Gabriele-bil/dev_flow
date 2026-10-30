@@ -5,85 +5,58 @@ description: Use when creating or refactoring Flutter domain entities, DTOs, enu
 
 # Skill: Flutter Models
 
-Full code examples: `references/models-patterns.md`.
+## Purpose
 
-## Core Rules
+Immutable domain entities, DTOs, mappers, failures and repository contracts with freezed 4 + json_serializable; entity `mock()` for skeleton loading UI.
 
-- Keep all models immutable (`final` fields, no setters, update with `copyWith`).
-- Keep boundaries strict: domain has no JSON/Supabase concerns; data layer handles wire format.
-- Prefer explicit class modifiers:
-  - `@freezed abstract class` for single-constructor entities/DTOs (Freezed 3+ requires the keyword).
-  - `@freezed sealed class` for union/failure/result states.
-  - `abstract interface class` for repository contracts.
-  - `final class` for concrete implementations you do not want externally subtype-able.
+## When NOT to Use
 
-## Why `abstract` On Entities?
+- File matches no row of `steps/implement.md` → skill load decision matrix
+- Provider/notifier state shape → `flutter-riverpod`
+- Supabase query or error-code mapping → `flutter-supabase`
+- Form field values before submit → `flutter-form`
 
-Freezed 3+ generates the concrete class (`_Pet`); the annotated declaration must be `abstract` (one factory) or `sealed` (several factories), or codegen fails.
-Entities stay immutable value types — `abstract` here is a Freezed requirement, not a behavior contract (that is `abstract interface class PetRepository`).
+## Rules
 
-## Required Setup
-
-Generate code with `dart run build_runner build --delete-conflicting-outputs` (or `watch` during heavy modeling work). Full setup snippet → `references/models-patterns.md`.
-
-## Entity (Domain)
-
-Lives in `domain/`. Holds business meaning only, no JSON methods. Add private constructor (`const Pet._()`) when the entity has custom getters/methods or `mock()`. Full code → `references/models-patterns.md`.
+- **Class modifiers** (freezed ≥3 fails codegen without them):
+  - `@freezed abstract class X with _$X` — one factory (entities, DTOs).
+  - `@freezed sealed class X with _$X` — several factories (failures, unions); consume with `switch` patterns — freezed no longer generates `.when`/`.map` by default, do not use them.
+  - `abstract interface class XRepository` — repository contracts.
+  - `final class` — concrete impls not meant for subtyping.
+- No `final` on factory parameters — removed in freezed 4 (Dart 3.13 disallows it).
+- **Boundaries:** domain holds no JSON/Supabase code; DTO + mapper in `data/` own wire format, DateTime/enum parsing, snake_case.
+- **DTO JSON config:** `@JsonSerializable(fieldRename: FieldRename.snake)` on the **factory constructor**, not the class; `@JsonKey` on constructor parameters.
+- **Mapper:** `final class` with static `fromDto` / `toInsertJson`; pure conversion, no I/O.
+- **Enums:** explicit wire value + `fromValue` with `orElse` fallback.
+- **Failures + results:** sealed failure union per feature; contracts return `Future<Result<T, XFailure>>` (project `Result` sealed type). One failure style per feature.
+- Private constructor `const X._();` only when entity has getters/methods.
+- Codegen: `dart run build_runner build --delete-conflicting-outputs`.
 
 ## Skeleton `mock()` (domain)
 
-Lives on the entity in `domain/`. Single source of truth for loading-state data consumed by `AsyncValue.skeleton` / `AsyncSnapshot.skeleton` (`mock:` parameter).
+Single source of loading-state data for `.skeleton(mock:)` (`flutter-riverpod`).
 
-Rules:
+- `factory X.mock()` on the entity — never `placeholder()`, never widget-local fakes, never on DTOs.
+- `static List<X> mockList({int count = 3})` when a list provider renders it.
+- Realistic field lengths, non-null where loaded UI expects values — skeletonizer paints real layout.
+- Only on entities actually rendered through `.skeleton`.
 
-- **Name**: `factory Entity.mock()` — never `placeholder()` or widget-local fakes.
-- **Shape**: realistic field lengths and non-null values where the loaded UI expects them; skeletonizer masks content, layout must match real data.
-- **Lists**: `static List<Entity> mockList({int count = 3})` on the same entity class.
-- **Scope**: domain only — no `mock()` on DTOs.
+Code (entity + mock, DTO, mapper, failure, `Result`): [`references/models-patterns.md`](references/models-patterns.md). freezed / json_serializable signatures change between majors — check Context7 (`/rrousselgit/freezed`) before writing an unfamiliar annotation option.
 
-Wiring in UI (see `flutter-riverpod`) and full example → `references/models-patterns.md`.
+## Checklist
 
-## DTO (Data Transfer Object)
-
-Lives in `data/`. Maps the transport/storage schema with `@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)`. Use `@JsonKey(...)` when one field needs custom behavior (rename, conversion, required/default). Full code → `references/models-patterns.md`.
-
-## Mapper (Boundary Adapter)
-
-Lives in `data/`. Pure conversion only — `fromDto` builds the domain entity, `toInsertJson` builds the write payload. Full code → `references/models-patterns.md`.
-
-## Enums
-
-Prefer explicit wire values and safe parsing (`fromValue` with `orElse` fallback). Full code → `references/models-patterns.md`.
-
-## Failures And Results
-
-Use sealed unions (`PetFailure`) and a `Result<S, F>` type for exhaustive handling; repository contracts return `Future<Result<List<Pet>, PetFailure>>`. Full code → `references/models-patterns.md`.
-
-## Recommended Feature Layout
-
-`domain/` holds the entity, failure, repository contract; `data/` holds the DTO, mapper, datasource, repository impl. Full tree → `references/models-patterns.md`.
-
-## Quick Checklist
-
-- [ ] Entity in `domain/`, DTO in `data/`
-- [ ] Domain models contain no `fromJson`/`toJson`
-- [ ] DTO uses `fieldRename: FieldRename.snake` or explicit `@JsonKey(name: ...)`
-- [ ] Mapper owns all DateTime/enum/string-wire conversions
-- [ ] Unions/failures use `sealed` for exhaustive `switch`
-- [ ] Contracts use `abstract interface class`
-- [ ] Entities used in skeleton UI expose `mock()` / `mockList()` on the domain class
-
-## Context7 References Used
-
-- Freezed docs (`/rrousselgit/freezed`): immutable classes, custom methods with private constructor, sealed unions.
-- json_serializable docs (`/google/json_serializable.dart`): `fieldRename`, `@JsonKey`, enum annotations.
-- Dart docs (`/dart-lang/site-www`): class modifiers (`abstract interface`, `sealed`, `final`) and API boundaries.
+- [ ] Entity in `domain/`, DTO + mapper in `data/`
+- [ ] No `fromJson`/`toJson` on domain entities
+- [ ] `abstract` / `sealed` keyword on every `@freezed` class
+- [ ] DTO `@JsonSerializable` on factory constructor
+- [ ] Unions consumed with `switch`, not `.when`/`.map`
+- [ ] Skeleton-rendered entities expose `mock()` / `mockList()`
 
 ## I/O Reference
 
-|                |                                                                                                           |
-| -------------- | --------------------------------------------------------------------------------------------------------- |
-| Trigger        | Creating or refactoring domain entities, DTOs, enums, failures, or repository contracts                   |
-| Reads          | `constitution.md` (three-layer architecture, naming conventions), `registry.md` (existing model patterns) |
-| Invoked by     | `devflow.plan` (data layer design), `devflow.implement` (model file implementation)                       |
-| Related skills | `flutter-riverpod` (providers consuming models), `flutter-supabase` (DTO ↔ Supabase JSON mapping)         |
+| | |
+| --- | --- |
+| Trigger | `steps/implement.md` matrix row: `*/domain/*.dart`, `*_entity.dart`, `*_model.dart`, `*_dto.dart`, `*_mapper.dart`, `*_failure.dart` |
+| Reads | `constitution.md` (layers, naming), `registry.md` (model patterns), `data-model.md` when present |
+| Invoked by | `devflow.plan` (data layer design), `devflow.implement` (model files) |
+| Related skills | `flutter-riverpod` (`.skeleton` consumer), `flutter-supabase` (DTO ↔ Supabase JSON) |

@@ -37,11 +37,18 @@ Mobile E2E (Maestro declarative flow):
 maestro test .maestro/[feature-name]/
 ```
 
-Use `flutter_test` and Riverpod test utilities; mock Supabase — no real network in unit tests.
+Use `flutter_test` + Riverpod 3 test utilities: `ProviderContainer.test()` (auto-disposed) for providers, `ProviderScope(overrides: [...])` + `tester.container()` in widget tests. Fake repositories via overrides — no real network (Supabase or other) in unit tests.
 
 ### Responsive tests
 
-For UI screens, assert layout variants at compact vs expanded widths using `MediaQuery` overrides per project patterns (`AppBreakpoints`).
+For UI screens, assert each breakpoint variant (compact / medium / expanded per `AppBreakpointWidth`) by sizing the test view, not by wrapping in a fake `MediaQuery` (`tester.binding.window` / `physicalSizeTestValue` removed — do not use):
+
+```dart
+tester.view.physicalSize = const Size(400, 800); // compact
+tester.view.devicePixelRatio = 1.0;
+addTearDown(tester.view.reset);
+await tester.pumpWidget(app);
+```
 
 ### Verify (runtime)
 

@@ -3,81 +3,69 @@ name: flutter-form
 description: Use when implementing or refactoring Flutter forms with `flutter_form_builder` and `form_builder_validators`, including validation, submit flow, edit forms, and multi-step wizards.
 ---
 
-# Flutter Forms
+# Skill: Flutter Forms
 
-## Scope
+## Purpose
 
-Default stack for this repository:
+Forms on `flutter_form_builder` + `form_builder_validators`: field naming, validation order, submit through notifier, edit prefill, wizards.
 
-- `flutter_form_builder` for fields and form state.
-- `form_builder_validators` for composable validation.
+## When NOT to Use
 
-Prefer package primitives over custom controllers/ad-hoc validation.
+- File matches no row of `steps/implement.md` → skill load decision matrix
+- Single search box or toggle with no validation → plain widget + provider
+- Submit payload → domain mapping rules → `flutter-models`
 
-Full code: `references/form-patterns.md`.
+## Rules
 
-## Form skeleton rules
+- `GlobalKey<FormBuilderState>` held stably (`State` field or `useMemoized`) — never recreated per build.
+- Field `name` unique, `snake_case`.
+- `autovalidateMode: AutovalidateMode.onUserInteraction` default; never `always`.
+- Read values only after `saveAndValidate()` → `.value`. `validate()` + `instantValue` only when values are needed without save side effects.
+- Validators: `FormBuilderValidators.compose([...])` in order presence (`required`) → shape (`email`, `numeric`, `match`) → range/domain (`min`, `max`, custom). Shared custom validators, not per-field imperative checks.
+- Numeric/date fields: `valueTransformer` to domain type (`double.tryParse`); dates bounded by `firstDate` / `lastDate`.
+- Select fields (dropdown/radio/chips): primitive values (`String`, `int`); map to enums/value objects on submit.
+- Labels and error text from slang (`InputDecoration(labelText: t.pets.name)`), specific and actionable.
+- Submit: widget calls one notifier method; mapping + repository call live there. Disable submit while running.
+- Field errors via validators; server/page errors in banner/snackbar/error section — never fake field validation.
+- Edit mode: `initialValue` for first render; async-loaded data → `patchValue` once available. Source of truth stays in the provider.
+- Wizard: one `FormBuilder` key per step → validate/save step → merge into notifier-held aggregate → last step submits. No cross-step payload in widget state.
 
-- Use `GlobalKey<FormBuilderState>` for `FormBuilder`.
-- Keep field names unique and `snake_case`.
-- Use `AutovalidateMode.onUserInteraction` as default UX baseline.
-- Call `saveAndValidate()` before reading `.value`. Use `validate()` + `instantValue` only when current values are needed without save side effects.
-- Keep business mapping/submit side effects in notifier/use-case layer, not inline in widgets.
+```dart
+FormBuilderTextField(
+  name: 'weight',
+  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+  decoration: InputDecoration(labelText: t.pets.weight),
+  valueTransformer: (v) => double.tryParse(v ?? ''),
+  validator: FormBuilderValidators.compose([
+    FormBuilderValidators.required(),
+    FormBuilderValidators.numeric(),
+    FormBuilderValidators.min(0.1),
+  ]),
+);
 
-## Field patterns
+void onSubmit() {
+  final form = formKey.currentState;
+  if (form == null || !form.saveAndValidate()) return;
+  ref.read(petFormProvider.notifier).submit(form.value);
+}
+```
 
-- **Text**: standard `FormBuilderTextField` with composed validators.
-- **Numeric**: normalize with `valueTransformer` (e.g. `double.tryParse`) — domain type is numeric, not string.
-- **Select (dropdown/radio/chips)**: serializable primitives (`String`, `int`) as UI values, map to domain enum/value objects on submit.
-- **Date**: constrain with `firstDate`/`lastDate`, validate domain constraints (e.g. "not in future") via composed validators.
+Validator names and field widgets change between `form_builder_validators` majors — check Context7 (`/flutter-form-builder-ecosystem/flutter_form_builder`) before using one not shown here.
 
-## Validator conventions
-
-`FormBuilderValidators.compose([...])`, order intentional: 1) presence (`required`) 2) shape (`email`, `numeric`, `match`) 3) range/domain (`min`, `max`, custom validator).
-
-## Edit mode and programmatic updates
-
-- Use `initialValue` for first render prefill.
-- For async-loaded edit data, update form state programmatically (e.g. `patchValue`) once data is available.
-- Keep source of truth in provider/notifier state; form is an editing surface.
-
-## Multi-step (wizard) forms
-
-Pattern: 1) one `FormBuilder` key per step 2) validate/save step 3) merge into notifier-held aggregate payload 4) final step triggers repository submit. Do not store cross-step aggregate payload in widget-local mutable state.
-
-## Loading, disable, and feedback
-
-- Disable submit actions while async submit is running.
-- Show inline error messages through validators for field errors.
-- Show page-level/server errors outside fields (banner/snackbar/error section), not as fake field validation.
-
-## Accessibility and UX baseline
-
-- Always provide meaningful `InputDecoration(labelText: ...)`.
-- Keep error text specific and actionable.
-- Do not use `AutovalidateMode.always` by default; prefer `onUserInteraction`.
-
-## Anti-patterns
+## Anti-Patterns
 
 | Avoid | Prefer |
 | --- | --- |
-| Reading `.value` before validation | `saveAndValidate()` then read `.value` |
-| Enum instances as raw field values | serializable value + mapping on submit |
-| Business submit logic inside widget callback | notifier/use-case orchestrates submit |
-| Per-field custom imperative checks everywhere | shared composed validators |
-| Recreating `GlobalKey` every rebuild | stable key lifecycle (`State` or `useMemoized`) |
-| Wizard payload in widget state | aggregate payload in notifier/provider |
-
-## References used for this skill update
-
-- Context7: `/flutter-form-builder-ecosystem/flutter_form_builder` (README examples and API usage)
-- Context7: `/websites/flutter_dev` (Flutter form validation and `autovalidateMode` guidance)
+| Reading `.value` before validation | `saveAndValidate()` then `.value` |
+| Enum instances as field values | Primitive value + mapping on submit |
+| Submit logic in widget callback | Notifier method orchestrates submit |
+| Wizard payload in widget state | Aggregate in notifier |
 
 ## I/O Reference
 
 | | |
 | --- | --- |
-| Trigger | Any feature that introduces or modifies a form (login, signup, wizard steps, edit screens) |
-| Reads | `constitution.md` (architecture conventions), `registry.md` (existing form patterns) |
-| Invoked by | `devflow.implement` (form screens), `devflow.plan` (when wizard or multi-field form is planned) |
-| Related skills | `flutter-riverpod` (form state via notifier), `flutter-models` (form payload mapping) |
+| Trigger | `steps/implement.md` matrix row: `*/forms/*.dart`, `*_form.dart`, files using `FormBuilder` |
+| Reads | `constitution.md` (architecture conventions), `registry.md` (form patterns) |
+| Invoked by | `devflow.implement` (form screens), `devflow.plan` (wizard or multi-field form planned) |
+| Related skills | `flutter-riverpod` (submit via notifier), `flutter-models` (payload mapping) |

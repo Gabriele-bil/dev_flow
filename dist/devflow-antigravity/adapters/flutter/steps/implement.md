@@ -4,18 +4,23 @@ Loaded by `devflow-implement` together with the adapter core (`ADAPTER.md`).
 
 ## Implement: skill load decision matrix
 
-When implementing files, load technology skills based on file path patterns:
+Single source of skill triggers. Match each file in the current batch by path or content; load every skill its rows name. `ADAPTER.md` → **Technology skills** is the feature-level index of the same skills.
 
-| File path pattern | Load skill |
+| File path / content pattern | Load skill |
 | --- | --- |
-| `*/domain/*.dart`, `*_entity.dart`, `*_model.dart` | `flutter-models` |
-| `*/providers/*.dart`, `*_provider.dart`, `*_notifier.dart` | `flutter-riverpod` |
-| `*/datasource*.dart`, `*_datasource.dart`, `*_repository*.dart` | `flutter-supabase` |
-| `supabase/migrations/*.sql`, `*_migration.sql` | `flutter-supabase-migrations` |
+| First file under a new `lib/features/<name>/`; feature file-tree scaffold; code moving between layers | `flutter-architecture` |
+| `*/domain/*.dart`, `*_entity.dart`, `*_model.dart`, `*_dto.dart`, `*_mapper.dart`, `*_failure.dart` | `flutter-models` |
+| `*/providers/*.dart`, `*_provider.dart`, `*_notifier.dart`; any widget rendering an `AsyncValue` (`.skeleton(`, `ref.watch(`) | `flutter-riverpod` |
+| New provider whose scope (widget-local / feature / app-wide) is not fixed by the plan | `common-state-patterns` (`$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/common/skills/common-state-patterns/SKILL.md`) |
+| `*_datasource.dart`, `*/datasources/*.dart`, `*_repository_impl.dart`, any file importing `supabase_flutter` | `flutter-supabase` |
+| `supabase/migrations/*.sql` | `flutter-supabase-migrations` |
 | `*/pages/*.dart`, `*/screens/*.dart`, `*/widgets/*.dart` | `flutter-theme` + `flutter-layout` |
-| `*/forms/*.dart`, `*_form*.dart`, `*_form_*.dart` | `flutter-form` |
+| `lib/core/theme/**` | `flutter-theme` |
+| `lib/core/layout/**`, overflow / unbounded-constraint fix | `flutter-layout` |
+| `*/forms/*.dart`, `*_form.dart`, any file using `FormBuilder` | `flutter-form` |
+| New repository impl, use case or service class; refactor spanning more than one class | `common-clean-code` (`$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/common/skills/common-clean-code/SKILL.md`) |
 
-Load only the skills triggered by the current batch's file paths. Do not load all skills preemptively.
+Load only the skills triggered by the current batch's files. Do not load all skills preemptively.
 
 ## Implement: commands and checklist
 
@@ -34,64 +39,25 @@ flutter analyze
 dart run build_runner build --delete-conflicting-outputs
 ```
 
+**i18n** (only if `assets/i18n/*.i18n.json` changed): `dart run slang`.
+
 Retry failed steps up to **3** attempts each; then stop and report full output.
 
 ### Flutter implementation rules (summary)
 
 - **Responsive UI:** compact / medium / expanded via `LayoutBuilder` + project breakpoint helpers; no magic width literals.  
 - **Localization:** slang only for user-visible strings.  
-- **UI stack:** follow `flutter-theme`; async UIs need loading / error / empty with slang copy.  
+- **UI stack:** follow `flutter-theme`; async UIs render through `.skeleton(mock:)` (`flutter-riverpod`) with error + empty states in slang copy.  
 - **State:** prefer hooks + Riverpod per `flutter-riverpod`; contract-first repositories per `flutter-models` / `flutter-supabase`.  
 - **Shared components first:** before building a new widget, check `lib/shared/` (or the project-equivalent shared folder) for an existing component that covers the use case. Extend or parameterise a shared widget instead of duplicating it. Create a new shared widget when the same visual pattern appears in more than one feature.
 
 ### Barrel files (mandatory)
 
-Every directory containing Dart source files **must** have a barrel file that re-exports all public symbols in that directory.
+Every directory with Dart sources has a barrel `_[folder_name].dart` inside it, exporting every public file of that folder (`domain/_domain.dart`, `data/_data.dart`, `providers/_providers.dart`, `widgets/_widgets.dart`, `lib/core/theme/_theme.dart`).
 
-**Naming convention:** `_[folder_name].dart` — the barrel lives inside the folder it represents.
-
-Examples:
-
-| Folder | Barrel file |
-| -------- | ------------- |
-| `domain/` | `domain/_domain.dart` |
-| `data/` | `data/_data.dart` |
-| `providers/` | `providers/_providers.dart` |
-| `widgets/` | `widgets/_widgets.dart` |
-| `shared/` | `shared/_shared.dart` |
-| `lib/core/theme/` | `lib/core/theme/_theme.dart` |
-
-**Import rules:**
-
-1. **Cross-folder imports** — always import from the nearest barrel, never from individual files in another folder:
-
-   ```dart
-   // ✅ Good — import the barrel of the target folder
-   import '../domain/_domain.dart';
-
-   // ❌ Bad — direct import of a file in another folder
-   import '../domain/pet.dart';
-   ```
-
-2. **Same-folder imports** — import the file directly (no barrel indirection):
-
-   ```dart
-   // ✅ Good — same folder: import the file directly
-   import 'pet_mapper.dart';
-
-   // ❌ Bad — do not import the barrel from within the same folder
-   import '_data.dart';
-   ```
-
-3. **Barrel content** — export every public `.dart` file in the folder; do not filter unless a file is intentionally package-private:
-
-   ```dart
-   // data/_data.dart
-   export 'pet_dto.dart';
-   export 'pet_mapper.dart';
-   export 'pet_datasource.dart';
-   export 'pet_repository_impl.dart';
-   ```
+- **Cross-folder import** → nearest barrel of the target folder: `import '../domain/_domain.dart';` — never `../domain/pet.dart`.
+- **Same-folder import** → the file directly: `import 'pet_mapper.dart';` — never the folder's own barrel (`_data.dart` from inside `data/`).
+- Filter a file out of the barrel only when it is intentionally package-private.
 
 ### Pre-handoff checklist (implement)
 

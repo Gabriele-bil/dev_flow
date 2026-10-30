@@ -8,14 +8,14 @@ Include these in `plan.md` when applicable (after core sections from `devflow-pl
 
 ### Dependency ordering (layering)
 
-Order the **File list** bottom-up per project `constitution.md` (typical Petmate-style stack):
+Order the **File list** bottom-up per project `constitution.md`:
 
 1. Database migrations / schema before repositories using new tables  
 2. Domain models, failures, repository contracts  
 3. Data sources and repository implementations  
 4. Riverpod providers and notifiers  
 5. UI (pages, widgets, router)  
-6. Localization (`assets/i18n/*.json`) and codegen (`dart run slang`, `build_runner`) when new strings or generated files are required  
+6. Localization (`assets/i18n/*.i18n.json`) and codegen (`dart run slang`, `build_runner`) when new strings or generated files are required  
 
 ### Riverpod Providers (table)
 

@@ -3,93 +3,72 @@ name: flutter-riverpod
 description: Use when implementing, refactoring, or debugging Flutter state management with Riverpod, especially for async state, invalidation/refresh, rebuild optimization, families, and provider testing.
 ---
 
-# Flutter Riverpod Expert
+# Skill: Flutter Riverpod
 
-## Overview
+## Purpose
 
-Use Riverpod v3 patterns for predictable, testable, performant state.
-Prefer `@riverpod` codegen + explicit invalidation.
+Riverpod 3 + riverpod_generator 4 providers, async UI through the project `.skeleton(mock:)` extension, invalidation and provider tests.
 
-Full code: `references/riverpod-patterns.md`.
+## When NOT to Use
 
-## When to Use
+- File matches no row of `steps/implement.md` → skill load decision matrix
+- Choosing state scope (widget-local vs feature vs app-wide) before any provider exists → `common-state-patterns`
+- Entity / DTO shape or `mock()` content → `flutter-models`
+- Form field state inside a `FormBuilder` → `flutter-form`
 
-- Building features with Riverpod in Flutter.
-- Fixing stale UI, over-rebuilds, or wrong provider lifecycle behavior.
-- Designing async fetch + mutation flows.
-- Testing providers/widgets with overrides.
+## Rules
 
-## Core Rules
+1. `@riverpod` codegen for every provider: functional (`Foo foo(Ref ref)`) or class (`extends _$Foo`). Generated typed refs (`FooRef`) removed — always plain `Ref`.
+2. `StateProvider`, `StateNotifierProvider`, `ChangeNotifierProvider` live in `legacy.dart` — never use them in new code.
+3. `AsyncValue.value` (null while loading/error); `valueOrNull` removed in Riverpod 3 — do not use it.
+4. After every `await` in a notifier or provider: `if (!ref.mounted) return;` before touching `ref` or `state` (disposed `Ref` throws).
+5. `ref.watch` to render, `ref.read` in callbacks, `ref.listen` for side effects (snackbar, navigation). Never `ref.read` in `build`.
+6. `select` / `selectAsync` when only one field drives a rebuild.
+7. Explicit invalidation after mutations: `ref.invalidateSelf()` in the same notifier, `ref.invalidate(other)` for dependents, `ref.refresh` for pull-to-refresh.
+8. Auto-dispose default (generator default). `@Riverpod(keepAlive: true)` only for app-wide singletons (client, auth, router) or expensive caches; release with `onDispose`.
+9. Family arguments stable + `==`-comparable (primitives, freezed classes).
+10. State lives in providers — no duplicate mutable copy in widgets. Hooks (`HookConsumerWidget`) only for ephemeral widget state (controllers, focus, animation).
 
-1. Prefer `@riverpod` code generation for type-safe providers (`Notifier` and `AsyncNotifier`).
-2. Do not use legacy `StateNotifierProvider`, `StateProvider` or `ChangeNotifierProvider` (Riverpod 3.0 moved them to `flutter_riverpod/legacy.dart`).
-3. In Riverpod 3.0, use the unified `Ref` class (subclasses like `NotifierRef` are removed).
-4. Use `AsyncValue.value` (returns null during loading/error); `valueOrNull` was removed in Riverpod 3.0.
-5. Keep a single source of truth in providers (avoid duplicated mutable widget state).
-6. In UI, use `ref.watch` for rendering, `ref.read` for actions, `ref.listen` for side effects.
-7. Use `select`/`selectAsync` when only a sub-field triggers rebuilds.
-8. Make invalidation strategy explicit (`invalidate`, `refresh`, `invalidateSelf`).
-9. **Loading UI must use the `skeleton` extension** on `AsyncValue` (never `when(loading: …)` spinners/shimmers for content).
-10. **Skeleton mock lives on the entity** — pass `Entity.mock()` (or `Entity.mockList()`) as `mock:`; never inline ad-hoc fake data in widgets.
+## Loading UI: `.skeleton(mock:)` (mandatory)
 
-## Provider Selection
+Every `AsyncValue` rendered in UI goes through the project extension — never `when(loading: …)` spinners or custom shimmers for content.
 
-- **`Provider`**: immutable/computed values.
-- **`NotifierProvider`**: mutable synchronous state.
-- **`AsyncNotifierProvider`**: async state + mutations in one unit (recommended default for async features).
-- **`FutureProvider`**: read-only async computation.
-- **`StreamProvider`**: true real-time streams.
-- **Families**: parameterized providers; arguments must be stable/equatable.
+```dart
+ref.watch(petsProvider).skeleton(
+  mock: Pet.mockList(),               // from flutter-models — never inline fakes
+  data: (pets) => PetListView(pets: pets),
+  error: (e, st) => ErrorView(error: e),
+);
+```
 
-## Loading UI: `skeleton` extension (mandatory)
-
-For any `AsyncValue<T>` rendered in UI:
-
-- **Always** call `.skeleton(...)`, not `.when(loading: …)`.
-- **`data`**: build the real loaded UI once; extension reuses it for loading (with `Skeletonizer` enabled) and data (disabled, with switch animation).
-- **`mock`**: `Entity.mock()` / `Entity.mockList()` from the domain entity — never inline fakes.
-
-## Reference detail
-
-Detail for `watch` / `read` / `listen` / `select`, Invalidation Semantics: [references/riverpod-patterns.md](references/riverpod-patterns.md) — load when touching those areas.
-
-## Lifecycle: autoDispose and keepAlive
-
-- Prefer auto-dispose for screen-scoped state.
-- Use keep-alive only for expensive/UX-critical caches.
-- Manage resources with `onDispose` and related lifecycle hooks.
+- Extension lives in `lib/core/async/async_value_skeleton.dart`, exported by the `lib/core` barrel. **Missing → create it first** from [`references/riverpod-patterns.md`](references/riverpod-patterns.md) → `.skeleton` extension (built on `skeletonizer`).
+- `data` builder runs once for both states: with `mock` while loading (skeletonized), with real data after.
+- Inside slivers: `sliver: true`.
+- Empty state handled inside `data` (empty list → empty view in slang copy).
 
 ## Testing
 
-- Provider tests: `ProviderContainer.test()`, `addTearDown(container.dispose)`.
-- Overrides: `provider.overrideWithValue(fake)`.
-- Widget tests: wrap with `ProviderScope`, inject fakes via overrides, use `tester.container()` when direct access is needed.
+- Provider tests: `ProviderContainer.test(overrides: [...])` — auto-disposed, no manual `dispose`.
+- Widget tests: `ProviderScope(overrides: [...])`; `tester.container()` for direct container access.
+- Fakes via `repoProvider.overrideWithValue(FakeRepo())` — never real network.
 
-## Common Anti-Patterns
+Notifier, keepAlive and test code: [`references/riverpod-patterns.md`](references/riverpod-patterns.md). Riverpod APIs move between minors — check Context7 (`/rrousselgit/riverpod`) before writing an API not shown here.
 
-- Using `read` in `build` to avoid rebuilds.
-- Keeping duplicated mutable state in widget + provider.
-- Mutations without invalidation/refresh of dependent providers.
-- Watching entire objects when only one field is needed.
-- Business logic in widgets instead of provider/repository layer.
-- `AsyncValue.when(loading: CircularProgressIndicator…)` or custom loading widgets instead of `.skeleton`.
-- Inline skeleton mocks in widgets instead of `Entity.mock()` on the domain model.
+## Anti-Patterns
+
+| Avoid | Use instead |
+| --- | --- |
+| `ref.read` in `build` | `ref.watch(p.select(...))` |
+| Mutation without invalidation | `invalidateSelf` / `invalidate(dependent)` |
+| `ref` used after `await` without `ref.mounted` check | `if (!ref.mounted) return;` |
+| `when(loading: CircularProgressIndicator…)` | `.skeleton(mock: Entity.mock())` |
+| Business logic in widget callbacks | Notifier method → repository |
 
 ## I/O Reference
 
-|                |                                                                                                                     |
-| -------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Trigger        | Implementing or debugging Riverpod providers, notifiers, async state, or families                                   |
-| Reads          | `constitution.md` (Riverpod conventions), `registry.md` (existing provider patterns)                                |
-| Invoked by     | `devflow.plan` (Riverpod Providers section), `devflow.implement` (provider/notifier files)                          |
-| Related skills | `flutter-models` (domain entities consumed by providers), `flutter-supabase` (repository layer called by notifiers) |
-
-## Pre-Ship Checklist
-
-- [ ] Correct provider type selected.
-- [ ] Async UI uses `.skeleton` with `Entity.mock()` / `mockList()` as `mock:` (no manual loading spinners).
-- [ ] `watch/read/listen/select` used intentionally.
-- [ ] Invalidation strategy documented in code.
-- [ ] Family arguments stable/equatable.
-- [ ] Providers tested with `ProviderContainer.test` and overrides.
-- [ ] No obvious rebuild hot spots.
+| | |
+| --- | --- |
+| Trigger | `steps/implement.md` matrix row: `*/providers/*.dart`, `*_provider.dart`, `*_notifier.dart`, widgets rendering `AsyncValue` |
+| Reads | `constitution.md` (Riverpod conventions), `registry.md` (provider patterns) |
+| Invoked by | `devflow.plan` (Riverpod Providers section), `devflow.implement` (providers + async UI) |
+| Related skills | `flutter-models` (`mock()`), `flutter-supabase` (repositories), `common-state-patterns` (scope choice) |

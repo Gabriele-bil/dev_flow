@@ -5,85 +5,49 @@ description: Use when implementing or refactoring Flutter visual styling (colors
 
 # Skill: Flutter Theme
 
-Use when touching Flutter UI styling.
+## Purpose
 
-## Objectives
+Theme-first styling: every visual value comes from `lib/core/theme` (Material 3 `ColorScheme`, `TextTheme`, component themes, `AppLayout` tokens).
 
-- Keep visual decisions centralized under `lib/core/theme`: `MaterialTheme` builds `ThemeData`; shared imports use `lib/core/theme/_theme.dart`.
-- Prefer semantic Material 3 `ColorScheme` roles over raw values.
-- Make styling predictable, reusable, and easy to review.
-- Avoid local overrides that create design drift.
+## When NOT to Use
 
-## 1) Theme-first rule (mandatory)
+- File matches no row of `steps/implement.md` → skill load decision matrix
+- Constraint, overflow or breakpoint problem → `flutter-layout`
+- Loading/skeleton state → `flutter-riverpod`
 
-Never hardcode visual values in widgets. Pull from `ThemeData`, `ColorScheme`, `TextTheme`, and layout tokens (`AppLayout` in `lib/core/theme/app_layout.dart`).
+## Rules
+
+- No hardcoded visual values in feature widgets: no hex, no `Colors.*`, no inline `TextStyle(...)`, no raw radius/spacing literals.
+- Read from `Theme.of(context)`: `colorScheme` roles, `textTheme` styles (`copyWith` for one-property tweaks), `AppLayout` tokens (`lib/core/theme/app_layout.dart`).
+- Text: `labelLarge` buttons, `title*` titles, `body*` content. Content on colored surfaces uses matching `on*` role, never `Colors.white/black`.
+- Component defaults (inputs, buttons, cards, app bar, navigation) defined once in `MaterialTheme.theme(ColorScheme)` — pages only compose widgets.
+- Light/dark parity: edit through `MaterialTheme.theme(...)` or both scheme factories; semantic meaning (error, selected) survives mode switch; contrast WCAG AA.
+- Non-`ColorScheme` colors (`success`, `warning`, `info`) → `ThemeExtension` or `app_colors.dart` in `lib/core/theme`, never feature constants.
+- Scoped override only for one subtree: `Theme(data: Theme.of(context).copyWith(...), child: …)`. Never a page-level override for one widget.
 
 ```dart
-final theme = Theme.of(context);
-final colors = theme.colorScheme;
-final text = theme.textTheme;
-
-// Good
+final colors = Theme.of(context).colorScheme;
+final text = Theme.of(context).textTheme;
 Container(color: colors.surface);
-Text('Save', style: text.labelLarge?.copyWith(color: colors.onPrimary));
+Text(t.pets.save, style: text.labelLarge?.copyWith(color: colors.onPrimary));
 BorderRadius.circular(AppLayout.inputBorderRadius);
-
-// Avoid
-Container(color: Colors.white);
-TextStyle(fontSize: 14, color: Colors.black);
-BorderRadius.circular(12); // use AppLayout (or a new token) instead
 ```
 
-## Reference detail
+`lib/core/theme` layout, color roles, current component themes: [`references/theme-conventions.md`](references/theme-conventions.md).
 
-Detail for Color system conventions, Typography conventions, Component theming strategy, Repository layout (`lib/core/theme`): [references/theme-conventions.md](references/theme-conventions.md) — load when touching those areas.
+## Checklist
 
-## 2) Light and dark mode parity
-
-Always keep light and dark coherent:
-
-1. Changes go through `MaterialTheme.theme(colorScheme)` or both scheme factories if you edit raw `ColorScheme` constants.
-2. Ensure contrast stays readable for text and icons.
-3. Verify semantic meaning survives mode switch (error still error, selected still selected).
-
-## 3) Scoped overrides (allowed, but rare)
-
-If one widget needs a special style, wrap only that subtree with `Theme(data: ...copyWith(...))`.
-Never override an entire screen to solve a local requirement.
-
-```dart
-Theme(
-  data: Theme.of(context).copyWith(
-    cardTheme: const CardThemeData(margin: EdgeInsets.zero),
-  ),
-  child: const PetHighlightCard(),
-);
-```
-
-## 4) Review checklist
-
-Before finalizing UI changes, confirm:
-
-- [ ] no hardcoded hex or `Colors.*` in feature widgets
-- [ ] no inline `TextStyle(...)` except inside `lib/core/theme` (or font wiring in `App`)
-- [ ] spacing/radius uses `AppLayout` (or new tokens in the same file)
-- [ ] component defaults live in `MaterialTheme.theme`, not on screens
-- [ ] light and dark (and contrast variants if touched) stay visually consistent
-- [ ] one-off overrides are scoped to the smallest possible subtree
-
-## 5) Common anti-patterns
-
-- **Hardcoded color in widget** → use `colorScheme` role
-- **Local typographic scale drift** → use `textTheme` + `copyWith`
-- **Repeated button/input style in pages** → move to component themes in `theme.dart`
-- **Using `Colors.white/black` for readability** → use `on*` tokens
-- **Theme override at page level for one widget** → scope `Theme` override locally
+- [ ] No hex / `Colors.*` / inline `TextStyle` in feature widgets
+- [ ] Spacing + radius from `AppLayout` (new token added there if missing)
+- [ ] Component defaults in `MaterialTheme.theme`, not on screens
+- [ ] Light + dark (and contrast variants if touched) consistent
+- [ ] Overrides scoped to smallest subtree
 
 ## I/O Reference
 
-|                |                                                                                 |
-| -------------- | ------------------------------------------------------------------------------- |
-| Trigger        | New UI screens, new components, or any change to `lib/core/theme`               |
-| Reads          | `lib/core/theme/` layout, `constitution.md` (styling conventions)               |
-| Invoked by     | `devflow.plan` (when UI is introduced), `devflow.implement`, `devflow.beautify` |
-| Related skills | `flutter-layout`                                                                |
+| | |
+| --- | --- |
+| Trigger | `steps/implement.md` matrix row: `*/pages/*.dart`, `*/screens/*.dart`, `*/widgets/*.dart`, `lib/core/theme/**` |
+| Reads | `lib/core/theme/`, `constitution.md` (styling conventions) |
+| Invoked by | `devflow.plan` (UI introduced), `devflow.implement`, `devflow.beautify` |
+| Related skills | `flutter-layout` |

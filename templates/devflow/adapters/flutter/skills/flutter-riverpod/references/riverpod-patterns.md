@@ -1,160 +1,96 @@
 # Flutter Riverpod — Code Patterns
 
-## Sync state with Notifier
+Rules live in `../SKILL.md`; this file holds the code the project creates once or copies per feature.
+
+## `.skeleton` extension (create once)
+
+`lib/core/async/async_value_skeleton.dart` — needs `skeletonizer` (installed by `devflow.setup`). Export it from the `lib/core` barrel.
 
 ```dart
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-part 'counter.g.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
-@riverpod
-class Counter extends _$Counter {
-  @override
-  int build() => 0;
-
-  void increment() => state++;
-}
-```
-
-## Async fetch + mutation
-
-```dart
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-part 'todos.g.dart';
-
-@riverpod
-class Todos extends _$Todos {
-  @override
-  Future<List<Todo>> build() async {
-    return ref.watch(todoRepositoryProvider).fetchTodos();
-  }
-
-  Future<void> addTodo(String title) async {
-    final repo = ref.read(todoRepositoryProvider);
-    await repo.createTodo(title);
-    if (!ref.mounted) return; // Riverpod 3 throws on a disposed Ref
-    ref.invalidateSelf();
-  }
-}
-```
-
-## UI consumption (skeleton loading)
-
-Use the project `skeleton` extension on `AsyncValue` — it skeletonizes the **same** `data` builder with `mock` while loading, then animates to real data.
-
-```dart
-class TodoPage extends ConsumerWidget {
-  const TodoPage({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final todos = ref.watch(todosProvider);
-
-    ref.listen(todosProvider, (prev, next) {
-      next.whenOrNull(
-        error: (err, _) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(err.toString())),
+extension AsyncValueSkeleton<T> on AsyncValue<T> {
+  /// Renders [data] with [mock] while loading (skeletonized), real data after.
+  Widget skeleton({
+    required T mock,
+    required Widget Function(T value) data,
+    required Widget Function(Object error, StackTrace stackTrace) error,
+    bool sliver = false,
+  }) {
+    Widget wrap(bool loading, Widget child) => sliver
+        ? Skeletonizer.sliver(enabled: loading, child: child)
+        : Skeletonizer(
+            enabled: loading,
+            enableSwitchAnimation: true,
+            child: child,
           );
-        },
-      );
-    });
 
-    return todos.skeleton(
-      mock: Todo.mockList(), // on Todo entity — see flutter-models
-      data: (items) => ListView(
-        children: [for (final t in items) TodoTile(todo: t)],
-      ),
-      error: (e, _) => ErrorView(error: e),
+    return when(
+      data: (value) => wrap(false, data(value)),
+      loading: () => wrap(true, data(mock)),
+      error: error,
     );
   }
 }
 ```
 
-Single-entity provider: `mock: Pet.mock()`. List provider: `mock: Todo.mockList()`.
+`when` keeps previous data on refresh (`skipLoadingOnRefresh` defaults to `true`), so pull-to-refresh does not flash the skeleton.
 
-Entity mock contract: see `flutter-models` (`mock()` / `mockList()` on domain entities).
-
-## `skeleton` extension example
-
-```dart
-ref.watch(petProvider).skeleton(
-  mock: Pet.mock(),
-  data: (pet) => PetDetailBody(pet: pet),
-  error: (e, st) => PetErrorView(error: e, stackTrace: st),
-);
-```
-
-`AsyncSnapshot` has the same `skeleton` extension (e.g. `FutureBuilder`); use `sliver: true` inside sliver lists.
-
-## `watch` vs `read` in build
-
-Bad:
-
-```dart
-final value = ref.read(userProvider); // in build: UI won't react to updates
-```
-
-Good:
-
-```dart
-final userName = ref.watch(userProvider.select((u) => u.name));
-```
-
-## Lifecycle: keepAlive
+## Async notifier with mutation
 
 ```dart
 @riverpod
-Future<String> cachedValue(Ref ref) async {
-  final value = await fetchValue();
-  if (!ref.mounted) return value; // disposed during the await — Ref unusable
+class Pets extends _$Pets {
+  @override
+  Future<List<Pet>> build() =>
+      ref.watch(petRepositoryProvider).list().then((r) => switch (r) {
+            Ok(:final value) => value,
+            Err(:final error) => throw error,
+          });
+
+  Future<void> add(Pet pet) async {
+    await ref.read(petRepositoryProvider).create(pet);
+    if (!ref.mounted) return;
+    ref.invalidateSelf();
+  }
+}
+```
+
+## Side effects with `ref.listen`
+
+```dart
+ref.listen(petsProvider, (prev, next) {
+  if (next case AsyncError(:final error)) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$error')));
+  }
+});
+```
+
+## Timed cache with keepAlive
+
+```dart
+@riverpod
+Future<Config> remoteConfig(Ref ref) async {
+  final value = await fetchConfig();
+  if (!ref.mounted) return value;
   final link = ref.keepAlive();
-  Timer(const Duration(minutes: 5), link.close);
+  final timer = Timer(const Duration(minutes: 5), link.close);
+  ref.onDispose(timer.cancel);
   return value;
 }
 ```
 
-## Testing
-
-### Provider tests
+## Tests
 
 ```dart
-test('counter increments', () {
-  final container = ProviderContainer.test();
-  addTearDown(container.dispose);
-
-  expect(container.read(counterProvider), 0);
-  container.read(counterProvider.notifier).increment();
-  expect(container.read(counterProvider), 1);
+test('add invalidates the list', () async {
+  final container = ProviderContainer.test(
+    overrides: [petRepositoryProvider.overrideWithValue(FakePetRepository())],
+  );
+  await container.read(petsProvider.future);
+  await container.read(petsProvider.notifier).add(Pet.mock());
+  expect(await container.read(petsProvider.future), hasLength(1));
 });
 ```
-
-### Overrides
-
-```dart
-final container = ProviderContainer.test(
-  overrides: [
-    todoRepositoryProvider.overrideWithValue(FakeTodoRepository()),
-  ],
-);
-```
-
-## `watch` / `read` / `listen` / `select`
-
-- **`watch`**: reactive read for rendering/derived logic.
-- **`read`**: one-shot read for callbacks/commands.
-- **`listen`**: side effects on transitions (snackbar, navigation).
-- **`select`**: rebuild only on selected field changes.
-
-`ref.read` inside `build` is an anti-pattern — UI won't react to updates. Use `ref.watch(provider.select(...))` instead.
-
-## Invalidation Semantics
-
-- **`ref.invalidate(provider)`**: mark stale; recompute when read next.
-- **`ref.refresh(provider)`**: invalidate + immediate read.
-- **`ref.invalidateSelf()`**: invalidate current provider/notifier.
-
-Use:
-
-- After a mutation in the same notifier: `invalidateSelf`.
-- Pull-to-refresh action: `refresh`.
-- External cache dependency changed: `invalidate(targetProvider)`.

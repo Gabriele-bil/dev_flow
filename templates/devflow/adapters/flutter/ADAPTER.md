@@ -1,19 +1,25 @@
 # Flutter adapter (DevFlow)
 
+**Verified against:** sdk:flutter@3.47, sdk:dart@3.13, pub:flutter_riverpod@3.4, pub:hooks_riverpod@3.4, pub:riverpod_generator@4.0, pub:freezed@4.0 (2026-10-30)
+
 Single source of truth for Flutter behavior. Pipeline skills (`devflow-plan`, `devflow-implement`, `devflow-beautify`, `devflow-test`, `devflow-pr`) **must** read `@devflow/config.md`, resolve adapter, then load this core file **plus** the `steps/<step>.md` file for the active step (see **Step files** below). Do not load step files for other steps.
+
+Baseline: **Riverpod 3 codegen + hooks · freezed 4 · slang · skeletonizer · Material 3 theme · Supabase (optional)**. APIs that change between minors (Riverpod, freezed, Supabase, Flutter widgets): check current docs with Context7 / Dart MCP before writing them.
 
 ## Technology skills (load by feature type)
 
-| When | Load |
+Feature-level index (`devflow-plan`). Per-file triggers: `steps/implement.md` → skill load decision matrix — single source; keep both in sync.
+
+| When (feature) | Load |
 | ------ | ------ |
-| New feature architecture, layer ownership, feature file-tree scaffold | `@devflow/adapters/flutter/skills/flutter-architecture/SKILL.md` |
-| Database read/write/auth, schema, RLS | `@devflow/adapters/flutter/skills/flutter-supabase/SKILL.md` |
-| Schema migrations / SQL artifacts | `@devflow/adapters/flutter/skills/flutter-supabase-migrations/SKILL.md` |
-| New UI screens or visual styling | `@devflow/adapters/flutter/skills/flutter-theme/SKILL.md` |
-| Riverpod providers, notifiers, async state | `@devflow/adapters/flutter/skills/flutter-riverpod/SKILL.md` |
-| Entities, DTOs, JSON boundaries | `@devflow/adapters/flutter/skills/flutter-models/SKILL.md` |
-| Layout, breakpoints, scrollables | `@devflow/adapters/flutter/skills/flutter-layout/SKILL.md` |
-| Form / wizard flows | `@devflow/adapters/flutter/skills/flutter-form/SKILL.md` |
+| New feature: layers, dependency direction, feature file tree | `@devflow/adapters/flutter/skills/flutter-architecture/SKILL.md` |
+| Entities, `mock()`, DTOs, mappers, failures, repository contracts | `@devflow/adapters/flutter/skills/flutter-models/SKILL.md` |
+| Providers, notifiers, async state, `.skeleton(mock:)` loading UI, provider tests | `@devflow/adapters/flutter/skills/flutter-riverpod/SKILL.md` |
+| Supabase datasources, repositories, auth, storage, realtime (Supabase apps only) | `@devflow/adapters/flutter/skills/flutter-supabase/SKILL.md` |
+| Schema migrations, RLS, SQL (Supabase apps only) | `@devflow/adapters/flutter/skills/flutter-supabase-migrations/SKILL.md` |
+| Theme tokens, colors, typography, component themes | `@devflow/adapters/flutter/skills/flutter-theme/SKILL.md` |
+| Constraints, breakpoints, scrollables, spacing | `@devflow/adapters/flutter/skills/flutter-layout/SKILL.md` |
+| `flutter_form_builder` forms, validation, wizards | `@devflow/adapters/flutter/skills/flutter-form/SKILL.md` |
 | PR review, blast radius, architecture risk checks | `@code-review-graph/skills/code-review-graph/SKILL.md` |
 
 ## MCP (when available)

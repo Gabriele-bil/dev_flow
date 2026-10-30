@@ -1,87 +1,43 @@
 ---
-name: "flutter-layout"
-description: "Use when implementing or fixing Flutter widget layouts, especially with overflows, unbounded constraints, nested scrollables, alignment issues, or responsive/adaptive breakpoints."
-argument-hint: [optional-plan-path]
+name: flutter-layout
+description: Use when implementing or fixing Flutter widget layouts, especially with overflows, unbounded constraints, nested scrollables, alignment issues, or responsive/adaptive breakpoints.
 ---
 
-# Writing Correct Flutter Layouts
+# Skill: Flutter Layout
 
-## Overview
+## Purpose
 
-Build Flutter layouts that are constraint-safe, responsive, evolvable.
+Constraint-safe, responsive layouts on project breakpoints (`AppBreakpointWidth` / `AppBreakpointConstraints`), one scroll owner per region, token spacing.
 
-Full code examples: `references/layout-patterns.md`.
+## When NOT to Use
 
-## Core Layout Principles
+- File matches no row of `steps/implement.md` → skill load decision matrix
+- Colors, typography, component styling → `flutter-theme`
+- Loading/skeleton rendering → `flutter-riverpod`
 
-Core Flutter rule: **Constraints go down. Sizes go up. Parent sets position.**
+## Rules
 
-- **Pass constraints down:** Children must pick a size inside parent bounds.
-- **Pass sizes up:** Parent positions children after they report size.
-- **Parent sets position:** Children do not choose their own offset.
-- **Avoid unbounded constraints:** Most runtime layout errors come from this.
-- **One primary scroll direction per region:** Nesting scrollables without bounds causes broken layouts.
+- **Breakpoints:** branch with `LayoutBuilder` + `AppBreakpointConstraints` (on `BoxConstraints`) or `AppBreakpointWidth` (on `double`) from `lib/core/layout/app_breakpoints.dart` (or the path in `constitution.md`). No width literals (`> 600`) in features. Every new screen covers compact / medium / expanded.
+- **Responsive vs adaptive:** same tree flexing (`Expanded`, `Flexible`, `Wrap`) when content only reflows; different tree (bottom nav ↔ `NavigationRail`) when navigation or density changes.
+- **Sibling spacing:** `Row(spacing:)` / `Column(spacing:)` with `AppLayout` tokens. `SizedBox` only for one-off asymmetric gaps — never between every child.
+- **Scrolling:** one primary scrollable per region. Scrollable inside `Column`/`Row` → wrap in `Expanded` (or bounded `SizedBox`). Nested scrollables avoided; when unavoidable, inner list `shrinkWrap: true` + `NeverScrollableScrollPhysics`, short lists only.
+- **Large lists:** `ListView.builder` / slivers, never `ListView(children: [...])` over unbounded data.
+- **Overflow:** long text in a `Row` → `Expanded` + `maxLines` + `overflow`; no `double.infinity` inside unbounded parents.
+- **Structure:** build outer → inner (`Scaffold`, sections, then content); extract deep or repeated subtrees into private `StatelessWidget`s, not helper methods returning widgets.
+- Layout primitives and error explanations: Flutter docs via Dart MCP / Context7 (`/flutter/website`) — not repeated here.
 
-## When to Use
+## Checklist
 
-- Building new UI screens or reusable widgets.
-- Refactoring deeply nested `Row`/`Column` trees.
-- Fixing `RenderFlex overflowed`, "unbounded constraints", clipped content, or inconsistent spacing.
-- Implementing responsive or adaptive behavior for phone/tablet/desktop.
-
-## Reference detail
-
-Detail for Quick Layout Selector, Common Failures and Fast Fixes: [references/layout-patterns.md](references/layout-patterns.md) — load when touching those areas.
-
-## Workflow (Constraint-First)
-
-### 1) Decompose the UI
-
-- Split the screen into sections: header, body, footer, overlays.
-- Decide which section scrolls and which remains fixed.
-- Mark fixed-size vs flexible-size areas.
-
-### 2) Model constraints before coding
-
-- For each section, define max/min width/height expectations.
-- In `Row`/`Column`, decide which children must flex (`Expanded`) and which stay intrinsic.
-- Identify risky spots: scrollables in flex layouts, unconstrained text/images, nested scrollables.
-
-### 3) Implement outer-to-inner
-
-- Start with high-level structure (`Scaffold`, page sections).
-- Add uniform spacing between siblings via `Row(spacing:)` / `Column(spacing:)`; use `SizedBox` only for isolated gaps or section separators.
-- Extract repeated or deep subtrees into private stateless widgets.
-
-### 4) Validate with tools and edge cases
-
-- Use Flutter Inspector and enable debug paint when needed.
-- Test with tiny and very large widths, text scale, and dynamic content lengths.
-- Confirm there are no overflow stripes or layout exceptions.
-
-## Responsive vs Adaptive
-
-- **Responsive:** Same widget tree adapts with available constraints (`Expanded`, `Flexible`, `Wrap`, `LayoutBuilder`).
-- **Adaptive:** Different widget tree by form factor (for example bottom nav on mobile, `NavigationRail` on wide layouts).
-
-## Layout Quality Checklist (Definition of Done)
-
-- [ ] No layout exceptions in debug console.
-- [ ] No overflow warnings on target breakpoints.
-- [ ] Scroll behavior is intentional and predictable.
-- [ ] Long text, larger accessibility font, and dynamic data do not break structure.
-- [ ] Spacing and alignment are consistent with design tokens.
-- [ ] Widget tree is readable (large sections extracted into subwidgets).
-
-## Examples
-
-Sibling spacing (`spacing:` vs `SizedBox`), `ListView` inside `Column` fix, responsive `LayoutBuilder` branch → `references/layout-patterns.md`.
+- [ ] No overflow stripes or layout exceptions at compact / medium / expanded
+- [ ] Large text scale (≥1.5) and long content do not break structure
+- [ ] Spacing via `spacing:` + `AppLayout` tokens
+- [ ] Breakpoint tests size the view (`steps/test.md` → Responsive tests)
 
 ## I/O Reference
 
-|                |                                                                                                              |
-| -------------- | ------------------------------------------------------------------------------------------------------------ |
-| Trigger        | Any layout overflow, unbounded constraint error, or responsive/adaptive breakpoint work                      |
-| Reads          | `lib/core/layout/app_breakpoints.dart` (`AppBreakpointWidth`, `AppBreakpointConstraints`), `constitution.md` |
-| Invoked by     | `devflow.implement` (all UI screens), `devflow.beautify` (layout area E — responsive layout)                 |
-| Related skills | `flutter-theme` (spacing and sizing tokens)                                                                  |
+| | |
+| --- | --- |
+| Trigger | `steps/implement.md` matrix row: `*/pages/*.dart`, `*/screens/*.dart`, `*/widgets/*.dart`, `lib/core/layout/**`, overflow fix |
+| Reads | `lib/core/layout/app_breakpoints.dart`, `constitution.md` |
+| Invoked by | `devflow.implement` (UI screens), `devflow.beautify` (responsive layout axis) |
+| Related skills | `flutter-theme` (spacing + sizing tokens) |

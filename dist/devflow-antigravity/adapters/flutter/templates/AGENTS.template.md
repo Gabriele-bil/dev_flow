@@ -14,14 +14,15 @@
 <!-- devflow-managed:end:rules -->
 
 <!-- devflow-managed:start:skills -->
-@devflow/skills/devflow-task/SKILL.md
-@devflow/skills/devflow-plan/SKILL.md
-@devflow/skills/devflow-implement/SKILL.md
-@devflow/skills/devflow-beautify/SKILL.md
-@devflow/skills/devflow-test/SKILL.md
-@devflow/adapters/flutter/skills/flutter-layout/SKILL.md
-@devflow/adapters/flutter/skills/flutter-riverpod/SKILL.md
-@devflow/adapters/flutter/skills/flutter-theme/SKILL.md
-@devflow/adapters/flutter/skills/flutter-supabase/SKILL.md
-@code-review-graph/skills/code-review-graph/SKILL.md
+Pipeline steps (`/devflow-task`, `/devflow-plan`, …) load their own skills. Never `@`-import skills here — they would load in every session.
+
+When you touch → read skill (full matrix: adapter `steps/implement.md`):
+
+- new `lib/features/<name>/` → `flutter-architecture`
+- `domain/`, `*_dto.dart`, `*_mapper.dart` → `flutter-models`
+- `providers/`, `*_notifier.dart`, `AsyncValue` in UI → `flutter-riverpod`
+- `pages/`, `screens/`, `widgets/` → `flutter-theme` + `flutter-layout`
+- forms (`FormBuilder`) → `flutter-form`
+- Supabase datasource / repository impl → `flutter-supabase`; `supabase/migrations/*.sql` → `flutter-supabase-migrations`
+- PR review / blast radius → `code-review-graph`
 <!-- devflow-managed:end:skills -->

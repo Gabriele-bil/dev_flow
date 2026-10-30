@@ -4,7 +4,7 @@
 | Riverpod AsyncNotifier | Async feature state | `lib/features/<feature>/providers/...` |
 | Responsive LayoutBuilder | Multi-breakpoint UI | `lib/features/<feature>/pages/page.dart` |
 | Repository Contract | Data/domain boundary | `lib/features/<feature>/domain/...` |
-| Slang Localization | Any user-facing text | `assets/i18n/*.json` |
+| Slang Localization | Any user-facing text | `assets/i18n/*.i18n.json` |
 <!-- devflow-managed:end:patterns -->
 
 <!-- devflow-managed:start:conventions -->
