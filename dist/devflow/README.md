@@ -132,16 +132,6 @@ Fourteen hook registrations activate automatically — no user invocation requir
 | Stop | `stop-learn-distill.sh` | Detects file churn (≥4 edits) in `.devflow-observe.jsonl`; appends to `.devflow-learnings.jsonl` |
 | Stop | `observe.sh stop` | Logs response-boundary events to `.devflow-observe.jsonl` |
 
-## Contexts
-
-Three context files in `devflow/contexts/` tune Claude's behavior per pipeline phase. The SessionStart hook suggests which one to load based on the active step.
-
-| Context | Suggested for | Focus |
-| --- | --- | --- |
-| `contexts/implement.md` | devflow.implement, devflow.beautify | Code-first, follow plan.md order, mark [done] |
-| `contexts/review.md` | devflow.ship | 7-axis review, severity-ordered findings |
-| `contexts/research.md` | devflow.task, devflow.plan | Explore before acting, no application code |
-
 ## Core Principles
 
 `ETHOS.md` defines the four non-negotiable principles injected into every skill:
@@ -183,7 +173,7 @@ Cross-adapter skills in `adapters/common/`:
 
 ## Plugin Catalog
 
-`agent.yaml` at the plugin root is a machine-readable index of all pipeline components — steps, agents, skills, adapters, hooks, contexts, references. Use it for tooling, automation, or quick reference.
+`agent.yaml` at the plugin root is a machine-readable index of all pipeline components — steps, agents, skills, adapters, hooks, references. Use it for tooling, automation, or quick reference.
 
 ## Features output
 

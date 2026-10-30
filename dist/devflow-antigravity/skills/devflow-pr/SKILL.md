@@ -20,7 +20,7 @@ Commit all changes, push feature branch, open PR to the repo's default branch. F
 
 ## Step 0 - Resolve adapter and base branch
 
-Resolve adapter, adapter root, and app working directory per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md` (core) plus `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/steps/pr.md`. Legacy adapters without `steps/`: the **PR** section lives in `ADAPTER.md`. Use the PR step file for pre-push verification commands, expected success output, and checklist items that must appear in the PR body (monorepo: run verification commands from the resolved app's working directory).
+Resolve adapter, adapter root, and app working directory per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md` (core) plus `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/steps/pr.md`. Use the PR step file for pre-push verification commands, expected success output, and checklist items that must appear in the PR body (monorepo: run verification commands from the resolved app's working directory).
 
 Resolve the base branch instead of assuming `main` — repos also use `master`, `develop`, or `next` as their default:
 

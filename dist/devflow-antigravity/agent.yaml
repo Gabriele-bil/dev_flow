@@ -484,13 +484,3 @@ hooks:
     script: hooks/session-start-learnings.sh
     description: "Inject past learnings from .devflow-learnings.jsonl into session context, filtered by active feature"
 
-contexts:
-  - id: implement
-    path: contexts/implement.md
-    suggested_for: [devflow.implement, devflow.beautify]
-  - id: review
-    path: contexts/review.md
-    suggested_for: [devflow.ship]
-  - id: research
-    path: contexts/research.md
-    suggested_for: [devflow.init, devflow.discover, devflow.task, devflow.plan]

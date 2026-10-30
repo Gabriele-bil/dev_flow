@@ -63,7 +63,7 @@ Targeted rework after the plan was already implemented. Callers: `devflow.ship` 
 
 ### Step 0 - Resolve adapter
 
-Resolve adapter, adapter root, and app working directory per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md` (core: **Technology skills**, **MCP**) plus `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/steps/implement.md` (skill load matrix, commands, checklist, UI/data rules). Legacy adapters without `steps/`: all sections live in `ADAPTER.md` — read it in full. Follow those sections for the remainder of this skill.
+Resolve adapter, adapter root, and app working directory per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md` (core: **Technology skills**, **MCP**) plus `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/steps/implement.md` (skill load matrix, commands, checklist, UI/data rules). Follow those sections for the remainder of this skill.
 
 ### Step 1 - Read docs
 

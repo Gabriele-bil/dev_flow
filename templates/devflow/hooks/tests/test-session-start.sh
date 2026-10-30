@@ -85,9 +85,9 @@ grep -q "run /devflow:implement" "$OUT" \
 grep -q "001_login" "$OUT" \
   && assert "feature named" pass \
   || assert "feature named" fail
-grep -q "contexts/implement.md" "$OUT" \
-  && assert "context hint present" pass \
-  || assert "context hint present" fail
+grep -q "contexts/" "$OUT" \
+  && assert "no context file hinted (the skill is the context)" fail \
+  || assert "no context file hinted (the skill is the context)" pass
 grep -q "## Decision tree" "$OUT" \
   && assert "meta-skill NOT injected (compact)" fail \
   || assert "meta-skill NOT injected (compact)" pass

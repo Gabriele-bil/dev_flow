@@ -61,22 +61,6 @@ if [ -f "$STATE_FILE" ]; then
   FEATURE=$(jq -r '.feature // .active_feature // empty' "$STATE_FILE" 2>/dev/null) || FEATURE=""
 fi
 
-# Context file hint per next step
-case "$NEXT_STEP" in
-  devflow.task|devflow.plan)
-    CTX="$PLUGIN_ROOT/contexts/research.md"
-    ;;
-  devflow.implement|devflow.beautify)
-    CTX="$PLUGIN_ROOT/contexts/implement.md"
-    ;;
-  devflow.ship)
-    CTX="$PLUGIN_ROOT/contexts/review.md"
-    ;;
-  *)
-    CTX=""
-    ;;
-esac
-
 # ── Compact branch: state already names the entry point ──────────────────────
 # The full decision tree is redundant when next_step is a known pipeline step.
 KNOWN_STEP=false
@@ -93,16 +77,11 @@ if [ "$KNOWN_STEP" = true ]; then
   if [ -n "$FEATURE" ]; then
     FEATURE_LABEL=" (feature: $FEATURE)"
   fi
-  CTX_LINE=""
-  if [ -n "$CTX" ]; then
-    CTX_LINE="
-Load context: $CTX"
-  fi
   # Slash form per host (skills are the commands): /devflow:<step> on Claude
   # Code, /devflow-<step> on Antigravity. The build rewrites literal names, not
   # this one, which comes from the state file.
   if [ "$DF_HOST" = "antigravity" ]; then RUN="/devflow-${NEXT_STEP#devflow.}"; else RUN="/devflow:${NEXT_STEP#devflow.}"; fi
-  MSG="dev-flow active$FEATURE_LABEL. Next step: $NEXT_STEP — run $RUN, or /devflow:resume to re-orient after an interruption.$CTX_LINE
+  MSG="dev-flow active$FEATURE_LABEL. Next step: $NEXT_STEP — run $RUN, or /devflow:resume to re-orient after an interruption.
 User orchestrates; only ship/run/auto/hotfix chain other steps. Full orientation: $PLUGIN_ROOT/references/orientation.md.$CONFIG_WARN"
   df_context "$MSG"
   exit 0

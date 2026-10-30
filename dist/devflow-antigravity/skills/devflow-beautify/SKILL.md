@@ -47,7 +47,7 @@ Files from `devflow.implement` summary + `devflow/features/[NNN]_[feature-name]/
 
 ### Step 0 - Resolve adapter
 
-Resolve adapter, adapter root, and app working directory per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md` (core) plus `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/steps/beautify.md`. Legacy adapters without `steps/`: the **Beautify** sections live in `ADAPTER.md`. Use the beautify step file's commands and stack-specific review axes (monorepo: run commands from the resolved app's working directory).
+Resolve adapter, adapter root, and app working directory per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md` (core) plus `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/steps/beautify.md`. Use the beautify step file's commands and stack-specific review axes (monorepo: run commands from the resolved app's working directory).
 
 ### Step 1 - Read docs
 

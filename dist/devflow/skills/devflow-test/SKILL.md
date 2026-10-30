@@ -6,7 +6,7 @@ disable-model-invocation: true
 effort: medium
 ---
 
-> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
 
 # Skill: devflow.test
 
@@ -49,7 +49,7 @@ Files from `devflow.implement` + `devflow.beautify` + `devflow/features/[NNN]_[f
 
 ### Step 0 - Resolve adapter
 
-Resolve adapter, adapter root, and app working directory per `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core) plus `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/steps/test.md`. Legacy adapters without `steps/`: the **Test** section lives in `ADAPTER.md`. The test step file defines placement, frameworks, coverage expectations, and shell commands — follow it exactly for this run (monorepo: run test commands from the resolved app's working directory).
+Resolve adapter, adapter root, and app working directory per `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core) plus `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/steps/test.md`. The test step file defines placement, frameworks, coverage expectations, and shell commands — follow it exactly for this run (monorepo: run test commands from the resolved app's working directory).
 
 ### Step 1 - Read docs
 

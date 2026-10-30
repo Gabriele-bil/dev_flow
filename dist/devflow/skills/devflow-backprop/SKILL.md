@@ -4,7 +4,7 @@ description: Backpropagates a bug or failing test into the spec — traces failu
 argument-hint: "[bug-description-or-test-path]"
 ---
 
-> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
 
 # Skill: devflow.backprop
 
@@ -70,7 +70,7 @@ Propose, then apply after approval:
 
 ### Step 5 — Regression test
 
-Name it before writing: `[test file path] :: [test name referencing the AC]`. Test must fail on current code (Prove-It), pass after fix. Write it per the adapter test step file (`${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/steps/test.md`; legacy: `ADAPTER.md` → **Test**) conventions. Code fix itself: trivial → apply now; non-trivial → `devflow.implement --fix <affected File List entries>` re-entry mode (backward transition per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md`, user-confirmed), then `devflow.beautify` → `devflow.test` again. Trivial inline fix on a plan past `implemented` → still re-run `devflow.test` (regenerates `verification.md`) before ship. Slice `deps:` annotations present in **File List** → scope re-entry to the affected slice plus downstream slices listing it in `deps`; untouched independent slices stay `[done]`.
+Name it before writing: `[test file path] :: [test name referencing the AC]`. Test must fail on current code (Prove-It), pass after fix. Write it per the adapter test step file (`${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/steps/test.md`) conventions. Code fix itself: trivial → apply now; non-trivial → `devflow.implement --fix <affected File List entries>` re-entry mode (backward transition per `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md`, user-confirmed), then `devflow.beautify` → `devflow.test` again. Trivial inline fix on a plan past `implemented` → still re-run `devflow.test` (regenerates `verification.md`) before ship. Slice `deps:` annotations present in **File List** → scope re-entry to the affected slice plus downstream slices listing it in `deps`; untouched independent slices stay `[done]`.
 
 ### Step 6 — Log the gap (Rigor systemic rule)
 

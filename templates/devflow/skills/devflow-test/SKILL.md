@@ -47,7 +47,7 @@ Files from `devflow.implement` + `devflow.beautify` + `devflow/features/[NNN]_[f
 
 ### Step 0 - Resolve adapter
 
-Resolve adapter, adapter root, and app working directory per `@devflow/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `@devflow/adapters/<adapter>/ADAPTER.md` (core) plus `@devflow/adapters/<adapter>/steps/test.md`. Legacy adapters without `steps/`: the **Test** section lives in `ADAPTER.md`. The test step file defines placement, frameworks, coverage expectations, and shell commands — follow it exactly for this run (monorepo: run test commands from the resolved app's working directory).
+Resolve adapter, adapter root, and app working directory per `@devflow/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `@devflow/adapters/<adapter>/ADAPTER.md` (core) plus `@devflow/adapters/<adapter>/steps/test.md`. The test step file defines placement, frameworks, coverage expectations, and shell commands — follow it exactly for this run (monorepo: run test commands from the resolved app's working directory).
 
 ### Step 1 - Read docs
 

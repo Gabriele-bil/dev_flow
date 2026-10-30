@@ -28,7 +28,7 @@ Identical to pre-monorepo behavior — no new reads, no new questions.
 
 - `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md` (core: technology skills, MCP).
 - `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/steps/<step>.md` for the active step's commands, plan sections, checklists.
-- Legacy adapters without `steps/`: all sections live in `ADAPTER.md` — read it in full.
+-
 
 ## Working-directory scoping (monorepo only)
 

@@ -10,7 +10,7 @@ experimental:
   cacheTtl: 1h
 ---
 
-> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
 
 # Accessibility Auditor
 
@@ -35,7 +35,7 @@ Before auditing:
 - `.devflow-review-packet.md` (project root) — when dispatched by `devflow.ship`, read it first: changed files, diff (new files included), acceptance criteria, plan excerpts, verification stamps, project rules. It replaces `git diff` and full reads of the files below; open them only for what the packet lacks. Standalone review (no packet): read them.
 - `devflow/features/[NNN]_[feature-name]/task.md` — acceptance criteria and affected UI surfaces
 - `devflow/features/[NNN]_[feature-name]/plan.md` — component structure and interaction flows
-- Active adapter beautify step file (`${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/steps/beautify.md`; legacy: `ADAPTER.md`) → **Beautify: accessibility** — stack-specific patterns (Flutter `Semantics`, Angular `aria-*`)
+- Active adapter beautify step file (`${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/steps/beautify.md`) → **Beautify: accessibility** — stack-specific patterns (Flutter `Semantics`, Angular `aria-*`)
 - Full checklist: `${CLAUDE_PLUGIN_ROOT}/references/accessibility-checklist.md`
 
 ## Core Principles
@@ -126,7 +126,7 @@ Use dev-flow taxonomy throughout the report:
 
 ## Rules
 
-1. Read `task.md` acceptance criteria and the active adapter accessibility section (`steps/beautify.md`; legacy: `ADAPTER.md`) before auditing
+1. Read `task.md` acceptance criteria and the active adapter accessibility section (`steps/beautify.md`) before auditing
 2. Every Critical and Required finding includes a specific fix
 3. Never approve with Critical issues open
 4. Praise specific good accessibility practices — not generic "looks accessible"

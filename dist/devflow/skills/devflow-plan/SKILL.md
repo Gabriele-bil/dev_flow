@@ -6,7 +6,7 @@ disable-model-invocation: true
 effort: high
 ---
 
-> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
 
 # Skill: devflow.plan
 
@@ -70,7 +70,7 @@ Path: `devflow/features/[NNN]_[feature-name]/task.md` — if no arg, resolve wit
 
 1. Note `task.md`'s `**App:**` field if present (monorepo repos only).
 2. Resolve adapter, adapter root, and app working directory per `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`. `task.md` monorepo but missing `**App:**` → hard stop, ask user.
-3. Read `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core: technology skills, MCP) plus `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/steps/plan.md` (plan extra sections, dependency ordering, localization). Legacy adapters without `steps/`: all sections live in `ADAPTER.md` — read it in full.
+3. Read `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core: technology skills, MCP) plus `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/steps/plan.md` (plan extra sections, dependency ordering, localization).
 
 ### Step 0b - Constitution Gate
 

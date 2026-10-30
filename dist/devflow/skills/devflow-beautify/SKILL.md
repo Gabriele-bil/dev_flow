@@ -6,7 +6,7 @@ disable-model-invocation: true
 effort: medium
 ---
 
-> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
 
 # Skill: devflow.beautify
 
@@ -49,7 +49,7 @@ Files from `devflow.implement` summary + `devflow/features/[NNN]_[feature-name]/
 
 ### Step 0 - Resolve adapter
 
-Resolve adapter, adapter root, and app working directory per `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core) plus `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/steps/beautify.md`. Legacy adapters without `steps/`: the **Beautify** sections live in `ADAPTER.md`. Use the beautify step file's commands and stack-specific review axes (monorepo: run commands from the resolved app's working directory).
+Resolve adapter, adapter root, and app working directory per `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core) plus `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/steps/beautify.md`. Use the beautify step file's commands and stack-specific review axes (monorepo: run commands from the resolved app's working directory).
 
 ### Step 1 - Read docs
 

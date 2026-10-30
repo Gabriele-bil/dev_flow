@@ -246,7 +246,7 @@ In `skills/devflow-pr/SKILL.md`:
 
 | Tema | Contraddizione | Proposta |
 | --- | --- | --- |
-| Frequenza di format/analyze in implement | ✅ `contexts/implement.md` dice dopo ogni file. `skills/devflow-implement/SKILL.md` Step 6 dice una volta alla fine. Il suo anti-pattern dice dopo ogni slice verticale | Una sola regola: per slice. Eliminare `contexts/implement.md` ([T-6](#t-6)) |
+| Frequenza di format/analyze in implement | ✅ contexts/implement.md (rimosso nella fase 5) dice dopo ogni file. `skills/devflow-implement/SKILL.md` Step 6 dice una volta alla fine. Il suo anti-pattern dice dopo ogni slice verticale | Una sola regola: per slice. Eliminare contexts/implement.md (rimosso nella fase 5) ([T-6](#t-6)) |
 | Branch base | implement usa `origin/main` cablato e "When NOT to Use" esige un branch da `main`. task e pr rilevano `$BASE_BRANCH` | Uno script condiviso per il branch base, usato da tutte le skill |
 | Escalation di livello 4 in run mode | `references/escalation-ladder.md` chiede all'utente di approvare la scomposizione, ma run e auto non devono mai fare domande. `references/run-mode.md` non copre il caso | In run mode il livello 4 diventa un decision flag, oppure si passa direttamente al livello 5 |
 | Menu finale di test | `skills/devflow-test/SKILL.md` offre 3 opzioni: due saltano il gate di ship, una ripete lo Step 3 di pr | Nessuna domanda: si passa a ship |
@@ -399,7 +399,7 @@ Lo Step 7 di `skills/devflow-test/SKILL.md` incolla stdout e stderr di ogni targ
 <a id="t-6"></a>
 ### T-6 🟡 `contexts/*.md`
 
-6,4 KB che l'hook di `SessionStart` invita a caricare. Duplicano le skill e sono superati: `contexts/implement.md` contraddice implement ([Q-2](#q-2)) e dice "stop and surface" anche in run mode. Eliminarli, oppure ridurli a 3 righe ciascuno.
+6,4 KB che l'hook di `SessionStart` invita a caricare. Duplicano le skill e sono superati: contexts/implement.md (rimosso nella fase 5) contraddice implement ([Q-2](#q-2)) e dice "stop and surface" anche in run mode. Eliminarli, oppure ridurli a 3 righe ciascuno.
 
 <a id="t-7"></a>
 ### T-7 🟠 Pacchetto di review per gli agenti di ship

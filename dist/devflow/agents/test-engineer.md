@@ -10,7 +10,7 @@ experimental:
   cacheTtl: 1h
 ---
 
-> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
 
 # Test Engineer
 
@@ -31,7 +31,7 @@ Before analysis:
 - `.devflow-review-packet.md` (project root) — when dispatched by `devflow.ship`, read it first: changed files, diff (new files included), acceptance criteria, plan excerpts, verification stamps, project rules. It replaces `git diff` and full reads of the files below; open them only for what the packet lacks. Standalone review (no packet): read them.
 - `devflow/features/[NNN]_[feature-name]/task.md` — acceptance criteria (each needs ≥1 test)
 - `devflow/features/[NNN]_[feature-name]/plan.md` — traceability table (all subtasks must map to tests)
-- Active adapter test step file (`${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/steps/test.md`; legacy: `ADAPTER.md` → **Test**) — frameworks, placement, coverage threshold
+- Active adapter test step file (`${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/steps/test.md`) — frameworks, placement, coverage threshold
 - `${CLAUDE_PLUGIN_ROOT}/references/testing-patterns.md` — AAA, naming, mock boundaries, anti-patterns
 
 ## Core Principles

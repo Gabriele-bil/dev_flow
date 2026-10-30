@@ -33,7 +33,7 @@ AGY_STAGING="\$HOME/.gemini/antigravity-cli/plugins/$NAME"
 rm -rf "$AGY_DIR"
 mkdir -p "$AGY_DIR"
 # AGENTS.md escluso: agy carica regole solo da rules/ (orientamento → rules/)
-for ITEM in skills adapters hooks agents contexts references templates scripts config.md ETHOS.md agent.yaml README.md LICENSE; do
+for ITEM in skills adapters hooks agents references templates scripts config.md ETHOS.md agent.yaml README.md LICENSE; do
   [ -e "$DIST_DIR/$ITEM" ] && cp -R "$DIST_DIR/$ITEM" "$AGY_DIR/$ITEM"
 done
 rm -f "$AGY_DIR/hooks/hooks.json"
@@ -176,14 +176,14 @@ ok "Campi solo-Claude Code rimossi, tools degli agenti tradotti"
 # della build Claude Code non serve. I template per il consumer (adapters/*/templates)
 # restano invariati. @devflow/config.md è del consumer e non viene toccato.
 step "Percorsi del plugin → $AGY_STAGING"
-PLUGIN_DIRS_RE='(references|adapters|skills|agents|scripts|contexts)'
+PLUGIN_DIRS_RE='(references|adapters|skills|agents|scripts)'
 while IFS= read -r f; do
   sed -E -e '/^> \*\*Plugin root:\*\*/d' \
     -e "s#@devflow/${PLUGIN_DIRS_RE}/#$AGY_STAGING/\1/#g" \
     -e "s#\\\$\\{CLAUDE_PLUGIN_ROOT\\}#$AGY_STAGING#g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
-done < <(find "$AGY_DIR/skills" "$AGY_DIR/references" "$AGY_DIR/agents" "$AGY_DIR/adapters" "$AGY_DIR/contexts" \
+done < <(find "$AGY_DIR/skills" "$AGY_DIR/references" "$AGY_DIR/agents" "$AGY_DIR/adapters" \
   -name '*.md' ! -path '*/templates/*' 2>/dev/null)
-LEFT="$(find "$AGY_DIR/skills" "$AGY_DIR/references" "$AGY_DIR/agents" "$AGY_DIR/adapters" "$AGY_DIR/contexts" \
+LEFT="$(find "$AGY_DIR/skills" "$AGY_DIR/references" "$AGY_DIR/agents" "$AGY_DIR/adapters" \
   -name '*.md' ! -path '*/templates/*' -exec grep -lE "@devflow/${PLUGIN_DIRS_RE}/|CLAUDE_PLUGIN_ROOT|Plugin root:" {} + 2>/dev/null || true)"
 [ -z "$LEFT" ] || fail "percorsi non tradotti in: $LEFT"
 ok "Percorsi del plugin risolti"
