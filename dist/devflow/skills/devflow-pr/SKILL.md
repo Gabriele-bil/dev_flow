@@ -3,7 +3,6 @@ name: pr
 description: Commits all changes, pushes the current DevFlow feature branch, and opens a pull request toward the repo's default branch. Use at the final step of the DevFlow pipeline or when the user asks to run devflow.pr.
 argument-hint: "[optional notes for PR body]"
 disable-model-invocation: true
-model: haiku
 effort: low
 ---
 

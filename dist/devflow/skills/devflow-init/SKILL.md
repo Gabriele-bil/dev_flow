@@ -3,7 +3,6 @@ name: init
 description: "Bootstraps greenfield projects end-to-end: conducts a multi-phase interview, scaffolds evergreen workspaces (Nx, Angular, Next.js, Flutter, NestJS), generates plugin context and ADR-001, and writes an ordered multi-task roadmap with inter-task dependencies. Use when user runs devflow.init or starts a brand-new project from scratch."
 argument-hint: "[optional-project-name-or-brief] [--mcp]"
 disable-model-invocation: true
-model: opus
 effort: high
 ---
 

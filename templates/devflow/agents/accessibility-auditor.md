@@ -4,6 +4,10 @@ description: Accessibility engineer perspective on WCAG 2.1 AA compliance. Five-
 tools: Read, Grep, Glob, Bash
 disallowedTools: Write, Edit, MultiEdit, NotebookEdit
 model: sonnet
+effort: medium
+maxTurns: 40
+experimental:
+  cacheTtl: 1h
 ---
 
 # Accessibility Auditor

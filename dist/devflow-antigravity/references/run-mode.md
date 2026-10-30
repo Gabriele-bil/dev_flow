@@ -50,6 +50,21 @@ Precedence: repo precedent > `constitution.md` > adapter convention (`devflow.ta
 | Step input contract fails | Idea vs codebase mismatch → `## Deviations` + flag |
 | Missing monorepo App; brainstorm-scale idea (`auto`) | |
 
+## Step dispatch
+
+While armed, the orchestrator runs each pipeline step in a `step-runner` subagent (`$HOME/.gemini/antigravity-cli/plugins/devflow/agents/step-runner.md`), one per step: the step's skill body and tool output stay in that subagent, and `plan.md`, `.devflow-state.json`, the stamps and the reports carry everything to the next step. Same mechanism on both hosts.
+
+| | Claude Code | Antigravity CLI |
+| --- | --- | --- |
+| Tool | Agent, `subagent_type: "devflow:step-runner"` | `invoke_subagent`, subagent `step-runner` |
+| Model | per-call `model` from `$HOME/.gemini/antigravity-cli/plugins/devflow/references/model-selection.md` → Decision Table (run/auto column) | session model |
+| Workspace | shared (default) | `Workspace: 'inherit'` — a branched worktree would keep the step's edits out of the project |
+
+- **Prompt** — only: `Skill: <absolute path of skills/devflow-<step>/SKILL.md> · Feature: <NNN_name or "none yet"> · Arguments: <args or none> · Orchestrator: <devflow.run | devflow.auto>`. Wait for the subagent's final message before anything else.
+- **Result** — its `RESULT:` line. `ok` → confirm with `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" status` that `plan.md` reached the step's exit status (otherwise treat as `stopped`); `stopped` / `failed` → stop the run and carry its `REPORT:` block into the final report.
+- **Stay in the orchestrator's context**: `devflow.ship` (it dispatches the reviewer subagents, and subagents cannot dispatch subagents) and `devflow.pr`.
+- **No subagent support** on the host → run the step skills inline, in order, and write `Mode: single context` in the final report.
+
 ## Step behavior while armed
 
 - Notify blocks emitted, never waited on — control returns to the orchestrator.

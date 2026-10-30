@@ -4,6 +4,10 @@ description: Staff-engineer-level code reviewer. Seven-axis review across correc
 tools: Read, Grep, Glob, Bash
 disallowedTools: Write, Edit, MultiEdit, NotebookEdit
 model: sonnet
+effort: high
+maxTurns: 40
+experimental:
+  cacheTtl: 1h
 ---
 
 # Code Reviewer

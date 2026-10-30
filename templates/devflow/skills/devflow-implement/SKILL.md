@@ -3,7 +3,6 @@ name: devflow-implement
 description: Implements DevFlow plan files per architecture conventions, MCP-assisted validation. Use when user runs devflow.implement, executes plan.md, or third pipeline step.
 argument-hint: "[optional-plan-path] [--fix <findings|files>]"
 disable-model-invocation: true
-model: sonnet
 effort: medium
 ---
 

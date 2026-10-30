@@ -107,6 +107,10 @@ pipeline:
       description: "Generate and auto-sync a deterministic, static, read-only HTML project board in devflow/board/index.html showing tasks, Kanban pipeline, dependency DAG, Markdown docs, and command timings"
 
 agents:
+  - id: step-runner
+    path: agents/step-runner.md
+    description: "Runs one pipeline step (one skill) in its own context for devflow.run / devflow.auto and returns a RESULT line + short report"
+    invoked_by: devflow.run, devflow.auto, devflow.ship
   - id: code-reviewer
     path: agents/code-reviewer.md
     description: "Staff-engineer-level code reviewer. Seven-axis review across correctness, readability, architecture, security, performance, scope fidelity, simplicity. Use before merge or via devflow.ship fan-out"

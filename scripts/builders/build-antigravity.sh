@@ -147,12 +147,16 @@ agy_tools() {
 for f in "$AGY_DIR"/agents/*.md; do
   [ -f "$f" ] || continue
   CC_TOOLS="$(awk 'NR > 1 && /^---$/ { exit } /^tools:/ { sub(/^tools:[[:space:]]*/, ""); print }' "$f")"
-  strip_frontmatter_keys "$f" tools disallowedTools model
-  TOOLS_LINE=""
+  strip_frontmatter_keys "$f" tools disallowedTools model effort maxTurns experimental
   if [ -n "$CC_TOOLS" ]; then
     AGY_TOOLS="$(agy_tools "$CC_TOOLS")" || fail "$(basename "$f"): tool senza equivalente agy in '$CC_TOOLS' — aggiungerlo ad agy_tools"
-    TOOLS_LINE="tools: $AGY_TOOLS"
+  else
+    # Senza tools Claude Code eredita tutto; un subagente agy senza tools resta
+    # senza scrittura né shell (verificato su agy 1.4.10): set di sviluppo
+    # esplicito, senza invoke_subagent (i subagenti non lanciano subagenti).
+    AGY_TOOLS="$(agy_tools "Read, Grep, Glob, Bash, Write, Edit")"
   fi
+  TOOLS_LINE="tools: $AGY_TOOLS"
   # Subagente invocabile via invoke_subagent, con gli stessi tool di Claude Code
   awk -v t="$TOOLS_LINE" 'NR == 1 && $0 == "---" { print; print "subagent: true"; if (t != "") print t; next } { print }' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
 done

@@ -73,7 +73,7 @@ Each agent receives:
 | `standard` | `code-reviewer` · `security-auditor` · `test-engineer` |
 | `thorough` | `standard` set + `accessibility-auditor` · `docs-reviewer` |
 
-Agent definitions:
+Agent definitions (`thorough` profile: pass `model: opus` on the Agent calls for `code-reviewer` and `security-auditor` — Claude Code only; `$HOME/.gemini/antigravity-cli/plugins/devflow/references/model-selection.md`):
 
 1. `$HOME/.gemini/antigravity-cli/plugins/devflow/agents/code-reviewer.md` — seven-axis code review (security axis delegated to `security-auditor` when both dispatched)
 2. `$HOME/.gemini/antigravity-cli/plugins/devflow/agents/security-auditor.md` — security audit
@@ -148,6 +148,8 @@ Run mode only — iteration budget (Required-only verdicts; Critical never enter
 
 1. `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" run bump` — prints `grader iteration N/cap` and counts it; exit 3 = cap reached.
 2. Cap reached → stop looping. Under `devflow.run`: present report as-is, control returns to `devflow.run`. Under `devflow.auto` (`until: "pr"`): log remaining Required findings to `plan.md` `## Decision flags` as documented exceptions (go to PR body), proceed to Step 5.
+
+Run mode: steps 1–3 each run in a `step-runner` subagent per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md` → **Step dispatch** (implement's arguments: `--fix` + the findings); interactive: execute the skills here.
 
 Each iteration (interactive and run mode), every status boundary written with `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set plan <status>`:
 

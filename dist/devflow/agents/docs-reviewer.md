@@ -4,6 +4,10 @@ description: Documentation engineer perspective on doc coverage, accuracy, and d
 tools: Read, Grep, Glob, Bash
 disallowedTools: Write, Edit, MultiEdit, NotebookEdit
 model: sonnet
+effort: low
+maxTurns: 40
+experimental:
+  cacheTtl: 1h
 ---
 
 > **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts|contexts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.

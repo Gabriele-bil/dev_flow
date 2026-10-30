@@ -4,6 +4,10 @@ description: Security engineer focused on exploitable vulnerabilities, threat mo
 tools: Read, Grep, Glob, Bash
 disallowedTools: Write, Edit, MultiEdit, NotebookEdit
 model: sonnet
+effort: high
+maxTurns: 40
+experimental:
+  cacheTtl: 1h
 ---
 
 # Security Auditor

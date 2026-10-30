@@ -4,6 +4,10 @@ description: QA engineer focused on test strategy, coverage gap analysis, and te
 tools: Read, Grep, Glob, Bash
 disallowedTools: Write, Edit, MultiEdit, NotebookEdit
 model: sonnet
+effort: medium
+maxTurns: 40
+experimental:
+  cacheTtl: 1h
 ---
 
 # Test Engineer

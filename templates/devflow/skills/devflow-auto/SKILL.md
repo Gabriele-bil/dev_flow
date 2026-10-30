@@ -50,12 +50,12 @@ Arm immediately (no confirmation): `bash "@devflow/scripts/devflow-state.sh" run
 
 ### Step 1 - Chain
 
-Every step: full skill workflow, run-mode clauses active, status boundaries written. Stop/continue per **Discrepancy classes** in `run-mode.md`.
+Every step: full skill workflow, run-mode clauses active, status boundaries written. Stop/continue per **Discrepancy classes** in `run-mode.md`. Steps 1–4 (up to test) each run in their own `step-runner` subagent per `@devflow/references/run-mode.md` → **Step dispatch**; ship and pr run here.
 
-1. `@devflow/skills/devflow-task/SKILL.md` — after Step 9 writes `task.md`: `bash "@devflow/scripts/devflow-state.sh" run feature <NNN_name>`.
-2. `@devflow/skills/devflow-plan/SKILL.md`.
-3. `@devflow/skills/devflow-analyze/SKILL.md` — Critical → stop; Required/Nit → plan adjustment or waiver flag.
-4. Middle pipeline — `devflow-run` Step 1 chain rules, `--from implement --until ship`: implement → beautify → test (incl. Step 6b) → ship.
+1. `devflow-task` (arguments: the idea text, `--app`) — then `bash "@devflow/scripts/devflow-state.sh" resolve` gives the new `NNN_name`: `bash "@devflow/scripts/devflow-state.sh" run feature <NNN_name>`.
+2. `devflow-plan`.
+3. `devflow-analyze` — Critical → stop; Required/Nit → plan adjustment or waiver flag.
+4. Middle pipeline — `devflow-run` Step 1 chain rules, `--from implement --until ship`: implement → beautify → test (incl. Step 6b) dispatched, then `@devflow/skills/devflow-ship/SKILL.md` here.
 5. Ship gate passes (or loop cap reached with exceptions flagged) → `devflow-ship` Step 5 executes `@devflow/skills/devflow-pr/SKILL.md`; PR body carries `## Autonomous Decisions & Discrepancies` from `## Decision flags`, `## Deviations`, `task.md` `## Assumptions & Risks`.
 
 ### Step 2 - Disarm + report

@@ -3,8 +3,7 @@ name: devflow-ship
 description: 'Pre-merge fan-out gate: dispatches 1–5 review agents (code-reviewer, security-auditor, test-engineer, +2) per complexity profile, routes devflow.pr if clean. Use when user runs devflow.ship, wants pre-merge gate, or asks "ready to ship?" — after devflow.test, before devflow.pr.'
 argument-hint: "[optional notes for reviewers]"
 disable-model-invocation: true
-model: sonnet
-effort: high
+effort: medium
 ---
 
 # Skill: devflow.ship
@@ -74,7 +73,7 @@ Each agent receives:
 | `standard` | `code-reviewer` · `security-auditor` · `test-engineer` |
 | `thorough` | `standard` set + `accessibility-auditor` · `docs-reviewer` |
 
-Agent definitions:
+Agent definitions (`thorough` profile: pass `model: opus` on the Agent calls for `code-reviewer` and `security-auditor` — Claude Code only; `@devflow/references/model-selection.md`):
 
 1. `@devflow/agents/code-reviewer.md` — seven-axis code review (security axis delegated to `security-auditor` when both dispatched)
 2. `@devflow/agents/security-auditor.md` — security audit
@@ -149,6 +148,8 @@ Run mode only — iteration budget (Required-only verdicts; Critical never enter
 
 1. `bash "@devflow/scripts/devflow-state.sh" run bump` — prints `grader iteration N/cap` and counts it; exit 3 = cap reached.
 2. Cap reached → stop looping. Under `devflow.run`: present report as-is, control returns to `devflow.run`. Under `devflow.auto` (`until: "pr"`): log remaining Required findings to `plan.md` `## Decision flags` as documented exceptions (go to PR body), proceed to Step 5.
+
+Run mode: steps 1–3 each run in a `step-runner` subagent per `@devflow/references/run-mode.md` → **Step dispatch** (implement's arguments: `--fix` + the findings); interactive: execute the skills here.
 
 Each iteration (interactive and run mode), every status boundary written with `bash "@devflow/scripts/devflow-state.sh" set plan <status>`:
 

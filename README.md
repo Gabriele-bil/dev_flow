@@ -267,6 +267,7 @@ Specialized agents live in [`templates/devflow/agents/`](templates/devflow/agent
 
 | Agent | File | Role |
 | ------- | ------ | ------ |
+| Step Runner | [`agents/step-runner.md`](templates/devflow/agents/step-runner.md) | Runs one pipeline step in its own context for `devflow.run` / `devflow.auto` (Claude Code: per-step model); returns a `RESULT:` line |
 | Code Reviewer | [`agents/code-reviewer.md`](templates/devflow/agents/code-reviewer.md) | 5-axis code review: correctness, readability, architecture, security, performance |
 | Security Auditor | [`agents/security-auditor.md`](templates/devflow/agents/security-auditor.md) | Exploitable vulnerabilities, threat modeling, secure coding |
 | Test Engineer | [`agents/test-engineer.md`](templates/devflow/agents/test-engineer.md) | Coverage gap analysis, test strategy, test quality |

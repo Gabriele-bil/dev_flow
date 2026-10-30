@@ -4,6 +4,10 @@ description: Documentation engineer perspective on doc coverage, accuracy, and d
 tools: Read, Grep, Glob, Bash
 disallowedTools: Write, Edit, MultiEdit, NotebookEdit
 model: sonnet
+effort: low
+maxTurns: 40
+experimental:
+  cacheTtl: 1h
 ---
 
 # Documentation Reviewer

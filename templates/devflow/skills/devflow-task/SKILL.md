@@ -2,8 +2,7 @@
 name: devflow-task
 description: Transforms raw idea into Agile product task.md with goal, Connextra user story, INVEST-checked vertical use cases (Read/Write separated), BDD Gherkin acceptance criteria, and explicit async states. Use when user runs devflow.task, asks to write a task spec or user story for a new feature, or starts a new DevFlow pipeline. Not for direct code-change requests ("add X to file Y").
 argument-hint: "[--app <name>]"
-model: haiku
-effort: low
+effort: medium
 ---
 
 # Skill: devflow.task

@@ -126,6 +126,11 @@ for FILE in "${SKILL_FILES[@]}"; do
 
   # ── Style checks (--strict only) ─────────────────────────────────────────────
   if [[ "$STRICT" == true ]]; then
+    # Core skills run in the main context: a model: switch there drops the
+    # prompt cache (references/model-selection.md → Rules)
+    if [[ "$REL" == skills/*/SKILL.md ]] && awk '/^---/{c++; if(c==2) exit; next} c==1' "$FILE" | grep -qE '^model:'; then
+      FILE_ERRORS+=("core skill sets model: — main context runs on the session model; use effort, or a subagent (references/model-selection.md)")
+    fi
     # Lines starting with "This section..." or "Note that..."
     if grep -qiE '^(This section|Note that)' "$FILE"; then
       MATCHES=$(grep -inE '^(This section|Note that)' "$FILE" | head -3 | cut -d: -f1 | paste -sd, -)
