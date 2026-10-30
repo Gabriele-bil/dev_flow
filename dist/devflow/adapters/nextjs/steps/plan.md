@@ -10,13 +10,13 @@ Include these in `plan.md` when applicable (after core sections from `devflow-pl
 
 Order the **File list** bottom-up by layer ownership:
 
-1. Data models, Zod schemas, and TypeScript interfaces (`types/`, `schemas/`)
+1. Data models, Zod schemas, TypeScript types (`lib/<domain>/`, `app/**/_lib/schema.ts`)
 2. Database migrations and ORM queries (if applicable)
-3. Server Actions and API Route handlers (`actions/`, `app/api/`)
-4. Zustand stores and client-side state managers (`stores/`)
+3. Server Actions and Route Handlers (`app/**/actions.ts`, `app/api/`)
+4. Zustand stores (`lib/stores/`)
 5. UI components: primitives/shadcn first, then composite client components (`components/`)
 6. Route segments and pages (`app/**/page.tsx`, `layout.tsx`)
-7. Unit and integration tests (`__tests__/`)
+7. Unit, integration and E2E tests (colocated `*.test.tsx`, `__tests__/`, `e2e/`)
 
 ### Server/Client boundary table
 
@@ -61,7 +61,7 @@ For each store introduced or modified:
 
 Rules:
 
-- No server-fetched data in Zustand (use React cache / `fetch` with Next.js caching).
+- No server-fetched data in Zustand (Server Components + `'use cache'`; see `nextjs-state`).
 - Stores persist client-side only; rehydrate from URL params or server props when needed.
 
 ### Server Actions vs API Routes decision

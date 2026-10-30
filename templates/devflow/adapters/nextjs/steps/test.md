@@ -14,6 +14,8 @@ Any feature leaving public surfaces below this threshold must be called out expl
 
 - Unit: colocated `*.test.tsx` / `*.test.ts` in same directory as source file.
 - Integration: `__tests__/` at feature level or project root.
+- E2E (Playwright): `e2e/*.spec.ts` at project root — required for async Server Components (Jest cannot render them).
+- Coverage from `app/`, `components/`, `lib/` (`collectCoverageFrom` in `jest.config.ts`; no `src/` dir).
 
 ### Commands
 
@@ -26,7 +28,7 @@ pnpm test -- --passWithNoTests --watchAll=false --coverage
 - Components: conditional rendering, prop contract, accessibility-critical states.
 - Forms: validator behavior, submit disable/enable transitions, error display.
 - State (Zustand): state transitions, selector output.
-- Server Actions / API Routes: success/error mapping.
+- Server Actions / Route Handlers: success/error mapping; invalid body → `400`.
 
 ### Verify (runtime)
 

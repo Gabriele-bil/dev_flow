@@ -1,75 +1,50 @@
-# Next.js State with Zustand — reference detail
+# Next.js State with Zustand — project patterns
 
-Loaded on demand from `../SKILL.md`.
+Loaded on demand from `../SKILL.md`. Middleware options change between minors: check current Zustand docs with Context7 before using one not shown here.
 
-## Middleware `persist`
-
-For state that must survive page refresh — stored in localStorage.
+## Base store
 
 ```ts
+// lib/stores/ui-store.ts
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 
-interface CartState {
-  items: CartItem[]
-  addItem: (item: CartItem) => void
-  removeItem: (id: string) => void
+interface UIState {
+  sidebarOpen: boolean
+  toggleSidebar: () => void
 }
 
-export const useCartStore = create<CartState>()(
-  persist(
-    (set) => ({
-      items: [],
-      addItem: (item) => set((state) => ({ items: [...state.items, item] })),
-      removeItem: (id) => set((state) => ({ items: state.items.filter(i => i.id !== id) })),
-    }),
-    { name: 'cart-storage' }
-  )
-)
-```
-
-## Middleware `immer`
-
-For complex updates on nested state — direct mutation syntax.
-
-```ts
-import { create } from 'zustand'
-import { immer } from 'zustand/middleware/immer'
-
-export const useComplexStore = create<State>()(
-  immer((set) => ({
-    // state...
-    updateNested: (id, value) => set((state) => {
-      state.nested[id].value = value  // direct mutation via immer
-    }),
-  }))
-)
-```
-
-## Store Slice Pattern
-
-Split large stores into domain slices, combine in main store.
-
-```ts
-// lib/stores/slices/ui-slice.ts
-export const createUISlice = (set) => ({
+export const useUIStore = create<UIState>()((set) => ({
   sidebarOpen: true,
-  toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
-})
-
-// lib/stores/app-store.ts
-export const useAppStore = create()((...a) => ({
-  ...createUISlice(...a),
-  ...createNotificationSlice(...a),
+  toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
 }))
 ```
 
-## Testing Zustand
+## Multi-value selector
 
-Reset store between tests with `setState`. Use real state with overrides — do not mock Zustand.
+```ts
+import { useShallow } from 'zustand/shallow'
+
+const { sidebarOpen, toggleSidebar } = useUIStore(
+  useShallow((s) => ({ sidebarOpen: s.sidebarOpen, toggleSidebar: s.toggleSidebar })),
+)
+```
+
+## Persist
+
+```ts
+import { persist } from 'zustand/middleware'
+
+export const useCartStore = create<CartState>()(
+  persist((set) => ({ items: [], addItem: (item) => set((s) => ({ items: [...s.items, item] })) }), {
+    name: 'cart',
+  }),
+)
+```
+
+## Test reset
 
 ```ts
 beforeEach(() => {
-  useUIStore.setState({ sidebarOpen: false })
+  useCartStore.setState(useCartStore.getInitialState(), true)
 })
 ```

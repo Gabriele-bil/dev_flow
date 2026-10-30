@@ -1,22 +1,31 @@
 # Next.js adapter (DevFlow)
 
+**Verified against:** next@16.4, react@19.3, zod@4.6, tailwindcss@4.3, zustand@5.0 (2026-10-30)
+
 Single source of truth for Next.js behavior. Pipeline skills (`devflow-plan`, `devflow-implement`, `devflow-beautify`, `devflow-test`, `devflow-pr`) **must** read `@devflow/config.md`, resolve adapter, then load this core file **plus** the `steps/<step>.md` file for the active step (see **Step files** below). Do not load step files for other steps.
 
-Baseline: **Next.js 16+ App Router · Zustand 5 · Tailwind CSS v4 + shadcn/ui · Server Actions + API Routes · Turbopack · Jest + RTL**. Keep output token-lean and imperative.
+Baseline: **Next.js 16.4 App Router + Cache Components · React 19 · Zustand 5 · Tailwind CSS 4 + shadcn/ui · Zod 4 · Server Actions + Route Handlers · Turbopack · ESLint CLI · Jest + RTL · Playwright**. Keep output token-lean and imperative.
 
-## Technology skills (load by feature type)
+Banned APIs (validator-enforced): `deprecated-apis.txt`. For fast-moving APIs (caching, `next/image`, shadcn, Zod) check current docs with Context7 before writing code.
 
-| When | Load |
+## Technology skills (what each covers)
+
+Index only. Triggers (file path / content → skill) live in one place: `steps/implement.md` → skill load decision matrix.
+
+| Skill | Covers |
 | ------ | ------ |
-| App structure, folder layout, route segments, boundaries, parallel/intercepting routes | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/skills/nextjs-architecture/SKILL.md` |
-| Server Components, Server Actions, API Routes, data fetching, `'use cache'` | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/skills/nextjs-server/SKILL.md` |
-| Client Components, React hooks, interactivity, context, hydration errors | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/skills/nextjs-components/SKILL.md` |
-| Zustand stores, client state management | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/skills/nextjs-state/SKILL.md` |
-| shadcn/ui, Tailwind, design tokens, dark mode, responsive | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/skills/nextjs-ui/SKILL.md` |
-| React Hook Form, Zod validation, form flows, Server Actions | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/skills/nextjs-forms/SKILL.md` |
-| Jest + RTL, unit/integration tests, coverage | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/skills/nextjs-testing/SKILL.md` |
-| SEO, metadata, OG images, `generateMetadata`, sitemap, robots | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/skills/nextjs-metadata/SKILL.md` |
-| Image optimization, font loading, script strategies, bundling | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/skills/nextjs-performance/SKILL.md` |
+| `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/skills/nextjs-architecture/SKILL.md` | App structure, route groups, segment files, parallel/intercepting routes, `proxy.ts`, boundary placement |
+| `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/skills/nextjs-server/SKILL.md` | Server Components, `'use cache'` / `cacheLife` / `cacheTag`, invalidation, Server Actions, Route Handlers |
+| `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/skills/nextjs-components/SKILL.md` | Client Components, React 19 hooks, serializable props, hydration errors |
+| `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/skills/nextjs-state/SKILL.md` | Zustand stores, selectors, `persist`, store tests |
+| `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/skills/nextjs-ui/SKILL.md` | shadcn/ui, Tailwind 4 tokens (`@theme inline`), CVA, dark mode, responsive |
+| `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/skills/nextjs-forms/SKILL.md` | React Hook Form + Zod 4 + shadcn `Field`, Server Action submit |
+| `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/skills/nextjs-testing/SKILL.md` | Jest + RTL units, Playwright E2E, coverage config |
+| `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/skills/nextjs-metadata/SKILL.md` | Metadata API, OG images, `robots.ts`, `sitemap.ts`, viewport |
+| `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/skills/nextjs-performance/SKILL.md` | `next/image` (`preload`, `sizes`), `next/font`, `next/script`, bundle analysis |
+| `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/common/skills/common-state-patterns/SKILL.md` | State scope decision (local / lifted / store) |
+| `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/common/skills/common-web-interface-guidelines/SKILL.md` | UI accessibility and UX audit rules |
+| `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/common/skills/common-clean-code/SKILL.md` | Naming language, file size, duplication, dependency direction |
 
 ## MCP (when available)
 

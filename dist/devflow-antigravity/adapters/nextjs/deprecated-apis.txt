@@ -1,0 +1,33 @@
+# Next.js adapter — banned APIs. Format: <extended regex><TAB><use instead>.
+# A match in any adapter .md is an error unless the line says why (removed / deprecated / instead / not supported / never use / do not use).
+# Next.js 16 caching
+revalidateTag\([^,)]*\)	use revalidateTag(tag, 'max') instead, or updateTag(tag) / refresh() in Server Actions
+export const (dynamic|revalidate|fetchCache|runtime) *=	route segment config not supported with Cache Components; use 'use cache' + cacheLife()/cacheTag() instead
+unstable_cache	use 'use cache' + cacheLife() + cacheTag() instead
+next: *\{ *(revalidate|tags)	use 'use cache' + cacheLife() + cacheTag() around the fetch instead
+experimental\.(dynamicIO|useCache)	use cacheComponents: true instead
+# Next.js 16 routing / tooling
+middleware\.ts	use proxy.ts exporting proxy() instead (Node runtime only)
+export (async )?function middleware	use export function proxy() instead
+next lint	use ESLint CLI instead: "lint": "eslint ." (codemod next-lint-to-eslint-cli)
+from 'next/router'	use next/navigation (App Router) instead
+runtime *= *'edge'	Cache Components and proxy reject runtime config; use default Node.js runtime instead
+# next/image
+(<Image[^>]* priority|^ +priority( |$)|`priority`)	use preload prop on next/image instead
+onLoadingComplete	use onLoad instead
+# Zod 4
+\.flatten\(\)	use z.flattenError(error) instead
+\.formErrors\b	use z.flattenError(error).formErrors instead
+error\.errors\b	use error.issues instead
+z\.string\(\)\.(email|url|uuid)\(	use z.email() / z.url() / z.uuid() instead
+# shadcn/ui forms
+<(FormField|FormItem|FormControl|FormMessage)\b|components/ui/form'	use Controller + Field / FieldLabel / FieldError instead
+# Tailwind 4
+@tailwind (base|components|utilities)	use @import "tailwindcss" instead
+tailwind\.config\.(js|ts|mjs|cjs)	use CSS-first config in app/globals.css (@theme inline) instead
+hsl\(var\(--	use OKLCH values on :root/.dark + @theme inline { --color-x: var(--x) } instead
+# React 19 / testing
+useFormState	use useActionState from react instead
+setupFilesAfterFramework	use setupFilesAfterEnv instead
+collectCoverageFrom=?'?src/	use collectCoverageFrom: ['{app,components,lib}/**/*.{ts,tsx}'] instead
+ts-jest	use next/jest.js (SWC transform) instead

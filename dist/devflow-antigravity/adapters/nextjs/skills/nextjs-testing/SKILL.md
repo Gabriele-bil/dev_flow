@@ -1,53 +1,54 @@
 ---
 name: nextjs-testing
-description: Jest + React Testing Library for Next.js — Client/Server Components, Server Actions, API Routes, Zustand stores. Load when touching *.test.tsx, *.test.ts, or __tests__/**.
+description: Jest + React Testing Library for Next.js — Client Components, sync Server Components, Server Actions, Route Handlers, Zustand stores; Playwright for async Server Components and flows. Load when touching *.test.tsx, *.test.ts, __tests__/**, or e2e/**.
 ---
 
 # Next.js Testing
 
-Test Next.js with Jest + React Testing Library. Focus: Client Components, Server Components, Server Actions, API Routes, Zustand stores.
+## Purpose
 
-Full code: `references/testing-patterns.md`.
+Test rules for Next.js: Jest + RTL via `next/jest` for units, Playwright for async Server Components and user flows. Config and examples: `references/testing-patterns.md`.
+
+## When NOT to Use
+
+- File matches no row of `steps/implement.md` → skill load decision matrix
+- Coverage threshold, test placement, commands → `steps/test.md` (SSOT)
+- Code under test itself → skill for that file type
 
 ## Baseline
 
-`pnpm add -D jest jest-environment-jsdom @testing-library/react @testing-library/user-event @testing-library/jest-dom ts-jest`. Config via `next/jest`, `testEnvironment: 'jsdom'`.
+Dev deps from `steps/setup.md`: `jest`, `jest-environment-jsdom`, `@testing-library/react`, `@testing-library/dom`, `@testing-library/jest-dom`, `@testing-library/user-event`, `@types/jest`, `ts-node`, `@playwright/test`. Config via `next/jest.js` (SWC transform; do not use `ts-jest`).
 
-## Required Test Focus
+## Required focus
 
-- **Components:** conditional rendering, prop contract, accessibility states
-- **Forms:** validator behavior, submit disable/enable transitions, server-side error display
-- **State (Zustand):** state transitions per action, correct selector output
-- **Server Actions:** success/error return for valid/invalid input
-- **API Routes:** correct status code per scenario (200, 201, 400, 404, 500)
+- **Components:** conditional rendering, prop contract, accessibility states.
+- **Forms:** validation messages, submit disabled while pending, server error display.
+- **Stores:** transitions per action, selector output (real store, reset per test — see `nextjs-state`).
+- **Server Actions:** success / validation error / failure result for given input.
+- **Route Handlers:** status per scenario — `200`, `201`, `400` (invalid body), `404`, `500`. Same codes as `nextjs-server`.
 
-## Key rules
+## Rules
 
-- Always `userEvent.setup()` — never deprecated `userEvent.click()` direct call
-- Query priority: `getByRole` > `getByLabelText` > `getByText` > `getByTestId`
-- Use `waitFor` for async assertions
-- Async Server Components: not supported by Jest/RTL — cover them with E2E (Playwright); unit-test their sync children and extracted logic
-- Server Actions are pure functions — test directly; mock external dependencies (DB, fetch), not the action itself
-- Mock `next/navigation` (`useRouter`, `usePathname`, `useSearchParams`, `useParams`) for components using routing hooks
-
-## Coverage
-
-`pnpm test -- --passWithNoTests --watchAll=false --coverage --collectCoverageFrom='src/**/*.{ts,tsx}'`. Threshold: 80% statements, branches, functions, lines. Exclude: `*.stories.tsx`, `*.config.ts`, `app/layout.tsx`, `app/globals.css`.
+- `const user = userEvent.setup()` then `await user.click(...)`; no `fireEvent` for user interactions.
+- Query priority: `getByRole` > `getByLabelText` > `getByText` > `getByTestId`.
+- `findBy*` / `waitFor` for async; no manual `act()`.
+- Async Server Components: Jest cannot render them → cover with Playwright; unit-test sync children and extracted `lib/` logic.
+- Server Actions and Route Handlers: call directly; mock DB / external fetch and `next/cache` (`updateTag`, `revalidateTag`, `refresh`), never the function under test.
+- Mock `next/navigation` hooks for components that use them.
+- Coverage collected from `app/`, `components/`, `lib/` (no `src/` dir).
 
 ## Anti-Patterns
 
-- Snapshot tests on complex components — fragile, documents nothing
-- Testing implementation details (`wrapper.instance()`, `component.state()`)
-- Excessive mocking — mocking everything empties test value
-- `fireEvent` instead of `userEvent` — doesn't simulate real user behavior
-- Tests without assertions — always-passing tests
-- Manual `act()` — `userEvent` wraps in `act` automatically
+- Snapshots of complex components — fragile, assert nothing specific.
+- Testing implementation details (internal state, private functions).
+- Mocking everything — test proves only the mocks.
+- Tests without assertions.
 
 ## I/O Reference
 
 | | |
 | --- | --- |
-| Reads | Active spec/test files, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/ADAPTER.md` |
-| Writes | New or refactored Jest + RTL spec files |
-| Invoked by | `devflow-implement` for `**/*.test.tsx`, `**/*.test.ts`, `**/__tests__/**` |
+| Invoked by | `devflow-implement` / `devflow-test` via `steps/implement.md` → skill load decision matrix (`**/*.test.ts(x)`, `**/__tests__/**`, `e2e/**`) |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/nextjs/steps/test.md`, `references/testing-patterns.md` |
+| Writes | Jest + RTL specs, Playwright specs |
 | Related | `nextjs-components`, `nextjs-server`, `nextjs-forms`, `nextjs-state` |

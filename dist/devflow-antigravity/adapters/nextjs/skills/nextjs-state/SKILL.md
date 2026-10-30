@@ -1,99 +1,57 @@
 ---
 name: nextjs-state
-description: Zustand — stores, middleware, selectors, state-location decision matrix. Load when touching store.ts, *Store.ts, or use*Store.ts files.
+description: Zustand 5 stores in Next.js — naming, selectors with useShallow, persist, testing with real stores. Load when touching store.ts, *Store.ts, or use*Store.ts files.
 ---
 
 # Next.js State with Zustand
 
-Manage client-only global state with Zustand. Next.js cache handles server state — never duplicate in store.
+## Purpose
 
-## Fundamental Rule
+Next.js-specific Zustand rules. Scope decision (local vs lifted vs global) and cross-stack mental model: `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/common/skills/common-state-patterns/SKILL.md` — read it first when introducing a new store. Middleware examples: `references/state-patterns.md`.
 
-Zustand = client state only. Server data (user profile, posts, products) lives in Server Components + Next.js cache. Never put fetched server data in Zustand.
+## When NOT to Use
 
-## Decision Matrix
+- File matches no row of `steps/implement.md` → skill load decision matrix
+- Server data (profile, posts, products) → `nextjs-server` (Server Components + `'use cache'`), never a store
+- Form field state → `nextjs-forms` (React Hook Form)
 
-| State type | Where |
+## Where state lives (Next.js)
+
+| State | Where |
 | --- | --- |
-| Server data (user profile, posts, products) | Server Component fetch + Next.js cache |
-| UI transient (modal open, accordion expanded) | `useState` local to component |
-| UI global (sidebar collapsed, selected tab) | Zustand store |
-| Form data (field values, errors) | React Hook Form |
-| URL-driven (filters, page, sort) | `useSearchParams` + URL |
-| Auth session | next-auth / dedicated auth provider |
-| Shopping cart (persistent) | Zustand + `persist` middleware |
+| Server data | Server Component + Next.js cache |
+| Transient UI (modal open) | `useState` in component |
+| Global UI (sidebar, selected tab) | Zustand store |
+| Filters, page, sort | URL (`searchParams` / `useSearchParams`) |
+| Auth session | Auth provider, read on server |
+| Persistent cart / preferences | Zustand + `persist` |
 
-## Base Store Pattern
+## Rules
 
-```ts
-// lib/stores/ui-store.ts
-import { create } from 'zustand'
+- Name `use<Feature>Store`, file `lib/stores/<feature>-store.ts`. One store per domain.
+- `create<State>()((set) => ({ … }))` — curried form for typing.
+- Select a single slice: `useUIStore((s) => s.sidebarOpen)`. Multiple values → `useShallow` from `zustand/shallow`; object selector without `useShallow` loops re-renders in Zustand 5.
+- Mutate only via `set` inside store actions.
+- Store is client-only: never import into Server Components, never seed it from module scope on the server (shared across requests). Per-request initial data → `createStore` + React context provider in a Client Component.
+- `persist` only for state that must survive reload; reading persisted state during render → hydration mismatch, gate with `useEffect` or `skipHydration`.
 
-interface UIState {
-  sidebarOpen: boolean
-  toggleSidebar: () => void
-  setSidebarOpen: (open: boolean) => void
-}
+## Testing (overrides `common-state-patterns` "inject mock store" row for Next.js)
 
-export const useUIStore = create<UIState>()((set) => ({
-  sidebarOpen: true,
-  toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
-  setSidebarOpen: (open) => set({ sidebarOpen: open }),
-}))
-```
-
-## Naming Convention
-
-Always `use[Feature]Store`: `useUIStore`, `useCartStore`, `useNotificationStore`.
-
-## Optimized Selectors
-
-Subscribe only to the required slice — never the entire store.
-
-```ts
-// ✅ Subscribe only to a single primitive slice
-const sidebarOpen = useUIStore((state) => state.sidebarOpen)
-
-// ✅ Multi-property selector: MUST use useShallow from 'zustand/react/shallow' in Zustand 5
-import { useShallow } from 'zustand/react/shallow'
-const { sidebarOpen, toggleSidebar } = useUIStore(
-  useShallow((state) => ({
-    sidebarOpen: state.sidebarOpen,
-    toggleSidebar: state.toggleSidebar,
-  }))
-)
-
-// ❌ Object selector without useShallow (causes infinite re-render loops in Zustand 5 / React 19)
-const { sidebarOpen } = useUIStore((state) => ({ sidebarOpen: state.sidebarOpen }))
-
-// ❌ Subscribe to entire store (re-renders on every change)
-const store = useUIStore()
-```
-
-## Reference detail
-
-Detail for Middleware `persist`, Middleware `immer`, Store Slice Pattern, Testing Zustand: [references/state-patterns.md](references/state-patterns.md) — load when touching those areas.
-
-## Anti-patterns
-
-- Store as database cache — Zustand is not a server data layer
-- Monolithic store — prefer one store per domain
-- Direct mutation without `set` — always use `set`
-- Subscribe to entire store — always use selectors
-- Returning object from selector without `useShallow` — triggers infinite re-render loops in Zustand 5
-- Initialize store from Server Component — store is client-only
+Use real stores. Reset in `beforeEach` with `useXStore.setState(useXStore.getInitialState(), true)`; seed component tests with `setState`. Do not mock store hooks — mocks hide selector bugs.
 
 ## Review Checklist
 
-- [ ] Naming: `use[Feature]Store`
-- [ ] Granular selector or `useShallow` for multi-value selectors (never naked object selector)
+- [ ] `use<Feature>Store` naming, one domain per store
+- [ ] Single-slice selectors or `useShallow`
 - [ ] No server data in store
-- [ ] `persist` only for state that must survive refresh
-- [ ] Store testable with `setState` reset
+- [ ] `persist` justified; hydration gated
+- [ ] Tests reset real store with `getInitialState()`
 
 ## I/O Reference
 
 | | |
 | --- | --- |
-| Invoked by | `devflow-implement` for `**/store.ts`, `**/*Store.ts`, `**/use*Store.ts` |
-| Related | `nextjs-components`, `nextjs-server` |
+| Invoked by | `devflow-implement` via `steps/implement.md` → skill load decision matrix (`**/store.ts`, `**/*Store.ts`, `**/use*Store.ts`, `lib/stores/**`) |
+| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/common/skills/common-state-patterns/SKILL.md`, `references/state-patterns.md` |
+| Writes | Zustand stores and their tests |
+| Related | `nextjs-components`, `nextjs-server`, `nextjs-testing` |

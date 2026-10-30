@@ -1,8 +1,8 @@
-# Next.js Forms — Code Patterns
+# Next.js Forms — project patterns
 
-## Zod schema — source of truth
+Loaded on demand from `../SKILL.md`. shadcn/ui and Zod evolve quickly: check current docs with Context7 before adding a field type not shown here.
 
-Define schema BEFORE the form. Reuse in Server Action validation. Never duplicate.
+## Shared schema
 
 ```ts
 // app/(app)/settings/_lib/schema.ts
@@ -10,150 +10,75 @@ import { z } from 'zod'
 
 export const profileSchema = z.object({
   name: z.string().min(1, 'Name required').max(50),
-  email: z.string().email('Invalid email'),
+  email: z.email('Invalid email'),
   bio: z.string().max(200).optional(),
 })
 
-export type ProfileFormData = z.infer<typeof profileSchema>
+export type ProfileInput = z.infer<typeof profileSchema>
 ```
 
-## React Hook Form + Zod setup
-
-```tsx
-'use client'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { profileSchema, type ProfileFormData } from './_lib/schema'
-
-export function ProfileForm() {
-  const form = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: { name: '', email: '', bio: '' },
-  })
-
-  const { formState: { isSubmitting, errors } } = form
-  // ...
-}
-```
-
-## shadcn/ui Form components — structure
-
-```tsx
-import {
-  Form, FormControl, FormField, FormItem, FormLabel, FormMessage
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-
-return (
-  <Form {...form}>
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-      <FormField
-        control={form.control}
-        name="email"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Email</FormLabel>
-            <FormControl>
-              <Input placeholder="email@example.com" {...field} />
-            </FormControl>
-            <FormMessage />  {/* validation error rendered automatically */}
-          </FormItem>
-        )}
-      />
-      <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? 'Saving...' : 'Save'}
-      </Button>
-    </form>
-  </Form>
-)
-```
-
-## Server Action integration — hybrid pattern
+## Form — RHF `Controller` + shadcn `Field` + Server Action
 
 ```tsx
 'use client'
 import { useTransition } from 'react'
-import { updateProfile } from './_lib/actions'
+import { Controller, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { profileSchema, type ProfileInput } from './_lib/schema'
+import { updateProfile } from '../actions'
 
-export function ProfileForm() {
+export function ProfileForm({ initial }: { initial: ProfileInput }) {
   const [isPending, startTransition] = useTransition()
-  const form = useForm<ProfileFormData>({ resolver: zodResolver(profileSchema) })
+  const form = useForm<ProfileInput>({ resolver: zodResolver(profileSchema), defaultValues: initial })
 
-  function onSubmit(data: ProfileFormData) {
+  function onSubmit(data: ProfileInput) {
     startTransition(async () => {
       const result = await updateProfile(data)
-      if (!result.success) {
-        // Map server errors to form fields
-        form.setError('email', { message: result.error })
-        return
+      if (!result.success && typeof result.error === 'object') {
+        for (const [name, messages] of Object.entries(result.error)) {
+          form.setError(name as keyof ProfileInput, { message: messages?.[0] })
+        }
       }
-      // success: redirect, toast, etc.
     })
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        {/* fields */}
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      <FieldGroup>
+        <Controller
+          name="email"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+              <Input {...field} id={field.name} type="email" aria-invalid={fieldState.invalid} />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
         <Button type="submit" disabled={isPending}>Save</Button>
-      </form>
-    </Form>
-  )
-}
-```
-
-## Native React 19 + Server Action (`useActionState`)
-
-For lightweight or progressively-enhanced forms without React Hook Form:
-
-```tsx
-'use client'
-import { useActionState } from 'react'
-import { updateProfileState, type FormState } from './_lib/actions'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-
-const initialState: FormState = { success: false, error: null }
-
-export function SimpleProfileForm() {
-  const [state, formAction, isPending] = useActionState(updateProfileState, initialState)
-
-  return (
-    <form action={formAction} className="space-y-4">
-      <Input name="email" type="email" placeholder="email@example.com" required />
-      {state.error && <p className="text-sm text-destructive">{state.error}</p>}
-      <Button type="submit" disabled={isPending}>
-        {isPending ? 'Saving...' : 'Save'}
-      </Button>
+      </FieldGroup>
     </form>
   )
 }
 ```
 
-## Server Action — validate with same schema
+Server side: `updateProfile(data: unknown)` runs `profileSchema.safeParse(data)` and returns `{ success: false, error: z.flattenError(parsed.error).fieldErrors }` on failure (pattern in `nextjs-server` reference).
 
-```ts
-// app/(app)/settings/_lib/actions.ts
-'use server'
-import { profileSchema } from './schema'
+## Without RHF — `useActionState`
 
-export async function updateProfile(data: unknown) {
-  const parsed = profileSchema.safeParse(data)
-  if (!parsed.success) {
-    return { success: false, error: parsed.error.issues[0].message }
-  }
-
-  // ... persist
-  return { success: true }
-}
+```tsx
+const [state, formAction, isPending] = useActionState(createItem, null) // CreateItemState includes null
+return <form action={formAction}>…</form>
 ```
 
-## Common field patterns
+## Field types
 
-| Field type | Pattern |
+| Field | Pattern |
 | --- | --- |
-| Select | `<Select>` shadcn + `Controller` from react-hook-form |
-| Checkbox | `<Checkbox>` shadcn + `Controller` |
-| Date | `<Input type="date">` or shadcn date picker |
-| Array of fields | `useFieldArray` from react-hook-form |
+| Select, Checkbox, Switch, RadioGroup | shadcn control inside `Controller` + `Field` (`orientation="horizontal"` for checkbox/switch) |
+| Array of rows | `useFieldArray` |
+| Date | `<Input type="date">` or shadcn date picker in `Controller` |

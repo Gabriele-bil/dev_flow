@@ -1,257 +1,56 @@
-# Next.js Performance — Code Patterns
+# Next.js Performance — project patterns
 
-## 1) Image Optimization — `next/image`
+Loaded on demand from `../SKILL.md`. `next/image` props change across majors: check current docs with Context7 before using a prop not shown here.
 
-### Local images (auto-sized)
+## LCP image
 
 ```tsx
 import Image from 'next/image'
-import profilePic from './profile.png' // TypeScript knows width/height
+import hero from './hero.jpg'
 
-export function Avatar() {
-  return <Image src={profilePic} alt="Profile" placeholder="blur" />
-}
-```
-
-### Remote images
-
-```tsx
-// next.config.ts — allowlist remote domains
-const nextConfig = {
-  images: {
-    remotePatterns: [
-      { protocol: 'https', hostname: 'images.example.com', pathname: '/uploads/**' },
-    ],
-  },
-}
-```
-
-```tsx
-<Image
-  src="https://images.example.com/uploads/photo.jpg"
-  alt="Photo"
-  width={800}
-  height={600}
-  sizes="(max-width: 768px) 100vw, 50vw" // always set for remote images
-/>
-```
-
-### LCP image — `priority`
-
-Add `priority` to the largest image above the fold (hero, banner):
-
-```tsx
-<Image
-  src={heroImage}
-  alt="Hero"
-  fill
-  priority              // disables lazy loading, adds preload link
-  sizes="100vw"
-/>
-```
-
-### Fill mode (parent-relative)
-
-```tsx
-<div style={{ position: 'relative', width: '100%', height: '400px' }}>
-  <Image
-    src={photo}
-    alt="Cover"
-    fill
-    style={{ objectFit: 'cover' }}
-    sizes="(max-width: 768px) 100vw, 800px"
-  />
+<div className="relative h-96">
+  <Image src={hero} alt="…" fill preload sizes="100vw" className="object-cover" placeholder="blur" />
 </div>
 ```
 
-### `sizes` attribute — always set for responsive images
+## Remote image allowlist
 
-```tsx
-// without sizes → browser downloads at full viewport width
-// with sizes → browser picks correct source for viewport
-<Image
-  src={thumbnail}
-  alt="Product"
-  width={400}
-  height={300}
-  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
-/>
+```ts
+// next.config.ts
+import type { NextConfig } from 'next'
+
+const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [new URL('https://images.example.com/uploads/**')],
+  },
+}
+export default nextConfig
 ```
 
-### Blur placeholder
-
-```tsx
-// local images: automatic
-<Image src={localPhoto} alt="..." placeholder="blur" />
-
-// remote images: provide blurDataURL (base64 tiny image)
-<Image
-  src="https://..."
-  alt="..."
-  width={800}
-  height={600}
-  placeholder="blur"
-  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANS..."
-/>
-```
-
-## 2) Font Optimization — `next/font`
-
-### Google Fonts
+## Font + Tailwind
 
 ```tsx
 // app/layout.tsx
-import { Inter, Geist_Mono } from 'next/font/google'
+import { Geist, Geist_Mono } from 'next/font/google'
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-})
+const sans = Geist({ subsets: ['latin'], variable: '--font-geist-sans' })
+const mono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' })
 
-const geistMono = Geist_Mono({
-  subsets: ['latin'],
-  variable: '--font-geist-mono',
-  display: 'swap',
-})
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en" className={`${inter.variable} ${geistMono.variable}`}>
-      <body>{children}</body>
-    </html>
-  )
-}
+// <html lang="en" className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
 ```
-
-Tailwind CSS v4 integration:
 
 ```css
 /* app/globals.css */
-@theme {
-  --font-sans: var(--font-inter);
+@theme inline {
+  --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 ```
 
-### Local Fonts
-
-```tsx
-import localFont from 'next/font/local'
-
-const myFont = localFont({
-  src: [
-    { path: '../fonts/MyFont-Regular.woff2', weight: '400', style: 'normal' },
-    { path: '../fonts/MyFont-Bold.woff2', weight: '700', style: 'normal' },
-  ],
-  variable: '--font-my',
-  display: 'swap',
-})
-```
-
-## 3) Script Loading — `next/script`
+## Third-party script
 
 ```tsx
 import Script from 'next/script'
-```
 
-```tsx
-// app/layout.tsx
-import Script from 'next/script'
-
-export default function RootLayout({ children }) {
-  return (
-    <html lang="en">
-      <body>
-        {children}
-        <Script src="https://cdn.example.com/widget.js" strategy="lazyOnload" />
-      </body>
-    </html>
-  )
-}
-```
-
-### Inline scripts — `id` required
-
-```tsx
-<Script id="analytics-init" strategy="afterInteractive">
-  {`window.dataLayer = window.dataLayer || []`}
-</Script>
-```
-
-### Google Analytics — use `@next/third-parties`
-
-```bash
-npm install @next/third-parties
-```
-
-```tsx
-// app/layout.tsx
-import { GoogleAnalytics } from '@next/third-parties/google'
-
-export default function RootLayout({ children }) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-      <GoogleAnalytics gaId="G-XXXXXXXXXX" />
-    </html>
-  )
-}
-```
-
-## 4) Bundling Gotchas
-
-### Server-incompatible packages
-
-Some npm packages use browser APIs and cannot run in Server Components:
-
-```ts
-// next.config.ts
-const nextConfig = {
-  serverExternalPackages: ['some-native-package', 'canvas'],
-}
-```
-
-### CSS imports — no `<link>` tags
-
-```tsx
-// ❌ — unsupported in Next.js App Router
-<link rel="stylesheet" href="/styles/vendor.css" />
-
-// ✅ — import as module
-import '@/styles/vendor.css'
-// or in layout/page:
-import 'some-package/dist/style.css'
-```
-
-### ESM/CommonJS conflicts
-
-When a package fails to bundle properly:
-
-```ts
-// next.config.ts
-const nextConfig = {
-  transpilePackages: ['problematic-esm-package'],
-}
-```
-
-### Bundle analysis
-
-```bash
-npm install @next/bundle-analyzer
-```
-
-```ts
-// next.config.ts
-import bundleAnalyzer from '@next/bundle-analyzer'
-
-const withBundleAnalyzer = bundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true',
-})
-
-export default withBundleAnalyzer({ /* config */ })
-```
-
-```bash
-ANALYZE=true npm run build
+<Script src="https://cdn.example.com/widget.js" strategy="lazyOnload" />
 ```

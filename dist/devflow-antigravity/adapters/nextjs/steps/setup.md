@@ -11,7 +11,7 @@ Loaded by `devflow-setup` together with the adapter core (`ADAPTER.md`).
 
 Template intent:
 
-- `AGENTS.template.md`: short operational rules + skill references (`@...`) only.
+- `AGENTS.template.md`: short operational rules + "when you touch X → read skill Y" list. No `@`-imports of skills (they would load into every session).
 - `REGISTRY.template.md`: compact pattern registry and core conventions.
 
 Output must stay token-lean, imperative, filler-free.
@@ -20,9 +20,10 @@ Output must stay token-lean, imperative, filler-free.
 
 Dependencies below are authoritative for `devflow.setup` auto-install.
 
+Baseline project: `create-next-app` defaults (App Router, TypeScript, Tailwind 4, ESLint CLI, Turbopack, Cache Components). Then `npx shadcn@latest init`. `package.json` `lint` script must be `eslint .` — `next lint` was removed in Next 16.
+
 ### js-runtime-dependencies
 
-- `next-intl`
 - `zustand`
 - `react-hook-form`
 - `zod`
@@ -31,11 +32,18 @@ Dependencies below are authoritative for `devflow.setup` auto-install.
 - `clsx`
 - `tailwind-merge`
 - `lucide-react`
+- `next-themes`
 
 ### js-dev-dependencies
 
 - `jest`
 - `jest-environment-jsdom`
 - `@testing-library/react`
+- `@testing-library/dom`
 - `@testing-library/jest-dom`
+- `@testing-library/user-event`
 - `@types/jest`
+- `ts-node`
+- `@playwright/test`
+
+i18n library: none by default. Add one only when `constitution.md` requires i18n, and record the choice in `registry.md`.
