@@ -16,7 +16,8 @@ npm run build
 ### PR body checklist (copy into PR description)
 
 - [ ] Lint passing
-- [ ] Unit tests passing (coverage ≥ 80% on modified areas)
+- [ ] Unit tests passing (`test` stamp)
+- [ ] No open coverage gaps on modified files (Ship Gate report — test-engineer)
 - [ ] E2E tests passing
 - [ ] Build passing
 - [ ] `nestjs-architecture` constraints respected (feature modules, constructor injection, no circular deps)

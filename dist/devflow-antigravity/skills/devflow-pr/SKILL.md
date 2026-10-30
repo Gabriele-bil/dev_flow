@@ -168,13 +168,10 @@ layers touched, key abstractions, notable patterns used.]
 [List any discrepancies between idea/spec and implementation, defensible defaults picked, decision flags from plan.md ## Decision flags, assumptions from task.md ## Notes, and non-critical exceptions documented during review.]
 
 ## Testing
-[How the feature was tested — mirror what the adapter PR step file requires:
-- Unit tests: what was covered
-- Integration / e2e: which flows and targets
-- Analyze/typecheck and format: outcome]
+[What the tests cover (unit, integration/e2e flows and targets), then the Step 3 stamp lines as printed — counts come from them, never from memory. Verification: `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" report` → its Verification line.]
 
 ## Checklist
-[Bullets from the adapter PR step file + repo-wide items below. Every bullet ticked `- [x]` with its evidence (Step 3 command + outcome, or file). Bullet not verifiable or not satisfied → do not open the PR (see When NOT to Use).]
+[Bullets from the adapter PR step file + repo-wide items below. Every bullet ticked `- [x]` with its evidence: a Step 3 stamp line (lint, analyze, format, test, e2e, build), the Ship Gate report (architecture, conventions, docs, coverage gaps), or a file. Bullet not verifiable or not satisfied → do not open the PR (see When NOT to Use).]
 - [x] No TODO or placeholder comments in changed files — [evidence]
 - [x] `registry.md` updated for new patterns, or no new patterns — [evidence]
 

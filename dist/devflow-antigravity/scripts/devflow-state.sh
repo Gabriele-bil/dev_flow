@@ -6,6 +6,8 @@
 # Usage (from the project root; [F] = feature: NNN, NNN_name or a path inside it):
 #   devflow-state.sh resolve [F]          active feature NNN_name (exit 1 → ask the user)
 #   devflow-state.sh status [F]           one line: statuses, next step, progress
+#   devflow-state.sh report [F]           report lines for run/auto: files, checks,
+#                                         verification, decision flags — computed, not recalled
 #   devflow-state.sh set plan|task <status> [F] [--force]
 #                                         write **Status:** + merge .devflow-state.json;
 #                                         refuses illegal transitions (--force: user-confirmed)
@@ -251,6 +253,33 @@ cmd_checkpoint() {
   jq -r '"checkpoint: \(.step // "—") · \(.slice // "—") · \(.decisions | length) decisions · \(.constraints | length) constraints · \(.errors_tried | length) errors tried"' "$FDIR/.checkpoint.json"
 }
 
+# count_items <file> <heading> — "- " bullets under "## <heading>".
+count_items() {
+  awk -v h="## $2" '$0 == h || index($0, h " ") == 1 { on = 1; next } on && /^## / { exit } on && /^- / { n++ } END { print n + 0 }' "$1" 2>/dev/null
+}
+
+cmd_report() {
+  need_feature "$1"
+  local plan="$FDIR/plan.md" ver="$FDIR/verification.md" stamps total ok
+  printf 'Feature:       '; status_line
+  if [ -f "$plan" ]; then
+    printf 'Files:         %s create · %s modify (plan.md File List)\n' \
+      "$(grep -cE '^###.*` - create' "$plan" || true)" "$(grep -cE '^###.*` - modify' "$plan" || true)"
+  fi
+  stamps=$(bash "$SCRIPT_DIR/verify-stamp.sh" show 2>/dev/null)
+  printf 'Checks:        %s\n' "$(printf '%s\n' "${stamps:-no stamps}" | sed '2,$s/^/               /')"
+  if [ -f "$ver" ]; then
+    total=$(grep -cE '\|[[:space:]]*(PASS|FAIL|PARTIAL)[[:space:]]*\|[[:space:]]*$' "$ver" || true)
+    ok=$(grep -cE '\|[[:space:]]*(PASS|PARTIAL)[[:space:]]*\|[[:space:]]*$' "$ver" || true)
+    printf 'Verification:  %s — %s/%s ACs verified (%s)\n' "$(verification_result)" "$ok" "$total" "$ver"
+  else
+    echo "Verification:  not written yet"
+  fi
+  [ -f "$plan" ] && printf 'Flags:         decision flags: %s · deviations: %s (plan.md)\n' \
+    "$(count_items "$plan" "Decision flags")" "$(count_items "$plan" "Deviations")"
+  return 0
+}
+
 cmd_run() {
   local sub="$1"; shift
   [ -n "$HAS_JQ" ] || die "run marker needs jq"
@@ -304,6 +333,7 @@ cmd_run() {
 case "$1" in
   resolve) resolve_feature "$2" && echo || exit 1 ;;
   status) need_feature "$2"; status_line ;;
+  report) cmd_report "$2" ;;
   set) shift; cmd_set "$@" ;;
   mark-done) shift; cmd_mark_done "$@" ;;
   checkpoint) shift; cmd_checkpoint "$@" ;;

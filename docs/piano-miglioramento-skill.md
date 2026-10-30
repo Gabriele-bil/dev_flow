@@ -192,7 +192,7 @@ I revisori di ship girano in parallelo sullo stesso albero di lavoro. Su Claude 
 - In mancanza di quel formato, un hook `PreToolUse` nega scritture e modifiche mentre è attivo il marcatore di fan-out di ship (`hooks/pre-agent-fanout-cap.sh` conosce già il fan-out).
 
 <a id="agy-3"></a>
-#### AGY-3 🟠 Script come strato comune ai due host
+#### AGY-3 🟠 ✅ Script come strato comune ai due host
 
 Su Antigravity mancano i campi che su Claude Code regolano modello, contesto e permessi, quindi la leva principale per qualità, token e tempo sono gli **script**. *scripts/devflow-state.sh* ([T-1](#t-1)), *scripts/verify-stamp.sh* ([L-1](#l-1)) e *scripts/review-packet.sh* ([T-7](#t-7)) devono:
 
@@ -251,7 +251,7 @@ In `skills/devflow-pr/SKILL.md`:
 | Riferimenti interni | implement rimanda a "Step 8 deviations" e "before Step 7b", ma le deviazioni sono lo Step 7b. test legge constitution e registry senza scopo dichiarato | Correggere i rimandi e togliere le letture senza scopo |
 
 <a id="q-3"></a>
-### Q-3 🟠 Verifiche dichiarate ma non dimostrate
+### Q-3 🟠 ✅ Verifiche dichiarate ma non dimostrate
 
 - La "Pre-handoff checklist" di implement non ha un campo per l'evidenza.
 - I contratti di ship "beautify complete" e "analyze clean" non hanno un controllo: il modello o li rilancia o li presume.

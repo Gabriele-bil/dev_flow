@@ -129,6 +129,20 @@ assert_equals "checkpoint: earlier errors kept" "$(jq -c .errors_tried $CP)" '["
 assert_equals "checkpoint: step kept when not passed" "$(jq -r .step $CP)" "devflow.implement"
 teardown
 
+# ── report ───────────────────────────────────────────────────────────────────
+setup
+feature 008_rep clarified tested
+F=devflow/features/008_rep
+printf '\n## Deviations\n\n- `src/b.ts`: sync → async — API is async\n\n## Decision flags\n\n- picked cursor paging\n- kept REST\n' >> $F/plan.md
+printf '**Result:** PARTIAL\n\n| # | AC | Verdict |\n|---|---|---|\n| 1 | a | PASS |\n| 2 | b | PARTIAL |\n| 3 | c | FAIL |\n' > $F/verification.md
+out=$(st report)
+assert_contains "report: feature line" "$out" "Feature:       008_rep · task: clarified · plan: tested"
+assert_contains "report: create/modify counted" "$out" "2 create · 1 modify"
+assert_contains "report: verification counted from verdicts" "$out" "PARTIAL — 2/3 ACs verified"
+assert_contains "report: flags and deviations counted" "$out" "decision flags: 2 · deviations: 1"
+assert_contains "report: no stamps yet" "$out" "Checks:        no stamps"
+teardown
+
 # ── run marker ───────────────────────────────────────────────────────────────
 setup
 out=$(st run arm --orchestrator devflow.auto --from task --until pr)

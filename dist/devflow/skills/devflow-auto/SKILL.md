@@ -62,15 +62,14 @@ Every step: full skill workflow, run-mode clauses active, status boundaries writ
 
 ### Step 2 - Disarm + report
 
-Disarm on every exit path: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" run disarm`. Report:
+Disarm on every exit path: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" run disarm`. Then `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" report` (computed Feature, Files, Checks, Verification, Flags lines — paste as printed; skip when no `task.md` was written). Report:
 
 ```text
 🤖 devflow.auto [complete: idea → PR opened | stopped at <step>: <major discrepancy>]
 
-Feature:  [NNN]_[feature-name]  ·  Status: [plan.md Status or "task only"]
-Branch:   [type]/[NNN]_[feature-name]   PR: [URL, when opened]
-Steps:    task · plan · analyze · implement · beautify · test · ship · pr  [✅/❌ each]
-Flags:    [N] decision flags / discrepancies (in PR body when opened)
+Branch:        [type]/[NNN]_[feature-name]   PR: [URL, when opened]
+Steps:         task · plan · analyze · implement · beautify · test · ship · pr  [✅/❌ each]
+[report lines, as printed]
 [Blocker + action required, when stopped — continue with devflow.resume or interactive commands]
 ```
 

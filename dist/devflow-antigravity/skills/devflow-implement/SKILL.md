@@ -183,7 +183,7 @@ If errors are found:
 
 #### Pre-handoff checklist (adapter)
 
-Before Step 7, confirm every item in the **Pre-handoff checklist** section of the adapter implement step file (adapter-specific quality gates).
+Before Step 7, confirm every item in the **Pre-handoff checklist** section of the adapter implement step file (adapter-specific quality gates), each with its evidence: a stamp line (`verify-stamp.sh`), a `file:line`, or a command result. An item without evidence is not done — fix it or report it in the Step 8 notify block.
 
 ### Step 7 - Registry update
 

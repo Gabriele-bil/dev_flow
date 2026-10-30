@@ -88,17 +88,14 @@ Never block on ambiguity while armed — defensible default + `plan.md` `## Deci
 
 ### Step 3 - Disarm + consolidated report
 
-Disarm on every exit path: `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" run disarm`. Report:
+Disarm on every exit path: `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" run disarm`. Then `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" report` — it computes the Feature, Files, Checks, Verification and Flags lines from `plan.md`, the verification stamps and `verification.md`; paste them as printed, never recount by hand. Report:
 
 ```text
 🤖 devflow.run complete: [from] → [last step executed]
 
-Feature:  [NNN]_[feature-name]  ·  Status: [final plan.md Status]
-Steps:    implement [✅/⏭/❌] · beautify [✅/⏭/❌] · test [✅/⏭/❌] [· ship [✅/❌]]
-Files:    [N] created · [M] modified
-Tests:    [N] passed · [N] failed  ·  Verification: [PASS|FAIL|PARTIAL] [n]/[n] ACs
-Flags:    [N] decision flags — review plan.md ## Decision flags
-Pending:  [N] beautify proposals not applied (listed as flags)
+Steps:         implement [✅/⏭/❌] · beautify [✅/⏭/❌] · test [✅/⏭/❌] [· ship [✅/❌]]
+[report lines, as printed]
+Pending:       [N] beautify proposals not applied (listed as flags)
 [Stopped at [step]: [failed check | stuck-report | handoff written], if not complete]
 
 Next (human): devflow.ship — reviews code AND open flags
