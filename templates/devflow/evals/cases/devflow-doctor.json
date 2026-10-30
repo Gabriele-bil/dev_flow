@@ -1,0 +1,29 @@
+{
+  "skill_name": "devflow-doctor",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Check whether my devflow setup and MCP servers are working",
+        "top_k": 3
+      },
+      {
+        "prompt": "Run a pre-flight diagnostic of the devflow toolchain",
+        "top_k": 3
+      },
+      {
+        "prompt": "Is anything misconfigured in the devflow adapter or CLI tools?",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Show the token savings and cost dashboard",
+        "owner": "devflow-metrics"
+      },
+      {
+        "prompt": "Where am I in the pipeline right now?",
+        "owner": "devflow-status"
+      }
+    ]
+  }
+}

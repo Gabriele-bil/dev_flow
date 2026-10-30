@@ -1,0 +1,29 @@
+{
+  "skill_name": "devflow-rollback",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Undo the implementation step and go back to the checkpoint",
+        "top_k": 3
+      },
+      {
+        "prompt": "Roll back the beautify changes for this feature",
+        "top_k": 3
+      },
+      {
+        "prompt": "Revert the active step to its pre-step state",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "The pipeline state is corrupted, diagnose it",
+        "owner": "devflow-recovery"
+      },
+      {
+        "prompt": "Resume where the last session stopped",
+        "owner": "devflow-resume"
+      }
+    ]
+  }
+}
