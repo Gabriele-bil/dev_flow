@@ -50,7 +50,7 @@ Build the review packet once, then dispatch all profile-required agents **simult
 bash "@devflow/scripts/review-packet.sh" [NNN] --profile <profile> --roster "<agent names>"
 ```
 
-It writes `.devflow-review-packet.md` — changed files and diff against the base branch (uncommitted and new files included, `devflow/` excluded), acceptance criteria, scope, architecture decisions, traceability, deviations, decision flags, verification stamps, `constitution.md` and the `registry.md` entries for the changed files.
+Keep the `tree <hash>` its summary line prints: Step 4b re-reviews start from it. It writes `.devflow-review-packet.md` — changed files and diff against the base branch (uncommitted and new files included, `devflow/` excluded), acceptance criteria, scope, architecture decisions, traceability, deviations, decision flags, verification stamps, `constitution.md` and the `registry.md` entries for the changed files.
 
 Each agent receives:
 
@@ -150,8 +150,8 @@ Each iteration (interactive and run mode), every status boundary written with `b
 
 1. `@devflow/skills/devflow-implement/SKILL.md` with `--fix <findings>` — re-entry mode, scoped to this report's findings (`file:line` + description); `tested` → `implementing` → `implemented`.
 2. `@devflow/skills/devflow-beautify/SKILL.md` on touched files (run mode: certain improvements only) → `beautified`.
-3. `@devflow/skills/devflow-test/SKILL.md` full workflow incl. Step 6b goal-backward verification → fresh `verification.md`; `tested` only with zero FAIL. Test step fails or verification FAIL → stop loop, present report + failure (escalation per `@devflow/references/escalation-ladder.md`); never set `shipped`.
-4. Re-run full fan-out from Step 1 at the **same depth profile** — never shrink on retry; independent reviews, not a recheck of fixed lines.
+3. `@devflow/skills/devflow-test/SKILL.md` with `--changed <files the fix touched>` — the unit suite runs through the stamp as always; Step 6b re-verifies only ACs whose Traceability files are in that list and carries the other rows over (`thorough`: no `--changed`, full re-verification) → fresh `verification.md`; `tested` only with zero FAIL. Test step fails or verification FAIL → stop loop, present report + failure (escalation per `@devflow/references/escalation-ladder.md`); never set `shipped`.
+4. Re-run the fan-out from Step 1 at the **same depth profile** (same agents — never shrink on retry). `quick` / `standard`: build the packet with `--since <tree from the previous packet>`, so the agents review the fix diff with the previous report's findings as context; `thorough`: full packet, fully independent re-review.
 5. Route new report through Step 4. Critical on any iteration → immediate hard stop, independent of remaining budget.
 
 ---

@@ -67,7 +67,7 @@ echo "── review-packet.sh ────────────────�
 setup
 out=$(bash "$RP" 2>&1)
 P=.devflow-review-packet.md
-case "$out" in "review packet: $P · 001_cards · 2 files"*) pass "summary line" ;; *) fail "summary line" "$out" ;; esac
+case "$out" in "review packet: $P · 001_cards · tree "*" · 3 files"*) pass "summary line (a.ts, user-card.tsx, .gitignore entry)" ;; *) fail "summary line" "$out" ;; esac
 has "base resolved to local main" $P "base: main"
 has "committed change in diff" $P "-export const a = 1;"
 has "uncommitted change in diff" $P "+export const b = 1;"
@@ -91,6 +91,17 @@ for i in $(seq 1 400); do echo "line $i of a long generated file" ; done > src/b
 bash "$RP" --max-diff-kb 2 --profile thorough --roster "code-reviewer docs-reviewer" >/dev/null 2>&1
 has "diff cap announced" .devflow-review-packet.md "Cut at 2 KB"
 has "profile and roster flags" .devflow-review-packet.md "Depth profile: thorough · roster: code-reviewer docs-reviewer"
+teardown
+
+setup
+bash "$RP" >/dev/null 2>&1
+TREE1=$(grep -m1 '^- Tree: ' .devflow-review-packet.md | sed 's/^- Tree: \([0-9a-f]*\).*/\1/')
+printf 'export function UserCard() { return 1 }\n' > src/user-card.tsx
+out=$(bash "$RP" --since "$TREE1" 2>&1)
+case "$out" in *"1 files"*) pass "since: only the file changed after the first review" ;; *) fail "since: only the file changed after the first review" "$out" ;; esac
+hasnt "since: earlier changes left out" .devflow-review-packet.md "+export const b = 1;"
+has "since: incremental header" .devflow-review-packet.md "**Incremental:**"
+bash "$RP" --since deadbeef >/dev/null 2>&1; assert_equals "since: bad tree → exit 1" "$?" "1"
 teardown
 
 T=$(mktemp -d); cd "$T" || exit 1; git init -q

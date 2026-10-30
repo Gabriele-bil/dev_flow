@@ -1,7 +1,7 @@
 ---
 name: devflow-test
 description: Writes/runs unit+integration tests via adapter targets, bounded retries. Use when user runs devflow.test, validates feature after beautify, or fifth pipeline step.
-argument-hint: "[optional-plan-path]"
+argument-hint: "[optional-plan-path] [--changed <files>]"
 disable-model-invocation: true
 ---
 
@@ -103,6 +103,8 @@ Failure handling:
 - Context pressure (host compaction warning, long retry session) → write `devflow/features/[NNN]_[feature-name]/handoff.md` per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` → **Handoff file**, stop, tell user: restart session + `devflow.resume`
 
 ### Step 6b - Goal-backward verification
+
+**`--changed <files>`** (ship fix loop, `quick`/`standard`): re-verify only ACs whose **Traceability** files intersect the list; copy the other rows from the existing `verification.md` unchanged and note `carried over` in their evidence. No `verification.md` yet, or `thorough` → full verification.
 
 After all tests pass, verify **backwards from the spec** per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/verification-levels.md`:
 

@@ -6,7 +6,9 @@
 # and re-reading task.md, plan.md and constitution.md. Identical on both hosts.
 #
 # Usage (from the project root):
-#   review-packet.sh [feature] [--base BRANCH] [--profile P] [--roster "a b c"] [--max-diff-kb N]
+#   review-packet.sh [feature] [--base BRANCH] [--profile P] [--roster "a b c"] [--max-diff-kb N] [--since TREE]
+# --since TREE: incremental packet — diff from that tree (the "Tree:" a previous
+# packet printed) to now, for ship fix-loop re-reviews.
 # Writes .devflow-review-packet.md (gitignored) and prints one summary line.
 # Diff over --max-diff-kb (default 80) is cut; the packet names the files to
 # open instead. Exit 1: no feature resolved.
@@ -19,13 +21,14 @@ DF_WORKSPACE="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$DF_WORKSPACE" || exit 1
 OUT=".devflow-review-packet.md"
 
-FEATURE_ARG="" BASE="" PROFILE="" ROSTER="" MAX_KB=80
+FEATURE_ARG="" BASE="" PROFILE="" ROSTER="" MAX_KB=80 SINCE=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --base) BASE="$2"; shift 2 ;;
     --profile) PROFILE="$2"; shift 2 ;;
     --roster) ROSTER="$2"; shift 2 ;;
     --max-diff-kb) MAX_KB="$2"; shift 2 ;;
+    --since) SINCE="$2"; shift 2 ;;
     -h|--help) sed -n '2,/^$/s/^# \{0,1\}//p' "$0"; exit 0 ;;
     *) FEATURE_ARG="$1"; shift ;;
   esac
@@ -54,12 +57,18 @@ MB=""
 [ -n "$MB" ] || MB=4b825dc642cb6eb9a060e54bf8d69288fbee4904  # empty tree: no commit yet
 
 # ── Diff: base → working tree, untracked files included (throwaway index) ────
+df_gitignore "$OUT"  # first, so the .gitignore edit is not part of the next incremental diff
 IDX=$(mktemp "${TMPDIR:-/tmp}/devflow-index.XXXXXX")
 REAL_IDX=$(git rev-parse --git-path index 2>/dev/null)
 if [ -n "$REAL_IDX" ] && [ -f "$REAL_IDX" ]; then cp -p "$REAL_IDX" "$IDX"; else rm -f "$IDX"; fi
 trap 'rm -f "$IDX"' EXIT
 GIT_INDEX_FILE="$IDX" git add -A -- . ':(exclude)devflow' ':(exclude).devflow-*' >/dev/null 2>&1
 PATHSPEC=(-- . ':(exclude)devflow' ':(exclude).devflow-*')
+TREE=$(GIT_INDEX_FILE="$IDX" git write-tree 2>/dev/null)
+if [ -n "$SINCE" ]; then
+  git cat-file -e "$SINCE^{tree}" 2>/dev/null || { echo "review-packet: --since $SINCE is not a tree" >&2; exit 1; }
+  MB="$SINCE" BASE_REF="previous review (tree ${SINCE:0:12})"
+fi
 NAMES=$(GIT_INDEX_FILE="$IDX" git diff --cached --name-status "$MB" "${PATHSPEC[@]}" 2>/dev/null)
 SUMMARY=$(GIT_INDEX_FILE="$IDX" git diff --cached --shortstat "$MB" "${PATHSPEC[@]}" 2>/dev/null | sed 's/^ *//')
 DIFF=$(GIT_INDEX_FILE="$IDX" git diff --cached -U3 "$MB" "${PATHSPEC[@]}" 2>/dev/null)
@@ -98,6 +107,8 @@ STAMPS=$(bash "$SCRIPT_DIR/verify-stamp.sh" show 2>/dev/null)
   echo "Generated $(date -u +%Y-%m-%dT%H:%M:%SZ) by scripts/review-packet.sh. Read this first; open source files only for the lines you need."
   echo
   echo "- Branch: $(git branch --show-current 2>/dev/null) · base: ${BASE_REF:-none} (merge-base ${MB:0:12})"
+  echo "- Tree: $TREE — pass to --since for an incremental re-review"
+  [ -n "$SINCE" ] && echo "- **Incremental:** only what changed since the previous review — the earlier findings were addressed in this diff"
   echo "- Depth profile: ${PROFILE:-standard}${ROSTER:+ · roster: $ROSTER}${APP:+ · app: $APP}"
   echo "- Feature: $FDIR (task.md, plan.md, verification.md)"
   echo
@@ -142,5 +153,4 @@ STAMPS=$(bash "$SCRIPT_DIR/verify-stamp.sh" show 2>/dev/null)
   echo '```diff'; printf '%s\n' "$DIFF"; echo '```'
 } > "$OUT"
 
-df_gitignore "$OUT"
-echo "review packet: $OUT · $FEATURE · $NFILES files · ${SUMMARY:-no changes} · diff $((DIFF_BYTES / 1024)) KB${CUT:+ (cut at ${MAX_KB} KB)} · $(wc -c < "$OUT" | tr -d ' ') bytes"
+echo "review packet: $OUT · $FEATURE · tree ${TREE:0:12} · $NFILES files · ${SUMMARY:-no changes} · diff $((DIFF_BYTES / 1024)) KB${CUT:+ (cut at ${MAX_KB} KB)} · $(wc -c < "$OUT" | tr -d ' ') bytes"
