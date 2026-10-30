@@ -28,6 +28,7 @@ Skip: private/internal functions, test files, generated code.
 
 Before reviewing:
 
+- `.devflow-review-packet.md` (project root) — when dispatched by `devflow.ship`, read it first: changed files, diff (new files included), acceptance criteria, plan excerpts, verification stamps, project rules. It replaces `git diff` and full reads of the files below; open them only for what the packet lacks. Standalone review (no packet): read them.
 - `devflow/features/[NNN]_[feature-name]/task.md` — acceptance criteria and feature scope
 - `devflow/features/[NNN]_[feature-name]/plan.md` — traceability table and public surfaces introduced
 - `constitution.md` — naming conventions and documentation standards for the project

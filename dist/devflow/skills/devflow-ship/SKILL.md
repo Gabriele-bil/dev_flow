@@ -49,12 +49,17 @@ Before dispatching, verify all of the following. Stop and report which check fai
 
 ## Step 1 - Fan-out (parallel)
 
-Dispatch all profile-required agents **simultaneously**. Do not wait for one before dispatching the next.
+Build the review packet once, then dispatch all profile-required agents **simultaneously**. Do not wait for one before dispatching the next.
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/review-packet.sh" [NNN] --profile <profile> --roster "<agent names>"
+```
+
+It writes `.devflow-review-packet.md` — changed files and diff against the base branch (uncommitted and new files included, `devflow/` excluded), acceptance criteria, scope, architecture decisions, traceability, deviations, decision flags, verification stamps, `constitution.md` and the `registry.md` entries for the changed files.
 
 Each agent receives:
 
-- Path to `task.md` and `plan.md`
-- List of files created/modified by `devflow.implement` and `devflow.beautify`
+- Path to `.devflow-review-packet.md` — read first; replaces each agent's own `git diff` and full reads of `task.md`/`plan.md`/`constitution.md`
 - Active adapter name and app working directory (resolved per `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`)
 - Optional reviewer notes from `$ARGUMENTS`
 - Dispatch roster (profile + agent names) — `code-reviewer` skips its security axis when `security-auditor` is on it
@@ -200,7 +205,7 @@ Execute `${CLAUDE_PLUGIN_ROOT}/skills/devflow-pr/SKILL.md` exactly.
 | | |
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md`, `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`, `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` |
-| Reads | Files from `devflow.implement` / `devflow.beautify` summary |
+| Runs | `${CLAUDE_PLUGIN_ROOT}/scripts/review-packet.sh` (Step 1, every fan-out incl. Step 4b re-runs) → `.devflow-review-packet.md` |
 | Reads | `${CLAUDE_PLUGIN_ROOT}/references/complexity-scoring.md` (depth profile → fan-out), `${CLAUDE_PLUGIN_ROOT}/references/token-economy.md` (agent prompt rules) |
 | Reads (conditional) | `plan.md` `## Decision flags` (→ **Open Decision Flags** report section); `.devflow-run.json` (`until` field — stops before PR if `until: "ship"`, routes to `devflow.pr` if `until: "pr"`; `ship_grader_iterations`/`ship_grader_iteration_count` for Step 4b) |
 | Writes | `plan.md` — `**Status:** shipped` on gate pass; Step 4b statuses via the chained skills; `.devflow-state.json` (merge) |

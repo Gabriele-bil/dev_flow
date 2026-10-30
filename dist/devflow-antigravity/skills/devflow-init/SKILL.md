@@ -76,7 +76,7 @@ Execute the 3-phase interview per `$HOME/.gemini/antigravity-cli/plugins/devflow
 
 Execute directory initialization and optional technology scaffolding per `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-init/references/scaffolding-matrix.md`:
 
-1. **Workspace & Git init:** Create `<project-slug>/` (if subfolder mode), `cd` into root, run `git init -b main` (if `.git` absent), write `.gitignore` (stack ignores + `.devflow-state.json`, `.devflow-run.json`, `.devflow-verify.json`, `.devflow-verify/`, `.devflow-*.jsonl`, `.devflow-*.tmp`), and create `devflow/features/`, `devflow/plans/`, `docs/adr/`.
+1. **Workspace & Git init:** Create `<project-slug>/` (if subfolder mode), `cd` into root, run `git init -b main` (if `.git` absent), write `.gitignore` (stack ignores + `.devflow-state.json`, `.devflow-run.json`, `.devflow-verify.json`, `.devflow-verify/`, `.devflow-review-packet.md`, `.devflow-*.jsonl`, `.devflow-*.tmp`), and create `devflow/features/`, `devflow/plans/`, `docs/adr/`.
 2. **If technology scaffolding is enabled, enforce the Always Up-to-Date rule:**
    - **Zero hardcoded stale versions:** Never write static templates with outdated package versions or legacy config schemas (e.g. no `.eslintrc.json`, no Angular NgModules, no Next.js Pages router).
    - **Live version & config resolution:** Query `context7` MCP (or stack MCPs: `dart`, `angular-cli`, `next-devtools`) and live registries (`npm view <pkg> version`, `flutter pub outdated`) to confirm current latest stable conventions before generating files.

@@ -28,6 +28,7 @@ Review widget and component code only. Skip business logic, data layers, state m
 
 Before auditing:
 
+- `.devflow-review-packet.md` (project root) — when dispatched by `devflow.ship`, read it first: changed files, diff (new files included), acceptance criteria, plan excerpts, verification stamps, project rules. It replaces `git diff` and full reads of the files below; open them only for what the packet lacks. Standalone review (no packet): read them.
 - `devflow/features/[NNN]_[feature-name]/task.md` — acceptance criteria and affected UI surfaces
 - `devflow/features/[NNN]_[feature-name]/plan.md` — component structure and interaction flows
 - Active adapter beautify step file (`${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/steps/beautify.md`; legacy: `ADAPTER.md`) → **Beautify: accessibility** — stack-specific patterns (Flutter `Semantics`, Angular `aria-*`)

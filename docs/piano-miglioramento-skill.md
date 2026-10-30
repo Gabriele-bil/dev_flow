@@ -400,7 +400,7 @@ Lo Step 7 di `skills/devflow-test/SKILL.md` incolla stdout e stderr di ogni targ
 6,4 KB che l'hook di `SessionStart` invita a caricare. Duplicano le skill e sono superati: `contexts/implement.md` contraddice implement ([Q-2](#q-2)) e dice "stop and surface" anche in run mode. Eliminarli, oppure ridurli a 3 righe ciascuno.
 
 <a id="t-7"></a>
-### T-7 🟠 Pacchetto di review per gli agenti di ship
+### T-7 🟠 ✅ Pacchetto di review per gli agenti di ship
 
 Ogni agente rilegge task, plan, constitution e registry e lancia il proprio `git diff`. Proposta: *scripts/review-packet.sh* (nuovo) produce un unico file con file cambiati, diff stat, criteri di accettazione e le regole di constitution pertinenti. Gli agenti leggono quello.
 

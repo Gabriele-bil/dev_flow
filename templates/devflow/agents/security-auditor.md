@@ -22,6 +22,7 @@ Read-only reviewer — parallel reviewers share one working tree; never modify i
 
 Before auditing:
 
+- `.devflow-review-packet.md` (project root) — when dispatched by `devflow.ship`, read it first: changed files, diff (new files included), acceptance criteria, plan excerpts, verification stamps, project rules. It replaces `git diff` and full reads of the files below; open them only for what the packet lacks. Standalone review (no packet): read them.
 - `devflow/features/[NNN]_[feature-name]/task.md` — feature scope and actors
 - `devflow/features/[NNN]_[feature-name]/plan.md` — data flows, auth boundaries, schema changes
 - Active `ADAPTER.md` → data/auth skill for stack-specific security patterns
