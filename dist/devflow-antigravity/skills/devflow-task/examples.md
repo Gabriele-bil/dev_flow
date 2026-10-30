@@ -8,7 +8,7 @@ Study structure, INVEST rigor, BDD Gherkin formatting, and token economy.
 
 **User:** “We should make notifications smarter.”
 
-**Agent (after reading `docs/product.md`, constitution/registry as needed):** Identify problem & actor. Ask with `AskUserQuestion` / `ask_question`: (1) actor (owner vs co-owner), (2) "smarter" dimension (priority/grouping/quiet hours/other), (3) success signal.
+**Agent (after reading `docs/product.md`, constitution/registry as needed):** Identify problem & actor. Ask with `ask_question`: (1) actor (owner vs co-owner), (2) "smarter" dimension (priority/grouping/quiet hours/other), (3) success signal.
 
 **User:** “Owners. Group by pet and don’t spam when two co-owners edit the same thing. Success is fewer taps to see what matters.”
 

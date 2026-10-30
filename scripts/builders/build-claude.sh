@@ -84,6 +84,20 @@ LEFT="$(grep -rlE "/devflow\.(${STEPS_RE})([^a-z-]|\$)" "$DIST_DIR" 2>/dev/null 
 [ "$(grep -l '^name: devflow-' "$DIST_DIR"/skills/devflow-*/SKILL.md 2>/dev/null | wc -l | tr -d ' ')" = 0 ] || fail "name: devflow-<passo> rimasto in una skill"
 ok "Skill invocabili come /$NAME:<passo>"
 
+# Strumento per le domande all'utente: nei sorgenti le skill scrivono entrambi i
+# nomi (`AskUserQuestion` / `ask_question`); qui resta quello di Claude Code. Le
+# righe di tabella etichettate per host (**Antigravity**) restano com'erano.
+step "Nomi dei tool → Claude Code"
+while IFS= read -r f; do
+  sed -E -e '/\*\*Antigravity\*\*/!{' \
+    -e 's#\*\*`AskUserQuestion`\*\* \(Claude Code\) or \*\*`ask_question`\*\* \(Antigravity\)#**`AskUserQuestion`**#g' \
+    -e 's#\*\*`AskUserQuestion`\*\* / \*\*`ask_question`\*\*#**`AskUserQuestion`**#g' \
+    -e 's#`AskUserQuestion` / `ask_question`#`AskUserQuestion`#g' -e '}' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+done < <(grep -rl 'ask_question' "$DIST_DIR/skills" "$DIST_DIR/references" "$DIST_DIR/agents" 2>/dev/null)
+LEFT="$(grep -rn 'ask_question' "$DIST_DIR/skills" "$DIST_DIR/references" "$DIST_DIR/agents" 2>/dev/null | grep -v '\*\*Antigravity\*\*' || true)"
+[ -z "$LEFT" ] || fail "ask_question rimasto fuori dalle righe per host: $LEFT"
+ok "Domande all'utente: AskUserQuestion"
+
 # Genera .claude-plugin/plugin.json da manifest
 step "Generazione .claude-plugin/plugin.json"
 

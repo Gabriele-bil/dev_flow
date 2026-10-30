@@ -132,7 +132,7 @@ Analyze:
 - Seed **Risks and mitigations** table directly from `task.md` `## Assumptions & Risks` (convert into concrete boundary checks)
 - Bullets in active adapter plan step file (`steps/plan.md`) applying to this feature (state, UI, DB, i18n, responsive layout)
 - Edge cases, error states, and required DB/external-system edits
-- Architectural trade-offs: state the concrete mechanism and strongest real limitation/trade-off for each decision (never empty boosters like `scalable` or `seamless`); when multiple viable designs exist, trigger `AskUserQuestion` / `ask_question` checkpoint and recommend `/grill-me` for deep review
+- Architectural trade-offs: state the concrete mechanism and strongest real limitation/trade-off for each decision (never empty boosters like `scalable` or `seamless`); when multiple viable designs exist, trigger `ask_question` checkpoint and recommend `/grill-me` for deep review
 - ADR alignment: verify architecture complies with decisions in `docs/adr/`; record in Architecture decisions
 
 ### Step 4b - Dependency pass & Contracts First

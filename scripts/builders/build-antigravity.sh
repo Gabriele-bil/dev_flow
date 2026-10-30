@@ -206,6 +206,18 @@ LEFT="$(grep -rlE "/${NAME}:(${AGY_STEPS_RE})([^a-z-]|\$)" "$AGY_DIR" 2>/dev/nul
 [ -z "$LEFT" ] || fail "/$NAME:<passo> non tradotto in: $LEFT"
 ok "Skill invocabili come /$NAME-<passo>"
 
+# ── Nomi dei tool ─────────────────────────────────────────────────────────────
+# Il build Claude Code ha lasciato `AskUserQuestion`: qui diventa ask_question,
+# tranne nelle righe di tabella etichettate per host (**Claude Code**), dove la
+# sintassi della chiamata è quella di Claude Code.
+step "Nomi dei tool → Antigravity"
+while IFS= read -r f; do
+  sed -E '/\*\*Claude Code\*\*/!s#AskUserQuestion#ask_question#g' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+done < <(grep -rl 'AskUserQuestion' "$AGY_DIR/skills" "$AGY_DIR/references" "$AGY_DIR/agents" "$AGY_DIR/adapters" 2>/dev/null)
+LEFT="$(grep -rn 'AskUserQuestion' "$AGY_DIR/skills" "$AGY_DIR/references" "$AGY_DIR/agents" "$AGY_DIR/adapters" 2>/dev/null | grep -v '\*\*Claude Code\*\*' || true)"
+[ -z "$LEFT" ] || fail "AskUserQuestion rimasto fuori dalle righe per host: $LEFT"
+ok "Domande all'utente: ask_question"
+
 # ── rules/ ────────────────────────────────────────────────────────────────────
 step "rules/devflow-orientation.md"
 mkdir -p "$AGY_DIR/rules"

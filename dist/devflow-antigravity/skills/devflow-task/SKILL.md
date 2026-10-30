@@ -44,7 +44,7 @@ Turn raw idea into a lean, product-focused Agile task. Acts as Requirements Arch
 2. No `## Apps` heading → single-app repo. Skip step entirely — no app question, no `**App:**` field anywhere downstream.
 3. `## Apps` heading present:
    - `--app <name>` in `$ARGUMENTS` → validate against table's App column. Unknown name → list valid names, ask again — never guess.
-   - No `--app` → ask ("Which app is this feature for?") using **`AskUserQuestion`** / **`ask_question`** with table App names as options.
+   - No `--app` → ask ("Which app is this feature for?") using **`ask_question`** with table App names as options.
    - Keep resolved app name for Step 2, Step 9 (`task.md`), and Step 10 (`docs/product.md`).
 
 ### Step 2 - Read context
@@ -80,7 +80,7 @@ Structured elicitation rules (per `$HOME/.gemini/antigravity-cli/plugins/devflow
 
 - Max 5 questions, asked sequentially one at a time
 - **High-stakes filter:** ask ONLY when the answer changes user-visible behavior, scope, safety, or data/cost boundaries. If a sensible, cheap-to-reverse default exists, record it in `## Assumptions & Risks` instead of asking
-- Use **`AskUserQuestion`** / **`ask_question`**: offer 2–4 options with first option marked `(Recommended)` and a 1-sentence rationale; fallback to chat prompt if tool unavailable
+- Use **`ask_question`**: offer 2–4 options with first option marked `(Recommended)` and a 1-sentence rationale; fallback to chat prompt if tool unavailable
 - Skip entirely if idea is already clear enough
 
 **Run mode** (`.devflow-run.json` present): do not stop — pick defensible default (repo precedent > `docs/product.md` > conservative reading), record each as bullet in `task.md` **`## Assumptions & Risks`**; never leave raw `[NEEDS CLARIFICATION]` marker. Missing **App** on monorepo still hard-stops.
@@ -103,7 +103,7 @@ Read **`refinement-hints.md`**, run pass:
    - If feature numbering is not applicable/present in the repo, omit `[number-of-task-is-present]_`.
 2. **Feature name (`name`):**
    - Automatically derive a 1-3 word `kebab-case` name from the user story, pain point, or goal (e.g. `cart-checkout`, `pet-notifications`).
-   - **CRITICAL:** Do NOT ask the user for the feature name or branch name. Never prompt via `AskUserQuestion` / `ask_question` or chat for naming — choose the most direct, descriptive name autonomously.
+   - **CRITICAL:** Do NOT ask the user for the feature name or branch name. Never prompt via `ask_question` or chat for naming — choose the most direct, descriptive name autonomously.
 3. **Change type (`type`):**
    - Automatically infer the conventional commit type from the nature of the request:
      - `feat`: new capability, user flow, or feature enhancement

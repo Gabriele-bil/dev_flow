@@ -69,7 +69,7 @@ For each question in the prioritized queue, one at a time:
    - Provide 2–4 distinct, mutually exclusive options phrased as direct user choices (grounded in concrete behavior, never abstract buzzwords)
    - Mark the first choice with `(Recommended)` and a 1-sentence technical rationale
    - Do not include an "Other" option (handled automatically by host tool write-in)
-   - Invoke **`AskUserQuestion`** (Claude Code) or **`ask_question`** (Antigravity); fallback to formatted markdown choices in chat
+   - Invoke **`AskUserQuestion`**; fallback to formatted markdown choices in chat
    - Suggest **/grill-me** slash command if the user desires comprehensive edge-case and architecture interrogation
 2. Wait for the user's answer.
 3. On answer accepted:

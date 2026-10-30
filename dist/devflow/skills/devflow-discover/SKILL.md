@@ -45,7 +45,7 @@ Before proceeding, verify:
    - No `constitution.md` / `docs/product.md`, or user prompt indicates new project ("create app", "new project", "choose stack") → **Greenfield App Mode**.
    - `constitution.md` or `docs/product.md` exists, or `--feature <slug>` passed → **Feature Architecture Mode**.
 2. Monorepo check: read `@devflow/config.md`. If `## Apps` table present:
-   - Validate `--app <name>` against table or prompt user with `AskUserQuestion` / `ask_question`.
+   - Validate `--app <name>` against table or prompt user with `AskUserQuestion`.
    - Scope architecture analysis to resolved app.
 
 ### Step 2 — Multi-axis problem analysis
@@ -66,7 +66,7 @@ Read existing project context (`docs/product.md`, `constitution.md`, `registry.m
 Formulate prioritized, high-impact questions targeting the most critical or ambiguous axes identified in Step 2:
 
 1. Cap question queue at **≤5 questions** — keep only high-impact architectural forks.
-2. Ask questions one at a time using `AskUserQuestion` / `ask_question` tool:
+2. Ask questions one at a time using `AskUserQuestion` tool:
    - State the architectural axis and concrete operational consequence.
    - Provide a **recommended answer** with concise technical rationale.
    - Offer bounded, distinct multiple-choice options when possible.
@@ -89,7 +89,7 @@ Generate 2–3 distinct, viable architectural options grounded in the confirmed 
 
 1. Present comparative options and trade-off matrix to user.
 2. Recommend best option with concise technical rationale grounded in confirmed decision drivers.
-3. Ask user to choose or adjust using `AskUserQuestion` / `ask_question` tool (or chat prompt).
+3. Ask user to choose or adjust using `AskUserQuestion` tool (or chat prompt).
 4. If minor sub-decisions remain (e.g. storage engine, auth provider), resolve with maximum 2 concise follow-up questions.
 5. Confirm agreed architectural direction before writing files.
 
@@ -128,7 +128,7 @@ Generate 2–3 distinct, viable architectural options grounded in the confirmed 
 | --- | --- | --- |
 | Asking open-ended essay questions | Paralyzes user and produces vague answers | Use bounded multi-choice questions with a recommended option |
 | Skipping multi-axis analysis | Misses critical non-functional constraints (scale, security, blast radius) | Systematically review the 6 discovery axes before formulating options |
-| Monolithic option dumping | Overwhelms user with unformatted text | Use structured comparison table followed by focused `AskUserQuestion` / `ask_question` |
+| Monolithic option dumping | Overwhelms user with unformatted text | Use structured comparison table followed by focused `AskUserQuestion` |
 | Skipping existing code inspection | Re-invents existing modules or violates constitution conventions | Read `constitution.md` and inspect codebase before proposing options |
 | Leaving ADR in draft without user decision | Unresolved decisions stall downstream pipeline | Run interactive Q&A loop to reach explicit Accepted status |
 

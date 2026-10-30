@@ -6,7 +6,7 @@ Used by `devflow.init` Step 1 — structured elicitation protocol to capture pro
 
 ## Elicitation Rules
 
-1. **One question at a time:** Use `AskUserQuestion` / `ask_question` sequentially. Never batch multiple unrelated questions in a single prompt.
+1. **One question at a time:** Use `ask_question` sequentially. Never batch multiple unrelated questions in a single prompt.
 2. **Bounded options with recommendation first:** Offer 2–4 distinct options per question. Prefix the first option with `(Recommended)` followed by a 1-sentence technical rationale grounded in the user's brief.
 3. **Adaptive skipping:** If `$ARGUMENTS` or an attached brief already specifies an answer unambiguously (e.g., "Build a Next.js + NestJS Nx monorepo for a clinic booking SaaS"), confirm the extracted parameters in a compact summary and ask only the remaining unresolved questions.
 4. **Incremental persistence:** After completing Phase A, Phase B, and Phase C, persist collected answers into `<project-root>/.devflow-init-answers.tmp` (deleted at Step 5 completion and ignored by `.gitignore`) so an interrupted session can resume without re-asking completed phases.
@@ -39,7 +39,7 @@ Goal: extract complete functional inventory and actors to drive `docs/product.md
 ### QA.2 — Target Personas & External Actors
 - **Question:** Who are the primary user personas and external actors interacting with the system?
 - **Rule:** Must be real human roles (e.g., `Customer`, `Store Admin`, `Dispatcher`) or external systems (`Stripe Webhook`, `OAuth Provider`) — never technical roles (`Frontend Developer`, `Database`).
-- Offer 2–4 domain-tailored persona sets via `AskUserQuestion` / `ask_question` based on the project brief.
+- Offer 2–4 domain-tailored persona sets via `ask_question` based on the project brief.
 
 ### QA.3 — Feature Inventory (Core + Secondary + Admin/Ops Flows)
 - Present a proposed list of 4–10 vertical product features inferred from the brief and ask the user to confirm, add, or trim features.
