@@ -29,9 +29,10 @@ trap 'rm -rf "$TMPDIR"' EXIT
 export CLAUDE_PROJECT_DIR="$TMPDIR"
 
 run_hook() {
-  local file_path="$1"
+  local file_path="$1" session="${2:-s1}"
   local payload
-  payload=$(jq -cn --arg fp "$file_path" '{tool_use: {name: "Edit", input: {file_path: $fp}}}')
+  payload=$(jq -cn --arg fp "$file_path" --arg cwd "$TMPDIR" --arg s "$session" \
+    '{hook_event_name: "PostToolUse", session_id: $s, cwd: $cwd, tool_name: "Edit", tool_input: {file_path: $fp}}')
   printf '%s' "$payload" | bash "$HOOK" 2>/dev/null || true
 }
 
@@ -93,6 +94,18 @@ EOF
   echo "$out" | grep -qF "always enable null safety" \
     && assert "python file does not surface flutter instinct" fail \
     || assert "python file does not surface flutter instinct" pass
+
+  echo "--- T6: each instinct sent once per session ---"
+  out=$(run_hook "src/other.ts")
+  [ -z "$out" ] && assert "same instinct, same session: silent" pass || assert "same instinct, same session: silent (output: '$out')" fail
+  out=$(run_hook "lib/main.dart")
+  echo "$out" | grep -qF "always enable null safety" \
+    && assert "new instinct in same session still sent" pass \
+    || assert "new instinct in same session still sent (output: '$out')" fail
+  out=$(run_hook "src/app.ts" s2)
+  echo "$out" | grep -qF "always type function returns explicitly" \
+    && assert "new session sends it again" pass \
+    || assert "new session sends it again (output: '$out')" fail
 fi
 
 echo "--- T5: degenerate input allowed silently ---"

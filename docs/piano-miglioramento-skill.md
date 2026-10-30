@@ -407,7 +407,7 @@ Ogni agente rilegge task, plan, constitution e registry e lancia il proprio `git
 **Effetto stimato**: −56 KB per ship nel profilo standard, −112 KB nel profilo thorough. Gli agenti partono anche prima.
 
 <a id="t-8"></a>
-### T-8 🟡 Hook istinti senza deduplica
+### T-8 🟡 ✅ Hook istinti senza deduplica
 
 `hooks/post-edit-instinct-context.sh` reinietta gli stessi 3 istinti a ogni modifica, inclusa ogni marcatura `[done]` in plan.md. Proposta: tenere un registro per sessione degli istinti già inviati in `.devflow-observe-state.json`. **Effetto stimato**: −10-20 KB per implement.
 

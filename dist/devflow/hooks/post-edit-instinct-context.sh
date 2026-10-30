@@ -13,6 +13,9 @@
 # Input: host payload, parsed by lib/payload.sh (DF_FILE)
 # Output: lib/emit.sh df_context (additionalContext on Claude Code)
 # Silent (exit 0, no stdout) when nothing matches or tooling is missing.
+# Each instinct is sent once per session: lines already sent are kept in
+# .devflow-observe-state.json (instincts_sent), so repeated edits of the same
+# kind of file — or of plan.md while marking [done] — add no context.
 
 HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
 . "$HOOK_DIR/lib/payload.sh"
@@ -60,6 +63,19 @@ ENTRIES=$(
 ) || true
 
 [[ -z "$ENTRIES" ]] && exit 0
+
+OBS_STATE="${DEVFLOW_OBSERVE_STATE_FILE:-$WORKSPACE_ROOT/.devflow-observe-state.json}"
+SENT='[]'
+[[ -s "$OBS_STATE" ]] && SENT=$(jq -c --arg s "$DF_SESSION" \
+  'if (.instincts_sent.session // "") == $s then (.instincts_sent.lines // []) else [] end' "$OBS_STATE" 2>/dev/null || echo '[]')
+NEW=$(printf '%s\n' "$ENTRIES" | jq -R -s -c --argjson sent "${SENT:-[]}" 'split("\n") | map(select(length > 0)) - $sent')
+[[ "$NEW" == "[]" || -z "$NEW" ]] && exit 0
+df_json_update "$OBS_STATE" '
+  .instincts_sent = {session: $s,
+    lines: ((if (.instincts_sent.session // "") == $s then (.instincts_sent.lines // []) else [] end) + $new | unique)}' \
+  --arg s "$DF_SESSION" --argjson new "$NEW"
+df_gitignore ".devflow-observe-state.json"
+ENTRIES=$(printf '%s' "$NEW" | jq -r '.[]')
 
 CONTEXT="🧠 Instincts relevant to $BASENAME:
 
