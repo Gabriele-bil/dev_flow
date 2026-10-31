@@ -71,6 +71,9 @@ teardown() {
 
 # ── Guard: yq required ────────────────────────────────────────────────────────
 if ! command -v yq >/dev/null 2>&1; then
+  if [ "${CI:-}" = "true" ]; then
+    echo "FAIL: yq not installed (required in CI)"; exit 1
+  fi
   echo "SKIP: yq not installed — install with: brew install yq"
   exit 0
 fi
@@ -83,14 +86,14 @@ echo "────────────────────────�
 
 # T1: no files at all → silent exit
 setup
-OUTPUT=$(bash "$HOOKS_DIR/session-start-learnings.sh")
+OUTPUT=$(bash "$HOOKS_DIR/session-start-learnings.sh" </dev/null)
 assert_str_empty "no files: silent" "$OUTPUT"
 teardown
 
 # T2: instincts file exists but empty → silent exit
 setup
 touch .devflow-instincts.yaml
-OUTPUT=$(bash "$HOOKS_DIR/session-start-learnings.sh")
+OUTPUT=$(bash "$HOOKS_DIR/session-start-learnings.sh" </dev/null)
 assert_str_empty "empty instincts: silent" "$OUTPUT"
 teardown
 
@@ -107,11 +110,11 @@ instincts:
     evidence: "churn: 1 session"
     ts: "2026-05-26T10:00:00Z"
 YAML
-OUTPUT=$(bash "$HOOKS_DIR/session-start-learnings.sh")
+OUTPUT=$(bash "$HOOKS_DIR/session-start-learnings.sh" </dev/null)
 assert_str_empty "below threshold (0.2): silent" "$OUTPUT"
 teardown
 
-# T4: instincts above threshold → valid JSON with priority + message
+# T4: instincts above threshold → valid JSON with hookSpecificOutput + additionalContext
 setup
 cat > .devflow-instincts.yaml <<'YAML'
 instincts:
@@ -124,9 +127,9 @@ instincts:
     evidence: "manual"
     ts: "2026-05-26T10:00:00Z"
 YAML
-OUTPUT=$(bash "$HOOKS_DIR/session-start-learnings.sh")
-assert_str_contains "instincts present: has priority field" "$OUTPUT" '"priority"'
-assert_str_contains "instincts present: has message field" "$OUTPUT" '"message"'
+OUTPUT=$(bash "$HOOKS_DIR/session-start-learnings.sh" </dev/null)
+assert_str_contains "instincts present: has hookSpecificOutput field" "$OUTPUT" '"hookSpecificOutput"'
+assert_str_contains "instincts present: has additionalContext field" "$OUTPUT" '"additionalContext"'
 if echo "$OUTPUT" | jq . > /dev/null 2>&1; then
   pass "instincts present: output is valid JSON"
 else
@@ -147,7 +150,7 @@ instincts:
     evidence: "manual"
     ts: "2026-05-26T10:00:00Z"
 YAML
-OUTPUT=$(bash "$HOOKS_DIR/session-start-learnings.sh")
+OUTPUT=$(bash "$HOOKS_DIR/session-start-learnings.sh" </dev/null)
 assert_str_contains "trigger text in output" "$OUTPUT" "state management"
 assert_str_contains "action text in output" "$OUTPUT" "Riverpod"
 teardown
@@ -156,7 +159,7 @@ teardown
 setup
 jq -cn '{ts:"2026-05-03T10:00:00Z",type:"churn_file",source:"auto",feature:"auth",file:"lib/auth.dart",note:"File edited auth.dart multiple times"}' \
   > .devflow-learnings.jsonl
-bash "$HOOKS_DIR/session-start-learnings.sh" > /dev/null
+bash "$HOOKS_DIR/session-start-learnings.sh" </dev/null > /dev/null
 assert_file_exists "migration: instincts file created" ".devflow-instincts.yaml"
 assert_file_exists "migration: old file renamed to .migrated" ".devflow-learnings.jsonl.migrated"
 assert_file_not_exists "migration: original JSONL removed" ".devflow-learnings.jsonl"
@@ -166,7 +169,7 @@ teardown
 setup
 jq -cn '{ts:"2026-05-03T10:00:00Z",type:"warning",source:"manual",file:"lib/auth.dart",note:"Auth module is fragile"}' \
   > .devflow-learnings.jsonl
-bash "$HOOKS_DIR/session-start-learnings.sh" > /dev/null
+bash "$HOOKS_DIR/session-start-learnings.sh" </dev/null > /dev/null
 assert_contains "migration: trigger references file" ".devflow-instincts.yaml" "when editing"
 assert_contains "migration: action from note" ".devflow-instincts.yaml" "Auth module is fragile"
 assert_yaml_field "migration: warning type gets confidence 0.7" ".devflow-instincts.yaml" \
@@ -188,7 +191,7 @@ instincts:
 YAML
 jq -cn '{ts:"2026-05-03T10:00:00Z",type:"lesson",source:"manual",note:"Old lesson"}' \
   > .devflow-learnings.jsonl
-bash "$HOOKS_DIR/session-start-learnings.sh" > /dev/null
+bash "$HOOKS_DIR/session-start-learnings.sh" </dev/null > /dev/null
 # JSONL should NOT have been renamed — migration skipped
 assert_file_exists "migration skip: JSONL still present when yaml exists" ".devflow-learnings.jsonl"
 assert_yaml_field "migration skip: existing instinct untouched" ".devflow-instincts.yaml" \
@@ -207,10 +210,10 @@ instincts:
   - {id: f, trigger: "t6", confidence: 0.65, domain: general, scope: project, action: "a6", evidence: "x", ts: "2026-01-01T00:00:00Z"}
   - {id: g, trigger: "t7", confidence: 0.6, domain: general, scope: project, action: "a7", evidence: "x", ts: "2026-01-01T00:00:00Z"}
 YAML
-OUTPUT=$(bash "$HOOKS_DIR/session-start-learnings.sh")
-COUNT=$(echo "$OUTPUT" | jq -r '.message' 2>/dev/null | grep -c "^•" || echo 0)
-[ "$COUNT" -le 6 ] && pass "max 6 instincts surfaced (got $COUNT)" \
-                   || fail "max 6 instincts surfaced" "got $COUNT, want ≤6"
+OUTPUT=$(bash "$HOOKS_DIR/session-start-learnings.sh" </dev/null)
+COUNT=$(echo "$OUTPUT" | jq -r '.hookSpecificOutput.additionalContext' 2>/dev/null | grep -c "^•" || true)
+[ "$COUNT" -eq 6 ] && pass "max 6 instincts surfaced (got $COUNT)" \
+                   || fail "max 6 instincts surfaced" "got $COUNT, want 6"
 teardown
 
 # T9b: shared instincts surfaced with team badge
@@ -226,7 +229,7 @@ instincts:
     evidence: "team consensus"
     ts: "2026-05-26T10:00:00Z"
 YAML
-OUTPUT=$(bash "$HOOKS_DIR/session-start-learnings.sh")
+OUTPUT=$(bash "$HOOKS_DIR/session-start-learnings.sh" </dev/null)
 assert_str_contains "shared instinct: has team badge" "$OUTPUT" "👥 team"
 assert_str_contains "shared instinct: contains action" "$OUTPUT" "Riverpod architecture"
 teardown
@@ -263,7 +266,7 @@ instincts:
     evidence: "manual"
     ts: "2026-05-26T10:00:00Z"
 YAML
-OUTPUT=$(bash "$HOOKS_DIR/session-start-learnings.sh")
+OUTPUT=$(bash "$HOOKS_DIR/session-start-learnings.sh" </dev/null)
 assert_str_contains "merge: shared takes precedence" "$OUTPUT" "Team test rule"
 assert_not_contains_msg() {
   if echo "$OUTPUT" | grep -q "Local old test rule"; then
@@ -283,11 +286,11 @@ echo ""
 echo "stop-learn-distill.sh"
 echo "─────────────────────"
 
-# T10: no observe.jsonl → passthrough, no instincts file
+# T10: no observe.jsonl → silent stdout (Stop hooks never echo stdin), no instincts file
 setup
 INPUT='{"type":"assistant","message":"hello"}'
 OUTPUT=$(printf '%s' "$INPUT" | bash "$HOOKS_DIR/stop-learn-distill.sh")
-assert_equals "no observe.jsonl: passthrough stdin" "$OUTPUT" "$INPUT"
+assert_str_empty "no observe.jsonl: silent stdout (no stdin echo)" "$OUTPUT"
 assert_file_not_exists "no observe.jsonl: no instincts file" ".devflow-instincts.yaml"
 teardown
 
@@ -359,14 +362,14 @@ else
 fi
 teardown
 
-# T15: passthrough preserves stdin exactly
+# T15: Stop hook with churn emits no stdout (never echoes stdin)
 setup
 for i in 1 2 3 4; do
   jq -cn '{event:"pre",tool:"Write",file:"lib/x.dart",ts:"2026-05-03T10:00:01Z"}' >> .devflow-observe.jsonl
 done
 INPUT='{"type":"assistant","stop_reason":"end_turn","message":"done"}'
 OUTPUT=$(printf '%s' "$INPUT" | bash "$HOOKS_DIR/stop-learn-distill.sh")
-assert_equals "passthrough with churn: stdin unchanged" "$OUTPUT" "$INPUT"
+assert_str_empty "with churn: silent stdout (no stdin echo)" "$OUTPUT"
 teardown
 
 # T16: instincts file gitignored after first write
