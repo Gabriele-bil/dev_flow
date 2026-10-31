@@ -8,7 +8,8 @@
     ],
     "negative": [
       { "prompt": "This large objective needs multiple PRs across several sessions, break it down", "owner": "devflow-blueprint" },
-      { "prompt": "Check consistency between task, plan and constitution before implementing", "owner": "devflow-analyze" }
+      { "prompt": "Check consistency between task, plan and constitution before implementing", "owner": "devflow-analyze" },
+      { "prompt": "What should I run next in the pipeline?", "owner": "devflow-status" }
     ]
   }
 }

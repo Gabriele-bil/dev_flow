@@ -1,11 +1,15 @@
 ---
-name: devflow-clarify
+name: clarify
 description: "Resolves [NEEDS CLARIFICATION: ...] markers in task.md via incremental Q&A. 8D scan → up to 5 questions → updates task.md → sets Status clarified. Use when task.md has open markers or high-risk assumptions before devflow.plan."
-model: haiku
+argument-hint: "[optional-task-path]"
 effort: low
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Skill: devflow.clarify
+
+**Arguments:** `$ARGUMENTS` — empty → resolve the feature with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve` (exit 1 → ask the user).
 
 ## Purpose
 
@@ -13,10 +17,7 @@ Optional interactive session between `devflow.task` and `devflow.plan`. Validate
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 
 ## When NOT to Use
 
@@ -36,7 +37,7 @@ Run when either condition is true:
 
 Before running, verify:
 
-- [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md`
+- [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md` — no path argument → resolve feature with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve` (exit 1 → ask)
 - [ ] `task.md` Status is not `done`
 
 If any item fails → stop and report which check failed.
@@ -46,7 +47,7 @@ If any item fails → stop and report which check failed.
 ### Step 1 — Load and scan
 
 1. Read `task.md` in full.
-2. Read `@devflow/skills/devflow-task/refinement-hints.md` — use all 8 dimensions as the scan framework.
+2. Read `${CLAUDE_PLUGIN_ROOT}/skills/devflow-task/refinement-hints.md` — use all 8 dimensions as the scan framework.
 3. Build the question backlog:
    - Extract every `[NEEDS CLARIFICATION: ...]` marker in `task.md` → one candidate question per marker.
    - Run the 8D scan on the full task content; generate additional candidate questions for dimensions with open ambiguities not already covered by a marker.
@@ -56,16 +57,16 @@ If any item fails → stop and report which check failed.
 
 ### Step 2 — Interactive Q&A loop
 
-Follow structured interview standards in `@devflow/skills/devflow-clarify/references/interactive-interview.md`.
+Follow structured interview standards in `${CLAUDE_PLUGIN_ROOT}/skills/devflow-clarify/references/interactive-interview.md`.
 
-For each question in the prioritized queue, one at a time:
+Work through the prioritized queue in rounds — independent questions batched in one call (1–4), dependent ones after the answer they depend on:
 
 1. Formulate structured elicitation:
    - State the specific ambiguity, trigger, or failure boundary being resolved
    - Provide 2–4 distinct, mutually exclusive options phrased as direct user choices (grounded in concrete behavior, never abstract buzzwords)
    - Mark the first choice with `(Recommended)` and a 1-sentence technical rationale
    - Do not include an "Other" option (handled automatically by host tool write-in)
-   - Invoke **`AskQuestion`** (Claude Code) or **`ask_question`** (Antigravity); fallback to formatted markdown choices in chat
+   - Invoke **`AskUserQuestion`**; fallback to formatted markdown choices in chat
    - Suggest **/grill-me** slash command if the user desires comprehensive edge-case and architecture interrogation
 2. Wait for the user's answer.
 3. On answer accepted:
@@ -100,7 +101,7 @@ After the Q&A loop completes:
 1. Scan `task.md` for remaining `[NEEDS CLARIFICATION: ...]` markers.
    - Resolved markers: already removed inline during Step 2.
    - Skipped markers: leave in place — they represent accepted risk.
-2. Update `task.md` header: set `**Status:** clarified`.
+2. `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" set task clarified` (writes `task.md` header + state cache).
 3. Output a **Clarification Summary** in the response:
 
 ```text
@@ -141,22 +142,18 @@ Audit trail only — do not reformat, compress, or omit after writing.
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Skipping unresolved markers | `devflow.plan` stops on them; resolve or explicitly waive first |
-| Batch Q&A then update | One question at a time — each answer shapes the next |
-| Rewriting `## Summary` to absorb answers | Update target section + `## Clarifications`; preserve original wording |
-| Treating clarify as mandatory | Optional; skip if no markers and assumptions are low-risk |
 | Absorbing ambiguity into plan instead | Unresolved → silent assumptions → bugs in `devflow.test` |
-| Batch-updating `task.md` at Q&A end | Update after each accepted answer |
-| Skipping questions without recording them | Record every skip in `## Clarifications` with reason |
-| Asking >5 questions | Cap at 5; surface only highest-risk ambiguities |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 
 | | |
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md` |
-| Reads | `@devflow/skills/devflow-task/refinement-hints.md` (8D scan framework) |
-| Reads | `@devflow/skills/devflow-clarify/references/interactive-interview.md` (structured interview standards) |
+| Reads | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-task/refinement-hints.md` (8D scan framework) |
+| Reads | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-clarify/references/interactive-interview.md` (structured interview standards) |
+| Reads (conditional) | `references/anti-patterns.md` (when unsure / retry) |
 | Writes | `devflow/features/[NNN]_[feature-name]/task.md` — inline marker removal, targeted section updates, `## Clarifications` section appended, `Status` → `clarified` |
 | Precedes | `devflow.plan` |
 | Follows | `devflow.task` |

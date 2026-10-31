@@ -1,9 +1,9 @@
 ---
 name: devflow-beautify
-description: "Reviews devflow.implement output: correctness, readability, security, performance, architecture, UI. Use when user runs devflow.beautify, reviews implementation output, or fourth pipeline step."
+description: "Polishes devflow.implement output: readability, conventions, design tokens, layout, accessibility basics — correctness and security stay with devflow.ship. Use when user runs devflow.beautify, polishes implementation output, or fourth pipeline step."
 argument-hint: "[optional-plan-path]"
 disable-model-invocation: true
-allowed-tools: "Bash(pnpm lint) Bash(pnpm run lint) Bash(pnpm test*) Bash(pnpm run test*) Bash(pnpm build) Bash(pnpm run build) Bash(npm run lint) Bash(npm run test*) Bash(npm run build) Bash(ng generate*) Bash(ng g *) Bash(ng lint*) Bash(ng test*) Bash(ng build*) Bash(flutter analyze*) Bash(flutter test*) Bash(flutter build*) Bash(dart format*) Bash(dart analyze*) Bash(dart run build_runner*) Bash(git status*) Bash(git diff*) Bash(git log*)"
+effort: medium
 ---
 
 # Skill: devflow.beautify
@@ -13,24 +13,22 @@ allowed-tools: "Bash(pnpm lint) Bash(pnpm run lint) Bash(pnpm test*) Bash(pnpm r
 Run `/devflow.beautify [optional plan path]`.
 
 - If an argument is passed, use it as the `plan.md` path
-- If no argument is passed, use the current file modified in git
+- If no argument is passed, resolve feature with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask)
 
 ## Purpose
 
-Review/improve `devflow.implement` output with **multi-axis** lens: correctness, readability/simplification, architecture, security, performance, UI consistency, responsive layout. Fourth DevFlow step.
+Polish `devflow.implement` output: readability/simplification, project conventions, design-token consistency, responsive layout, accessibility basics. Correctness, security and performance are `devflow.ship`'s review — not repeated here. Fourth DevFlow step; skipped in the `quick` profile.
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 
 ## When NOT to Use
 
 - `devflow.implement` has not run for this feature — there is nothing to beautify
 - Active adapter analyze/typecheck still has errors from `devflow.implement` — fix before beautifying
 - Scope is pre-existing code not touched by this DevFlow run — open a separate task
+- `plan.md` depth profile is `quick` — skip to `devflow.test` (`implemented → tested` is legal; ship's `code-reviewer` covers readability)
 
 ## Input contract
 
@@ -38,19 +36,19 @@ Before proceeding, verify:
 
 - [ ] `devflow.implement` has run and its summary lists at least one file created/modified
 - [ ] `plan.md` exists at `devflow/features/[NNN]_[feature-name]/plan.md`
-- [ ] Active adapter analyze/typecheck reports no unresolved errors
+- [ ] Analyze clean: `bash "@devflow/scripts/verify-stamp.sh" run analyze -- <adapter analyze cmd>` exits 0 (skipped while implement's stamp is fresh)
 
 If any item fails → stop, report which check failed, do not apply changes.
 
 ## Input
 
-Files from `devflow.implement` summary + `devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, use current git-modified file.
+Files from `devflow.implement` summary + `devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, resolve feature with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask). Summary unavailable (new session) → `plan.md` File List `[done]` entries are the scope.
 
 ## Workflow
 
 ### Step 0 - Resolve adapter
 
-Resolve adapter, adapter root, and app working directory per `@devflow/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `@devflow/adapters/<adapter>/ADAPTER.md` (core) plus `@devflow/adapters/<adapter>/steps/beautify.md`. Legacy adapters without `steps/`: the **Beautify** sections live in `ADAPTER.md`. Use the beautify step file's commands and stack-specific review axes (monorepo: run commands from the resolved app's working directory).
+Resolve adapter, adapter root, and app working directory per `@devflow/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `@devflow/adapters/<adapter>/ADAPTER.md` (core) plus `@devflow/adapters/<adapter>/steps/beautify.md`. Use the beautify step file's commands and stack-specific review axes (monorepo: run commands from the resolved app's working directory).
 
 ### Step 1 - Read docs
 
@@ -78,15 +76,17 @@ result[1] = buf[1] ^ key[1];
 // devflow-beautify-ignore-end
 ```
 
-### Step 3 - Analysis areas (multi-axis review)
+### Step 3 - Analysis areas
 
-Stack-agnostic defaults below. For stack-specific checks follow the adapter beautify step file and technology skills. Review **every** in-scope file against all axes; collect all findings before applying changes.
+Beautify polishes; it does not review. Correctness, security and performance belong to `devflow.ship` (`code-reviewer`, `security-auditor`) — no axis here for them. A Critical correctness or security problem you happen to see is still fixed (Step 4), not hunted for.
 
-Axes: correctness · readability/simplification · architecture compliance · security · performance · UI consistency · responsiveness/layout · accessibility.
+Stack-specific checks: adapter beautify step file and technology skills. Review **every** in-scope file against all axes; collect all findings before applying changes.
+
+Axes: readability/simplification · conventions (naming, imports, layering per `constitution.md`) · UI consistency · responsiveness/layout · accessibility basics (labels, alt text, focus, semantics — the full WCAG audit is ship's `accessibility-auditor`, `thorough` only).
 
 **UI consistency source:** `DESIGN.md` (or `docs/design.md`) present in project root → axis checks token compliance (palette, typography, spacing) against it instead of generic guidelines; hardcoded value with a DESIGN.md token equivalent = Required finding. Absent → generic guidelines, zero behavior change.
 
-**Depth profile:** read `**Complexity:**` from `plan.md` (per `@devflow/references/complexity-scoring.md`; missing → `standard`). `quick` → review only correctness + readability/simplification axes. `standard` / `thorough` → all 8 axes.
+**Depth profile:** read `**Complexity:**` from `plan.md` (per `@devflow/references/complexity-scoring.md`; missing → `standard`). `quick` → beautify does not run (When NOT to Use). `standard` / `thorough` → all 5 axes.
 
 Full per-axis checklist: `references/analysis-axes.md`.
 
@@ -120,7 +120,7 @@ Apply directly without asking:
 
 #### Opinable improvements
 
-**Run mode** (`.devflow-run.json` present): no approval channel exists — do not propose, do not apply. Log each opinable candidate as an entry in `plan.md` `## Decision flags` per `@devflow/skills/devflow-run/SKILL.md` Step 2 (decision: "not applied"), continue. Interactive mode below.
+**Run mode** (`.devflow-run.json` present): no approval channel exists — do not propose, do not apply. Log each opinable candidate as an entry in `plan.md` `## Decision flags` per `@devflow/references/run-mode.md` → **Decision flags** (decision: "not applied"), continue. Interactive mode below.
 
 Propose before applying:
 
@@ -130,26 +130,7 @@ Propose before applying:
 - Any change that modifies public API signatures
 - Simplifications where behavior preservation is not obvious
 
-**Proposal grouping:** group proposals by type before presenting them. Same-type proposals (all naming changes together, all structural refactors together, all extract-component proposals together) share one approval request. Different types each get their own request.
-
-**Stall-out rule:** after 3 consecutive proposal rounds with no user approval on any item, stop proposing and emit:
-
-```text
-⚠️ Beautify stalled: [N] proposals pending without approval.
-Options: (1) approve all remaining, (2) skip all remaining, (3) continue one by one
-```
-
-Wait for user choice before continuing.
-
-**Chesterton + incrementality:** for structural or simplification proposals, state briefly why the code exists as-is, then the proposed change. If tests exist for the feature, run adapter test commands relevant to touched scope after substantive refactors when feasible.
-
-Use this format and wait for user response before each grouped proposal round:
-
-```text
-💡 [Optional: Nit / Optional / Consider] Proposed improvement: [file path]
-[Description of the change and why it improves the code.]
-Apply? [yes / no]
-```
+**One question for all proposals:** collect every opinable proposal first, then ask once with `AskUserQuestion` / `ask_question`, `multiSelect: true` — one question per proposal type (structural, naming, API, simplification), up to 4 questions in the one call, each option `[file] — change — why the code is as it is today` (Chesterton). Apply exactly the selected options; unselected ones are listed as skipped in the notify block. No per-proposal rounds, no stall-out loop. If tests exist for the feature, run the relevant test command after substantive refactors when feasible.
 
 #### Dead code (scope-limited)
 
@@ -161,15 +142,15 @@ After edits, check **only** implement-touched files for unused imports, unreacha
 
 ### Step 5 - Run commands
 
-After all approved and certain changes are applied, run the **format**, **analyze/typecheck**, and conditional **codegen** commands from the adapter beautify step file, in the order specified there.
+After all approved and certain changes are applied, run the **format**, **analyze/typecheck**, and conditional **codegen** commands from the adapter beautify step file, in the order specified there, each as `bash "@devflow/scripts/verify-stamp.sh" run <format|analyze|codegen> -- <cmd>` (monorepo: `--cwd <app dir>`, `@<app>` suffix).
 
 On error: resolve autonomously; max 3 attempts; then escalate per `@devflow/references/escalation-ladder.md` (debug mode → re-approach → block).
 
 ### Step 6 - Notify user
 
-Set `plan.md` `**Status:** beautified`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
+`bash "@devflow/scripts/devflow-state.sh" set plan beautified`.
 
-**Run mode** (`.devflow-run.json` present): emit the block below but do not wait — control returns to `devflow.run`.
+**Run mode** (`.devflow-run.json` present): emit the block below but do not wait — control returns to the orchestrator (`@devflow/references/run-mode.md`).
 
 Respond with:
 
@@ -181,15 +162,12 @@ Respond with:
 - ...
 
 ### Improvements by area
-[`quick` profile: mark unreviewed axes as "skipped (quick profile)"]
-- **Correctness**: [brief summary, or "no changes"]
 - **Readability / simplification**: [brief summary, or "no changes"]
-- **Security**: [brief summary, or "no changes"]
-- **Performance**: [brief summary, or "no changes"]
-- **Architecture**: [brief summary, or "no changes"]
+- **Conventions**: [brief summary, or "no changes"]
 - **UI consistency**: [brief summary, or "no changes"]
 - **Responsive layout**: [brief summary, or "no changes"]
-- **Accessibility**: [brief summary, or "no changes"]
+- **Accessibility basics**: [brief summary, or "no changes"]
+- **Proposals**: [N applied · N skipped — omit if none]
 
 ### Findings by severity (if any)
 - **Critical**: [list or "none"]
@@ -211,14 +189,10 @@ Continue to testing? -> devflow.test
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Expanding scope beyond `devflow.implement` summary | Limit strictly to the implement summary |
 | Adding features during beautify ("while I'm here") | Log as new subtask; implement in next cycle |
-| Skipping security axis ("already reviewed") | Run all axes the depth profile requires; `quick` never applies to security-touching features (profile floor) |
 | Format/analyze only on new files | Run on the full changed set |
-| Treating Nit as mandatory | Fix Critical/Required; user decides Nit/Optional |
-| Applying opinable improvements while run mode active | Certain improvements only; opinable candidates → `## Decision flags`, not applied |
-| Flagging hardcoded style as Nit when DESIGN.md defines a token | Token equivalent exists → Required finding |
-| Profiling without confirmed bottleneck | Apply heuristics only; profile when benchmark confirms |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## Completion checklist
 
@@ -228,7 +202,7 @@ Continue to testing? -> devflow.test
 - [ ] Performance: heuristics applied; profiling only when warranted
 - [ ] **Critical** and required issues fixed or explicitly escalated to the user
 - [ ] Dead code in scope handled or listed for user decision
-- [ ] Format and analyze/typecheck from the adapter beautify step file completed (or failure reported after retries)
+- [ ] Format and analyze/typecheck stamped pass on the final tree (`verify-stamp.sh check analyze`), or failure reported after retries
 - [ ] Codegen run only when the adapter beautify step file says to and annotations changed
 
 ## I/O Reference
@@ -238,8 +212,8 @@ Continue to testing? -> devflow.test
 | Reads | files from `devflow.implement` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md`, `registry.md` |
-| Reads | `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status), `@devflow/references/complexity-scoring.md` (depth profile) |
-| Reads (conditional) | `DESIGN.md` / `docs/design.md` — token source for UI consistency axis; `.devflow-run.json` (existence — run-mode switch) |
+| Reads | `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/complexity-scoring.md` (depth profile) |
+| Reads (conditional) | `DESIGN.md` / `docs/design.md` — token source for UI consistency axis; `.devflow-run.json` (existence — run-mode switch, contract `@devflow/references/run-mode.md`); `references/anti-patterns.md` (when unsure / retry) |
 | Writes | improvements to existing files only (no new files) |
 | Writes | `plan.md` — `**Status:** beautified`, `## Decision flags` (run mode — opinable candidates) |
 | Next step | `devflow.test` |

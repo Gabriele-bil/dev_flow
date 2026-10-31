@@ -6,25 +6,22 @@
 # signal — no TTL. Entries without an ETag or Last-Modified are never served
 # (can't revalidate).
 #
-# Cache hit: emits {"decision":"block","reason":"<cached content>"} so Claude
-# reads the cached body in place of a live fetch. Cache miss, stale, or any
+# Cache hit: denies the live fetch (lib/emit.sh df_deny) with the cached body
+# as the reason, so the model reads it in place of a live fetch. Cache miss, stale, or any
 # missing dependency: silent exit 0 — fetch proceeds normally.
 #
 # Dependencies: jq, curl, shasum (or sha256sum).
 
-set -uo pipefail
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOK_DIR/lib/payload.sh"
+. "$HOOK_DIR/lib/emit.sh"
 
-command -v jq >/dev/null 2>&1 || exit 0
+df_read_input || exit 0
 command -v curl >/dev/null 2>&1 || exit 0
 command -v shasum >/dev/null 2>&1 || command -v sha256sum >/dev/null 2>&1 || exit 0
 
-RAW="$(cat 2>/dev/null || true)"
-[ -z "$RAW" ] && exit 0
-
-TOOL=$(printf '%s' "$RAW" | jq -r '.tool_name // .tool_use.name // empty' 2>/dev/null)
-[ "$TOOL" = "WebFetch" ] || exit 0
-
-URL=$(printf '%s' "$RAW" | jq -r '.tool_input.url // .tool_use.input.url // empty' 2>/dev/null)
+[ "$DF_TOOL" = "fetch" ] || exit 0
+URL="$DF_URL"
 [ -z "$URL" ] && exit 0
 
 hash_key() {
@@ -35,7 +32,7 @@ hash_key() {
   fi
 }
 
-WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+WORKSPACE_ROOT="$DF_WORKSPACE"
 CACHE_DIR="${DEVFLOW_FETCH_CACHE_DIR:-$WORKSPACE_ROOT/.devflow-fetch-cache}"
 CACHE_FILE="$CACHE_DIR/$(hash_key "$URL").json"
 [ -f "$CACHE_FILE" ] || exit 0
@@ -75,5 +72,5 @@ REASON="$REASON
 $CONTENT
 ----- END CACHED CONTENT -----"
 
-jq -n --arg reason "$REASON" '{decision:"block",reason:$reason}' 2>/dev/null || exit 0
+df_deny "$REASON" 2>/dev/null || exit 0
 exit 0

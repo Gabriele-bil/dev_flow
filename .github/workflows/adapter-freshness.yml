@@ -1,0 +1,27 @@
+name: Adapter Freshness
+
+# Settimanale: confronta la riga "**Verified against:**" di ogni ADAPTER.md con
+# le ultime versioni su npm e pub.dev. Non blocca nulla: il risultato va nel
+# riepilogo del job, da leggere quando si pianifica l'aggiornamento degli adapter.
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  freshness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq jq
+
+      - name: Check adapter versions
+        run: |
+          bash templates/devflow/scripts/check-adapter-versions.sh | tee report.txt
+          { echo '```text'; cat report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

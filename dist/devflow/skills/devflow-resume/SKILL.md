@@ -1,10 +1,15 @@
 ---
-name: devflow-resume
+name: resume
 description: Resumes an interrupted DevFlow session — reads saved state, cross-checks plan.md markers, confirms resume position, re-enters correct pipeline skill. Use when returning after session restart, compaction, or break to continue work where it left off.
-argument-hint: "[]"
+argument-hint: "[optional-feature]"
+disallowed-tools: Write, Edit, NotebookEdit
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Skill: devflow.resume
+
+**Arguments:** `$ARGUMENTS` — empty → resume the feature resolved with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve`.
 
 First-class session re-entry. Reads state, validates it against files, routes to the correct pipeline step — no re-deriving from scratch, no re-implementing `[done]` work.
 
@@ -14,10 +19,7 @@ Resume an interrupted pipeline at the exact position it stopped. Promotes the re
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 
 ## When NOT to Use
 
@@ -28,22 +30,16 @@ Resume an interrupted pipeline at the exact position it stopped. Promotes the re
 
 ## Input contract
 
-- [ ] `devflow/config.md` exists (adapter known; monorepo: `plan.md`'s App resolves in the `## Apps` table — see `@devflow/references/adapter-resolution.md`)
+- [ ] `devflow/config.md` exists (adapter known; monorepo: `plan.md`'s App resolves in the `## Apps` table — see `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`)
 - [ ] `.devflow-state.json` exists OR at least one `devflow/features/*/plan.md` exists
 
-Both absent → stop: "Nothing to resume. Start with `/devflow.task` (or `/devflow.setup` on a new project)."
+Both absent → stop: "Nothing to resume. Start with `/devflow:task` (or `/devflow:setup` on a new project)."
 
 ## Workflow
 
 ### Step 1 — Read saved state
 
-```bash
-cat .devflow-state.json 2>/dev/null || echo "STATE_MISSING"
-```
-
-Extract `feature`, `plan_status`, `next_step`, `pending_files`.
-
-If `STATE_MISSING`: derive from files — latest `devflow/features/*/plan.md` (highest `NNN_` prefix), read its `**Status:**`, map to `next_step` via `@devflow/references/state-machine.md` status table. Continue with derived values.
+Resolve feature with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve` (exit 1 → ask) (explicit argument → state `.feature // .active_feature` → lowest open feature → ask). Read its `plan.md` `**Status:**`, map to `next_step` via the status table. State file (`plan_status`, `next_step`, `pending_files`) = hint only — Step 2 cross-checks it.
 
 Also read the feature checkpoint when present — restores working context lost at compaction (`slice`, `decisions`, `constraints`, `errors_tried`; schema: `state-machine.md` → **Checkpoint file**):
 
@@ -61,7 +57,7 @@ cat devflow/features/[NNN]_[feature-name]/handoff.md 2>/dev/null
 
 ### Step 2 — Cross-check state against files
 
-Trust order: `plan.md` > `.devflow-state.json` (state file is derived cache — see `@devflow/references/state-machine.md`).
+Trust order: `plan.md` > `.devflow-state.json` (state file is derived cache — see `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md`).
 
 1. Read `plan.md` `**Status:**` for the active feature.
 2. Count `[done]` / `[pending]` markers in **File List**.
@@ -100,34 +96,26 @@ Continue with [next_step]? (yes / no / different step)
 
 On confirmation, execute the skill for `next_step` honoring its input contract:
 
-- `devflow.implement` mid-run: enter at first `[pending]` File List entry. When slice headings carry `deps:` annotations (`plan-template.md` → **Slice dependency annotations**): enter at the first `[pending]` entry of a slice whose dep slices are all `[done]`; note any blocked slice skipped. Never re-implement a `[done]` file unless explicitly asked.
+- `devflow.implement` mid-run (Status `implementing` — accepted by its input contract): enter at first `[pending]` File List entry; no `[pending]` left (interrupted `--fix` re-entry) → ask user for the findings list, re-enter with `--fix`. When slice headings carry `deps:` annotations (`plan-template.md` → **Slice dependency annotations**): enter at the first `[pending]` entry of a slice whose dep slices are all `[done]`; note any blocked slice skipped. Never re-implement a `[done]` file unless explicitly asked.
 - All other steps: run from their Step 0.
 
 After position confirmed: delete consumed `handoff.md` (`rm -f devflow/features/[NNN]_[feature-name]/handoff.md`); delete stale `.devflow-run.json` unless user chose to re-arm via `devflow.run` or `devflow.auto`.
-
-## Common Rationalizations
-
-| Thought | Reality |
-| --- | --- |
-| "State file looks fine, skip the cross-check" | State file is a cache written at compaction — plan.md may have moved since. Cross-check is 2 greps |
-| "Faster to re-implement the done files, they're small" | Re-implementing `[done]` work destroys prior review/fixes and wastes the session |
-| "Position is obvious, no need to confirm with user" | User may have edited files outside DevFlow between sessions — confirmation catches it |
 
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
 | --- | --- |
 | Resuming from memory of previous session | Read `.devflow-state.json` + `plan.md` fresh at invocation |
-| Repairing corrupted state inline | Resume routes; `devflow.recovery` repairs — separate concerns |
-| Skipping user confirmation on resume position | Always confirm Step 3 — cheapest wrong-direction insurance |
 | Re-running completed pipeline steps "to be safe" | Statuses per `state-machine.md` are authoritative; enter at `next_step` only |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 
 | | |
 | --- | --- |
-| Reads | `.devflow-state.json`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md` (existence), `devflow/features/[NNN]_[feature-name]/.checkpoint.json` (working context), `devflow/features/[NNN]_[feature-name]/handoff.md` (context-pressure handoff), `.devflow-run.json` (stale-marker check), `devflow/config.md`, `@devflow/references/adapter-resolution.md` |
-| Reads | `@devflow/references/state-machine.md` — status/transition source of truth |
+| Reads | `.devflow-state.json`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md` (existence), `devflow/features/[NNN]_[feature-name]/.checkpoint.json` (working context), `devflow/features/[NNN]_[feature-name]/handoff.md` (context-pressure handoff), `.devflow-run.json` (stale-marker check), `devflow/config.md`, `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md` |
+| Reads | `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` — status/transition source of truth |
 | Deletes | `handoff.md` (after position confirmed), stale `.devflow-run.json` (unless user re-arms `devflow.run` or `devflow.auto`) |
 | Writes | nothing else (routing only) |
 | Routes to | pipeline skill matching `next_step` |

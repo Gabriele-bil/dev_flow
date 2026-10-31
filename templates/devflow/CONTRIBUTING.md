@@ -18,7 +18,6 @@ Three mechanisms, three jobs. Don't blur them.
 | --- | --- | --- | --- |
 | **Hook** | Must run every time, no exceptions — safety, formatting, config protection | Deterministic — shell script, exit code decides | `pre-bash-destructive-guard.sh` blocks `rm -rf /` unconditionally |
 | **Skill** | Needs judgment, context, multi-step reasoning | Probabilistic — Claude follows workflow guidance | `devflow-ship` weighs findings, asks user on Critical |
-| **Command** | Thin entry point, no logic of its own | N/A — dispatches only | `devflow.ship.md`: "Use `@devflow/skills/devflow-ship/SKILL.md` and execute it exactly" |
 
 Rule of thumb: if skipping the check even once is unacceptable, it's a hook, not a skill instruction. Skills can be misread or rationalized around; hooks can't. Never put a hard safety rule only in skill prose — a determined agent (or a bad day) will talk itself past it. See Anthropic's "Steering Claude Code: Skills, Hooks, Rules, Subagents and More" for the underlying deterministic-vs-probabilistic framework.
 
@@ -30,7 +29,7 @@ Required sections (in order):
 
 1. YAML frontmatter — `name`, `description` (+ optional `argument-hint`, `disable-model-invocation`, `model`, `effort`)
 2. `## Purpose` — one line; what it does, which pipeline step
-3. `## Core Principles` — copy exact 4-bullet block from `ETHOS.md`; do not paraphrase
+3. `## Core Principles` — first bullet is the one-line **Ethos** reference (`- **Ethos** — spec-first · traceability · vertical slices · token-lean …`), never the four `ETHOS.md` bullets copied; then only principles specific to the skill
 4. `## When NOT to Use` — conditions routing agent elsewhere
 5. `## Input contract` — checklist; fail-fast on any failure before touching files
 6. `## Workflow` — numbered steps, concrete actions
@@ -53,16 +52,23 @@ Location: `devflow/adapters/<adapter>/skills/<adapter>-<domain>/SKILL.md`
 
 Additional requirements:
 
-- File path trigger documented in `ADAPTER.md` → **Technology skills** table
-- `## When NOT to Use` includes: "file does not match trigger pattern in `ADAPTER.md`"
+- Trigger (file path or content pattern) as a row of `adapters/<adapter>/steps/implement.md` → **skill load decision matrix** — the only place triggers live; `ADAPTER.md` → **Technology skills** is the index of what each skill covers. A skill no row names is never loaded (`validate-adapters.sh` fails)
+- Sections: `## Purpose`, `## When NOT to Use` (includes: file matches no row of `adapters/<adapter>/steps/implement.md` → skill load decision matrix), `## I/O Reference` (`validate-skills.sh` fails without them)
 - Content over 100 lines → extract to `references/<file>.md` in skill directory; link from `SKILL.md`
-- No duplication of `common-clean-code` or other common skills — reference them
+- References keep project decisions only — what to use, what to avoid and why, one short example; no tutorials the model already knows. APIs that change often → "check current docs (Context7) before writing X"
+- No duplication of `common-clean-code` or other common skills — reference them; a common skill needs a matrix row in some adapter (or a core reference) to be reachable
+
+## Keeping an Adapter Current
+
+- `ADAPTER.md` carries `**Verified against:** <pkg>@<major.minor>, … (YYYY-MM-DD)` under the title (`pub:<name>` for pub.dev, `sdk:<name>` for SDKs). `scripts/check-adapter-versions.sh` compares it with npm / pub.dev; CI runs it weekly (`.github/workflows/adapter-freshness.yml`, non-blocking)
+- `deprecated-apis.txt`: one `<extended regex><TAB><use instead>` per removed or replaced API. `validate-adapters.sh` fails when one reappears in the adapter, unless the same line says why (removed / deprecated / instead)
+- Update an adapter: verify every changed API with Context7, add what you replaced to `deprecated-apis.txt`, bump the `Verified against` line
 
 ## Adding a New Adapter
 
 1. Copy `adapters/flutter/` as template
 2. Rename to `adapters/<name>/`
-3. Rewrite `ADAPTER.md` (core: Technology skills table, MCP, step-files index) and the `steps/*.md` files (per-step commands, plan sections, checklists — one file per pipeline step: setup, plan, implement, beautify, test, pr)
+3. Rewrite `ADAPTER.md` (core: `**Verified against:**` line, Technology skills table, MCP, step-files index), add `deprecated-apis.txt`, and the `steps/*.md` files (per-step commands, plan sections, checklists — one file per pipeline step: setup, plan, implement, beautify, test, pr)
 4. Add technology skills under `adapters/<name>/skills/`
 5. Add setup templates under `adapters/<name>/templates/` (`AGENTS.template.md`, `REGISTRY.template.md`, `PRODUCT.template.md`)
 6. Document in root `README.md`
@@ -86,10 +92,13 @@ DevFlow supports monorepos with multiple applications, each on its own adapter. 
 | Pipeline skill dir | `devflow-<name>` | `devflow-task` |
 | Adapter skill dir | `<adapter>-<domain>` | `angular-forms` |
 | Common skill dir | `common-<domain>` | `common-clean-code` |
-| Command file | `devflow.<step>.md` | `devflow.task.md` |
 | `SKILL.md` | Always uppercase | `SKILL.md` |
 | `ADAPTER.md` | Always uppercase | `ADAPTER.md` |
 | Feature directories | `NNN_<kebab-name>` | `003_user-profile` |
+
+**Paths.** Plugin files are written `@devflow/<references|adapters|skills|agents|scripts>/…`; consumer files without `@` (`devflow/features/…`) except `@devflow/config.md`. The build rewrites plugin paths per host (`scripts/builders/build-claude.sh` → `${CLAUDE_PLUGIN_ROOT}/…` in skills, commands and agents, plus a "Plugin root" note for files read later; `scripts/builders/build-antigravity.sh` → the fixed agy install path everywhere). Never hardcode `templates/devflow/…` or `dist/devflow/…` in a skill — those exist only in this repo. Run plugin scripts as `bash "@devflow/scripts/<name>.sh"`.
+
+**Scripts over prose.** Deterministic work both hosts must do identically — pipeline state, verification stamps, review packets — lives in `scripts/*.sh`, called as `bash "@devflow/scripts/<name>.sh" …`, never as shell or jq snippets the model copies. Scripts are portable bash (macOS bash 3.2 and Linux, no GNU-only flags, `jq` optional unless the command cannot work without it), print one compact line per result, and ship only when listed in `RUNTIME_SH` in `scripts/build-plugin.sh` (the build fails when a skill calls one that is not). Pipeline state: `scripts/devflow-state.sh` (`resolve`, `set`, `mark-done`, `checkpoint`, `sync`, `run`, `report`). Every checklist item and report count needs a source — a stamp line, a file, a script's output — or it does not belong in the checklist. Checks (format, lint, analyze, test, e2e, build): `scripts/verify-stamp.sh run <name> -- <cmd>` — one run per tree, so a contract never re-runs a check that already passed on the same code. Ship reviewers: `scripts/review-packet.sh` writes the one file every agent reads first.
 
 ## Common Rationalizations (when writing skills)
 
@@ -124,30 +133,44 @@ Keep: technical terms exact, file paths exact, commands exact, all verbs, negati
 
 ## Adding Hooks
 
-Hook vs skill vs command — see **Choosing a Mechanism** above.
+Hook vs skill — see **Choosing a Mechanism** above. There are no command files: a skill is its own slash command (`/devflow:<step>` on Claude Code, `/devflow-<step>` on Antigravity); write `/devflow.<step>` in sources and the build translates it.
 
-**Available events:**
+**Two hosts, one script.** `hooks/hooks.json` (Claude Code format) is the single source; `scripts/builders/build-antigravity.sh` translates it into the root `hooks.json` Antigravity CLI reads (event and tool-name mapping, events Antigravity lacks dropped). Never parse stdin or print control JSON by hand — source the shared library:
 
-| Event | Notes |
-| --- | --- |
-| `SessionStart` | Fires once at session start; use for context injection |
-| `PreToolUse` | Fires before a tool call; block with `{"decision":"block","reason":"..."}` on stdout |
-| `PostToolUse` | Fires after a tool call; async hooks emit no stdout; sync hooks may emit control JSON — `hookSpecificOutput.updatedToolOutput` rewrites tool output in context (cap 10k chars) |
-| `PreModelSwitch` | Fires before a model switch; block with `{"decision":"block","reason":"..."}` on stdout — use only for a high-confidence, narrowly-scoped rule (see `pre-model-switch.sh`); fail-open on ambiguous input |
-| `PostModelSwitch` | Fires after a model switch completes; audit/log only, no blocking — async, no passthrough required |
-| `PreCompact` | Fires before context compaction; output becomes part of compacted context |
-| `Stop` | Fires after each Claude response; reads full response on stdin, must write it back on stdout (passthrough); async hooks skip passthrough requirement |
-| `SessionEnd` | Fires when session closes; async OK |
+```bash
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOK_DIR/lib/payload.sh"   # df_read_input → DF_HOST DF_EVENT DF_TOOL DF_FILE DF_CMD DF_URL DF_IS_ERROR DF_SESSION DF_TRANSCRIPT DF_WORKSPACE
+. "$HOOK_DIR/lib/emit.sh"      # df_deny / df_context / df_notify — host-correct output
+df_read_input || exit 0        # returns 1 without jq → fail open
+```
+
+`DF_TOOL` is host-neutral: `shell`, `write`, `edit`, `read`, `fetch`, `subagent`, `other`. `df_read_input` also `cd`s into the workspace (payload `cwd` on Claude Code, `workspacePaths[0]` on Antigravity, whose hooks start in the plugin dir).
+
+**Available events (Claude Code):**
+
+| Event | Antigravity | Output contract |
+| --- | --- | --- |
+| `SessionStart` | yes | `df_context` → `hookSpecificOutput.additionalContext` (model context). Also fires after compaction (`source: "compact"`) |
+| `PreToolUse` | yes (tool names mapped) | `df_deny` → `hookSpecificOutput.permissionDecision: "deny"`; soft warning → `df_context` |
+| `PostToolUse` | yes (tool names mapped) | `df_context` → `additionalContext`; Bash output rewrite → `updatedToolOutput` as a Bash-shaped object `{stdout, stderr, interrupted, isImage}` (a string is ignored) |
+| `PostToolUseFailure` | no | Failed tool calls (PostToolUse fires on success only) |
+| `PreModelSwitch` | no | `{"decision":"block","reason":"..."}` — high-confidence, narrowly-scoped rules only (see `pre-model-switch.sh`); fail-open |
+| `PostModelSwitch` | no | Audit/log only — async |
+| `PreCompact` | no | Output never reaches the model — `df_notify` for the user; post-compaction context goes through `SessionStart` |
+| `Stop` | yes | `df_notify` → `systemMessage` (the only visible channel). Never echo stdin back |
+
+Antigravity also has `PreInvocation` / `PostInvocation` (per model call). Payload fixtures for both hosts: `hooks/tests/fixtures/`.
 
 **Script conventions:**
 
-- No `set -e` — hooks must never crash the Claude session
-- Always consume stdin: `RAW=$(cat)` — do not leave stdin open
-- Stop hooks: always `printf '%s' "$RAW"` at the end (passthrough)
-- Async hooks: add `"async": true, "timeout": N` in hooks.json
-- Guard with `|| true` on all fallible commands
-- Require `jq`? Check availability first: `command -v jq >/dev/null 2>&1 || exit 0`
-- Runtime artifacts (`.tmp`, `.jsonl`, `.json`): append to `.gitignore` if `.gitignore` exists
+- No `set -e` — hooks must never crash the session; guard fallible commands with `|| true`
+- Read stdin only through `df_read_input` — it always consumes it
+- Never write to stdout except through `hooks/lib/emit.sh`; stderr with exit 0 reaches nobody (debug log only)
+- Shared files (`.devflow-state.json`, counters, JSONL logs) only through `df_json_update` / `df_append` (locked + atomic — async hooks and parallel tool calls run concurrently); cap logs with `df_rotate`
+- Hook-owned counters/timing live in `.devflow-observe-state.json`; `.devflow-state.json` belongs to the pipeline (schema: `references/state-machine.md`)
+- Async hooks: `"async": true` in hooks.json (Claude Code does not enforce `timeout` on async hooks)
+- Optional tools (`yq`, `timeout`/`gtimeout`, `curl`): check with `command -v` and degrade silently; add them to `scripts/doctor.sh`
+- Runtime artefacts: `df_gitignore <entry...>`
 
 **Naming convention:** `<event>-<purpose>.sh` — e.g. `pre-config-protect.sh`, `stop-format-typecheck.sh`
 
@@ -161,7 +184,7 @@ Any skill writing DevFlow content into consumer-owned files (`AGENTS.md`, `const
 - Removal deletes fenced region only; delete file only if empty after removal
 - Add/remove exactly what you own — never clobber neighbouring user/tool sections; clean up empty parent keys only
 
-**Behavioral tests (required):** every hook manipulating consumer state gets a suite in `hooks/tests/test-<purpose>.sh` (plain bash asserts, temp-dir fixtures — copy structure from `test-pre-compact.sh`). Run all suites: `bash scripts/run-hook-tests.sh`. `bash -n` alone is not coverage.
+**Behavioral tests (required):** every hook manipulating consumer state gets a suite in `hooks/tests/test-<purpose>.sh` (plain bash asserts, temp-dir fixtures — copy structure from `test-pre-compact.sh`). Feed real host payloads (`hooks/tests/fixtures/`), never the legacy `{tool_use:{...}}` shape. Run all suites: `bash scripts/run-hook-tests.sh`. `bash -n` alone is not coverage.
 
 ## What Not to Do
 

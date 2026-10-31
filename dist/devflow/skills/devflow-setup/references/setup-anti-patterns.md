@@ -1,4 +1,4 @@
-# Setup Anti-Patterns Reference
+# devflow-setup — anti-patterns and rationalizations
 
 Full catalog of setup anti-patterns, symptoms, and required fixes.
 

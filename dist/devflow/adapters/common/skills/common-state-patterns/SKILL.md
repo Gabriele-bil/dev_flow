@@ -5,144 +5,63 @@ description: Cross-adapter state management guide — Riverpod (Flutter), Signal
 
 # Skill: Common State Patterns
 
-Cross-adapter. Use alongside adapter-specific state skill (flutter-riverpod, angular-state, nextjs-state).
+Cross-adapter decision guide. Code samples live in the adapter state skill (`flutter-riverpod`, `angular-state`, `nextjs-state`) — on conflict the adapter skill wins.
 
 ## Purpose
 
-Provide a unified mental model for state management across all DevFlow adapters. Prevent over-engineering and under-engineering state. Guide the when-to-choose decision.
+Pick the smallest state scope and the matching container per stack before writing state code; diagnose state bugs with one shared model.
 
 ## When NOT to Use
 
-- Already in implementation — consult adapter-specific state skill directly
-- Single-component local state — use component-local state; no global store needed
-- Form state — use adapter-specific form skill (angular-forms, nextjs-forms, flutter-form)
+- File matches no row of the active adapter's `steps/implement.md` → skill load decision matrix that names this skill
+- Writing store/provider code — adapter state skill has the API
+- Form state — adapter form skill (`angular-forms`, `nextjs-forms`, `flutter-form`)
+- Server data in Next.js — Server Components + Next.js cache, not a client store
 
 ## Choosing a State Scope
 
-Apply this decision tree before writing any state code:
-
 ```text
-Is the state used by only one component?
-  Yes → component-local state (useState, StatefulWidget, local signal)
-  No  → Is it shared across sibling components only?
-          Yes → lift to parent; prop drilling acceptable for ≤2 levels
-          No  → Is it shared across distant/unrelated components?
-                  Yes → global/feature store (Riverpod, Signal Store, Zustand)
+Used by one component?            → local state (Angular `signal()`/`computed()`, React `useState`, Flutter StatefulWidget)
+Shared by parent + ≤2 levels down → lift to parent, pass down
+Shared by distant components?     → feature store (scoped to feature route/subtree)
+Needed app-wide (session, theme)? → global store
 ```
 
-**Rule**: use the smallest scope that satisfies the requirement. Over-scoping state creates coupling.
-
-## Adapter Comparison
-
-### Riverpod (Flutter)
-
-```dart
-// Provider definition with @riverpod codegen
-@riverpod
-class UserNotifier extends _$UserNotifier {
-  @override
-  UserState build() => const UserState(name: '');
-
-  void updateName(String name) {
-    state = state.copyWith(name: name);
-  }
-}
-
-// Read (one-shot in callbacks)
-final user = ref.read(userNotifierProvider);
-
-// Watch (rebuild on change)
-final user = ref.watch(userNotifierProvider);
-
-// Mutate
-ref.read(userNotifierProvider.notifier).updateName('Alice');
-```
-
-**Pattern**: Notifier owns mutation; widget only reads/watches via `ref`.
-**Scope**: `ProviderScope` at app root; `ProviderContainer` for test isolation.
-**Async**: Use `AsyncNotifier` + `AsyncValue` (`.skeleton(mock:)` extension) for loading/error/data states.
-
-### Signal Store (Angular)
-
-```typescript
-// Store definition
-export const UserStore = signalStore(
-  withState({ name: '', loading: false }),
-  withMethods((store) => ({
-    updateName: (name: string) => patchState(store, { name }),
-  })),
-);
-
-// Component usage
-@Component({ providers: [UserStore] }) // feature-scoped
-export class UserComponent {
-  readonly store = inject(UserStore);
-}
-```
-
-**Pattern**: Store provides signals + methods; component injects store directly.
-**Scope**: Root (`providedIn: 'root'`) for global; component `providers:[]` for feature.
-**Computed**: `withComputed` for derived signals — replaces selectors.
-
-### Zustand (Next.js)
-
-```typescript
-// Store definition (curried create for TypeScript)
-interface UserState {
-  name: string;
-  setName: (name: string) => void;
-}
-
-export const useUserStore = create<UserState>()((set) => ({
-  name: '',
-  setName: (name) => set({ name }),
-}));
-
-// Component usage: granular selector
-const name = useUserStore((state) => state.name);
-
-// Multi-property selector requires useShallow (Zustand 5) to prevent infinite re-renders:
-import { useShallow } from 'zustand/react/shallow';
-const { name, setName } = useUserStore(
-  useShallow((state) => ({ name: state.name, setName: state.setName }))
-);
-```
-
-**Pattern**: `create` defines store; components use slice selectors (or `useShallow`) to prevent over-render.
-**Scope**: Module-level store (global); `createStore` + `useStore` for feature-scoped.
-**Server**: Zustand is client-side only; server state is fetched in Server Components and managed via Next.js cache and Server Actions. Never duplicate server cache in Zustand.
+Smallest scope that satisfies the requirement. Over-scoping = coupling.
 
 ## Shared Mental Model
 
-All three solutions share the same conceptual structure:
+| Concept | Riverpod 3 (codegen) | NgRx Signal Store | Zustand 5 |
+| --- | --- | --- | --- |
+| Container | `@riverpod class UserNotifier` → `userProvider` (`Notifier` suffix stripped) | `signalStore(withState(…))` | `create<State>()((set) => …)` |
+| Read | `ref.watch(userProvider)`; `ref.read` in callbacks | `store.name()` | `useUserStore((s) => s.name)` |
+| Mutate | `ref.read(userProvider.notifier).method()` | `withMethods` + `patchState` | action calling `set` |
+| Derived | `provider.select(…)` / functional `@riverpod` | `withComputed` | selector; `useShallow` for multi-field |
+| Async | `AsyncNotifier` → `AsyncValue`; check `ref.mounted` after `await` | `rxMethod` / `resource()` | async action + `set` (loading/error fields) |
+| Global scope | `ProviderScope` at root | `signalStore({ providedIn: 'root' }, …)` | module-level `create` |
+| Feature scope | nested `ProviderScope` / overrides | component or route `providers: [Store]` | `createStore` + React context + `useStore` |
+| Test | `ProviderContainer.test(overrides: […])` | `TestBed.inject(Store)` | real store, reset to `getInitialState()` per test |
 
-| Concept | Riverpod | Signal Store | Zustand |
-| --------- | ---------- | -------------- | --------- |
-| State container | `@riverpod` Notifier | `signalStore` | `create` |
-| Read state | `ref.watch` | `store.field` (signal) | `useStore(sel)` |
-| Mutate state | notifier method | store method | set / action |
-| Derived state | `.select` / `@riverpod` fn | `withComputed` | slice selector / `useShallow` |
-| Async state | `AsyncNotifier` (`AsyncValue`) | `withMethods` + RxJS / `resource()` | devtools + middleware |
-| Feature scope | `ProviderScope` | component `providers` | `createStore` / context |
-| Test isolation | `ProviderContainer` | `TestBed` overrides | mock store / `setState` |
+APIs move between minors: check current docs with Context7 before writing store code.
 
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Global store for all state | Scope to smallest container that satisfies the requirement |
-| Mutating state outside store methods | Always mutate through store-provided methods |
-| Deriving state in components | Define derived state in store (`withComputed`, selectors, `.select`) |
-| One store for entire application | Feature stores with clear ownership per domain |
-| Async state without loading/error/empty | Handle all async states (`AsyncValue`, loading signal, Zustand middleware) |
-| Server state in client store (Next.js) | Server state → Server Components + Next.js cache; UI state only in Zustand |
-| Testing with real store | Inject mock store / `ProviderContainer` per test |
+| Global store for everything / one app-wide store | Feature stores, one owner per domain |
+| Mutation outside store methods | Mutate only through store/notifier methods |
+| Derived state computed in components | `withComputed`, selectors, `.select` |
+| Async state without loading/error/empty | `AsyncValue`, resource status, explicit fields |
+| Server state duplicated in Zustand | Next.js cache owns server data; Zustand = UI state |
+| Effect copying state into other state | Derive: `computed()`/`linkedSignal()`, selector, `.select` |
+| Mocking the store under test | Real store, fake its dependencies (repository/service); mock the store only in component tests |
+| State leaking between tests | Fresh container/`TestBed` per test; Zustand reset in `afterEach` |
 
 ## I/O Reference
 
 | | |
 | --- | --- |
-| Reads | Adapter-specific state skill (`flutter-riverpod`, `angular-state`, `nextjs-state`) |
-| Reads | Active `ADAPTER.md` → **Technology skills → state** |
-| Related | `common-clean-code` (SOLID principles applied to state design) |
-| Next step | Implement state layer per adapter skill; link back to `plan.md` subtask |
+| Reads | Active `ADAPTER.md` → **Technology skills** (state row); adapter state skill |
+| Writes | Nothing — scope/container decision feeds `plan.md` or the implement step |
+| Related | `common-clean-code` (dependency direction) |
+| Next step | Implement state per adapter state skill |

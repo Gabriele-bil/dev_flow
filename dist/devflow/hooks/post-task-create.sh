@@ -5,15 +5,12 @@
 # .devflow-state.json, records initial task timing telemetry, and syncs the
 # DevFlow Board if devflow/board/index.html exists.
 
-if ! command -v jq >/dev/null 2>&1; then
-  exit 0
-fi
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOK_DIR/lib/payload.sh"
+SCRIPT_DIR="$HOOK_DIR"
 
-RAW=$(cat) || true
-[ -z "$RAW" ] && exit 0
-
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-FILE_PATH=$(printf '%s' "$RAW" | jq -r '.tool_use.input.file_path // empty' 2>/dev/null)
+df_read_input || exit 0
+FILE_PATH="$DF_FILE"
 
 # Only act on devflow/features/NNN_*/task.md writes
 if ! echo "$FILE_PATH" | grep -qE 'devflow/features/[0-9]{3}_[^/]+/task\.md$'; then
@@ -28,40 +25,44 @@ if [ -z "$NNN" ]; then
 fi
 
 NEXT=$(printf '%03d' $((10#$NNN + 1)))
-WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+WORKSPACE_ROOT="$DF_WORKSPACE"
 STATE_FILE="${DEVFLOW_STATE_FILE:-$WORKSPACE_ROOT/.devflow-state.json}"
+OBS_STATE="${DEVFLOW_OBSERVE_STATE_FILE:-$WORKSPACE_ROOT/.devflow-observe-state.json}"
 TIMINGS_FILE="${DEVFLOW_TIMINGS_LOG:-$WORKSPACE_ROOT/.devflow-timings.jsonl}"
 TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || echo "")
 STARTED_AT="$TS"
 STARTED_EPOCH=0
 ENDED_EPOCH=$(date +%s 2>/dev/null || echo 0)
 
-if [ -f "$STATE_FILE" ]; then
-  STARTED_AT=$(jq -r --arg fallback "$TS" '.turn_started_at // $fallback' "$STATE_FILE" 2>/dev/null || echo "$TS")
-  STARTED_EPOCH=$(jq -r '.turn_started_epoch // 0' "$STATE_FILE" 2>/dev/null || echo 0)
-  # Merge next_feature_number into existing state (preserve existing feature/active_feature if present)
-  UPDATED=$(jq --arg n "$NEXT" --arg f "$FEATURE_SLUG" \
-    '. + {next_feature_number: $n} + (if (.active_feature // .feature // "") == "" then {active_feature: $f} else {} end)' \
-    "$STATE_FILE" 2>/dev/null)
-  [ -n "$UPDATED" ] && printf '%s\n' "$UPDATED" > "$STATE_FILE"
-else
-  # Create minimal state with counter (and active_feature)
-  jq -n --arg n "$NEXT" --arg f "$FEATURE_SLUG" \
-    '{next_feature_number: $n, active_feature: $f}' > "$STATE_FILE" 2>/dev/null
+if [ -f "$OBS_STATE" ]; then
+  STARTED_AT=$(jq -r --arg fallback "$TS" '.turn_started_at // $fallback' "$OBS_STATE" 2>/dev/null || echo "$TS")
+  STARTED_EPOCH=$(jq -r '.turn_started_epoch // 0' "$OBS_STATE" 2>/dev/null || echo 0)
 fi
+
+# Merge counter into state (atomic, locked). Never lowers next_feature_number;
+# sets the active feature only when none is recorded yet (canonical key:
+# feature — active_feature is a read-only legacy alias, migrated here).
+df_json_update "$STATE_FILE" '
+  (if (.feature // "") == "" and (.active_feature // "") != "" then .feature = .active_feature else . end)
+  | del(.active_feature)
+  | ((.next_feature_number // 0) | tonumber? // 0) as $cur
+  | (if $cur < $n then .next_feature_number = $n else .next_feature_number = $cur end)
+  | (if (.feature // "") == "" then .feature = $f | .feature_path = ("devflow/features/" + $f) else . end)' \
+  --argjson n "$((10#$NEXT))" --arg f "$FEATURE_SLUG"
+df_gitignore ".devflow-state.json"
 
 # Record initial task command timing entry in .devflow-timings.jsonl if not already present for this feature
 if [ "$TIMINGS_FILE" != "off" ] && [ -n "$FEATURE_SLUG" ]; then
   EXISTING_TASK_TIMING=""
   if [ -f "$TIMINGS_FILE" ]; then
-    EXISTING_TASK_TIMING=$(jq -r --arg f "$FEATURE_SLUG" 'select((.active_feature // .feature) == $f and .command == "task") | .command' "$TIMINGS_FILE" 2>/dev/null | head -1 || true)
+    EXISTING_TASK_TIMING=$(jq -r --arg f "$FEATURE_SLUG" 'select((.feature // .active_feature) == $f and .command == "task") | .command' "$TIMINGS_FILE" 2>/dev/null | head -1 || true)
   fi
   if [ -z "$EXISTING_TASK_TIMING" ]; then
     DURATION_SEC=0
     if [ "${STARTED_EPOCH:-0}" -gt 0 ] && [ "${ENDED_EPOCH:-0}" -ge "${STARTED_EPOCH:-0}" ]; then
       DURATION_SEC=$(( ENDED_EPOCH - STARTED_EPOCH ))
     fi
-    jq -cn \
+    ENTRY=$(jq -cn \
       --arg ts "$TS" \
       --arg feat "$FEATURE_SLUG" \
       --arg started_at "$STARTED_AT" \
@@ -76,7 +77,8 @@ if [ "$TIMINGS_FILE" != "off" ] && [ -n "$FEATURE_SLUG" ]; then
         started_at: $started_at,
         ended_at: $ended_at,
         duration_sec: $duration_sec
-      }' >> "$TIMINGS_FILE" 2>/dev/null || true
+      }' 2>/dev/null) || true
+    [ -n "$ENTRY" ] && df_append "$TIMINGS_FILE" "$ENTRY"
   fi
 fi
 

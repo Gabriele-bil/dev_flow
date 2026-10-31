@@ -86,9 +86,9 @@ Write `devflow/plans/project-blueprint.md` using this structure (adapted from `@
 ## Execution Guide
 
 1. All `task.md` specifications (`001` to `[NNN]`) are pre-generated on `main`.
-2. Run `/devflow.plan` (with no arguments) to plan `TASK-001` (`001_[first-feature]`), or run `/devflow.run` / `/devflow.auto` per task.
-3. When `TASK-001` merges to `main`, `/devflow.plan` automatically resolves the next unblocked un-planned task in topological order (`TASK-002`).
-4. For `[parallel-safe]` waves, use `/devflow.worktree` to run concurrent sessions safely in isolated git worktrees.
+2. Run `/devflow:plan` (with no arguments) to plan `TASK-001` (`001_[first-feature]`), or run `/devflow:run` / `/devflow:auto` per task.
+3. When `TASK-001` merges to `main`, `/devflow:plan` automatically resolves the next unblocked un-planned task in topological order (`TASK-002`).
+4. For `[parallel-safe]` waves, use `/devflow:worktree` to run concurrent sessions safely in isolated git worktrees.
 ```
 
 ---
@@ -115,21 +115,8 @@ Write `devflow/plans/project-blueprint.md` using this structure (adapted from `@
 
 ## 5. Final `.devflow-state.json` Initialization (Post-Hook Override)
 
-Because the `PostToolUse` hook `hooks/post-task-create.sh` fires on every `Write` to `devflow/features/[NNN]_*/task.md` and sets `next_feature_number` to `NNN + 1`, writing `001` through `NNN` sequentially leaves `.devflow-state.json` without `active_feature` pointing to `001`.
+Because the `PostToolUse` hook `hooks/post-task-create.sh` fires on every `Write` to `devflow/features/[NNN]_*/task.md` and sets `next_feature_number` to `NNN + 1`, writing `001` through `NNN` sequentially leaves `.devflow-state.json` without `feature` pointing to `001`.
 
-**Mandatory final step:** After ALL `task.md` files (`001..NNN`) and `docs/product.md` have been written, write `.devflow-state.json` in the project root with:
-
-```json
-{
-  "feature": "001_<first-feature-slug>",
-  "active_feature": "001_<first-feature-slug>",
-  "feature_path": "devflow/features/001_<first-feature-slug>",
-  "branch": "feat/001_<first-feature-slug>",
-  "task_status": "draft",
-  "next_feature_number": "<NNN+1 formatted as 3 digits, e.g. 006>",
-  "next_step": "devflow.plan",
-  "saved_at": "<ISO-8601 timestamp>"
-}
-```
+**Mandatory final step:** After ALL `task.md` files (`001..NNN`) and `docs/product.md` have been written, run `bash "@devflow/scripts/devflow-state.sh" sync 001` — sets `feature`/`feature_path`/`branch`/`task_status` to `001`, `next_step: devflow.plan`, `next_feature_number: NNN+1`; keeps keys it does not own, drops legacy `active_feature`.
 
 Remove temporary `.devflow-init-answers.tmp` if present.

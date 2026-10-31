@@ -3,6 +3,7 @@ name: devflow-plan
 description: Transforms DevFlow task into file-oriented implementation plan. Use when user runs devflow.plan, creates planning artifact from task, or plan.md for feature.
 argument-hint: "[optional-task-path]"
 disable-model-invocation: true
+effort: high
 ---
 
 # Skill: devflow.plan
@@ -12,7 +13,7 @@ disable-model-invocation: true
 Run `/devflow.plan [optional task path]`.
 
 - If an argument is passed, use it as the `task.md` path
-- If no argument is passed, check `.devflow-state.json` (`active_feature` / `feature_path` if un-planned) or select the first `devflow/features/[NNN]_*/task.md` in ascending numerical order without a `plan.md` whose `**Blockers:**` are satisfied (`done`)
+- If no argument is passed, resolve feature with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask)
 - Produce `plan.md` in the same feature directory
 
 ## Purpose
@@ -38,11 +39,8 @@ Order **File list** bottom-up per `constitution.md` and the adapter plan step fi
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 - **reuse-first** — always check `registry.md` and shared folders before planning new components; reuse or extend over duplicate
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
 
 ## When NOT to Use
 
@@ -62,9 +60,7 @@ If any item fails → stop, report which check failed, do not write `plan.md`.
 
 ## Input
 
-Path: `devflow/features/[NNN]_[feature-name]/task.md` — if no arg, resolve via `.devflow-state.json` (`active_feature` / `feature_path` lacking `plan.md`) or select the lowest-numbered `devflow/features/[NNN]_*/task.md` without a `plan.md` whose declared `**Blockers:**` are `done` (never blindly pick highest `NNN` when pre-generated roadmap tasks exist).
-
-Feature numbering: IDs strictly incremental; never reuse prefix. Next = highest existing + 1.
+Path: `devflow/features/[NNN]_[feature-name]/task.md` — if no arg, resolve with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask) (never highest `NNN`). Resolved feature already has `plan.md` past `ready` → stop, report status; re-plan only on explicit argument.
 
 ## Workflow
 
@@ -72,7 +68,7 @@ Feature numbering: IDs strictly incremental; never reuse prefix. Next = highest 
 
 1. Note `task.md`'s `**App:**` field if present (monorepo repos only).
 2. Resolve adapter, adapter root, and app working directory per `@devflow/references/adapter-resolution.md`. `task.md` monorepo but missing `**App:**` → hard stop, ask user.
-3. Read `@devflow/adapters/<adapter>/ADAPTER.md` (core: technology skills, MCP) plus `@devflow/adapters/<adapter>/steps/plan.md` (plan extra sections, dependency ordering, localization). Legacy adapters without `steps/`: all sections live in `ADAPTER.md` — read it in full.
+3. Read `@devflow/adapters/<adapter>/ADAPTER.md` (core: technology skills, MCP) plus `@devflow/adapters/<adapter>/steps/plan.md` (plan extra sections, dependency ordering, localization).
 
 ### Step 0b - Constitution Gate
 
@@ -133,7 +129,7 @@ Analyze:
 - Seed **Risks and mitigations** table directly from `task.md` `## Assumptions & Risks` (convert into concrete boundary checks)
 - Bullets in active adapter plan step file (`steps/plan.md`) applying to this feature (state, UI, DB, i18n, responsive layout)
 - Edge cases, error states, and required DB/external-system edits
-- Architectural trade-offs: state the concrete mechanism and strongest real limitation/trade-off for each decision (never empty boosters like `scalable` or `seamless`); when multiple viable designs exist, trigger `AskQuestion` checkpoint and recommend `/grill-me` for deep review
+- Architectural trade-offs: state the concrete mechanism and strongest real limitation/trade-off for each decision (never empty boosters like `scalable` or `seamless`); when multiple viable designs exist, trigger `AskUserQuestion` / `ask_question` checkpoint and recommend `/grill-me` for deep review
 - ADR alignment: verify architecture complies with decisions in `docs/adr/`; record in Architecture decisions
 
 ### Step 4b - Dependency pass & Contracts First
@@ -187,7 +183,7 @@ Read by `devflow.implement` (loads DESIGN.md for `[ui]` batches) and `devflow.be
 
 ### Step 5 - Write plan file
 
-Create `devflow/features/[NNN]_[feature-name]/plan.md` using the template in `references/plan-template.md`. Sections in order: Overview, Architecture decisions, Risks and mitigations, Open questions, Traceability, File List, Implementation checkpoints, Adapter-specific sections, Edge Cases & Error Handling, Pre-implement checklist.
+Create `devflow/features/[NNN]_[feature-name]/plan.md` using the template in `references/plan-template.md`. After write (`**Status:** ready`): `bash "@devflow/scripts/devflow-state.sh" sync [NNN]` refreshes the state cache. Sections in order: Overview, Architecture decisions, Risks and mitigations, Open questions, Traceability, File List, Implementation checkpoints, Adapter-specific sections, Edge Cases & Error Handling, Pre-implement checklist.
 
 Header: copy `**App:**` from `task.md` verbatim when present; omit the line entirely when absent (single-app repos) — never invent it.
 
@@ -196,7 +192,7 @@ Format rules:
 - Adapter-specific sections: follow adapter plan step file layout exactly.
 - Language: English (all docs). Compression: caveman-compress (drop filler, keep precision).
 
-**Run mode** (`.devflow-run.json` present): a genuine **Open questions** entry (plan-level ambiguity, not a constitution violation) does not escalate to the user — pick defensible default (repo precedent > `constitution.md` > adapter convention), append it to `plan.md` **`## Decision flags`** (create on first flag; format per `@devflow/skills/devflow-run/SKILL.md` Step 2), and keep Status `ready`. Constitution Gate Critical/Required violations above are the one exception — those stop regardless of mode.
+**Run mode** (`.devflow-run.json` present, contract `@devflow/references/run-mode.md`): a genuine **Open questions** entry (plan-level ambiguity, not a constitution violation) does not escalate — default + `## Decision flags` entry per its **Decision flags**; keep Status `ready`. Constitution Gate Critical/Required violations above are the one exception — those stop regardless of mode.
 
 ### Step 6 - Notify user
 
@@ -219,15 +215,13 @@ Continue to implementation? -> devflow.implement
 
 ## Anti-Patterns
 
-Full catalog: `@devflow/skills/devflow-plan/references/plan-anti-patterns.md`.
+| Anti-Pattern | Fix |
+| --- | --- |
+| Open questions with Status `ready` | Leave open; escalate to user; never guess |
+| Architecture decisions made during implement | All decisions in `plan.md` before implement |
+| No implementation checkpoints on long plans | ≥2 checkpoints for plans >5 files |
 
-Critical checks:
-
-- No plan without reading `task.md` and active ADRs
-- File list ordered by vertical slice, not architectural layer
-- Every subtask mapped in Traceability (no gold-plating)
-- Architecture decisions (and ADR alignment) locked before implement
-- Complexity score scored per `complexity-scoring.md` signals in Step 4d
+Full catalog — read when unsure, or before retrying after a failed contract: `references/plan-anti-patterns.md`.
 
 ## I/O Reference
 
@@ -238,10 +232,11 @@ Critical checks:
 | Reads (adapter) | `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/plan.md`; technology skills per ADAPTER table |
 | Reads | `@devflow/references/complexity-scoring.md` (Step 4d — score + profile) |
 | Reads | `@devflow/references/token-economy.md` (Step 1 — index-first exploration) |
-| Reads | `@devflow/skills/devflow-plan/references/plan-anti-patterns.md` (Anti-patterns catalog) |
-| Writes | `devflow/features/[NNN]_[feature-name]/plan.md` |
+| Reads (conditional) | `@devflow/skills/devflow-plan/references/plan-anti-patterns.md` (Anti-patterns catalog — when unsure / retry) |
+| Runs | `@devflow/scripts/devflow-state.sh` (`resolve`, `sync`) |
+| Writes | `devflow/features/[NNN]_[feature-name]/plan.md`, `.devflow-state.json` (merge) |
 | Writes (conditional) | `plan.md` `## Decision flags` (run mode — resolved Open questions) |
-| Reads (conditional) | `docs/adr/` (if present — active ADRs referenced in `task.md`); `.devflow-run.json` (existence — run-mode switch, per `devflow-auto`) |
+| Reads (conditional) | `docs/adr/` (if present — active ADRs referenced in `task.md`); `.devflow-run.json` (existence — run-mode switch, `@devflow/references/run-mode.md`) |
 | Reads (conditional) | `DESIGN.md` / `docs/design.md` (Step 4e — existence check + UI tagging) |
 | Writes (optional) | `devflow/features/[NNN]_[feature-name]/data-model.md` (Step 4c — triggered when feature touches persistent entities) |
 | Next step | `devflow.implement` |

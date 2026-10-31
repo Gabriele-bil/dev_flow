@@ -29,7 +29,7 @@ Machine-readable pipeline status for CI and scripts. `devflow.status --json` run
 | `generated_at` | emitter run time (UTC ISO-8601) | not `.devflow-state.json` `saved_at` |
 | `adapter` | `devflow/config.md` `**Adapter:**` line (single-app) or `## Apps` table row for the resolved app (monorepo) | `"unknown"` when unparsable |
 | `app` | `plan.md` `**App:**` line | `""` in single-app repos (no `## Apps` table) |
-| `feature`, `plan_path` | latest `devflow/features/*/plan.md` | most recently modified |
+| `feature`, `plan_path` | `state-machine.md` → **Active feature resolution** | explicit argument wins |
 | `plan_status` | `plan.md` `**Status:**` (authoritative) | legal values: `state-machine.md` |
 | `next_step` | status → step mapping in `state-machine.md` | |
 | `complexity` | `plan.md` `**Complexity:**` profile | `"standard"` when tag missing |
@@ -43,14 +43,14 @@ Machine-readable pipeline status for CI and scripts. `devflow.status --json` run
 | Exit | `health` | Condition |
 | --- | --- | --- |
 | 0 | `healthy` | plan exists, status legal, markers consistent |
-| 1 | `no-pipeline` | no `devflow/config.md`, or no `devflow/features/*/plan.md` |
+| 1 | `no-pipeline` | no `devflow/config.md`, or resolved feature has no `plan.md` (none resolved, or not yet planned) |
 | 2 | `inconsistent` | status not in `state-machine.md` tables, or status `implemented`+ with `[pending]` entries remaining |
 
 `state_drift: true` alone does NOT set exit 2 — state file is a derived cache; `plan.md` wins.
 
 ## Emitter snippet
 
-Run by `devflow.status` Step 3-JSON. Requires `jq`.
+Run by `devflow.status` Step 3-JSON. Requires `jq`. `$1` = optional explicit feature; `$DEVFLOW_STATE` = the `@devflow/scripts/devflow-state.sh` path.
 
 ```bash
 #!/bin/bash
@@ -63,10 +63,9 @@ grep -q '^## Apps' devflow/config.md 2>/dev/null && IS_MONOREPO=true
 ADAPTER=$(grep -m1 '^\*\*Adapter:\*\*' devflow/config.md 2>/dev/null | sed 's/^\*\*Adapter:\*\*[[:space:]]*//' | tr -d '\r' | sed 's/[[:space:]]*$//')
 [ -z "$ADAPTER" ] && ADAPTER="unknown"
 
-PLAN_FILE=$(find devflow/features -name "plan.md" -type f 2>/dev/null | xargs ls -t 2>/dev/null | head -1)
-[ -z "$PLAN_FILE" ] && { jq -n --arg a "$ADAPTER" '{schema_version:1, adapter:$a, health:"no-pipeline"}'; exit 1; }
-
-FEATURE=$(echo "$PLAN_FILE" | sed 's|devflow/features/||; s|/plan.md||')
+FEATURE=$(bash "$DEVFLOW_STATE" resolve "$1" 2>/dev/null)
+PLAN_FILE="devflow/features/$FEATURE/plan.md"
+{ [ -n "$FEATURE" ] && [ -f "$PLAN_FILE" ]; } || { jq -n --arg a "$ADAPTER" '{schema_version:1, adapter:$a, health:"no-pipeline"}'; exit 1; }
 
 APP=""
 if [ "$IS_MONOREPO" = true ]; then

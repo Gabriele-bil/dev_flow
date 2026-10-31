@@ -1,107 +1,60 @@
 ---
 name: angular-animations
-description: Angular v22+ DOM animations. Native CSS animate.enter/leave by default; @angular/animations DSL for pre-v20.2 only. Triggers on enter/leave, state transitions, or animation-library (GSAP) integration.
+description: Angular v22+ DOM animations with native CSS and animate.enter/animate.leave. Triggers on enter/leave, state transitions, legacy animation migration, or animation-library (GSAP) integration.
 ---
 
 # Angular Animations
 
-Animate DOM enter/leave + state transitions. Check `package.json` Angular version first — drives which approach applies.
+## Purpose
 
-## Native CSS — `animate.enter` / `animate.leave` (v20.2+, Default)
+Animate enter/leave and state transitions with native CSS plus `animate.enter`/`animate.leave` (v20.2+). Migrate legacy animation code when touched.
 
-Apply CSS classes during enter/leave phases. Angular removes enter classes on completion; for leave, Angular waits for animation to finish before removing the element.
+## When NOT to Use
+
+- File matches no row of `steps/implement.md` → skill load decision matrix (no animation, enter/leave or transition code touched).
+- Route-to-route transitions → `angular-routing` (`withViewTransitions()`).
+- Static styling, tokens, dark mode → `angular-theme`.
+
+## Rules
+
+- **`@angular/animations` is deprecated (v20.2), removal planned in v23** — do not use it in new code. Touching a component that uses `trigger()`/`[@x]` bindings or `provideAnimationsAsync()` → migrate it to native CSS in the same change (Angular docs: "Migrating away from Angular's Animations package"). Check current docs with Context7 for the mapping.
+- Enter: `animate.enter="css-class"` (or CSS `@starting-style`). Leave: `animate.leave="css-class"` — Angular waits for the animation, then removes the element.
+- Keep animation CSS in the component stylesheet; keyframes/tokens shared across components → `src/styles/` (`angular-theme`).
 
 ```html
 @if (isShown()) {
-  <div class="enter-container" animate.enter="enter-animation">
-    <p>The box is entering.</p>
-  </div>
+  <div class="panel" animate.enter="slide-in" animate.leave="fade-out">…</div>
 }
 ```
 
 ```css
-.enter-animation { animation: slide-fade 1s; }
-
-@keyframes slide-fade {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+.slide-in { animation: slide-fade 200ms ease-out; }
+.fade-out { opacity: 0; transition: opacity 150ms ease-in; }
+@keyframes slide-fade { from { opacity: 0; transform: translateY(8px); } }
 ```
 
-### Event Bindings — Custom/Third-Party Logic
+## JS / third-party (GSAP, anime.js)
+
+Bind the event form and call `animationComplete()` when done; otherwise Angular removes the element only after `MAX_ANIMATION_TIMEOUT` (4 s default).
+
+```typescript
+onLeave(event: AnimationCallbackEvent) { // from @angular/core
+  gsap.to(event.target, { opacity: 0, onComplete: () => event.animationComplete() });
+}
+```
 
 ```html
-@if (show()) {
-  <div (animate.leave)="onLeave($event)">...</div>
-}
+<div (animate.leave)="onLeave($event)">…</div>
 ```
 
-```typescript
-import { AnimationCallbackEvent } from "@angular/core";
+## State transitions
 
-onLeave(event: AnimationCallbackEvent) {
-  // custom logic (e.g. GSAP)
-  event.animationComplete(); // REQUIRED — Angular waits for this before removing element
-}
-```
-
-`event.animationComplete()` is mandatory on `(animate.leave)` handlers — omitting it leaks DOM nodes Angular thinks are still animating.
-
-## State-Based Class Toggling
-
-```html
-<div [class.open]="isOpen()">...</div>
-```
-
-```css
-div { transition: height 0.3s ease-out; height: 100px; }
-div.open { height: 200px; }
-```
-
-Auto-height via CSS grid trick:
-
-```css
-.container { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s; }
-.container.open { grid-template-rows: 1fr; }
-.container > div { overflow: hidden; }
-```
-
-Stagger list items with `animation-delay`/`transition-delay` per index. Run animations in parallel via shorthand: `animation: rotate 3s, fade-in 2s;`. Programmatic control: `element.getAnimations()`.
-
-## Legacy DSL (`@angular/animations`) — Pre-v20.2 / Heavy Existing Usage Only
-
-```typescript
-bootstrapApplication(App, { providers: [provideAnimationsAsync()] });
-```
-
-```typescript
-import { trigger, state, style, animate, transition } from "@angular/animations";
-
-@Component({
-  animations: [
-    trigger("openClose", [
-      state("open", style({ opacity: 1 })),
-      state("closed", style({ opacity: 0 })),
-      transition("open <=> closed", [animate("0.5s")]),
-    ]),
-  ],
-  template: `<div [@openClose]="isOpen() ? 'open' : 'closed'">...</div>`,
-})
-export class OpenClose {
-  protected readonly isOpen = signal(true);
-}
-```
-
-**Never mix legacy DSL and `animate.enter`/`animate.leave` in the same component** — conflicting animation systems produce undefined timing behavior.
-
-## Route Transitions
-
-Cross-route animations use the View Transitions API via `withViewTransitions()` — covered in `angular-routing` (Route Transition Animations section). CSS for `::view-transition-old/new` MUST live in global `src/styles.css`, never component-scoped — view encapsulation blocks pseudo-element selectors.
+Toggle a class from a signal (`[class.open]="isOpen()"`) and let CSS `transition` animate it. Auto-height: `grid-template-rows: 0fr → 1fr`. Stagger lists with per-index `animation-delay`. Respect `prefers-reduced-motion` (disable or shorten).
 
 ## I/O Reference
 
 |            |                                                                   |
 | ---------- | ----------------------------------------------------------------- |
-| Reads      | Active component/template/style files, `package.json` (Angular version), `@devflow/adapters/angular/ADAPTER.md` |
-| Writes     | New or refactored animation triggers, CSS keyframes/transitions, animation event handlers |
+| Reads      | Active component/template/style files, `@devflow/adapters/angular/ADAPTER.md` |
+| Writes     | New or migrated enter/leave animations, CSS keyframes/transitions, animation event handlers |
 | Invoked by | `devflow.implement`, `devflow.beautify`                          |

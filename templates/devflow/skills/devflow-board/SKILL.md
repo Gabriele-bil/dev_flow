@@ -7,6 +7,8 @@ disable-model-invocation: true
 
 # Skill: devflow.board
 
+**Arguments:** `$ARGUMENTS` — empty → generate the board without opening or syncing.
+
 ## Quick Start
 
 Run `/devflow.board [--open] [--sync] [--port <port>] [--json]`.
@@ -21,10 +23,7 @@ Generate and synchronize a deterministic, portable, strictly read-only HTML proj
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` are written and approved
-- **traceability** — every subtask maps to an acceptance criterion; every acceptance criterion maps to one or more files
-- **vertical slices** — for plans with >5 files: implement end-to-end user-visible increments, never layers
-- **token-lean** — caveman-compress all written output: drop articles, hedging, filler, linking phrases; keep technical terms, file paths, commands, verbs, negations, conditions exact
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 
 ## When NOT to Use
 
@@ -55,18 +54,10 @@ Inspect `$ARGUMENTS` for optional flags:
 
 ### Step 2 — Execute Deterministic Board Generator
 
-Resolve and run `board.sh`:
+Run `board.sh`:
 
 ```bash
-BOARD_SCRIPT="templates/devflow/scripts/board.sh"
-if [ ! -f "$BOARD_SCRIPT" ] && [ -n "${CLAUDE_PLUGIN_ROOT:-}" ]; then
-  BOARD_SCRIPT="${CLAUDE_PLUGIN_ROOT}/scripts/board.sh"
-fi
-if [ ! -f "$BOARD_SCRIPT" ]; then
-  BOARD_SCRIPT="dist/devflow/scripts/board.sh"
-fi
-
-bash "$BOARD_SCRIPT" $ARGUMENTS
+bash "@devflow/scripts/board.sh" $ARGUMENTS
 ```
 
 What `board.sh` executes deterministically:
@@ -85,23 +76,15 @@ What `board.sh` executes deterministically:
 
 Report generated board location (`devflow/board/index.html`), project completion KPI (`completed / total tasks`, `%`, active feature), total tracked development time, and confirm that automatic hook synchronization (`post-task-create.sh`, `post-edit-accumulate.sh`, `stop-metrics.sh`) keeps `board-data.js` updated on every feature or state change.
 
-## Common Rationalizations
-
-| Thought | Reality |
-| --- | --- |
-| "Write a custom HTML dashboard tailored to this repo's stack" | Forbidden. Every project must use the exact `@devflow/skills/devflow-board/assets/board-template.html` via `board.sh` |
-| "Add drag-and-drop card moving or checkbox toggling in the browser" | Board is strictly static and read-only; state changes happen exclusively through DevFlow pipeline commands |
-| "Recreate `devflow/board/index.html` from scratch on every hook event" | Once initialized, hooks run `board.sh --sync --quiet` to update only `board-data.js` |
-| "Require npm/vite/webpack in the consumer project to build the board" | Zero consumer build dependencies allowed; `index.html` + `board-data.js` run directly on `file://` or static HTTP |
-
 ## Anti-Patterns
 
 | Anti-Pattern | Problem | Fix |
 | --- | --- | --- |
 | Hand-editing `devflow/board/board-data.js` | Overwritten on next `--sync` hook trigger | Edit source `task.md` / `plan.md` and let `board.sh --sync` regenerate the manifest |
-| Using `fetch()` only without `board-data.js` script tag | Browser CORS blocks `fetch()` when opening `devflow/board/index.html` via `file://` | Always emit `board-data.js` (`window.__DEVFLOW_BOARD_DATA__`) alongside `board-data.json` |
 | Running synchronous heavy board builds inside `PreToolUse` hooks | Adds latency to every tool call | Run `board.sh --sync --quiet` only in async `PostToolUse` / `Stop` hooks |
 | Rendering unescaped raw Markdown HTML in the drawer | Risks broken DOM or script injection from code snippets inside specs | Escape HTML entities before applying Markdown/Gherkin formatting |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 

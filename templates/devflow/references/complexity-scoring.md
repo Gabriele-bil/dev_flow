@@ -33,7 +33,7 @@ Score each signal 0–4; sum = total (0–20).
 
 | Step | quick | standard | thorough |
 | --- | --- | --- | --- |
-| `devflow.beautify` axes | correctness + readability/simplification only | all 8 axes | all 8 axes |
+| `devflow.beautify` | skipped (`implemented → tested`) | 5 polish axes | 5 polish axes |
 | `devflow.test` scope | happy path + 1 regression case per AC | happy path + ≥1 error path per public surface | standard + edge cases per `testing-patterns.md` |
 | Verification (test Step 6b) | levels 1–3 | levels 1–3; level 4 when adapter defines targets | levels 1–4; level 4 mandatory — no adapter target → verdict PARTIAL with note |
 | `devflow.ship` fan-out | `code-reviewer` only | `code-reviewer` + `security-auditor` + `test-engineer` | all 5 agents (adds `accessibility-auditor`, `docs-reviewer`) |

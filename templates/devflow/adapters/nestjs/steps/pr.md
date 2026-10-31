@@ -16,10 +16,11 @@ npm run build
 ### PR body checklist (copy into PR description)
 
 - [ ] Lint passing
-- [ ] Unit tests passing (coverage ≥ 80% on modified areas)
+- [ ] Unit tests passing (`test` stamp)
+- [ ] No open coverage gaps on modified files (Ship Gate report — test-engineer)
 - [ ] E2E tests passing
 - [ ] Build passing
 - [ ] `nestjs-architecture` constraints respected (feature modules, constructor injection, no circular deps)
 - [ ] All new/changed endpoints documented with `@nestjs/swagger` decorators
-- [ ] All new DTOs validated with `class-validator`; guards applied to protected routes
+- [ ] All new input validated per `ADAPTER.md` → Project choices (DTO class or `@Body({ schema })`); guards applied to protected routes
 - [ ] `registry.md` updated if new patterns introduced

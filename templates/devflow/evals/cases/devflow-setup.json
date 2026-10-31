@@ -8,7 +8,7 @@
     ],
     "negative": [
       { "prompt": "Start a new feature idea for the pipeline", "owner": "devflow-task" },
-      { "prompt": "Where do I begin with devflow on a brand new project?", "owner": "devflow-discovery" }
+      { "prompt": "Log this lesson about the build as a project instinct", "owner": "devflow-learn" }
     ]
   }
 }

@@ -1,0 +1,29 @@
+{
+  "skill_name": "devflow-hotfix",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Production login is broken, fast-track a fix straight to a PR",
+        "top_k": 3
+      },
+      {
+        "prompt": "Hotfix this regression with a minimal patch and quick review",
+        "top_k": 3
+      },
+      {
+        "prompt": "Critical bug in checkout: patch it quickly through the pipeline",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Plan a new feature for user profiles",
+        "owner": "devflow-plan"
+      },
+      {
+        "prompt": "A test fails because the spec missed a case, tighten the acceptance criteria",
+        "owner": "devflow-backprop"
+      }
+    ]
+  }
+}

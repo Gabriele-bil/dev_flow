@@ -4,22 +4,23 @@ Loaded by `devflow-implement` together with the adapter core (`ADAPTER.md`).
 
 ## Implement: skill load decision matrix
 
-When implementing files, load technology skills based on file path patterns:
+Only place where adapter skill triggers live. Match each file in the current batch (path first, then content); load every skill its rows name. A file matching no row loads no adapter skill.
 
-| File path pattern | Load skill |
+| File path / content pattern | Load skill |
 | --- | --- |
-| `*.module.ts` | `nestjs-architecture` |
-| `*.service.ts`, files with constructor DI, `@Inject()`, or injection tokens | `nestjs-architecture` |
-| `*.controller.ts` | `nestjs-api-design` |
-| `*.dto.ts`, `*.pipe.ts`, `*.interceptor.ts` | `nestjs-api-design` |
-| `*.filter.ts`, files with `@Catch()` or custom `HttpException` subclasses | `nestjs-error-handling` |
-| `*.guard.ts`, files importing `@nestjs/jwt`, `@nestjs/passport`, `@nestjs/throttler`, `class-validator` | `nestjs-security` |
-| Files with `CacheModule`, `@Cacheable`-style wrappers, `onModuleInit`, `onApplicationBootstrap`, `enableShutdownHooks` | `nestjs-performance` |
-| `*.entity.ts`, `*.repository.ts`, `migrations/**` | `nestjs-database` |
-| `*.spec.ts`, `*.e2e-spec.ts` | `nestjs-testing` |
-| `*.gateway.ts`, `*.processor.ts`, files with `@MessagePattern`, `@EventPattern`, `@nestjs/bullmq` | `nestjs-microservices` |
+| `*.module.ts`, `*.tokens.ts`, `config/**`, files with `@Inject(`, `registerAs(`, `Scope.REQUEST` | `nestjs-architecture` |
+| `*.service.ts` | `nestjs-architecture`, `common-clean-code` |
+| `*.controller.ts` | `nestjs-api-design`, `nestjs-security` |
+| `*.dto.ts`, `*.schema.ts`, `*.pipe.ts`, `*.interceptor.ts`, files with `@nestjs/swagger` | `nestjs-api-design` |
+| `*.filter.ts`, files with `@Catch(`, `HttpException` subclasses, `@OnEvent(`, `@Cron(` | `nestjs-error-handling` |
+| `*.guard.ts`, `*.strategy.ts`, `auth/**`, files importing `@nestjs/jwt`, `@nestjs/passport`, `@nestjs/throttler` | `nestjs-security` |
+| `main.ts` | `nestjs-security`, `nestjs-performance` |
+| Files with `CacheModule`, `CACHE_MANAGER`, `LazyModuleLoader`, `onModuleInit`, `onApplicationBootstrap`, `onApplicationShutdown` | `nestjs-performance` |
+| `*.entity.ts`, `*.repository.ts`, `migrations/**`, `prisma/**`, `prisma.config.ts`, `*prisma.service.ts`, files with `DataSource`, `$transaction` | `nestjs-database` |
+| `*.spec.ts`, `*.e2e-spec.ts`, `test/**` | `nestjs-testing` |
+| `*.gateway.ts`, `*.processor.ts`, `health/**`, files with `@MessagePattern`, `@EventPattern`, `@nestjs/bullmq`, `@nestjs/terminus` | `nestjs-microservices` |
 
-Load only skills triggered by current batch's file paths. Do not load all skills preemptively.
+Common skill paths: `@devflow/adapters/common/skills/<name>/SKILL.md`. Adapter skill paths: `ADAPTER.md` → Technology skills. Load only skills triggered by the current batch.
 
 ## Implement: commands and checklist
 
@@ -46,12 +47,13 @@ nest g service <name>
 nest g controller <name>
 ```
 
-Review generated code against `nestjs-architecture` before commit — schematics do not enforce feature-module export discipline or DI token conventions.
+Review generated code against `nestjs-architecture` — schematics do not enforce export discipline, DI tokens, or the project's validation choice.
 
 ### Pre-handoff checklist (implement)
 
 - [ ] `lint`, `test`, `build` pass (or failures documented)
-- [ ] Relevant NestJS skills loaded and applied for touched areas
-- [ ] New modules follow feature organization (no technical-layer grouping: no bare `controllers/`, `services/` dirs)
-- [ ] Constructor injection only — no `ModuleRef.get()` service-locator pattern
-- [ ] New DTOs carry `class-validator` decorators; controllers rely on global `ValidationPipe`, not manual parsing
+- [ ] Every touched file matched against the decision matrix; listed skills applied
+- [ ] New modules follow feature organization (no bare `controllers/`, `services/` dirs)
+- [ ] Constructor injection only — no `ModuleRef.get()` service locator
+- [ ] New input validated per `ADAPTER.md` → Project choices (DTO class or `@Body({ schema })`), never manual parsing
+- [ ] Data access uses the project ORM only (`ADAPTER.md` → Project choices)

@@ -21,12 +21,12 @@ assert() {
 
 TMPDIR="$(mktemp -d)"
 trap 'rm -rf "$TMPDIR"' EXIT
-export CLAUDE_PROJECT_DIR="$TMPDIR"
+export DEVFLOW_FANOUT_STATE_FILE="$TMPDIR/.devflow-fanout-state.json"
 export DEVFLOW_MAX_FANOUT=5
 export DEVFLOW_FANOUT_WINDOW_MS=10000
 
 run_hook() {
-  printf '%s' '{"tool_use":{"name":"Agent","input":{}}}' | bash "$HOOK" 2>/dev/null || true
+  (cd "$TMPDIR" && printf '%s' '{"hook_event_name":"PreToolUse","tool_name":"Agent","tool_input":{}}' | bash "$HOOK" 2>/dev/null) || true
 }
 
 echo "=== test-pre-agent-fanout-cap.sh ==="
@@ -35,7 +35,7 @@ echo ""
 echo "--- T1: calls 1-5 within window allowed ---"
 rm -f "$TMPDIR/.devflow-fanout-state.json"
 ALL_ALLOWED=true
-for i in 1 2 3 4 5; do
+for _ in 1 2 3 4 5; do
   out=$(run_hook)
   [ -z "$out" ] || ALL_ALLOWED=false
 done
@@ -43,7 +43,7 @@ done
 
 echo "--- T2: 6th call within window blocked ---"
 out=$(run_hook)
-echo "$out" | grep -qE '"decision"[[:space:]]*:[[:space:]]*"block"' \
+echo "$out" | grep -qE '"permissionDecision"[[:space:]]*:[[:space:]]*"deny"' \
   && assert "6th call blocked" pass \
   || assert "6th call blocked (output: '$out')" fail
 
@@ -54,7 +54,7 @@ out=$(run_hook)
 
 echo "--- T4: degenerate input allowed silently ---"
 rm -f "$TMPDIR/.devflow-fanout-state.json"
-out=$(printf '' | bash "$HOOK" 2>/dev/null || true)
+out=$(cd "$TMPDIR" && printf '' | bash "$HOOK" 2>/dev/null || true)
 [ -z "$out" ] && assert "empty stdin allowed" pass || assert "empty stdin allowed" fail
 
 echo ""

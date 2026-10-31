@@ -1,115 +1,70 @@
 ---
 name: nextjs-components
-description: "'use client' components — React hooks, interactivity, context providers. Load when touching files with 'use client' directive."
+description: "'use client' components — React 19 hooks, interactivity, context providers, hydration errors. Load when touching files with 'use client' directive."
 ---
 
 # Next.js Client Components
 
-Build interactive UI with `'use client'`. Keep boundary minimal. Server fetches, Client renders.
+## Purpose
 
-Full code examples: `references/components-patterns.md`.
+Rules for `'use client'` files: minimal boundary, React 19 primitives, serializable props, hydration safety. Short examples: `references/components-patterns.md`.
+
+## When NOT to Use
+
+- File matches no row of `steps/implement.md` → skill load decision matrix
+- Server Component or Server Action → `nextjs-server`
+- Form wiring (RHF + Zod + shadcn `Field`) → `nextjs-forms`; Zustand store files → `nextjs-state`
 
 ## Baseline
 
-Next.js 16+, React 19, TypeScript strict.
+Next.js 16, React 19.3, TypeScript strict.
 
-## React 19 Primitives
+## When `'use client'`
 
-- **`ref` as prop**: In React 19, `ref` is a standard prop on function components (`function MyInput({ ref, ...props })`). Do NOT use `forwardRef`.
-- **`use()` hook**: In Client Components, unwrap Promises passed as props (e.g. `const params = use(props.params)`) and read context conditionally.
-- **`useActionState`**: React 19 native hook (`const [state, formAction, isPending] = useActionState(serverAction, initialState)`). Replaces `useFormState` and includes built-in `isPending`.
-- **`useOptimistic`**: For immediate optimistic UI updates during async transitions.
+Only if file uses state/effect/ref hooks, DOM event handlers, browser APIs (`window`, `localStorage`), or `next/navigation` client hooks. Place at lowest leaf — every import below a `'use client'` file ships to browser.
 
-## When to Use `'use client'`
+## React 19 rules
 
-Add directive ONLY if component uses:
+- `ref` is a regular prop — do not use `forwardRef` in new code (unnecessary in React 19, slated for deprecation).
+- `use(promise)` unwraps Promise props (e.g. `params` passed from a page) inside Client Components.
+- `useActionState(action, initialState)` → `[state, formAction, isPending]`; initial state type must match action's return type (include `null` in the union when starting from `null`).
+- `useFormStatus` (`react-dom`) for pending state in nested submit buttons.
+- `useOptimistic` for instant UI before server confirmation.
+- `useId()` for element ids — never `Math.random()`.
 
-- `useState`, `useEffect`, `useRef`, `useCallback`, `useMemo`
-- Event handlers: `onClick`, `onChange`, `onSubmit`, etc.
-- Browser-only APIs: `window`, `document`, `localStorage`
-- Next.js client hooks: `useRouter`, `usePathname`, `useSearchParams`, `useParams`
+## Server → Client props
 
-**Rule:** place `'use client'` at the lowest leaf in the tree — not in parent. One `'use client'` file makes its entire import subtree client-side. Full correct/wrong examples → `references/components-patterns.md`.
+- Serializable only: primitives, plain objects/arrays, Server Actions. `Date` → ISO string; `Map`/`Set` → object/array; class instance → plain object.
+- No functions as props from server (except Server Actions).
+- No `async` Client Components — fetch in parent Server Component.
+- Never import Server Component into Client Component — pass it as `children`.
 
-## Passing Data Server → Client
+## Navigation hooks
 
-- Server Component fetches → passes as props to Client Component
-- Never re-fetch in Client Component
-- Props must be serializable: no functions, no class instances, no raw `Date` (use ISO string)
-- When passing Promise props (like Next.js 16 dynamic `params`), unwrap in the Client Component using React 19 `use(props.params)`.
+From `next/navigation` only (`next/router` is Pages Router — never use). `useSearchParams()` needs a `<Suspense>` boundary around the leaf using it, otherwise the page falls back to client rendering.
 
-Full code → `references/components-patterns.md`.
+## Hydration
 
-## Context Providers
+Mismatch causes: time/random during render, browser APIs during render, invalid nesting (`<div>` in `<p>`), theme class. Fix: move to `useEffect` / client state, `useId`, `suppressHydrationWarning` on `<html>` only (next-themes).
 
-Wrap in dedicated Client Component (`providers.tsx`). Import in root `layout.tsx` as single entry point. Full code → `references/components-patterns.md`.
+## Anti-Patterns
 
-## Next.js Hooks in Client Components
-
-All from `next/navigation` — NOT `next/router` (legacy Pages Router):
-
-- `useRouter()` — programmatic navigation
-- `usePathname()` — current pathname
-- `useSearchParams()` — query string (**requires Suspense boundary**)
-- `useParams()` — dynamic route params
-
-### Suspense boundary requirements by hook
-
-| Hook | Suspense required |
-| --- | --- |
-| `useSearchParams()` | Always |
-| `usePathname()` | Dynamic routes only (`[slug]`, `[id]`) |
-| `useParams()` | No |
-| `useRouter()` | No |
-
-Without `<Suspense>` where required, Next.js triggers a full-page CSR bailout. Isolate `useSearchParams` components in leaf nodes wrapped in `<Suspense>`. Full code → `references/components-patterns.md`.
-
-## Optimistic Updates
-
-Use `useOptimistic` for reactive UI before server confirmation. Full code → `references/components-patterns.md`.
-
-## useFormStatus and useActionState
-
-- `useFormStatus` — access parent form state (`pending`, `data`, `method`, `action`) inside child submit buttons
-- `useActionState` — manage Server Action state, errors, and `isPending` natively with progressive enhancement
-
-Full code → `references/components-patterns.md`.
-
-## RSC Boundaries — Common Server→Client Errors
-
-1. **Async Client Component — forbidden.** Only Server Components can be `async`. Fetch in parent Server Component, pass result via props.
-2. **Non-serializable props.** Must be JSON-serializable: convert `Date` with `.toISOString()`, convert `Map`/`Set` to plain objects/arrays, pass class instances as plain objects, define non-Server-Action functions inside Client Component.
-
-Full code + type table → `references/components-patterns.md`.
-
-## Hydration Errors
-
-Caused by server vs client HTML mismatch. Common triggers: `Date.now()`/`Math.random()` during render, accessing `window`/`localStorage` during render, invalid HTML nesting, browser extensions, server-applied theme class. Fix: move browser/time logic to `useEffect`, add `suppressHydrationWarning` on root `<html>` when appropriate, use `useId()` instead of `Math.random()` for stable IDs.
-
-Debug: Next.js overlay highlights the mismatched HTML element. Look for "Expected server HTML to contain a matching...". Full code → `references/components-patterns.md`.
-
-## Anti-patterns
-
-- No `'use client'` on root `layout.tsx`
-- No data fetching in Client Components — receive from Server Component via props
-- No `'use client'` wrapping entire `page.tsx` — isolate interactive part only
-- No importing Server Components inside Client Components — invert: Server wraps Client
-- No `useEffect` for initial data fetch — use Server Components
-- No `async` Client Components — only Server Components can be `async`
-- No `Date`, `Map`, `Set`, or class instances as Server→Client props — serialize first
-- No `Math.random()` for IDs — use `useId()`
+- `'use client'` on root `layout.tsx` or whole `page.tsx`.
+- `useEffect` for initial data fetch — Server Component instead.
+- Providers scattered across tree — one `app/providers.tsx`.
 
 ## Review Checklist
 
-- [ ] `'use client'` only where necessary
-- [ ] Boundary at lowest possible level in tree
-- [ ] Server data passed as props, not re-fetched
-- [ ] Context providers centralized in `providers.tsx`
-- [ ] No `useEffect` for initial data fetch
+- [ ] `'use client'` only where needed, deepest level
+- [ ] Props from server serializable
+- [ ] `useSearchParams` leaves wrapped in `<Suspense>`
+- [ ] No `forwardRef`, no `Math.random()` ids
 
 ## I/O Reference
 
-|            |                                                                        |
-| ---------- | ---------------------------------------------------------------------- |
-| Invoked by | `devflow-implement` for files containing `'use client'` directive      |
-| Related    | `nextjs-architecture`, `nextjs-server`, `nextjs-state`, `nextjs-forms` |
+| | |
+| --- | --- |
+| Invoked by | `devflow-implement` via `steps/implement.md` → skill load decision matrix (files with `'use client'`) |
+| Reads | `references/components-patterns.md` |
+| Writes | Client Components, `app/providers.tsx` |
+| Related | `nextjs-architecture`, `nextjs-server`, `nextjs-state`, `nextjs-forms` |

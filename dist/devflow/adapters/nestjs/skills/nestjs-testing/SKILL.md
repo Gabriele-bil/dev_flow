@@ -1,52 +1,35 @@
 ---
 name: nestjs-testing
-description: TestingModule unit tests, Supertest e2e tests, mocking external services/repositories. Load when creating or refactoring *.spec.ts, *.e2e-spec.ts, or test fixtures/mocks.
+description: TestingModule unit tests, Supertest e2e tests, mocking repositories and external services, on Vitest (ESM) or Jest 30 (CommonJS). Load when creating or refactoring *.spec.ts, *.e2e-spec.ts, or test fixtures/mocks.
 ---
 
 # Skill: NestJS Testing
 
-Use when writing unit tests (`*.spec.ts`), e2e tests (`*.e2e-spec.ts`), or mocking repositories/HTTP clients/SDKs.
+## Purpose
 
-Full code examples: `references/testing-patterns.md`.
+Project rules for unit and e2e tests of NestJS code. Layout, commands and coverage threshold: `steps/test.md`. Examples: `references/testing-patterns.md`.
 
 ## When NOT to Use
 
-- File does not match trigger pattern in `ADAPTER.md` (not a test file)
-- Test-runner/CI config changes with no test-code change — see `steps/test.md`
+- File matches no row of `steps/implement.md` → skill load decision matrix that names `nestjs-testing`
+- Runner/CI configuration without test code — see `steps/test.md`
+- Deciding what a feature must cover — `devflow-test` owns that
 
-## Objectives
+## Rules
 
-- Every service/guard/interceptor unit-tested via `Test.createTestingModule` with mocked providers — never manual `new Service(realDep)`.
-- Every controller has at least one `*.e2e-spec.ts` exercising the real HTTP stack (guards, pipes, interceptors, serialization) via Supertest.
-- No real external service, database, or SDK called in a unit test — always mocked.
-- Tests assert observable behavior/outcomes, not internal call sequences.
-
-## 1) Use TestingModule for Unit Tests (HIGH)
-
-`Test.createTestingModule({ providers: [ServiceUnderTest, { provide: Dependency, useValue: mockObject }] }).compile()` — never `new UsersService(new UserRepository())` (bypasses DI, can hit a real DB). Mock every constructor dependency explicitly with `jest.fn()` per method used. `module.get<T>(Token)` retrieves both the unit under test and its mocks for assertion. Guards/interceptors get the same treatment — instantiate via `TestingModule`, not `new RolesGuard()`, so `Reflector` and other DI'd collaborators are real or properly mocked.
-
-## 2) Use Supertest for E2E Testing (HIGH)
-
-`*.e2e-spec.ts` boots the real app: `Test.createTestingModule({ imports: [AppModule] }).compile()` then `moduleFixture.createNestApplication()` then `app.init()`. Apply the exact same global config as production (`app.useGlobalPipes(new ValidationPipe(...))`) — an e2e test with different pipe config than `main.ts` doesn't actually validate the real request path. Drive requests with `request(app.getHttpServer()).post('/users').send(...).expect(201)`. Always `app.close()` in `afterAll`; for DB-backed e2e suites, isolate/reset state in `beforeEach` (test DB, transaction rollback, or `synchronize(true)` against a dedicated test datasource — never the dev/prod DB).
-
-## 3) Mock External Services (HIGH)
-
-Never call a real Stripe/HTTP/queue client or real database in a unit test — slow, costs money, flaky, non-deterministic. Mock at the injection boundary: `{ provide: HttpService, useValue: { get: jest.fn(), post: jest.fn() } }`, `{ provide: getRepositoryToken(User), useValue: mockRepo }`. Cover error paths explicitly (`httpService.get.mockReturnValue(throwError(() => new Error('ETIMEDOUT')))`), not only the happy path. For complex third-party SDKs, write one shared mock factory (`createMockStripe()`) reused across test files instead of ad hoc partial mocks that silently miss methods. Mock time (`jest.useFakeTimers()` / `jest.setSystemTime()`) for expiry/scheduling logic instead of real `setTimeout` waits.
-
-## Testing Checklist
-
-- [ ] Unit tests use `Test.createTestingModule`, not manual `new Service(...)`
-- [ ] Every constructor dependency mocked with explicit `jest.fn()` per used method
-- [ ] Controllers have a matching `*.e2e-spec.ts` using Supertest against a booted app
-- [ ] E2E test applies the same global pipes/filters/interceptors as `main.ts`
-- [ ] No real external service/DB/SDK call in a unit test
-- [ ] Error/edge-case paths (timeout, 4xx, empty result) covered, not only happy path
-- [ ] `app.close()` / mock cleanup (`jest.clearAllMocks()`) in `afterEach`/`afterAll`
+1. **Runner per project** (`ADAPTER.md` → Project choices): Vitest → `vi.fn()`, `vi.spyOn`, `vi.useFakeTimers()`; Jest → `jest.*`. Never mix in one repo. `@nestjs/testing` is runner-agnostic. Vitest needs SWC (`unplugin-swc`) for decorator metadata — do not remove it from `vitest.config.ts`.
+2. **Unit = `Test.createTestingModule`** with every constructor dependency replaced via `{ provide: Token, useValue: mock }`; fetch unit and mocks with `module.get()`. Never `new Service(realDep)`. Guards/interceptors the same way, so `Reflector` is real.
+3. **Mock at the injection boundary.** Repository token (`getRepositoryToken(User)`) or `PrismaService`; `HttpService` returning `of(...)` / `throwError(...)`; one shared factory per complex SDK (`createMockStripe()`). No real DB, network, queue or SDK in unit tests.
+4. **E2E boots the real app.** `Test.createTestingModule({ imports: [AppModule] })` → `createNestApplication()` → same bootstrap as `main.ts` (pipes, filters, security headers, versioning — extract a `configureApp(app)` and call it in both) → `app.init()`; `request(app.getHttpServer())`; `app.close()` in `afterAll`.
+5. **Isolated data.** E2E DB is a dedicated test database or container, reset per suite (migrations + truncate) — never dev/prod. Override external clients with `.overrideProvider(X).useValue(...)`.
+6. **Behavior over calls.** Assert results, status codes, thrown exception types, persisted state. `toHaveBeenCalledWith` only where the call itself is the contract (e.g. email sent).
+7. **Error paths are required:** not found, conflict, invalid input (`400`), unauthenticated (`401`), forbidden (`403`), upstream timeout. Time-dependent logic uses fake timers, never real waits.
+8. **Dynamic modules in tests.** Since Nest 11 dynamic modules are not deduplicated by config — import the shared constant (`nestjs-architecture` rule 3) or tests may get two instances.
 
 ## I/O Reference
 
 | | |
 | --- | --- |
-| Invoked by | `devflow-test` and `devflow-implement` when file path matches `*.spec.ts` or `*.e2e-spec.ts` |
-| Reads | `@devflow/adapters/nestjs/ADAPTER.md`, `steps/test.md` |
-| Related | `nestjs-architecture` (DI shape under test), `nestjs-security` (guard test patterns) |
+| Invoked by | `devflow-implement` / `devflow-test` per `steps/implement.md` → skill load decision matrix |
+| Reads | `@devflow/adapters/nestjs/ADAPTER.md`, `steps/test.md`, `references/testing-patterns.md` |
+| Related | `nestjs-architecture` (DI shape under test), `nestjs-database` (repository mocks per ORM), `nestjs-security` (guard tests) |

@@ -5,81 +5,54 @@ description: Supabase rules for Flutter — provider-based client access, dataso
 
 # Skill: Flutter + Supabase
 
-Use for data-layer work on `supabase_flutter` in Flutter + Riverpod architecture.
+## Purpose
 
-Full code examples: `references/supabase-patterns.md`.
+Data layer on `supabase_flutter`: client via provider, raw-JSON datasources, repositories mapping `PostgrestException` to typed failures. Supabase-backed apps only.
 
-## Objectives
+## When NOT to Use
 
-- Keep Supabase usage centralized and testable
-- Enforce datasource/repository separation
-- Use current Supabase APIs safely (`single`, `maybeSingle`, `stream(primaryKey:)`, `uploadBinary`, `rpc`, `functions.invoke`)
-- Standardize auth, storage, realtime, and error handling
+- File matches no row of `steps/implement.md` → skill load decision matrix
+- App does not depend on `supabase_flutter`
+- Schema, RLS or SQL changes → `flutter-supabase-migrations`
+- DTO/entity shape → `flutter-models`
 
-## 1) Client access pattern (mandatory)
+## Rules
 
-Always access the client via provider injection (`supabaseClientProvider`). Never call `Supabase.instance.client` directly inside repositories, use cases, or UI widgets. Full code → `references/supabase-patterns.md`.
+1. **Client:** only through `supabaseClientProvider` (`@Riverpod(keepAlive: true)`). `Supabase.instance.client` appears once — in that provider; never in repositories, use cases or widgets.
+2. **Datasource:** one per feature aggregate; returns raw JSON (`Map<String, dynamic>` / `List<Map<String, dynamic>>`); throws, never catches; no mapping or business logic.
+3. **Repository impl:** calls datasource, maps JSON → DTO → entity (`flutter-models` mapper), catches `PostgrestException` / `StorageException` / `AuthException` and returns typed failures. One `mapPostgrest` per feature.
+4. **Cardinality:** `.single()` when the row must exist; `.maybeSingle()` when absence is valid. Pagination: `.range(from, to)` with stable `.order(...)`.
+5. **Mutations:** chain `.select()` (+ `.single()`) when caller needs the written row; natural-key upsert via `onConflict:`.
+6. **Auth:** session state exposed by one `authStateProvider` (stream of `auth.onAuthStateChange`); widgets never call `auth` directly.
+7. **Storage:** path `<user_id>/<entity_id>/<filename>` inside the bucket; upload via `uploadBinary`; private buckets → signed URLs, not `getPublicUrl`.
+8. **Realtime:** `.stream(primaryKey: [...])` only for collaborative / multi-device live views; other screens use `AsyncNotifier` + invalidate/refresh.
+9. **Server logic:** DB-side → `rpc(...)`; secrets or third-party calls → Edge Functions (`functions.invoke`). No service-role key in the app.
 
-## 2) Datasource boundary rules
+Provider, datasource and error-mapping code: [`references/supabase-patterns.md`](references/supabase-patterns.md). Query builder, auth, storage and realtime signatures → Supabase MCP / Context7 (`/websites/supabase_reference_dart`) before writing them.
 
-- One datasource class per feature aggregate
-- Datasource returns raw JSON only (`Map<String, dynamic>` / `List<Map<String, dynamic>>`)
-- Datasource throws; it does not map errors
-- No domain mapping and no business logic in datasource
+## Anti-Patterns
 
-## 3) Database query patterns
+| Avoid | Use instead |
+| --- | --- |
+| `Supabase.instance.client` outside the client provider | `ref.watch(supabaseClientProvider)` |
+| try/catch in datasource | Throw in datasource, map in repository |
+| Datasource returns entities | Raw JSON from datasource |
+| `.single()` on optional row | `.maybeSingle()` |
+| Realtime on every list | Realtime only where live sync matters |
 
-Use `.single()` when the row must exist and be unique, `.maybeSingle()` when "not found" is valid, `.range(start, end)` with stable ordering for pagination, and `.select('*, related(...)')` for joins. Full read patterns → `references/supabase-patterns.md`.
+## Checklist
 
-## 4) Mutations (write patterns)
-
-After `insert`/`update`/`upsert`, chain `.select()` (and usually `.single()`) when the caller needs returned rows. Use `onConflict` for natural-key upserts. Full code → `references/supabase-patterns.md`.
-
-## 5) Repository error mapping (mandatory)
-
-Repositories convert datasource exceptions into typed failures by switching on `PostgrestException.code` (e.g. `PGRST116` → not found, `23505` → already exists, `42501` → permission denied). Full code → `references/supabase-patterns.md`.
-
-## 6) Auth patterns
-
-Use `_client.auth.currentUser` / `currentSession`, `signInWithPassword`, `signInWithOAuth`, `signOut`. Expose auth events via a provider wrapping `auth.onAuthStateChange`. Full code → `references/supabase-patterns.md`.
-
-## 7) Storage patterns
-
-Upload with `storage.from(bucket).uploadBinary(...)`, delete with `.remove([path])`. Path convention: `[bucket]/[user_id]/[entity_id]/[filename]`. Full code → `references/supabase-patterns.md`.
-
-## 8) Realtime patterns
-
-Use realtime only for collaborative or multi-device live views, via `.stream(primaryKey: [...])`. Prefer `AsyncNotifier` + manual refresh for non-live screens. Full code → `references/supabase-patterns.md`.
-
-## 9) RPC and Edge Functions
-
-Use RPC (`_client.rpc(...)`) for database-side logic. Use Edge Functions (`_client.functions.invoke(...)`) for server code that needs secrets or external integrations. Full code → `references/supabase-patterns.md`.
-
-## 10) Anti-patterns
-
-| Avoid                                                  | Use instead                                        |
-| ------------------------------------------------------ | -------------------------------------------------- |
-| `Supabase.instance.client` scattered in app            | `supabaseClientProvider`                           |
-| Catching in datasource                                 | Throw in datasource, map in repository             |
-| Domain entities returned by datasource                 | Raw JSON from datasource                           |
-| `.single()` when row is optional                       | `.maybeSingle()`                                   |
-| Realtime for every list                                | Realtime only where live sync matters              |
-| Missing `.select()` after mutations when row is needed | Chain `.select()` (+ `.single()` when appropriate) |
-
-## Quick checklist before merging
-
-- Client only retrieved from provider
-- Datasource has no business logic and no error mapping
-- Repository maps `PostgrestException` to typed failures
-- Read paths use correct cardinality (`single` vs `maybeSingle`)
-- Realtime only on screens that truly need live updates
-- Storage paths include `user_id` namespace
+- [ ] Client only from provider
+- [ ] Datasource: no business logic, no error mapping
+- [ ] Repository maps every Supabase exception to a typed failure
+- [ ] Storage paths namespaced by `user_id`
+- [ ] Realtime only on live screens
 
 ## I/O Reference
 
 | | |
 | --- | --- |
-| Trigger | Any feature involving Supabase data read/write, auth, storage, realtime, or RPC calls |
-| Reads | `constitution.md` (data layer conventions), `registry.md` (existing datasource/repository patterns) |
-| Invoked by | `devflow.plan` (when feature involves DB), `devflow.implement` (datasource and repository files) |
-| Related skills | `flutter-riverpod` (notifiers calling repositories), `flutter-models` (DTOs and domain entities), `flutter-supabase-migrations` (schema changes) |
+| Trigger | `steps/implement.md` matrix row: `*_datasource.dart`, `*/datasources/*.dart`, `*_repository_impl.dart`, files importing `supabase_flutter` |
+| Reads | `constitution.md` (data layer conventions), `registry.md` (datasource/repository patterns) |
+| Invoked by | `devflow.plan` (feature touches DB), `devflow.implement` (datasource + repository files) |
+| Related skills | `flutter-riverpod`, `flutter-models`, `flutter-supabase-migrations` |

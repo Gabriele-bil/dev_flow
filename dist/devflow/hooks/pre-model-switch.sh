@@ -12,29 +12,36 @@
 # (known cheap-model name + known security-sensitive step); everything else
 # passes through unblocked.
 #
+# Claude Code only (Antigravity CLI has no model-switch event).
 # Stdin: PreModelSwitch event JSON. Stdout (only on block): control JSON
 # {"decision":"block","reason":"..."}. Silent exit 0 = allow.
+#
+# "ship in progress" = ship is the command running this turn or the last one
+# (active_command / last_command, written by observe.sh / stop-metrics.sh) and
+# plan.md has not reached shipped yet. NOT next_step == devflow.ship, which
+# only means ship is the next thing to run (e.g. right after devflow.test).
 
-command -v jq >/dev/null 2>&1 || exit 0
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOK_DIR/lib/payload.sh"
 
-RAW=$(cat) || true
-[ -z "$RAW" ] && exit 0
+df_read_input || exit 0
+[ -z "$DF_RAW" ] && exit 0
 
-TO_MODEL=$(printf '%s' "$RAW" | jq -r '.to_model // .target_model // .new_model // empty' 2>/dev/null) || true
+TO_MODEL=$(printf '%s' "$DF_RAW" | jq -r '.to_model // .target_model // .new_model // empty' 2>/dev/null) || true
 [ -z "$TO_MODEL" ] && exit 0
 
-WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-STATE_FILE="${DEVFLOW_STATE_FILE:-$WORKSPACE_ROOT/.devflow-state.json}"
-STEP=""
-[ -f "$STATE_FILE" ] && STEP=$(jq -r '.next_step // .last_observed_step // empty' "$STATE_FILE" 2>/dev/null) || true
-[ -z "$STEP" ] && exit 0
+OBS_STATE="${DEVFLOW_OBSERVE_STATE_FILE:-$DF_WORKSPACE/.devflow-observe-state.json}"
+STATE_FILE="${DEVFLOW_STATE_FILE:-$DF_WORKSPACE/.devflow-state.json}"
+ACTIVE=""
+PLAN_STATUS=""
+[ -f "$OBS_STATE" ] && ACTIVE=$(jq -r '(.active_command // "") as $a | if $a != "" then $a else (.last_command // "") end' "$OBS_STATE" 2>/dev/null) || true
+[ -f "$STATE_FILE" ] && PLAN_STATUS=$(jq -r '.plan_status // empty' "$STATE_FILE" 2>/dev/null) || true
 
 # Security-sensitive steps per model-selection.md Decision Table (Opus/Sonnet
-# reserved — ship dispatches security-auditor, test dispatches coverage review).
-case "$STEP" in
-  devflow.ship|devflow-ship) ;;
-  *) exit 0 ;;
-esac
+# reserved — ship dispatches security-auditor).
+[ "$ACTIVE" = "ship" ] || exit 0
+case "$PLAN_STATUS" in shipped|pr-opened) exit 0 ;; esac
+STEP="devflow.ship"
 
 # Cheap-model name match — conservative, known Haiku identifiers only.
 case "$TO_MODEL" in

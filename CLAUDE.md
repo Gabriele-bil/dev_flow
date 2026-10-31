@@ -1,17 +1,17 @@
 # DevFlow Plugin — Claude Code Context
 
-Claude Code + Cursor plugin for spec-driven development pipelines.
+Claude Code + Antigravity CLI plugin for spec-driven development pipelines.
 Read `templates/devflow/CONTRIBUTING.md` for quality bar and style guidelines before modifying any skill.
 
 ## Critical structure
 
 - `templates/devflow/` — plugin source (edit here)
-- `dist/devflow/` — installable plugin (build output, committed)
+- `dist/devflow/` — installable Claude Code plugin (build output, committed)
+- `dist/devflow-antigravity/` — installable Antigravity CLI plugin (build output, committed; generated from `dist/devflow/` by `scripts/builders/build-antigravity.sh`)
 - `dist/devflow/.claude-plugin/plugin.json` — Claude Code manifest (generated)
 - `templates/devflow/skills/<name>/SKILL.md` — core pipeline skills
 - `templates/devflow/adapters/<stack>/skills/<name>/SKILL.md` — adapter-specific skills
 - `templates/devflow/hooks/` — shell scripts + `hooks.json` (lifecycle hooks)
-- `templates/devflow/commands/` — slash command entry points
 
 ## Operational rules
 

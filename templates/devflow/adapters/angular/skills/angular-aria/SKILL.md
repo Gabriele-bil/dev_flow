@@ -5,111 +5,54 @@ description: Angular v22+ accessible widgets (Accordion, Listbox, Combobox, Menu
 
 # Angular Aria
 
-Build accessible interactive widgets with `@angular/aria` headless directives. They handle keyboard interaction, ARIA attributes, focus management, screen-reader support — you provide HTML structure + CSS.
+## Purpose
+
+Build accessible composite widgets with `@angular/aria` headless directives: they own keyboard interaction, ARIA attributes and focus; the project owns markup and CSS.
+
+## When NOT to Use
+
+- File matches no row of `steps/implement.md` → skill load decision matrix (no `@angular/aria` import, no composite widget touched).
+- Simple controls with a native element (`<button>`, checkbox, radio, text input) — native HTML, `angular-component` accessibility baseline.
+- Form rules for the widget value → `angular-forms`.
 
 ## Setup
 
-```bash
-npm install @angular/aria
-```
-
-Confirm install before use — package not present by default.
-
-## Headless = You Style It
-
-Directives ship zero CSS. Style by targeting the ARIA attributes/state the directives toggle automatically:
-
-```css
-.option[aria-selected="true"] { background: #e0f7fa; font-weight: bold; }
-.tab-btn[aria-selected="true"] { border-bottom-color: blue; }
-.accordion-header[aria-expanded="true"] .icon { transform: rotate(180deg); }
-.tool-btn[aria-pressed="true"] { background: #ddd; }
-li[aria-expanded="true"] > .tree-label::before { transform: rotate(90deg); }
-[ngGridCell]:focus-visible { outline: 2px solid #2196f3; outline-offset: -2px; }
-```
-
-Common targets: `[aria-expanded]`, `[aria-selected]`, `[aria-disabled]`, `[aria-current]`, `[aria-pressed]`, `[aria-checked]`, `:focus-visible`.
+`@angular/aria` is installed by `devflow.setup` (`steps/setup.md`). Missing in an older project → `pnpm add @angular/aria`.
 
 ## Directive Families
 
-| Widget | Import path | Directives | Use for |
-|---|---|---|---|
-| Accordion | `@angular/aria/accordion` | `ngAccordionGroup`, `ngAccordionTrigger`, `ngAccordionPanel`, `ngAccordionContent` | FAQs, progressive disclosure |
-| Listbox | `@angular/aria/listbox` | `ngListbox`, `ngOption` | Visible single/multi-select lists |
-| Combobox | `@angular/aria/combobox` | `ngCombobox`, `ngComboboxPopup`, `ngComboboxWidget` | Autocomplete, Select, Multiselect (paired w/ `ngListbox`) |
-| Menu | `@angular/aria/menu` | `ngMenuBar`, `ngMenu`, `ngMenuItem`, `ngMenuTrigger`, `ngMenuContent` | Command bars, context menus |
-| Tabs | `@angular/aria/tabs` | `ngTabs`, `ngTabList`, `ngTab`, `ngTabPanel`, `ngTabContent` | Layered content sections |
-| Toolbar | `@angular/aria/toolbar` | `ngToolbar`, `ngToolbarWidget`, `ngToolbarWidgetGroup` | Grouped related controls |
-| Tree | `@angular/aria/tree` | `ngTree`, `ngTreeItem`, `ngTreeItemGroup` | Hierarchical/nested data |
-| Grid | `@angular/aria/grid` | `ngGrid`, `ngGridRow`, `ngGridCell`, `ngGridCellWidget` | 2D interactive collections (tables, calendars) |
+| Widget | Import path | Directives |
+|---|---|---|
+| Accordion | `@angular/aria/accordion` | `ngAccordionGroup`, `ngAccordionTrigger`, `ngAccordionPanel`, `ngAccordionContent` |
+| Listbox | `@angular/aria/listbox` | `ngListbox`, `ngOption` |
+| Combobox | `@angular/aria/combobox` | `ngCombobox`, `ngComboboxPopup`, `ngComboboxWidget` (+ `ngListbox`) |
+| Menu | `@angular/aria/menu` | `ngMenuBar`, `ngMenu`, `ngMenuItem`, `ngMenuTrigger`, `ngMenuContent` |
+| Tabs | `@angular/aria/tabs` | `ngTabs`, `ngTabList`, `ngTab`, `ngTabPanel`, `ngTabContent` |
+| Toolbar | `@angular/aria/toolbar` | `ngToolbar`, `ngToolbarWidget`, `ngToolbarWidgetGroup` |
+| Tree | `@angular/aria/tree` | `ngTree`, `ngTreeItem`, `ngTreeItemGroup` |
+| Grid | `@angular/aria/grid` | `ngGrid`, `ngGridRow`, `ngGridCell`, `ngGridCellWidget` |
 
-Full HTML/CSS examples per widget: [references/aria-patterns.md](references/aria-patterns.md).
+## Hard Rules
 
-## Quick Example — Listbox
+- Custom select/autocomplete/menu/tabs/tree → `ng*` directives. Do not use native `<select>`/`<input list>`/`<details>` for these patterns — they cannot express the interaction model.
+- Headless = you style it: every widget gets CSS for its state attributes (`[aria-selected="true"]`, `[aria-expanded="true"]`, `[aria-disabled]`, `:focus-visible`). Unstyled state = visually broken.
+- Colors from theme tokens via `angular-theme` conventions — no hardcoded hex.
+- Heavy panel content inside `<ng-template>` with the matching `ng*Content`/`ng*Group` directive (lazy).
+- Inside forms: wrap the widget in a `FormValueControl` component, bind `[formField]` on the wrapper.
 
 ```html
-<ul ngListbox [(value)]="selectedItems" orientation="vertical" [multi]="true">
+<ul ngListbox [(value)]="selected" [multi]="true">
   <li ngOption value="apple" class="option">Apple</li>
   <li ngOption value="banana" class="option">Banana</li>
 </ul>
 ```
 
 ```css
-.option[aria-selected="true"] { background: #e0f7fa; font-weight: bold; }
-.option:focus-visible { outline: 2px solid blue; }
+.option[aria-selected="true"] { @apply bg-primary-100 font-semibold; }
+.option:focus-visible { @apply outline-2 outline-primary-600; }
 ```
 
-## Lazy-Loaded Content
-
-Use structural content directives inside `<ng-template>` for heavy panels — defers rendering until needed:
-
-```html
-<div ngAccordionPanel #panel="ngAccordionPanel">
-  <ng-template ngAccordionContent>
-    <p>Lazy-loaded content here.</p>
-  </ng-template>
-</div>
-```
-
-Applies to `ngAccordionContent`, `ngTabContent`, `ngMenuContent`, `ngComboboxPopup`, `ngTreeItemGroup`.
-
-## Signal Forms Integration
-
-Aria directives expose `model()`-based `value` — `[formField]` binds them as custom controls out-of-the-box.
-
-```html
-<ul ngListbox [formField]="myForm.interests" [multi]="true">
-  <li ngOption value="sports">Sports</li>
-  <li ngOption value="music">Music</li>
-</ul>
-```
-
-See `angular-forms` for schema/model conventions. See [references/aria-patterns.md](references/aria-patterns.md) for Combobox/Select form-binding examples.
-
-## Testing with Harnesses
-
-Built on `@angular/cdk/testing` — assert behavior, not DOM structure.
-
-```typescript
-import { TestbedHarnessEnvironment } from "@angular/cdk/testing/testbed";
-import { AccordionHarness } from "@angular/aria/accordion/testing";
-
-const loader = TestbedHarnessEnvironment.loader(fixture);
-const accordion = await loader.getHarness(AccordionHarness.with({ title: "Section 1" }));
-
-expect(await accordion.isExpanded()).toBeFalse();
-await accordion.expand();
-expect(await accordion.isExpanded()).toBeTrue();
-```
-
-See `angular-testing` for harness setup conventions shared across the codebase.
-
-## Hard Rules
-
-- Never use native `<select>`/`<input list>`/`<details>` for these patterns — use `ng*` directives. Native elements can't express these interaction models accessibly.
-- Always provide CSS for ARIA-state selectors — directives apply attributes, not styles. Unstyled = visually broken.
-- Lazy-load heavy panel content via the `ng*Content`/`ng*Group` structural directives in `<ng-template>`.
-- Style via `angular-theme` conventions (`@apply` against ARIA-attribute selectors) — keep widget CSS colocated with the component.
+Widget choice table, Combobox + CDK Overlay shape, form wrapper, testing: [references/aria-patterns.md](references/aria-patterns.md). Check current docs with Context7 before writing widget inputs.
 
 ## I/O Reference
 

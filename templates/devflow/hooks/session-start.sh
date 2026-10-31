@@ -2,20 +2,28 @@
 # dev-flow session start hook
 # Injects pipeline orientation into every new session.
 # Active project with known next_step in state → compact pointer (~150 tokens).
-# Active project without usable state → full devflow-discovery meta-skill.
-# Inactive project → one-line INFO pointer.
+# Active project without usable state → full orientation decision tree.
+# Inactive project → one-line pointer.
+# Output: lib/emit.sh df_context (SessionStart additionalContext on Claude Code).
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SKILLS_DIR="$(dirname "$SCRIPT_DIR")/skills"
-META_SKILL="${DEVFLOW_META_SKILL:-$SKILLS_DIR/devflow-discovery/SKILL.md}"
+PLUGIN_ROOT="$(dirname "$SCRIPT_DIR")"
+META_SKILL="${DEVFLOW_META_SKILL:-$PLUGIN_ROOT/references/orientation.md}"
 
-if ! command -v jq >/dev/null 2>&1; then
-  echo '{"priority": "INFO", "message": "dev-flow: jq required for session-start hook but not found. Install jq (brew install jq) to enable pipeline orientation. Skills remain available individually."}'
+. "$SCRIPT_DIR/lib/payload.sh"
+. "$SCRIPT_DIR/lib/emit.sh"
+
+if ! df_read_input; then
+  # No jq: plain stdout is still added as context on SessionStart (Claude Code)
+  echo "dev-flow: jq required for session-start hook but not found. Install jq (brew install jq) to enable pipeline orientation. Skills remain available individually."
   exit 0
 fi
+DF_EVENT="${DF_EVENT:-SessionStart}"
 
-CONFIG_FILE="${DEVFLOW_CONFIG_FILE:-$SCRIPT_DIR/../config.md}"
-WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+WORKSPACE_ROOT="$DF_WORKSPACE"
+# Project config lives in the consumer repo (written by devflow.setup), never in
+# the plugin dir — the plugin's config.md is an unconfigured template.
+CONFIG_FILE="${DEVFLOW_CONFIG_FILE:-$WORKSPACE_ROOT/devflow/config.md}"
 STATE_FILE="${DEVFLOW_STATE_FILE:-$WORKSPACE_ROOT/.devflow-state.json}"
 
 # Only a consumer project actively using devflow gets orientation injected
@@ -31,7 +39,7 @@ elif [ -f "$CONFIG_FILE" ] && ! grep -q "\[TODO" "$CONFIG_FILE"; then
 fi
 
 if [ "$PROJECT_ACTIVE" != true ]; then
-  echo '{"priority": "INFO", "message": "dev-flow available but not set up in this project. Run /devflow.setup to start a spec-driven pipeline."}'
+  df_context "dev-flow available but not set up in this project. Run /devflow.setup to start a spec-driven pipeline."
   exit 0
 fi
 
@@ -50,24 +58,8 @@ NEXT_STEP=""
 FEATURE=""
 if [ -f "$STATE_FILE" ]; then
   NEXT_STEP=$(jq -r '.next_step // empty' "$STATE_FILE" 2>/dev/null) || NEXT_STEP=""
-  FEATURE=$(jq -r '.feature // empty' "$STATE_FILE" 2>/dev/null) || FEATURE=""
+  FEATURE=$(jq -r '.feature // .active_feature // empty' "$STATE_FILE" 2>/dev/null) || FEATURE=""
 fi
-
-# Context file hint per next step
-case "$NEXT_STEP" in
-  devflow.task|devflow.plan)
-    CTX="@devflow/contexts/research.md"
-    ;;
-  devflow.implement|devflow.beautify)
-    CTX="@devflow/contexts/implement.md"
-    ;;
-  devflow.ship)
-    CTX="@devflow/contexts/review.md"
-    ;;
-  *)
-    CTX=""
-    ;;
-esac
 
 # ── Compact branch: state already names the entry point ──────────────────────
 # The full decision tree is redundant when next_step is a known pipeline step.
@@ -85,14 +77,13 @@ if [ "$KNOWN_STEP" = true ]; then
   if [ -n "$FEATURE" ]; then
     FEATURE_LABEL=" (feature: $FEATURE)"
   fi
-  CTX_LINE=""
-  if [ -n "$CTX" ]; then
-    CTX_LINE="
-Load context: $CTX"
-  fi
-  MSG="dev-flow active$FEATURE_LABEL. Next step: $NEXT_STEP — run /$NEXT_STEP, or /devflow.resume to re-orient after an interruption.$CTX_LINE
-User is orchestrator — skills do not invoke each other. Full orientation: devflow-discovery skill.$CONFIG_WARN"
-  jq -cn --arg message "$MSG" '{priority: "IMPORTANT", message: $message}'
+  # Slash form per host (skills are the commands): /devflow:<step> on Claude
+  # Code, /devflow-<step> on Antigravity. The build rewrites literal names, not
+  # this one, which comes from the state file.
+  if [ "$DF_HOST" = "antigravity" ]; then RUN="/devflow-${NEXT_STEP#devflow.}"; else RUN="/devflow:${NEXT_STEP#devflow.}"; fi
+  MSG="dev-flow active$FEATURE_LABEL. Next step: $NEXT_STEP — run $RUN, or /devflow.resume to re-orient after an interruption.
+User orchestrates; only ship/run/auto/hotfix chain other steps. Full orientation: $PLUGIN_ROOT/references/orientation.md.$CONFIG_WARN"
+  df_context "$MSG"
   exit 0
 fi
 
@@ -104,9 +95,7 @@ if [ -f "$META_SKILL" ]; then
 
 $CONTENT"
 
-  jq -cn \
-    --arg message "${BASE_MSG}${CONFIG_WARN}" \
-    '{priority: "IMPORTANT", message: $message}'
+  df_context "${BASE_MSG}${CONFIG_WARN}"
 else
-  echo '{"priority": "INFO", "message": "dev-flow: devflow-discovery skill not found. Run devflow.setup if this is a new project."}'
+  df_context "dev-flow: orientation reference not found. Run devflow.setup if this is a new project."
 fi

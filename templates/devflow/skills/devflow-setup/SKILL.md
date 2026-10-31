@@ -3,9 +3,12 @@ name: devflow-setup
 description: "Generates AGENTS.md, REGISTRY.md, docs/product.md via adapter templates + questionnaire. Use when running devflow.setup post-install, or adapter/stack/product context changes."
 argument-hint: "[--force] [--mcp]"
 disable-model-invocation: true
+effort: medium
 ---
 
 # Skill: devflow.setup
+
+**Arguments:** `$ARGUMENTS` — empty → run without `--force`/`--mcp` (managed sections only).
 
 ## Purpose
 
@@ -13,10 +16,7 @@ Create or refresh global AI context files (`AGENTS.md`, `REGISTRY.md`) and produ
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 
 ## When NOT to Use
 
@@ -43,7 +43,7 @@ Never edit user content outside managed blocks unless `--force` is set.
 
 ### Step 1 - Resolve mode, apps, and adapter(s)
 
-1. Ask the user: "Single app, or multiple apps in this repo (monorepo)?" (`AskQuestion`, two options).
+1. Ask the user: "Single app, or multiple apps in this repo (monorepo)?" (`AskUserQuestion` / `ask_question`, two options).
 
 **Single app** (unchanged from pre-monorepo behavior):
 
@@ -62,14 +62,14 @@ Never edit user content outside managed blocks unless `--force` is set.
 3. Overwrite `@devflow/config.md` with the Apps table — template: `references/config-template.md` § Monorepo.
 
 **Both modes — build adapter contract paths:**
-`@devflow/adapters/<adapter>/ADAPTER.md` (core) and `@devflow/adapters/<adapter>/steps/setup.md` (setup templates + dependencies; legacy adapters keep all sections in `ADAPTER.md`). Monorepo builds a list of `(app, adapter, adapter_root)` tuples and repeats Steps 2–7c per app unless noted.
+`@devflow/adapters/<adapter>/ADAPTER.md` (core) and `@devflow/adapters/<adapter>/steps/setup.md` (setup templates + dependencies). Monorepo builds a list of `(app, adapter, adapter_root)` tuples and repeats Steps 2–7c per app unless noted.
 
 ### Step 2 - Load contract and templates
 
 Monorepo: repeat this step once per declared app, using that app's own adapter.
 
 1. Read adapter contract files (core + setup step file).
-2. Read `Setup dependencies` section from `@devflow/adapters/<adapter>/steps/setup.md` (legacy: `ADAPTER.md`) and extract:
+2. Read `Setup dependencies` section from `@devflow/adapters/<adapter>/steps/setup.md` and extract:
    - JavaScript package list (runtime + dev where applicable)
    - Flutter package list (`dependencies`, `dev_dependencies` if explicitly declared)
    - Optional adapter notes for setup installs
@@ -92,7 +92,7 @@ Do not skip this step even if values can be inferred.
 
 Collection order:
 
-1. Prefer `AskQuestion` for structured choices.
+1. Prefer `AskUserQuestion` / `ask_question` for structured choices.
 2. Use concise chat questions for free text fields.
 3. Confirm ambiguous answers once, then proceed.
 
@@ -206,7 +206,7 @@ After successful file writes, install dependencies declared in the active adapte
 
 ### Step 8 - Notify user
 
-Respond using the template in `references/notify-template.md`. If `--mcp` in `$ARGUMENTS`: emit ready-to-copy client MCP config JSON (Antigravity `mcp_config.json`, Claude Code `.mcp.json`, or Cursor) and offer to write it.
+Respond using the template in `references/notify-template.md`. If `--mcp` in `$ARGUMENTS`: emit ready-to-copy client MCP config JSON (Antigravity `mcp_config.json` or Claude Code `.mcp.json`) and offer to write it.
 
 ## Output quality checklist
 
@@ -224,23 +224,19 @@ Before final response:
 
 ## Anti-Patterns
 
-Key anti-patterns (full catalog: `@devflow/skills/devflow-setup/references/setup-anti-patterns.md`):
-
 | Anti-Pattern | Fix |
 | --- | --- |
 | Writing files inside `devflow/features/` | Write only to consumer root; `devflow/` is read-only. |
-| Skipping questionnaire and guessing adapter | Always run full questionnaire; no silent defaults. |
-| Regenerating files without `--force` | Check managed markers; preserve user content. |
 | Installing dependencies globally | Use project package manager (`pnpm add`, `flutter pub add`). |
-| Generating marker-less content | Wrap all managed content with `<!-- devflow-managed:start / :end -->`. |
-| Auto-scanning tree for apps in monorepo | Apps are declared explicitly by user — ask, never infer. |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/setup-anti-patterns.md`.
 
 ## I/O Reference
 
 | | |
 | --- | --- |
 | Reads | `@devflow/config.md`, `references/config-template.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/setup.md` (including `Setup dependencies`) — per declared app in monorepo mode, adapter + fallback templates |
-| Reads | `@devflow/skills/devflow-setup/references/setup-anti-patterns.md` (Anti-patterns catalog) |
+| Reads (conditional) | `@devflow/skills/devflow-setup/references/setup-anti-patterns.md` (Anti-patterns catalog — when unsure / retry) |
 | Writes | `AGENTS.md`, `REGISTRY.md`, `docs/product.md` (consumer project root); `@devflow/config.md`; `.gitignore` (appends `.devflow-state.json` if missing) |
 | Side effects | Installs adapter setup dependencies using project package manager or Flutter pub |
 | Next step | `devflow.task` |

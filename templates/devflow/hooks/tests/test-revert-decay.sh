@@ -53,6 +53,16 @@ instinct_field() {
   yq -r ".instincts[] | select(.id == \"$id\") | .$field" "$workdir/.devflow-instincts.yaml" 2>/dev/null
 }
 
+# Same graceful degrade as the hooks: no yq → instincts are off → skip.
+if ! command -v yq >/dev/null 2>&1; then
+  if [ "${CI:-}" = "true" ]; then
+    echo "FAIL: yq not installed (required in CI)"; exit 1
+  fi
+  echo "=== test-revert-decay.sh ==="
+  echo "SKIP: yq not installed — install with: brew install yq"
+  exit 0
+fi
+
 echo "=== test-revert-decay.sh ==="
 echo ""
 

@@ -2,6 +2,7 @@
 name: devflow-blueprint
 description: Transforms large objective into multi-PR blueprint with dependency graph and parallel-step detection. Use when feature requires 3+ PRs, spans sessions, or needs parallel workstreams.
 argument-hint: "[objective or path-to-brief]"
+effort: high
 ---
 
 # Skill: devflow.blueprint
@@ -21,10 +22,7 @@ Transform a large objective into a multi-PR blueprint. Output: dependency graph,
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved; blueprint approved before any `devflow.plan` begins
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep paths, IDs, commands exact
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 - **self-contained briefs** — every step contains enough context for a fresh agent with zero prior-session knowledge
 - **explicit dependencies** — steps list their blockers; no implicit ordering
 - **adversarial gate** — Opus subagent critiques the draft before it is finalised
@@ -165,21 +163,19 @@ Next: run devflow.plan for step [001] → [step title]
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Skip dependency graph — "deps obvious" | Implicit deps → merge conflicts. Always make explicit. |
-| Context brief not self-contained ("see step [NNN]") | Fresh agent in new session cannot proceed. Brief = files, contracts, constraints, full context. |
-| Skip/rush adversarial review | Wrong parallelization caught only during implement. Always run the gate. |
-| Mark all steps `parallel-safe: yes` by default | Concurrent edits → conflicts. Default `no`; prove `yes` only when no shared files. |
 | Edit steps after adversarial review without re-marking `draft` | Review gate bypassed. Mark `draft` → re-run adversarial → re-approve. |
-| Use blueprint for single-PR scope | Use `devflow.task` → `devflow.plan` directly. |
-| Step has no acceptance criteria | `devflow.implement` cannot prove completion. |
-| Step title is a layer ("add tests") not outcome increment | Layer-shaped → big-bang delivery. Reframe as increments. |
+| Mark all steps `parallel-safe: yes` by default | Concurrent edits → conflicts. Default `no`; prove `yes` only when no shared files. |
 | Two parallel-safe steps touch the same file / graph is straight line / missing transitive edges | Concurrent edits, wrong ordering, missed parallelism. Default `parallel-safe: no`; include all transitive deps; review straight-line graphs for parallel workstreams. |
+| Step title is a layer ("add tests") not outcome increment | Layer-shaped → big-bang delivery. Reframe as increments. |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 
 | | |
 | --- | --- |
 | Reads | `docs/product.md`, `constitution.md`, `registry.md`, `.devflow-state.json` |
+| Reads (conditional) | `references/anti-patterns.md` (when unsure / retry) |
 | Spawns | Opus subagent (adversarial review, Step 6) |
 | Writes | `devflow/plans/[slug]-blueprint.md` |
 | Next step | `devflow.plan` per step, in dependency order |

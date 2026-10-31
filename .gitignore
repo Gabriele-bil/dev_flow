@@ -25,7 +25,6 @@ $RECYCLE.BIN/
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
-.cursor/*.log
 
 # Environment & secrets (if tooling is added later)
 .env
@@ -99,3 +98,9 @@ devflow/board/
 
 # devflow fetch cache
 .devflow-fetch-cache/
+
+# DevFlow dogfood runs in this repo (consumer artefacts, not plugin source)
+devflow/features/
+
+# Per-developer tool config
+.serena/

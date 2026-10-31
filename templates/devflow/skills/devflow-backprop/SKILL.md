@@ -6,6 +6,8 @@ argument-hint: "[bug-description-or-test-path]"
 
 # Skill: devflow.backprop
 
+**Arguments:** `$ARGUMENTS` — empty → ask the user for the observed failure before Step 1.
+
 Spec backpropagation. A bug that escaped the pipeline means the spec was wrong, not only the code. Fix the spec, add a regression test, log the gap category — the next feature must not repeat it.
 
 ## Purpose
@@ -14,10 +16,7 @@ Close the loop between runtime failures and `task.md`: trace behavior → accept
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 
 ## When NOT to Use
 
@@ -69,7 +68,7 @@ Propose, then apply after approval:
 
 ### Step 5 — Regression test
 
-Name it before writing: `[test file path] :: [test name referencing the AC]`. Test must fail on current code (Prove-It), pass after fix. Write it per the adapter test step file (`@devflow/adapters/<adapter>/steps/test.md`; legacy: `ADAPTER.md` → **Test**) conventions. Code fix itself: trivial → apply now; non-trivial → re-enter `devflow.implement` for affected File List entries (status transition per `@devflow/references/state-machine.md`, user-confirmed). Slice `deps:` annotations present in **File List** → scope re-entry to the affected slice plus downstream slices listing it in `deps`; untouched independent slices stay `[done]`.
+Name it before writing: `[test file path] :: [test name referencing the AC]`. Test must fail on current code (Prove-It), pass after fix. Write it per the adapter test step file (`@devflow/adapters/<adapter>/steps/test.md`) conventions. Code fix itself: trivial → apply now; non-trivial → `devflow.implement --fix <affected File List entries>` re-entry mode (backward transition per `@devflow/references/state-machine.md`, user-confirmed), then `devflow.beautify` → `devflow.test` again. Trivial inline fix on a plan past `implemented` → still re-run `devflow.test` (regenerates `verification.md`) before ship. Slice `deps:` annotations present in **File List** → scope re-entry to the affected slice plus downstream slices listing it in `deps`; untouched independent slices stay `[done]`.
 
 ### Step 6 — Log the gap (Rigor systemic rule)
 
@@ -90,31 +89,22 @@ Fix:        [applied inline | routed to devflow.implement]
 Instinct:   [id] logged ([N] total in family[; clarify question proposed])
 ```
 
-## Common Rationalizations
-
-| Thought | Reality |
-| --- | --- |
-| "Just fix the bug, updating the spec is bureaucracy" | Unfixed spec reproduces the gap in the next feature; the fix is 2 lines of task.md |
-| "The AC sort of covers it" | AC that didn't catch the bug is by definition incomplete — tighten it |
-| "Regression test later, fix now" | Untested fix regresses silently; failing-test-first is the proof the gap is closed |
-| "One-off bug, not worth logging" | Families repeat — the 3+ rule only works if every gap is logged |
-
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
 | --- | --- |
 | Rewriting task.md Summary/scope during backprop | Touch only AC, subtask, Traceability, Notes — scope changes go through devflow.task |
 | Classifying every gap as "missing requirement" | Check existing subtasks first; most gaps are incomplete criteria |
-| Regression test asserting the buggy behavior | Test asserts the tightened AC, not current output |
-| Skipping the instinct log | Step 6 is the loop-closer — without it, backprop is a plain bugfix |
 | Fixing unrelated code "while tracing" | Trace is read-only until Step 4 approval |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 
 | | |
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md` (Traceability) |
-| Reads | `references/backprop-patterns.md`, `@devflow/references/state-machine.md`, `@devflow/adapters/<adapter>/steps/test.md` (Test conventions) |
+| Reads | `references/backprop-patterns.md`, `@devflow/adapters/<adapter>/steps/test.md` (Test conventions) |
 | Writes | `task.md` — AC added/tightened, `## Notes` backprop entry |
 | Writes | `plan.md` — Traceability row for changed AC |
 | Writes | regression test file per adapter conventions |

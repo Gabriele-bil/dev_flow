@@ -1,51 +1,37 @@
 ---
 name: nestjs-database
-description: TypeORM entities, migrations, transactions, N+1 avoidance, repository queries. Load when creating or refactoring *.entity.ts, migration files, or any repository/query-builder code.
+description: Data access with the project ORM (TypeORM 1 or Prisma 7) — schema/entities, repositories, transactions, migrations, N+1 avoidance. Load when creating or refactoring *.entity.ts, prisma/schema.prisma, migration files, or repository/query code.
 ---
 
 # Skill: NestJS Database
 
-Use when defining entities, writing migrations, wiring transactions, or reviewing query relation-loading for N+1 risk.
+## Purpose
 
-Full code examples: `references/database-patterns.md`.
+Project rules for persistence that hold for both supported ORMs; the ORM-specific form of each rule is one row in `references/database-patterns.md`.
 
 ## When NOT to Use
 
-- File does not match trigger pattern in `ADAPTER.md` (no entity/migration/repository change)
-- Pure caching-layer work on top of an already-correct query — use `nestjs-performance`
+- File matches no row of `steps/implement.md` → skill load decision matrix that names `nestjs-database`
+- Caching on top of a correct query — use `nestjs-performance`
+- Response shape of returned records — use `nestjs-api-design`
 
-## Objectives
+## Rules
 
-- Every entity list/detail fetch avoids N+1 — eager `relations`/joins, never a query inside a loop.
-- Schema changes only via migrations — `synchronize: true` never used outside local dev.
-- Multi-step writes that must succeed/fail together wrapped in a transaction.
-- Repository encapsulates query-builder logic (see `nestjs-architecture` §5) — services stay query-free.
-
-## 1) Avoid N+1 Queries (HIGH)
-
-Fetching a list then looping to fetch each item's relation (`for (const order of orders) order.items = await ...`) issues 1+N queries. Fix: `relations: ['items', 'items.product']` on the initial `find()` for a single JOIN query, or `createQueryBuilder` with `leftJoinAndSelect` for more control, or `select` shaping to avoid over-fetching while still joining. For GraphQL resolvers, use `DataLoader` (request-scoped, batches per-tick). Enable `logging: ['query', 'error']` in dev TypeORM config to catch N+1 patterns during development.
-
-## 2) Use Migrations, Never `synchronize: true` (HIGH)
-
-`synchronize: true` outside local dev can silently drop columns/tables/data on deploy — never in any shared environment. All schema changes go through generated migration files (`up`/`down` both implemented — `down` enables rollback). Column renames use the safe four-step pattern: add new column, backfill data, add constraint, drop old column (in a later migration, after verifying the app works) — never a direct rename that risks data loss if the deploy needs to roll back.
-
-## 3) Use Transactions for Multi-Step Operations (HIGH)
-
-Any sequence of writes that must all succeed or all fail together (`create order` + `decrement inventory` + `charge payment`) wraps in `dataSource.transaction(async (manager) => {...})` — every operation inside uses the transactional `manager`, not the injected repository, and a thrown error automatically rolls back everything. For manual control (multi-step validation between operations), use `QueryRunner` directly with explicit `startTransaction()`/`commitTransaction()`/`rollbackTransaction()`/`release()` in a `try/catch/finally`.
-
-## Database Review Checklist
-
-- [ ] No query issued inside a loop over a previously-fetched list — `relations`/joins used instead
-- [ ] `synchronize: false` in every non-local environment
-- [ ] Every schema change has a migration file with both `up` and `down` implemented
-- [ ] Column renames use the additive four-step pattern, not a direct rename
-- [ ] Multi-step writes that must be atomic wrapped in `dataSource.transaction()` or `QueryRunner`
-- [ ] Query-builder logic lives in a `<feature>.repository.ts`, not inline in the service
+0. **Resolve the ORM first** (`ADAPTER.md` → Project choices). Use only its column in the reference table. Never add the other ORM, never hand-roll SQL where the ORM has an API.
+1. **Repositories own queries.** `<feature>.repository.ts` wraps TypeORM `Repository<T>` or `PrismaService`; services hold no query builders and no ORM types in their public API.
+2. **No N+1.** Never query inside a loop over fetched rows. Load relations in the first query (TypeORM `relations` / join; Prisma `include` / `select`), or batch with `IN`. GraphQL field resolvers → request-scoped `DataLoader`.
+3. **Fetch only what is used.** Explicit `select` on list endpoints; paginate every list (`skip`/`take`); index every column used in frequent `WHERE`/`JOIN`/`ORDER BY` (declared in the entity or `schema.prisma`, shipped by migration).
+4. **Migrations only.** Every schema change is a generated, reviewed migration committed with the code. Never `synchronize: true` (TypeORM) or `prisma db push` (Prisma) outside a throwaway local DB. Deploy runs `migration:run` / `prisma migrate deploy`.
+5. **Expand–contract for destructive changes.** Rename/drop: add new column → backfill → switch code → drop old in a later release. Never a one-step rename on a live table.
+6. **Atomic multi-write.** Writes that must succeed together run in one transaction callback; every call inside uses the transactional handle (TypeORM `manager`, Prisma `tx`), never the injected repository. No external I/O (HTTP, queue, email) inside the transaction — publish after commit (outbox if it must not be lost).
+7. **TypeORM 1 specifics.** Find options are object-shaped (`relations: { posts: true }`, `select: { id: true }`); `null`/`undefined` in `where` throws — use `IsNull()`; non-nullable relations now `INNER JOIN` (orphans drop out). Removed in v1, never generate: `findByIds`, `@EntityRepository`, `getRepository()`/`getConnection()` globals.
+8. **Prisma 7 specifics.** Generator `prisma-client` with `output`; import `PrismaClient` from that generated path; a driver adapter (`@prisma/adapter-pg`, …) is required; connection URL lives in `prisma.config.ts`, not `schema.prisma`. `$use` middleware removed → `$extends`.
+9. **Versions move fast.** Before writing an ORM API not shown in the reference, check current docs with Context7 (TypeORM 1.x / Prisma 7.x).
 
 ## I/O Reference
 
 | | |
 | --- | --- |
-| Invoked by | `devflow-implement` when file path matches `*.entity.ts`, `**/migrations/*.ts`, `*.repository.ts`, or content uses `createQueryBuilder`/`dataSource.transaction` |
-| Reads | `@devflow/adapters/nestjs/ADAPTER.md` |
-| Related | `nestjs-architecture` (repository pattern placement), `nestjs-performance` (query/index optimization, caching) |
+| Invoked by | `devflow-implement` / `devflow-beautify` per `steps/implement.md` → skill load decision matrix |
+| Reads | `@devflow/adapters/nestjs/ADAPTER.md`, `references/database-patterns.md`, `constitution.md` (Key decisions) |
+| Related | `nestjs-architecture` (repository placement), `nestjs-performance` (caching, indexes under load), `nestjs-testing` (repository mocks) |

@@ -5,30 +5,34 @@ description: Angular v22 Signal Forms — two-way binding, schema validation, fi
 
 # Angular Signal Forms
 
-Build type-safe, reactive forms with Signal Forms API. One model signal = source of truth.
+## Purpose
 
-Signal Forms stable, production-ready in Angular v22.
+Build type-safe forms with Signal Forms (`@angular/forms/signals`): one model signal = source of truth, rules in a schema function.
 
-## Strict Rules
+## When NOT to Use
 
-These traps break builds or silently corrupt form behavior — pre-empt them:
+- File matches no row of `steps/implement.md` → skill load decision matrix (no form, form component or validator touched).
+- Template-driven forms, Formly/ngx-formly, or legacy Reactive Forms kept as-is.
+- Accessible widget markup itself (Combobox, Listbox) → `angular-aria`; only the `[formField]` binding lives here.
 
-- **Non-null model** — never `null`/`undefined` in initial model values. Use `''` for strings, `0` for numbers, `[]` for arrays, nested object defaults for groups. Inputs reject `null`.
-- **Calling convention** — fields are functions: `form.field().valid()`, NOT `form.field.valid`. `form.field()` = `FieldState` (signals); `form.field` = `FormField` (structure, no flags). Exception: `.length` on arrays is structural, no `()`.
-- **Forbidden `[formField]` attributes** — never set `min`, `max`, `value`, `[value]`, `[disabled]`, `[readonly]`, `[attr.min]`, `[attr.max]` alongside `[formField]`. `[formField]` owns these; conflicts throw `NG8022`. Express constraints via schema rules (`min()`, `max()`, `disabled()`, `readonly()`).
-- **Async validation** — use `validateAsync()`, never `validate()`, for async work. `params` MUST be a function (`({ value }) => value()`); `onError` is REQUIRED, not optional.
-- **`debounce()`** — delays model sync (e.g. `debounce(s.username, 300)`) for expensive downstream work (async validation, search).
-- **`applyEach`/`applyWhen` nuances** — `applyEach` callback takes exactly ONE argument (the item path), never `(item, index)`. `applyWhen` needs 3 args: `(path, condition, schemaFn)`; condition reads via `valueOf`/`stateOf`, paths are not signals/callable inside the schema.
-- **No `$parent` in nested `@for`** — capture outer index with `let outerIndex = $index`.
+## Rules
 
-Full pitfalls table + examples: [references/form-patterns.md](references/form-patterns.md#strict-rules--common-pitfalls).
+- **Non-null model** — `''`, `0`, `[]`, nested defaults; never `null`/`undefined`.
+- **Calling convention** — `form.field().valid()`, not `form.field.valid()`. Arrays: `form.items.length` (structural, no `()`).
+- **`[formField]` owns `value`, `disabled`, `readonly`, `min`, `max`** — never set them as attributes/bindings on the same element (NG8022). Use schema rules.
+- **Conditional state** — `hidden(p.x, { when })`, `disabled(p.x, { when })`, `readonly(p.x, { when })`. Positional logic fn deprecated.
+- **Async validation** — `validateHttp()` or `validateAsync()`, never `validate()`. Schema lives in `validators/`, not inline in the component.
+- **`debounce(p.x, ms)`** for expensive downstream work (async validation, search).
+- **`applyEach`** callback takes one arg; **`applyWhen`** takes `(path, condition, schemaFn)`.
+- **Submit** with `submit(form, async () => …)` — marks touched, runs only when valid.
+- **Custom controls** implement `FormValueControl<T>` and bind via `[formField]`.
 
-Full field/form patterns (setup, models, state, validation, conditional fields, submission, arrays, error display, reset) → [references/form-patterns.md](references/form-patterns.md).
+Pitfalls table, `{ when }` example, custom control and test notes: [references/form-patterns.md](references/form-patterns.md). Check current docs with Context7 before writing Signal Forms rules — API still moves between minors.
 
 ## I/O Reference
 
 |            |                                                           |
 | ---------- | --------------------------------------------------------- |
-| Reads      | Active form files, `@devflow/adapters/angular/ADAPTER.md` |
+| Reads      | Active form/validator files, `@devflow/adapters/angular/ADAPTER.md` |
 | Writes     | New or refactored Angular signal-based form files         |
 | Invoked by | `devflow.implement`, `devflow.beautify`                   |

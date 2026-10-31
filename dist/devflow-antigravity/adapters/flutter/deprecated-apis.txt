@@ -1,0 +1,18 @@
+# Banned APIs for Flutter: <extended regex><TAB><use instead>. validate-adapters.sh greps every .md
+# of the adapter; a match is allowed only on a line that says removed / deprecated / instead / do not use.
+# Each hint below ends with "instead" so this file passes the same grep.
+# Riverpod 3 / riverpod_generator 4
+valueOrNull	AsyncValue.value instead (valueOrNull removed in Riverpod 3)
+(ProviderRef|AutoDispose[A-Za-z]*Ref|SupabaseClientRef)	plain Ref instead (generated typed refs removed)
+(StateNotifierProvider|ChangeNotifierProvider|(^|[^A-Za-z])StateProvider)	@riverpod Notifier / AsyncNotifier instead (legacy.dart only)
+createContainer\(	ProviderContainer.test( instead
+custom_lint	riverpod_lint under plugins: in analysis_options.yaml instead (analysis_server_plugin)
+# freezed 3+/4
+^class [A-Za-z0-9_]+ with _\$	@freezed abstract class / sealed class instead
+# i18n
+easy_localization	slang + slang_flutter instead
+# flutter_test / Flutter SDK
+(physicalSizeTestValue|binding\.window)	tester.view.physicalSize + addTearDown(tester.view.reset) instead
+withOpacity\(	Color.withValues(alpha: ...) instead
+MaterialStateProperty	WidgetStateProperty instead
+textScaleFactor	TextScaler / MediaQuery.textScalerOf instead

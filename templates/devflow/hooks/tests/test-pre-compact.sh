@@ -123,9 +123,9 @@ run_hook "$D"
 [ ! -f "$D/.devflow-state.json" ] \
   && assert "no state file written without plan" pass \
   || assert "no state file written without plan" fail
-grep -q '"priority":"INFO"' /tmp/devflow-test-precompact-out \
-  && assert "INFO message emitted" pass \
-  || assert "INFO message emitted" fail
+[ ! -s /tmp/devflow-test-precompact-out ] \
+  && assert "silent without an active plan" pass \
+  || assert "silent without an active plan" fail
 rm -rf "$D"
 
 # T5: next_feature_number computed from highest prefix
@@ -134,7 +134,7 @@ D=$(tmpdir)
 write_plan "$D" "ready"
 mkdir -p "$D/devflow/features/007_other"
 run_hook "$D"
-[ "$(state_field "$D" '.next_feature_number')" = "008" ] \
+[ "$(state_field "$D" '.next_feature_number')" = "8" ] \
   && assert "next_feature_number is 008" pass \
   || assert "next_feature_number is 008 (got '$(state_field "$D" '.next_feature_number')')" fail
 rm -rf "$D"
@@ -150,14 +150,36 @@ grep -qF ".devflow-state.json" "$D/.gitignore" \
   || assert "gitignore contains .devflow-state.json" fail
 rm -rf "$D"
 
-# T7: output context message mentions resume
-echo "--- T7: compaction reminder mentions devflow.resume ---"
+# T7: user notice is a systemMessage naming the next step
+echo "--- T7: compaction notice is a systemMessage ---"
 D=$(tmpdir)
 write_plan "$D" "implementing"
 run_hook "$D"
-grep -q "devflow.resume" /tmp/devflow-test-precompact-out \
-  && assert "reminder mentions devflow.resume" pass \
-  || assert "reminder mentions devflow.resume" fail
+jq -e '.systemMessage | test("next: devflow.implement")' /tmp/devflow-test-precompact-out >/dev/null 2>&1 \
+  && assert "systemMessage names next step" pass \
+  || assert "systemMessage names next step (got '$(cat /tmp/devflow-test-precompact-out)')" fail
+rm -rf "$D"
+
+# T8: snapshot merges into existing state instead of replacing it
+echo "--- T8: merge preserves skill-written fields ---"
+D=$(tmpdir)
+write_plan "$D" "implementing"
+printf '{"branch":"feat/x","task_status":"done","app":"web","active_feature":"legacy"}' > "$D/.devflow-state.json"
+run_hook "$D"
+[ "$(state_field "$D" '.branch')" = "feat/x" ] && [ "$(state_field "$D" '.task_status')" = "done" ] && [ "$(state_field "$D" '.app')" = "web" ] \
+  && assert "branch/task_status/app preserved" pass \
+  || assert "branch/task_status/app preserved (got $(cat "$D/.devflow-state.json"))" fail
+[ "$(state_field "$D" '.active_feature // "gone"')" = "gone" ] \
+  && assert "legacy active_feature dropped in favour of feature" pass \
+  || assert "legacy active_feature dropped in favour of feature" fail
+
+# T9: unknown plan status keeps the skills' next_step
+printf '{"next_step":"devflow.analyze"}' > "$D/.devflow-state.json"
+sed -i.bak 's/^\*\*Status:\*\*.*/**Status:** weird/' "$D/devflow/features/"*/plan.md
+run_hook "$D"
+[ "$(state_field "$D" '.next_step')" = "devflow.analyze" ] \
+  && assert "unknown status keeps next_step" pass \
+  || assert "unknown status keeps next_step (got '$(state_field "$D" '.next_step')')" fail
 rm -rf "$D"
 
 # ── summary ───────────────────────────────────────────────────────────────────

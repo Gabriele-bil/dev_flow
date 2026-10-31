@@ -22,7 +22,7 @@ assert() {
 run_hook() {
   local file_path="$1"
   local payload
-  payload=$(jq -cn --arg fp "$file_path" '{tool_use: {name: "Edit", input: {file_path: $fp}}}')
+  payload=$(jq -cn --arg fp "$file_path" '{hook_event_name: "PreToolUse", session_id: "s1", tool_name: "Edit", tool_input: {file_path: $fp}}')
   printf '%s' "$payload" | bash "$HOOK" 2>/dev/null || true
 }
 
@@ -30,7 +30,7 @@ expect_block() {
   local label="$1" file_path="$2"
   local out
   out=$(run_hook "$file_path")
-  echo "$out" | grep -qE '"decision"[[:space:]]*:[[:space:]]*"block"' \
+  echo "$out" | grep -qE '"permissionDecision"[[:space:]]*:[[:space:]]*"deny"' \
     && assert "$label blocked" pass \
     || assert "$label blocked (output: '$out')" fail
 }

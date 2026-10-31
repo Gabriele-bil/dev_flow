@@ -13,12 +13,12 @@ DevFlow runs in multiple agentic hosts. Use the appropriate interactive question
 | Environment | Primary Tool | Tool Call Pattern |
 | ----------- | ------------ | ----------------- |
 | **Antigravity** | `ask_question` | `ask_question(questions=[{question: "...", options: ["(Recommended) ...", "..."], is_multi_select: false}])` |
-| **Claude Code** | `AskQuestion` | `AskQuestion(questions=[{question: "...", options: ["(Recommended) ...", "..."]}])` |
+| **Claude Code** | `AskUserQuestion` | `AskUserQuestion(questions=[{question: "...", header: "<≤12 chars>", multiSelect: false, options: [{label: "(Recommended) ...", description: "..."}, {label: "...", description: "..."}]}])` — 1–4 questions per call |
 | **CLI / Fallback** | Chat Prompt | Formatted markdown block with numbered choices, explicit recommendation, and write-in prompt |
 
 ### Core Questioning Rules
 
-1. **One question at a time:** Do not batch multiple questions into a single tool invocation unless the decisions are strictly coupled. Each answer shapes the next question.
+1. **Batch independent questions, chain dependent ones:** questions whose answers do not change each other go in one `AskUserQuestion` / `ask_question` call (1–4 per call — one round-trip instead of four). A question whose options depend on an earlier answer waits for that answer.
 2. **2 to 4 options:** Keep choices distinct and mutually exclusive. Avoid overwhelming menus.
 3. **Recommended option first:** Always prefix the primary choice with `(Recommended)` and append a concise technical rationale (e.g. `"(Recommended) Use SQLite with WAL mode — eliminates external service dependency for local-first architecture"`).
 4. **Direct user response phrasing:** Phrase options from the user's perspective (e.g. `"Use optimistic UI with rollback on error"` instead of `"The agent should use optimistic UI..."`).

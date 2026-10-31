@@ -5,22 +5,20 @@
 # Emits a non-blocking additionalContext reminder when touching an unlisted file
 # so the agent either stays in lane or logs the deviation in plan.md.
 #
-# Triggered by: Write, Edit, MultiEdit
-# Input (stdin): JSON { "tool_use": { "name": "...", "input": { "file_path": "..." } } }
-# Output: { "hookSpecificOutput": { "hookEventName": "PreToolUse", "additionalContext": "..." } }
+# Triggered by: Write|Edit|MultiEdit (Claude Code), file-write tools (Antigravity CLI)
+# Input: host payload, parsed by lib/payload.sh (DF_FILE)
+# Output: lib/emit.sh df_context (additionalContext on Claude Code)
 # Always exits 0 (soft warn only, never hard-blocks).
 
-set -euo pipefail
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOK_DIR/lib/payload.sh"
+. "$HOOK_DIR/lib/emit.sh"
 
-command -v jq >/dev/null 2>&1 || exit 0
+df_read_input || exit 0
+FILE_PATH="$DF_FILE"
+[[ -z "$FILE_PATH" ]] && exit 0
 
-INPUT="$(cat 2>/dev/null || true)"
-[[ -z "$INPUT" ]] && exit 0
-
-FILE_PATH="$(echo "$INPUT" | jq -r '.tool_use.input.file_path // empty' 2>/dev/null || true)"
-[[ -z "$FILE_PATH" || "$FILE_PATH" == "null" ]] && exit 0
-
-WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+WORKSPACE_ROOT="$DF_WORKSPACE"
 REL_PATH="${FILE_PATH#"$WORKSPACE_ROOT/"}"
 BASENAME="$(basename "$FILE_PATH")"
 
@@ -64,7 +62,7 @@ fi
 
 WARN_MSG="⚠️ Scope Guard (soft warn): '${REL_PATH}' is not listed in active plan.md (${PLAN_FILE#"$WORKSPACE_ROOT/"}).
 • If this file is Out of Scope for the current slice/lane, revert or avoid editing it.
-• If this edit is required, record it in plan.md under '## Implementation deviations' (Step 7b) to preserve traceability."
+• If this edit is required, record it in plan.md under '## Deviations' to preserve traceability."
 
-jq -cn --arg ctx "$WARN_MSG" '{hookSpecificOutput:{hookEventName:"PreToolUse", additionalContext:$ctx}}'
+df_context "$WARN_MSG"
 exit 0

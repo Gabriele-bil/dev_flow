@@ -1,89 +1,52 @@
 ---
 name: angular-testing
-description: Angular v22+ unit + integration tests with Vitest. Use for component (signals, OnPush), service, HTTP, or routing tests. Triggers on test creation, mocking, or coverage tasks. Skip for E2E (Cypress/Playwright) or non-Angular code.
+description: Angular v22+ unit + integration tests with Vitest. Use for component (signals, OnPush), service, HTTP, or routing tests. Triggers on test creation, mocking, or coverage tasks. Skip for E2E (Playwright) or non-Angular code.
 ---
 
 # Angular Testing
 
-Test Angular v22+ with Vitest + TestBed. Focus: signal components, services, HTTP, router, async correctness.
+## Purpose
 
-## Testing Fundamentals (Zoneless Async-First)
+Write zoneless Vitest + TestBed specs for Angular v22 components, services, stores, HTTP and routing.
 
-Zoneless is stable default since v22 — async-first patterns below are baseline, not opt-in.
+## When NOT to Use
 
-Default pattern: **Act -> Wait -> Assert**.
+- File matches no row of `steps/implement.md` → skill load decision matrix (no `*.spec.ts` touched).
+- E2E specs (Playwright, `e2e/`) → `steps/test.md` conventions; only the E2E notes in the reference apply.
+- Non-Angular utility code with no TestBed — plain Vitest, no skill needed.
 
-- Act: update input/state or trigger event
-- Wait: `await fixture.whenStable()`
-- Assert: check DOM/state
+## Baseline
 
-Do not use `fixture.detectChanges()` as main trigger for state propagation. Use it only when needed for explicit DOM sync checks.
+- Runner: Vitest via `@angular/build:unit-test` (`ng test`) — default since v21. Karma/Jasmine: not supported for new specs.
+- Zoneless is the default. Pattern **Act → Wait → Assert**: change input/signal or dispatch event → `await fixture.whenStable()` → assert DOM/state.
+- `fixture.detectChanges()` only in legacy specs; new specs wait with `whenStable()`.
+- Signal inputs: `fixture.componentRef.setInput('name', value)`.
+- Timers: `vi.useFakeTimers()` + `await vi.advanceTimersByTimeAsync(ms)`. Do not use `fakeAsync`/`waitForAsync` — they need zone.js.
+- Mocks: `vi.fn()` objects via `{ provide: X, useValue: mock }`. Real `provideRouter([...])` + `RouterTestingHarness`, never a mocked `Router`.
+- HTTP: `provideHttpClientTesting()` + `HttpTestingController` (`angular-http` reference).
 
 ```typescript
-import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { MyComponent } from "./my.component";
-
-describe("MyComponent", () => {
-  let fixture: ComponentFixture<MyComponent>;
-  let component: MyComponent;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [MyComponent],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(MyComponent);
-    component = fixture.componentInstance;
-  });
-
-  it("updates title", async () => {
-    component.title.set("New title");
-    await fixture.whenStable();
-    expect(fixture.nativeElement.textContent).toContain("New title");
-  });
+it("shows new title", async () => {
+  const fixture = TestBed.createComponent(TitleCard);
+  fixture.componentRef.setInput("title", "New title");
+  await fixture.whenStable();
+  expect(fixture.nativeElement.textContent).toContain("New title");
 });
 ```
 
-## Vitest Setup (Angular v22+)
-
-Angular v20+ supports unit-test builder in `@angular/build`.
-
 ```bash
-npm install -D vitest jsdom
+pnpm run test -- --watch=false
+pnpm run test -- --watch=false --coverage
 ```
 
-```json
-{
-  "projects": {
-    "your-app": {
-      "architect": {
-        "test": {
-          "builder": "@angular/build:unit-test",
-          "options": {
-            "tsConfig": "tsconfig.spec.json",
-            "buildTarget": "your-app:build"
-          }
-        }
-      }
-    }
-  }
-}
-```
+## Quality Rules
 
-```bash
-ng test
-ng test --watch
-ng test --code-coverage
-```
+- Assert behavior (rendered text, emitted outputs, store signals), not private members.
+- Deterministic: no real network, time or randomness.
+- One behavior per test; shared setup in helpers.
+- Prefer CDK component harnesses over `querySelector` for reusable widgets.
 
-## Coverage and Quality Rules
-
-- Prefer behavior assertions over internal implementation assertions.
-- Keep tests deterministic (no real network/time randomness).
-- One behavior per test.
-- Use fixture helpers for repetitive setup.
-
-For advanced patterns — component harnesses (incl. `.with()` predicates), router testing, Cypress E2E conventions (`data-cy`, custom commands, element-wait), forms, directives, pipes — see [references/testing-patterns.md](references/testing-patterns.md).
+Harnesses, router guard tests, store tests, E2E conventions: [references/testing-patterns.md](references/testing-patterns.md).
 
 ## I/O Reference
 
@@ -91,4 +54,4 @@ For advanced patterns — component harnesses (incl. `.with()` predicates), rout
 | ---------- | -------------------------------------------------------------- |
 | Reads      | Active spec/test files, `@devflow/adapters/angular/ADAPTER.md` |
 | Writes     | New or refactored Vitest + TestBed spec files                  |
-| Invoked by | `devflow.test`                                                 |
+| Invoked by | `devflow.implement`, `devflow.test`                            |

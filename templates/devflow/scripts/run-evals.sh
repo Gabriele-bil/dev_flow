@@ -7,9 +7,10 @@
 #      rank their own skill within top_k by keyword overlap against every core
 #      skill's description; negative prompts must rank their declared "owner"
 #      skill above the skill under test.
-#   3. Catalog drift: agent.yaml ids/paths/commands vs filesystem. Every skill,
-#      adapter skill, agent, reference, and command on disk must be in the
-#      catalog; every catalog path must exist on disk. Fails on mismatch.
+#   3. Catalog drift: agent.yaml ids/paths vs filesystem. Every skill, adapter
+#      skill, agent and reference on disk must be in the catalog; every catalog
+#      path must exist on disk; every command: /devflow.<step> must name a core
+#      skill. Fails on mismatch.
 # This is a lexical approximation (bag-of-words overlap), not semantic
 # judgment -- see evals/README.md. Usage: bash scripts/run-evals.sh
 #
@@ -266,16 +267,14 @@ else
     require_id "$(basename "$F" .md)" "${F#"$PLUGIN_ROOT/"}"
   done < <(find "$PLUGIN_ROOT/references" -maxdepth 1 -name "*.md" 2>/dev/null | sort)
 
-  # Commands: commands/devflow.<name>.md -> "command: /devflow.<name>" in catalog
-  while IFS= read -r F; do
-    CMDNAME="$(basename "$F" .md)"        # e.g. devflow.analyze
-    SUFFIX="${CMDNAME#devflow.}"          # e.g. analyze
-    if ! grep -qE "command: /devflow\.${SUFFIX}\$" "$CATALOG"; then
-      echo "  ERROR: command '/${CMDNAME}' (${F#"$PLUGIN_ROOT/"}) has no command entry in agent.yaml"
+  # Slash names: every "command: /devflow.<step>" must name a core skill (skills are the only entry point)
+  while IFS= read -r SUFFIX; do
+    if [[ ! -f "$PLUGIN_ROOT/skills/devflow-${SUFFIX}/SKILL.md" ]]; then
+      echo "  ERROR: agent.yaml command '/devflow.${SUFFIX}' has no skill skills/devflow-${SUFFIX}/"
       ERRORS=$((ERRORS + 1))
       DRIFT=$((DRIFT + 1))
     fi
-  done < <(find "$PLUGIN_ROOT/commands" -maxdepth 1 -name "devflow.*.md" 2>/dev/null | sort)
+  done < <(grep -oE 'command: /devflow\.[a-z-]+' "$CATALOG" | sed 's#.*/devflow\.##' | sort -u)
 
   # Reverse: every path: in the catalog must exist on disk
   while IFS= read -r P; do

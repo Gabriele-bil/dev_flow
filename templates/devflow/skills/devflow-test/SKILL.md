@@ -1,9 +1,9 @@
 ---
 name: devflow-test
 description: Writes/runs unit+integration tests via adapter targets, bounded retries. Use when user runs devflow.test, validates feature after beautify, or fifth pipeline step.
-argument-hint: "[optional-plan-path]"
+argument-hint: "[optional-plan-path] [--changed <files>]"
 disable-model-invocation: true
-allowed-tools: "Bash(pnpm lint) Bash(pnpm run lint) Bash(pnpm test*) Bash(pnpm run test*) Bash(pnpm build) Bash(pnpm run build) Bash(npm run lint) Bash(npm run test*) Bash(npm run build) Bash(ng generate*) Bash(ng g *) Bash(ng lint*) Bash(ng test*) Bash(ng build*) Bash(flutter analyze*) Bash(flutter test*) Bash(flutter build*) Bash(dart format*) Bash(dart analyze*) Bash(dart run build_runner*) Bash(git status*) Bash(git diff*) Bash(git log*)"
+effort: medium
 ---
 
 # Skill: devflow.test
@@ -13,7 +13,7 @@ allowed-tools: "Bash(pnpm lint) Bash(pnpm run lint) Bash(pnpm test*) Bash(pnpm r
 Run `/devflow.test [optional plan path]`.
 
 - If an argument is passed, use it as the `plan.md` path
-- If no argument is passed, resolve the latest `devflow/features/*/plan.md`
+- If no argument is passed, resolve feature with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask)
 
 ## Purpose
 
@@ -21,10 +21,7 @@ Write/run tests for current feature per active adapter **Test** section (unit/in
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 
 ## When NOT to Use
 
@@ -38,26 +35,26 @@ Before proceeding, verify:
 
 - [ ] `devflow.implement` (and optionally `devflow.beautify`) has run for this feature
 - [ ] `plan.md` exists at `devflow/features/[NNN]_[feature-name]/plan.md`
-- [ ] Active adapter analyze/typecheck reports no errors
+- [ ] Analyze clean: `bash "@devflow/scripts/verify-stamp.sh" run analyze -- <adapter analyze cmd>` exits 0 (skipped while beautify's stamp is fresh)
 
 If any item fails → stop, report which check failed, do not write test files.
 
 ## Input
 
-Files from `devflow.implement` + `devflow.beautify` + `devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, resolve latest `devflow/features/*/plan.md`.
+Files from `devflow.implement` + `devflow.beautify` + `devflow/features/[NNN]_[feature-name]/plan.md` — if no arg, resolve feature with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask).
 
 ## Workflow
 
 ### Step 0 - Resolve adapter
 
-Resolve adapter, adapter root, and app working directory per `@devflow/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `@devflow/adapters/<adapter>/ADAPTER.md` (core) plus `@devflow/adapters/<adapter>/steps/test.md`. Legacy adapters without `steps/`: the **Test** section lives in `ADAPTER.md`. The test step file defines placement, frameworks, coverage expectations, and shell commands — follow it exactly for this run (monorepo: run test commands from the resolved app's working directory).
+Resolve adapter, adapter root, and app working directory per `@devflow/references/adapter-resolution.md` (reads `plan.md`'s `**App:**` field in monorepo mode). Then read `@devflow/adapters/<adapter>/ADAPTER.md` (core) plus `@devflow/adapters/<adapter>/steps/test.md`. The test step file defines placement, frameworks, coverage expectations, and shell commands — follow it exactly for this run (monorepo: run test commands from the resolved app's working directory).
 
 ### Step 1 - Read docs
 
-Always read before starting:
+Read before writing tests:
 
-- `constitution.md`
-- `registry.md`
+- `constitution.md` — test naming, file placement and layering rules the new tests must follow
+- `registry.md` — existing test helpers, fixtures and mocks to reuse instead of re-creating
 
 ### Step 2 - Scope
 
@@ -91,9 +88,9 @@ Read `task.md` **Acceptance criteria** section first — derive at least one tes
    - Web: write/execute Playwright specs or drive browser runner.
    - Mobile: write/execute Maestro flows (`.maestro/`) or Flutter `integration_test` on emulator/device.
    - Verify clean state transitions, absence of crashes or unhandled runtime errors, and report results.
-4. **Execute** — run exact commands from the adapter test step file; paste raw stdout/stderr in the Step 7 report. When `.devflow-test-summary.json` exists (written by `post-bash-output-filter.sh`), cross-check its `passed`/`failed`/`skipped` counts against raw output; raw stdout/stderr remains the evidence of record in Step 7.
+4. **Execute** — run the exact commands from the adapter test step file through the stamp: `bash "@devflow/scripts/verify-stamp.sh" run test -- <cmd>` for the whole unit suite, `test:<scope>` for a subset (never reused as the full suite), `e2e[:<scope>]` for integration/E2E targets (monorepo: `--cwd`, `@<app>`). The result line carries passed/failed/skipped counts and the log path; a failure prints its decisive lines. The full output stays in the log (`.devflow-verify/<name>.log`) — the evidence of record.
 
-**Output discipline (intermediate runs):** retry loops and analysis runs follow `@devflow/references/token-economy.md` → **Derive, don't dump** — filter at source, quote decisive failure lines, report delta on re-runs. Step 7 report still pastes mandated raw evidence.
+**Output discipline:** retry loops and analysis runs follow `@devflow/references/token-economy.md` → **Derive, don't dump** — quote decisive failure lines from the log, report delta on re-runs. Step 7 reports the stamp lines, never pasted output.
 
 Failure handling:
 
@@ -101,11 +98,13 @@ Failure handling:
 - Attempt 1: analyze failure output and fix the test or implementation (if failure is in an untouched module or intermittent, run the **Paired Control** isolation check per `@devflow/references/testing-patterns.md` before patching)
 - Attempt 2: verify mocks and dependencies are correctly set up
 - Attempt 3: isolate and fix root cause
-- After each failed attempt: append error + what was tried to `.checkpoint.json` `errors_tried` per `@devflow/references/state-machine.md` → **Checkpoint file** — resume/recovery skip already-tried fixes
+- After each failed attempt: `bash "@devflow/scripts/devflow-state.sh" checkpoint --step devflow.test --error "<error> — <what was tried>"` — resume/recovery skip already-tried fixes
 - After 3 attempts: escalate per `@devflow/references/escalation-ladder.md` — Level 2 debug mode (one hypothesis, minimal probe), Level 3 re-approach (question the plan step), Level 5 block with stuck-report. Never mark a failing test as passing
 - Context pressure (host compaction warning, long retry session) → write `devflow/features/[NNN]_[feature-name]/handoff.md` per `@devflow/references/state-machine.md` → **Handoff file**, stop, tell user: restart session + `devflow.resume`
 
 ### Step 6b - Goal-backward verification
+
+**`--changed <files>`** (ship fix loop, `quick`/`standard`): re-verify only ACs whose **Traceability** files intersect the list; copy the other rows from the existing `verification.md` unchanged and note `carried over` in their evidence. No `verification.md` yet, or `thorough` → full verification.
 
 After all tests pass, verify **backwards from the spec** per `@devflow/references/verification-levels.md`:
 
@@ -124,84 +123,38 @@ Passing tests do not skip this step — tests prove behavior forward; verificati
 
 ### Step 7 - Notify user
 
-If tests pass AND `verification.md` **Result** is not FAIL: set `plan.md` `**Status:** tested`; refresh `.devflow-state.json` per `@devflow/references/state-machine.md` → **State update snippet**.
+If tests pass AND `verification.md` **Result** is not FAIL: `bash "@devflow/scripts/devflow-state.sh" set plan tested` (refuses a missing or FAIL `verification.md`).
 
-Include actual command output. Do NOT report "all tests passed" without raw evidence.
+Evidence = the stamp result lines (counts + log path), copied as printed — never "all tests passed" from memory.
 
 ```text
 ✅ Tests complete: [type]/[NNN]_[feature-name]
 
-### Unit tests
-[N] passed · [N] failed · [N] skipped
+Unit:          [stamp line — e.g. ✓ test: pass (41s) · 120 passed · 0 failed · 2 skipped · log: .devflow-verify/test.log]
+Integration:   [one stamp line per e2e target, or "no target defined"]
+Verification:  [PASS | FAIL | PARTIAL] — [N]/[N] ACs · devflow/features/[NNN]_[feature-name]/verification.md
+[FAIL verdicts with level + evidence]
 
-Output:
-```
-
-[paste actual unit test command output here]
-
-```text
-
-### Integration - Target 1
-[N] passed · [N] failed
-
-Output:
-```
-
-[paste actual integration test output here]
-
-```text
-
-### Integration - Target 2
-[N] passed · [N] failed
-
-Output:
-```
-
-[paste actual integration test output here]
-
-```text
-
-### Verification (goal-backward)
-Result: [PASS | FAIL | PARTIAL] — [N]/[N] ACs verified
-Report: devflow/features/[NNN]_[feature-name]/verification.md
-[FAIL verdicts listed here with level + evidence]
-
-[-- Failures --]
-(shown only if any test failed after 3 attempts)
-
-#### [test file path]
-- Test: [test name]
-- Error: [error message]
-- Attempts: 3/3 - unresolved
-- Notes: [what was tried]
+[Failures — only after 3 attempts]
+- [test file] :: [test name] — [decisive error line from the log] — 3/3 attempts: [what was tried]
 
 ---
 
-All tests passing and verification clean? Choose how to continue:
-1. Run ship gate (multi-agent review) -> devflow.ship
-2. Run full project test suite before opening PR -> devflow.pr
-3. Skip full suite and open PR directly -> devflow.pr
+Next: /devflow.ship — multi-agent review gate before the PR (it reuses these stamps; devflow.pr runs the full suite and the build).
 ```
 
-Wait for user choice before continuing. **Run mode** (`.devflow-run.json` present): emit the block but do not wait — control returns to the orchestrator (`devflow.run` stops at its `--until` boundary, or `devflow.auto` continues to `devflow.ship`).
+No menu: ship is the only next step (skipping it skips the review gate; the full suite already runs in `devflow.pr` Step 3). **Run mode** (`.devflow-run.json` present): control returns to the orchestrator (`devflow.run` stops at its `--until` boundary, or `devflow.auto` continues to `devflow.ship`).
 
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Writing tests after PR is open | Tests are a pre-condition for `devflow.pr` |
-| Manual-only testing | Automated tests required for PR checklist |
-| Skipping trivial files | A trivial test beats no test; untestable → document why |
-| Skipping integration tests | They cover user flows unit tests can't |
-| Marking failing tests as passing after 3 retries | Stop and report; never falsify the summary |
 | Testing implementation internals | Test inputs → outputs; mock only system boundaries |
 | 100% coverage with no assertions | Every test must assert at least one specific output |
 | Flaky test fixed with `retry(3)` | Fix root cause; use deterministic setup |
-| Happy-path-only tests | ≥1 error path per public function (`standard`+ profiles; `quick` = happy + regression per AC) |
-| Pasting full output of every retry attempt | Decisive lines only during retries; raw evidence in Step 7 report (`token-economy.md`) |
-| Skipping `testing-patterns.md` for novel scenarios | Read `@devflow/references/testing-patterns.md` first |
-| Skipping verification because tests pass | Tests are forward-looking; Step 6b proves each AC exists, is real, is wired |
-| Setting `tested` with FAIL verdicts in verification.md | FAIL = not tested; fix or route to `devflow.backprop` |
+| Manual-only testing | Automated tests required for PR checklist |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 
@@ -210,13 +163,13 @@ Wait for user choice before continuing. **Run mode** (`.devflow-run.json` presen
 | Reads | files from `devflow.implement` / `devflow.beautify` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md`, `registry.md`, `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/test.md` |
-| Reads | `@devflow/references/verification-levels.md` (Step 6b), `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (status), `@devflow/references/complexity-scoring.md` (depth profile), `@devflow/references/token-economy.md` (output discipline) |
-| Reads (conditional) | `.devflow-run.json` (existence — run-mode switch) |
+| Reads | `@devflow/references/verification-levels.md` (Step 6b), `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (handoff format, context pressure only), `@devflow/references/complexity-scoring.md` (depth profile), `@devflow/references/token-economy.md` (output discipline) |
+| Reads (conditional) | `.devflow-run.json` (existence — run-mode switch); `references/anti-patterns.md` (when unsure / retry) |
 | Reads (optional) | `@devflow/references/testing-patterns.md` — stack-agnostic patterns reference |
 | Reads (optional) | `.devflow-test-summary.json` — structured pass/fail/skipped counts from the most recent recognized test-runner command (written by `post-bash-output-filter.sh`; cross-check only, not evidence of record) |
 | Writes | Test output paths per the adapter test step file |
 | Writes | `devflow/features/[NNN]_[feature-name]/verification.md` — per-AC verdict table |
-| Writes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json` — `errors_tried` on retry loops (state-machine.md → Checkpoint file) |
+| Writes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json` — `errors_tried` on retry loops, via `@devflow/scripts/devflow-state.sh` |
 | Writes (conditional) | `devflow/features/[NNN]_[feature-name]/handoff.md` — on context pressure (state-machine.md → Handoff file) |
 | Writes | `plan.md` — `**Status:** tested` (only when tests pass + verification has no FAIL) |
 | Next step | `devflow.ship` (or `devflow.pr` directly for solo quick changes) |

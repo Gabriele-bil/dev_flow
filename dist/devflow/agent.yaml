@@ -1,114 +1,116 @@
 # DevFlow Plugin Catalog
 # Machine-readable index of all pipeline components.
-# Updated manually when commands/skills/agents are added or removed.
-# Drift guard: scripts/run-evals.sh check 3 diffs catalog IDs/paths against the
-# filesystem (skills, adapters, agents, references, commands) and fails on mismatch.
+# Updated manually when skills/agents are added or removed. `command:` is the
+# author notation /devflow.<step>; the build writes /devflow:<step> (Claude Code)
+# or /devflow-<step> (Antigravity CLI). Drift guard: scripts/run-evals.sh check 3
+# diffs catalog IDs/paths against the filesystem and fails on mismatch.
 
 name: devflow
-version: "1.0.0"
-description: "Spec-driven development pipeline: task → plan → implement → beautify → test → PR"
+version: "1.19.0"
+description: "Spec-driven development pipeline: task → [clarify] → plan → [analyze] → implement → beautify → test → ship → pr"
 
 pipeline:
   steps:
     - id: init
-      command: /devflow.init
+      command: /devflow:init
       skill: devflow-init
       description: "End-to-end greenfield project bootstrap: upfront long-process notice, multi-phase interview, evergreen technology scaffolding (Nx, Angular, Next.js, Flutter, NestJS), DevFlow context + ADR-001 generation, and topological multi-task roadmap (001..NNN)"
     - id: discover
-      command: /devflow.discover
+      command: /devflow:discover
       skill: devflow-discover
       description: "Interactive architectural discovery for greenfield app creation or complex features: explores technical alternatives, evaluates trade-offs, and generates formal ADR in docs/adr/"
     - id: setup
-      command: /devflow.setup
+      command: /devflow:setup
       skill: devflow-setup
       description: "Generate or update AGENTS.md, REGISTRY.md, and docs/product.md in the consumer project root from adapter templates with a mandatory full questionnaire"
     - id: blueprint
-      command: /devflow.blueprint
+      command: /devflow:blueprint
       skill: devflow-blueprint
       description: "Optional macro step before task for large objectives: transforms the objective into a multi-PR blueprint with dependency graph and parallel-step detection; each step then runs its own task → plan → implement cycle"
     - id: task
-      command: /devflow.task
+      command: /devflow:task
       skill: devflow-task
       description: "Transforms a raw idea into a structured DevFlow task by reading product and architecture context, optionally stress-testing scope, and generating a user story with HMW framing, scope boundaries, key assumptions, and verifiable subtasks"
     - id: clarify
-      command: /devflow.clarify
+      command: /devflow:clarify
       skill: devflow-clarify
       description: "Optional step between task and plan: resolves [NEEDS CLARIFICATION: ...] markers in task.md via incremental Q&A (8D scan, up to 5 questions) and sets Status clarified"
     - id: plan
-      command: /devflow.plan
+      command: /devflow:plan
       skill: devflow-plan
       description: "Transforms a structured DevFlow task into a detailed, file-oriented implementation plan for devflow.implement"
     - id: analyze
-      command: /devflow.analyze
+      command: /devflow:analyze
       skill: devflow-analyze
       description: "Optional read-only consistency check between plan and implement: flags traceability gaps, untestable acceptance criteria, terminology drift, and constitution violations across task.md + plan.md + constitution.md"
     - id: implement
-      command: /devflow.implement
+      command: /devflow:implement
       skill: devflow-implement
       description: "Implements all files defined in a DevFlow plan using project architecture conventions, MCP-assisted API validation, and verification steps"
     - id: beautify
-      command: /devflow.beautify
+      command: /devflow:beautify
       skill: devflow-beautify
       description: "Reviews and improves devflow.implement output across correctness, readability, security, performance, architecture compliance, and UI consistency"
     - id: test
-      command: /devflow.test
+      command: /devflow:test
       skill: devflow-test
       description: "Writes and executes unit and integration tests for the current DevFlow feature using the active adapter targets, with bounded retry handling and standardized reporting"
     - id: pr
-      command: /devflow.pr
+      command: /devflow:pr
       skill: devflow-pr
       description: "Commits all changes, pushes the current DevFlow feature branch, and opens a pull request toward the repo's default branch"
 
   orchestrator:
-    command: /devflow.ship
+    command: /devflow:ship
     skill: devflow-ship
     description: "Pre-merge gate before devflow.pr. Dispatches 1–5 review agents in parallel per complexity profile (quick: code-reviewer; standard: + security-auditor, test-engineer; thorough: + accessibility-auditor, docs-reviewer), synthesizes reports, and routes to devflow.pr if no blockers"
 
   utility:
-    - command: /devflow.status
+    - command: /devflow:status
       skill: devflow-status
       description: "Show current pipeline state — active feature, progress, next step, adapter"
-    - command: /devflow.learn
+    - command: /devflow:learn
       skill: devflow-learn
-      description: "Manage the learnings log — log project quirks, search past lessons, list recent entries, prune stale ones"
-    - command: /devflow.lint-skills
-      script: scripts/validate-skills.sh
-      description: "Validate all SKILL.md files for required structure (frontmatter, sections, style)"
-    - command: /devflow.recovery
+      description: "Manage local and team instincts — log, search, list, check (Rigor check_cmd/ratchet), prune, boost, promote to team store and REGISTRY.md"
+    - command: /devflow:recovery
       skill: devflow-recovery
       description: "Diagnose and recover a stuck or corrupted DevFlow pipeline — reads state, observe log, and feature files to identify failure and propose a targeted recovery"
-    - command: /devflow.resume
+    - command: /devflow:resume
       skill: devflow-resume
       description: "Resume an interrupted DevFlow session — read saved state, cross-check plan.md markers, confirm position, re-enter the correct pipeline step"
-    - command: /devflow.run
+    - command: /devflow:run
       skill: devflow-run
       description: "Chain implement → beautify → test as one unattended session — decision flags instead of pauses, consolidated report, stop before ship"
-    - command: /devflow.auto
+    - command: /devflow:auto
       skill: devflow-auto
       description: "Full-cycle autonomous delivery: chains task → plan → analyze → implement → beautify → test → ship → pr in total autonomy from idea to opened pull request"
-    - command: /devflow.backprop
+    - command: /devflow:backprop
       skill: devflow-backprop
       description: "Backpropagate a bug or failing test into the spec — trace to acceptance criterion, classify the gap, tighten task.md, add regression test"
-    - command: /devflow.worktree
+    - command: /devflow:worktree
       skill: devflow-worktree
       description: "Create, list, or remove isolated git worktrees for parallel feature development, with automatic dev-server port-offset assignment and overlap detection"
-    - command: /devflow.doctor
+    - command: /devflow:doctor
       skill: devflow-doctor
       description: "Diagnose environment readiness, MCP servers reachability, CLI toolchains, and pipeline state integrity"
-    - command: /devflow.rollback
+    - command: /devflow:rollback
       skill: devflow-rollback
       description: "Roll back the active DevFlow step (implement or beautify) to its pre-step checkpoint without corrupting pipeline state"
-    - command: /devflow.hotfix
+    - command: /devflow:hotfix
       skill: devflow-hotfix
       description: "Fast-track pipeline for critical bugfixes, targeted patches, or hotfixes — compact task+plan, implement, targeted test, and quick ship gate directly to PR"
-    - command: /devflow.metrics
+    - command: /devflow:metrics
       skill: devflow-metrics
       description: "Display token savings dashboard, estimated cost per feature, pass@1 success rate, and step durations"
-    - command: /devflow.board
+    - command: /devflow:board
       skill: devflow-board
       description: "Generate and auto-sync a deterministic, static, read-only HTML project board in devflow/board/index.html showing tasks, Kanban pipeline, dependency DAG, Markdown docs, and command timings"
 
 agents:
+  - id: step-runner
+    path: agents/step-runner.md
+    description: "Runs one pipeline step (one skill) in its own context for devflow.run / devflow.auto and returns a RESULT line + short report"
+    invoked_by: devflow.run, devflow.auto, devflow.ship
   - id: code-reviewer
     path: agents/code-reviewer.md
     description: "Staff-engineer-level code reviewer. Seven-axis review across correctness, readability, architecture, security, performance, scope fidelity, simplicity. Use before merge or via devflow.ship fan-out"
@@ -159,12 +161,9 @@ skills:
     - id: devflow-pr
       path: skills/devflow-pr/SKILL.md
       description: "Commits all changes, pushes the current DevFlow feature branch, and opens a pull request toward the repo's default branch"
-    - id: devflow-discovery
-      path: skills/devflow-discovery/SKILL.md
-      description: 'Orients AI agents to the dev-flow pipeline at session start. Answers "where do I begin?" by mapping current project state to the correct pipeline entry point. Injected automatically via SessionStart hook'
     - id: devflow-learn
       path: skills/devflow-learn/SKILL.md
-      description: "Manage the DevFlow learnings log. Sub-commands: log (record a quirk/lesson/warning), search (find past entries), list (show recent), prune (remove entries older than 30 days)"
+      description: "Manage local (.devflow-instincts.yaml) and team (.devflow-instincts.shared.yaml) instincts. Sub-commands: log, search, list, check (run Rigor check_cmd with optional ratchet_max), prune, boost, promote (team store + REGISTRY.md)"
     - id: devflow-recovery
       path: skills/devflow-recovery/SKILL.md
       description: "Diagnoses and recovers a stuck or corrupted DevFlow pipeline. Reads state, observe log, and feature files to identify failure category and propose a targeted recovery action"
@@ -397,7 +396,7 @@ references:
     description: "AI agent threat model for DevFlow — attack surfaces (prompt injection, state corruption, memory poisoning, supply chain), safeguards, and incident response. Use during devflow-beautify security axis and devflow-ship review"
   - id: state-machine
     path: references/state-machine.md
-    description: "Pipeline state machine — canonical task.md/plan.md statuses, legal transitions, next-step mapping, state update snippet. Single source of truth for discovery, status, resume, recovery, and hooks"
+    description: "Pipeline state machine — canonical task.md/plan.md statuses, legal transitions, next-step mapping, state update snippet. State file schema, active feature resolution. Single source of truth for orientation, status, resume, recovery, and hooks"
   - id: escalation-ladder
     path: references/escalation-ladder.md
     description: "Unified failure-handling ladder for implement/beautify/test — bounded retry, debug mode, re-approach, decompose, block with stuck-report. Replaces scattered retry-3× clauses"
@@ -416,6 +415,12 @@ references:
   - id: adapter-resolution
     path: references/adapter-resolution.md
     description: "Adapter and app resolution rules for single-app and monorepo mode — mode detection, adapter/app lookup from config.md and plan.md, working-directory scoping. Single source of truth for every skill that needs the active adapter"
+  - id: orientation
+    path: references/orientation.md
+    description: "Session-start routing tree — maps project state (config, task.md, plan.md Status, run marker, handoff) to the single correct pipeline entry point. Injected by SessionStart hook"
+  - id: run-mode
+    path: references/run-mode.md
+    description: "Run-mode contract shared by devflow.run and devflow.auto — marker arming, autonomy policy per orchestrator, decision-flag format, discrepancy classes, disarm rule"
   - id: mcp-catalog
     path: references/mcp-catalog.md
     description: "Authoritative reference for Model Context Protocol (MCP) servers across DevFlow adapters — core principles, universal baseline, stack-specific core, conditional infrastructure, and client configs"
@@ -423,7 +428,7 @@ references:
 hooks:
   - event: SessionStart
     script: hooks/session-start.sh
-    description: "Inject devflow-discovery meta-skill, suggest context file based on active pipeline step from .devflow-state.json"
+    description: "Inject references/orientation.md routing tree (or compact pointer when state names next_step), suggest context file based on active pipeline step from .devflow-state.json"
   - event: PreToolUse
     matcher: "Write|Edit|MultiEdit"
     script: hooks/pre-config-protect.sh
@@ -479,13 +484,3 @@ hooks:
     script: hooks/session-start-learnings.sh
     description: "Inject past learnings from .devflow-learnings.jsonl into session context, filtered by active feature"
 
-contexts:
-  - id: implement
-    path: contexts/implement.md
-    suggested_for: [devflow.implement, devflow.beautify]
-  - id: review
-    path: contexts/review.md
-    suggested_for: [devflow.ship]
-  - id: research
-    path: contexts/research.md
-    suggested_for: [devflow.init, devflow.discover, devflow.task, devflow.plan]

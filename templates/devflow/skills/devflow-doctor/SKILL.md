@@ -7,6 +7,8 @@ disable-model-invocation: true
 
 # Skill: devflow.doctor
 
+**Arguments:** `$ARGUMENTS` — empty → run diagnostics read-only (no `--json`, no `--fix`).
+
 Pre-flight diagnostic health check for DevFlow. Assesses environment readiness across MCP servers, CLI toolchains, project configuration, and pipeline state.
 
 ## Purpose
@@ -15,10 +17,7 @@ Validate that the consumer environment satisfies all DevFlow operational prerequ
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 - **zero-hard-dependency** — MCP absences degrade cleanly to CLI fallback; doctor identifies degradation levels without blocking progress unless a required CLI tool is missing
 - **actionable-remediation** — every warning or failure includes an exact copy-paste command or config snippet
 - **idempotent-and-safe** — diagnostic inspections never mutate workspace state unless `--fix` is supplied
@@ -34,12 +33,12 @@ Validate that the consumer environment satisfies all DevFlow operational prerequ
 
 Inspect `$ARGUMENTS`:
 
-- If `--json` is present: run `bash templates/devflow/scripts/doctor.sh --json` directly and emit only the raw JSON payload with its exit code. Stop here.
+- If `--json` is present: run `bash "@devflow/scripts/doctor.sh" --json` directly and emit only the raw JSON payload with its exit code. Stop here.
 - If `--fix` is present: pass `--fix` to the diagnostic script to automatically repair safe runtime files (e.g. `.gitignore`, resetting corrupted `.devflow-state.json`).
 
 ### Step 2 - Execute Environment Diagnostics
 
-Run `bash templates/devflow/scripts/doctor.sh` and capture its structured report across the 4 core inspection axes:
+Run `bash "@devflow/scripts/doctor.sh"` and capture its structured report across the 4 core inspection axes:
 
 1. **MCP Baseline Verification**:
    - Universal baseline: `context7`, `sequential-thinking`, code index (`serena` / LSP).
@@ -67,7 +66,7 @@ Emit the human-readable dashboard with severity indicators:
 If any warnings or errors are found:
 
 - Display specific copy-paste terminal commands to install missing binaries.
-- Output ready-to-copy MCP configuration blocks for the detected client (Antigravity `mcp_config.json`, Claude Code `.mcp.json`, or Cursor).
+- Output ready-to-copy MCP configuration blocks for the detected client (Antigravity `mcp_config.json` or Claude Code `.mcp.json`).
 - Suggest running `devflow.setup --mcp` to automatically configure MCP servers for the project.
 
 ## Anti-Patterns
@@ -76,7 +75,8 @@ If any warnings or errors are found:
 | --- | --- |
 | Treating absent MCP servers as fatal errors | Mark as `DEGRADED (CLI fallback active)`; DevFlow is designed to degrade cleanly. |
 | Mutating files during diagnostic check without `--fix` | Read-only inspection by default; require explicit `--fix` flag for automatic repairs. |
-| Emitting vague error messages like "CLI missing" | Provide exact binary name, package manager install command, and documentation link. |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 

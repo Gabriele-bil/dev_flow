@@ -1,0 +1,2211 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DevFlow Project Board — Read-Only Pipeline & Telemetry</title>
+  <style>
+    :root, [data-theme="dark"] {
+      --bg-base: #0b0f17;
+      --bg-surface: #111827;
+      --bg-elevated: #1e293b;
+      --bg-card: #161f30;
+      --bg-card-hover: #1e2a40;
+      --bg-glass: rgba(17, 24, 39, 0.88);
+      --border: #26334d;
+      --border-subtle: #1e293b;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent: #6366f1;
+      --accent-soft: rgba(99, 102, 241, 0.16);
+      --accent-border: rgba(99, 102, 241, 0.45);
+      --success: #10b981;
+      --success-soft: rgba(16, 185, 129, 0.15);
+      --warning: #f59e0b;
+      --warning-soft: rgba(245, 158, 11, 0.16);
+      --danger: #ef4444;
+      --danger-soft: rgba(239, 68, 68, 0.16);
+      --info: #38bdf8;
+      --info-soft: rgba(56, 189, 248, 0.15);
+      --critical: #ec4899;
+      --critical-soft: rgba(236, 72, 153, 0.16);
+      --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55);
+      --code-bg: #090d14;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+      --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+
+    [data-theme="light"] {
+      --bg-base: #f1f5f9;
+      --bg-surface: #ffffff;
+      --bg-elevated: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f8fafc;
+      --bg-glass: rgba(255, 255, 255, 0.92);
+      --border: #cbd5e1;
+      --border-subtle: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --accent: #4f46e5;
+      --accent-soft: rgba(79, 70, 229, 0.1);
+      --accent-border: rgba(79, 70, 229, 0.35);
+      --success: #059669;
+      --success-soft: rgba(5, 150, 105, 0.12);
+      --warning: #d97706;
+      --warning-soft: rgba(217, 119, 6, 0.12);
+      --danger: #dc2626;
+      --danger-soft: rgba(220, 38, 38, 0.12);
+      --info: #0284c7;
+      --info-soft: rgba(2, 132, 199, 0.12);
+      --critical: #db2777;
+      --critical-soft: rgba(219, 39, 119, 0.12);
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 14px 34px rgba(15, 23, 42, 0.16);
+      --code-bg: #f1f5f9;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-base);
+      color: var(--text-primary);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      user-select: text;
+    }
+
+    /* Header & Project Summary */
+    .board-header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 1.5rem;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.15rem;
+      height: 2.15rem;
+      border-radius: 0.55rem;
+      background: linear-gradient(135deg, var(--accent), #38bdf8);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.95rem;
+      letter-spacing: -0.03em;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .project-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .readonly-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid var(--accent-border);
+    }
+
+    .meta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+      padding: 0.2rem 0.6rem;
+      border-radius: 0.4rem;
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .meta-pill.active-feat {
+      background: var(--info-soft);
+      color: var(--info);
+      border-color: rgba(56, 189, 248, 0.35);
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 0.42rem 0.75rem;
+      border-radius: 0.45rem;
+      font-size: 0.82rem;
+      width: 210px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+    }
+
+    .btn, .select-ctrl {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      padding: 0.42rem 0.75rem;
+      border-radius: 0.45rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+    }
+
+    .btn:hover:not(:disabled), .select-ctrl:hover {
+      border-color: var(--accent);
+      background: var(--bg-card-hover);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #4f46e5;
+    }
+
+    /* Summary KPI Strip */
+    .summary-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+      gap: 0.75rem;
+      margin-top: 0.8rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .kpi-box {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0.5rem;
+      padding: 0.55rem 0.8rem;
+    }
+
+    .kpi-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .kpi-value {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: 0.15rem;
+      display: flex;
+      align-items: baseline;
+      gap: 0.4rem;
+    }
+
+    .kpi-sub {
+      font-size: 0.74rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+    }
+
+    /* Navigation Tabs */
+    .view-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 1.5rem;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .view-tabs {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .tab-btn {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid transparent;
+      padding: 0.42rem 0.9rem;
+      border-radius: 0.45rem;
+      font-size: 0.83rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-primary);
+      background: var(--bg-elevated);
+    }
+
+    .tab-btn.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: var(--accent-border);
+    }
+
+    .global-docs-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    /* Status / Error Banner */
+    .status-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 1.5rem;
+      background: var(--warning-soft);
+      color: var(--warning);
+      border-bottom: 1px solid var(--warning);
+      font-size: 0.82rem;
+    }
+
+    .status-banner.visible {
+      display: flex;
+    }
+
+    /* Main Workspace */
+    .board-main {
+      flex: 1;
+      padding: 1.25rem 1.5rem;
+      overflow-x: auto;
+    }
+
+    .view-panel {
+      display: none;
+    }
+
+    .view-panel.active {
+      display: block;
+    }
+
+    /* Kanban Columns */
+    .kanban-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(280px, 1fr));
+      gap: 1rem;
+      align-items: start;
+      min-width: 1420px;
+    }
+
+    .kanban-col {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 0.7rem;
+      display: flex;
+      flex-direction: column;
+      max-height: calc(100vh - 235px);
+    }
+
+    .col-header {
+      padding: 0.75rem 0.95rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .col-header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .col-dot {
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 50%;
+    }
+
+    .col-draft_clarified .col-dot { background: #94a3b8; }
+    .col-planned_ready .col-dot { background: #38bdf8; }
+    .col-in_progress .col-dot { background: #f59e0b; }
+    .col-implemented_verified .col-dot { background: #a855f7; }
+    .col-pr_opened_done .col-dot { background: #10b981; }
+
+    .col-count {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.1rem 0.5rem;
+      border-radius: 999px;
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .col-body {
+      padding: 0.75rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .col-empty {
+      padding: 1.5rem 0.75rem;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      border: 1px dashed var(--border);
+      border-radius: 0.5rem;
+    }
+
+    /* Task Card (Strictly Read-Only, Clickable to Inspect) */
+    .task-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 0.6rem;
+      padding: 0.85rem;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: transform 0.12s, border-color 0.15s, background 0.15s;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      position: relative;
+    }
+
+    .task-card:hover {
+      border-color: var(--accent);
+      background: var(--bg-card-hover);
+      transform: translateY(-1px);
+    }
+
+    .task-card.is-active-feature {
+      border-left: 3px solid var(--info);
+    }
+
+    .task-card.is-blocked {
+      border-left: 3px solid var(--danger);
+    }
+
+    .task-card.is-critical {
+      box-shadow: 0 0 0 1px rgba(236, 72, 153, 0.35);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .task-id-badge {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 0.35rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid var(--accent-border);
+    }
+
+    .badge-row {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 0.12rem 0.42rem;
+      border-radius: 0.3rem;
+      font-family: var(--font-mono);
+      border: 1px solid transparent;
+    }
+
+    .badge-status-done { background: var(--success-soft); color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
+    .badge-status-wip { background: var(--warning-soft); color: var(--warning); border-color: rgba(245, 158, 11, 0.3); }
+    .badge-status-ready { background: var(--info-soft); color: var(--info); border-color: rgba(56, 189, 248, 0.3); }
+    .badge-status-draft { background: var(--bg-elevated); color: var(--text-secondary); border-color: var(--border); }
+    .badge-blocked { background: var(--danger-soft); color: var(--danger); border-color: rgba(239, 68, 68, 0.35); }
+    .badge-unblocked { background: var(--success-soft); color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
+    .badge-critical { background: var(--critical-soft); color: var(--critical); border-color: rgba(236, 72, 153, 0.35); }
+
+    .card-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.35;
+    }
+
+    .card-meta-paths {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      font-family: var(--font-mono);
+      font-size: 0.71rem;
+      color: var(--text-secondary);
+    }
+
+    .card-meta-paths span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Progress bar for Vertical Slices */
+    .slice-progress {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .slice-progress-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 0.38rem;
+      background: var(--bg-elevated);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--success));
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+
+    .relations-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      padding-top: 0.35rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .card-timings {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.35rem;
+      padding-top: 0.45rem;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.35rem;
+      margin-top: 0.2rem;
+    }
+
+    .mini-btn {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.32rem;
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .mini-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--accent);
+    }
+
+    /* Relations / Dependency DAG View */
+    .dag-container {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .dag-legend {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .legend-items {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .legend-swatch {
+      width: 0.75rem;
+      height: 0.75rem;
+      border-radius: 0.2rem;
+    }
+
+    .dag-canvas-wrap {
+      width: 100%;
+      overflow: auto;
+      min-height: 420px;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0.6rem;
+      padding: 1rem;
+      position: relative;
+    }
+
+    .dag-matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      margin-top: 0.5rem;
+    }
+
+    .dag-matrix-table th, .dag-matrix-table td {
+      padding: 0.65rem 0.85rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dag-matrix-table th {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--bg-elevated);
+    }
+
+    /* Timeline & Telemetry Global Table */
+    .telemetry-table-wrap {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      overflow-x: auto;
+    }
+
+    /* Slide-Over Drawer for Task Detail, Timeline & Markdown Viewer */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(3px);
+      z-index: 50;
+      display: none;
+    }
+
+    .drawer-backdrop.open {
+      display: block;
+    }
+
+    .drawer-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: min(920px, 94vw);
+      background: var(--bg-surface);
+      border-left: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .drawer-panel.open {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      padding: 1rem 1.35rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      background: var(--bg-elevated);
+    }
+
+    .drawer-tabs {
+      display: flex;
+      gap: 0.35rem;
+      padding: 0.6rem 1.35rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-surface);
+      overflow-x: auto;
+    }
+
+    .drawer-body {
+      flex: 1;
+      padding: 1.35rem;
+      overflow-y: auto;
+    }
+
+    /* Command Timeline Breakdown inside Drawer */
+    .timeline-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 0.85rem;
+    }
+
+    .timeline-row {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 0.55rem;
+      padding: 0.85rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .timeline-row-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .cmd-pill {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 0.35rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid var(--accent-border);
+    }
+
+    /* Integrated Markdown Viewer Styles */
+    .md-viewer {
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      line-height: 1.65;
+    }
+
+    .md-frontmatter-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-bottom: 1.15rem;
+      padding: 0.75rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+    }
+
+    .md-viewer h1, .md-viewer h2, .md-viewer h3, .md-viewer h4 {
+      margin-top: 1.3rem;
+      margin-bottom: 0.55rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .md-viewer h1 { font-size: 1.35rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+    .md-viewer h2 { font-size: 1.12rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.3rem; }
+    .md-viewer h3 { font-size: 0.98rem; color: var(--info); }
+
+    .md-viewer p, .md-viewer ul, .md-viewer ol {
+      margin-bottom: 0.75rem;
+    }
+
+    .md-viewer ul, .md-viewer ol {
+      padding-left: 1.35rem;
+    }
+
+    .md-viewer li {
+      margin-bottom: 0.3rem;
+    }
+
+    .md-viewer code {
+      font-family: var(--font-mono);
+      font-size: 0.82em;
+      background: var(--code-bg);
+      padding: 0.15rem 0.38rem;
+      border-radius: 0.3rem;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .md-viewer pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 0.85rem 1rem;
+      overflow-x: auto;
+      margin-bottom: 0.9rem;
+    }
+
+    .md-viewer pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 0.8rem;
+    }
+
+    .md-viewer table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+      font-size: 0.82rem;
+    }
+
+    .md-viewer th, .md-viewer td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.7rem;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .md-viewer th {
+      background: var(--bg-elevated);
+      font-weight: 700;
+    }
+
+    .md-viewer hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.1rem 0;
+    }
+
+    .gherkin-kw {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.05rem 0.38rem;
+      border-radius: 0.25rem;
+      margin: 0 0.15rem;
+    }
+
+    .gherkin-given { background: var(--info-soft); color: var(--info); }
+    .gherkin-when  { background: var(--warning-soft); color: var(--warning); }
+    .gherkin-then  { background: var(--success-soft); color: var(--success); }
+    .gherkin-and   { background: var(--accent-soft); color: var(--accent); }
+
+    .md-checkbox {
+      pointer-events: none;
+      accent-color: var(--success);
+      margin-right: 0.45rem;
+      transform: translateY(1px);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 0.85rem;
+      height: 0.85rem;
+      border: 2px solid currentColor;
+      border-right-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header & Project Summary -->
+  <header class="board-header">
+    <div class="header-top">
+      <div class="brand-group">
+        <div class="brand-logo" aria-hidden="true">DF</div>
+        <div>
+          <div style="display:flex;align-items:center;gap:0.55rem;flex-wrap:wrap;">
+            <h1 class="project-title" id="hdr-project-name">DevFlow Project</h1>
+            <span class="readonly-pill" title="Strictly static & read-only: no state mutation or file modifications allowed from browser">🔒 Read-Only Board</span>
+            <span class="meta-pill" id="hdr-branch" title="Current Git Branch">⎇ main</span>
+            <span class="meta-pill active-feat" id="hdr-active-feature" title="Active Feature in .devflow-state.json">⚡ active: —</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <input type="search" id="search-input" class="search-input" placeholder="Filter tasks, IDs, branches..." aria-label="Filter tasks" />
+        <select id="poll-select" class="select-ctrl" aria-label="Auto-refresh interval" title="Auto-sync polling interval">
+          <option value="0">Auto-Sync: Manual</option>
+          <option value="5000" selected>Auto-Sync: 5s</option>
+          <option value="15000">Auto-Sync: 15s</option>
+          <option value="30000">Auto-Sync: 30s</option>
+        </select>
+        <button type="button" id="refresh-btn" class="btn btn-primary" title="Reload board-data.js and Markdown artifacts">
+          <span id="refresh-icon">↻</span>
+          <span id="refresh-label">Refresh</span>
+        </button>
+        <button type="button" id="theme-btn" class="btn" aria-label="Toggle Dark or Light Theme" title="Toggle Dark / Light Theme">☀/☾</button>
+      </div>
+    </div>
+
+    <div class="summary-strip">
+      <div class="kpi-box">
+        <span class="kpi-label">Total Tasks</span>
+        <div class="kpi-value">
+          <span id="kpi-total-tasks">0</span>
+          <span class="kpi-sub" id="kpi-tasks-sub">0 done · 0 in progress</span>
+        </div>
+      </div>
+      <div class="kpi-box">
+        <span class="kpi-label">Completion</span>
+        <div class="kpi-value">
+          <span id="kpi-completion-pct">0%</span>
+          <span class="kpi-sub" id="kpi-blocked-sub">0 blocked</span>
+        </div>
+      </div>
+      <div class="kpi-box">
+        <span class="kpi-label">Total Dev Time</span>
+        <div class="kpi-value">
+          <span id="kpi-dev-time">0s</span>
+          <span class="kpi-sub" id="kpi-lead-sub">lead: 0s</span>
+        </div>
+      </div>
+      <div class="kpi-box">
+        <span class="kpi-label">Telemetry & Cost (Est.)</span>
+        <div class="kpi-value">
+          <span id="kpi-cost">$0.00</span>
+          <span class="kpi-sub" id="kpi-tokens">0 tok</span>
+        </div>
+      </div>
+      <div class="kpi-box">
+        <span class="kpi-label">Last Synced</span>
+        <div class="kpi-value">
+          <span id="kpi-updated-at" style="font-size:0.88rem;font-family:var(--font-mono);">—</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Non-destructive status / error banner -->
+  <div id="status-banner" class="status-banner" role="status" aria-live="polite">
+    <span id="status-banner-msg"></span>
+    <button type="button" class="btn" id="status-retry-btn">Retry Refresh</button>
+  </div>
+
+  <!-- View Switcher & Global Docs Bar -->
+  <nav class="view-bar" aria-label="Board Views">
+    <div class="view-tabs" role="tablist">
+      <button type="button" class="tab-btn active" data-view="kanban" role="tab" aria-selected="true">📋 Kanban Pipeline</button>
+      <button type="button" class="tab-btn" data-view="dag" role="tab" aria-selected="false">🕸️ Relations & Dependency DAG</button>
+      <button type="button" class="tab-btn" data-view="timings" role="tab" aria-selected="false">⏱️ Command Timings & Telemetry</button>
+    </div>
+    <div class="global-docs-bar" id="global-docs-bar"></div>
+  </nav>
+
+  <!-- Main Workspace -->
+  <main class="board-main">
+    <!-- 1. Kanban View -->
+    <section id="view-kanban" class="view-panel active" aria-label="Kanban Pipeline">
+      <div id="kanban-grid" class="kanban-grid"></div>
+    </section>
+
+    <!-- 2. Dependency Graph (DAG) View -->
+    <section id="view-dag" class="view-panel" aria-label="Dependency Graph DAG">
+      <div class="dag-container">
+        <div class="dag-legend">
+          <div>
+            <h2 style="font-size:1rem;font-weight:700;">Inter-Task Dependency Graph (DAG) & Critical Path</h2>
+            <p style="font-size:0.78rem;color:var(--text-secondary);">Derived from <code>**Blockers:**</code> and <code>**Unlocks:**</code> in <code>task.md</code> and <code>devflow/plans/project-blueprint.md</code>. Click any node to inspect.</p>
+          </div>
+          <div class="legend-items">
+            <span class="legend-item"><span class="legend-swatch" style="background:#10b981;"></span> Completed / Done</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:#38bdf8;"></span> Ready to Develop</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:#f59e0b;"></span> In Progress</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:#ef4444;"></span> Blocked</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:#ec4899;"></span> Critical Path</span>
+          </div>
+        </div>
+        <div id="dag-critical-banner" style="font-size:0.8rem;font-family:var(--font-mono);color:var(--critical);"></div>
+        <div id="dag-canvas-wrap" class="dag-canvas-wrap"></div>
+        <div style="overflow-x:auto;">
+          <table class="dag-matrix-table" id="dag-matrix-table">
+            <thead>
+              <tr>
+                <th>Task ID</th>
+                <th>Title & Folder</th>
+                <th>State</th>
+                <th>Blockers (Prerequisites)</th>
+                <th>Unlocks (Downstream)</th>
+                <th>Critical Path</th>
+                <th>Lead Time / Dev Time</th>
+              </tr>
+            </thead>
+            <tbody id="dag-matrix-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Command Timings & Telemetry Overview -->
+    <section id="view-timings" class="view-panel" aria-label="Command Timings Overview">
+      <div class="telemetry-table-wrap">
+        <h2 style="font-size:1rem;font-weight:700;margin-bottom:0.35rem;">Per-Task & Per-Command Development Timings</h2>
+        <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">Chronological command durations (<code>task</code>, <code>clarify</code>, <code>plan</code>, <code>analyze</code>, <code>implement</code>, <code>beautify</code>, <code>test</code>, <code>ship</code>, <code>pr</code>, <code>hotfix</code>), total accumulated time, and task lead time.</p>
+        <table class="dag-matrix-table">
+          <thead>
+            <tr>
+              <th>Task</th>
+              <th>Status</th>
+              <th>First Started</th>
+              <th>Last Command Ended</th>
+              <th>Active Dev Time</th>
+              <th>Lead Time (Task → Done)</th>
+              <th>Commands Executed</th>
+              <th>Est. Tokens / Cost</th>
+            </tr>
+          </thead>
+          <tbody id="timings-overview-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Slide-over Drawer for Task Detail, Command Timeline & Integrated Markdown Viewer -->
+  <div id="drawer-backdrop" class="drawer-backdrop"></div>
+  <aside id="drawer-panel" class="drawer-panel" aria-label="Task & Document Inspector">
+    <div class="drawer-header">
+      <div>
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;" id="drawer-badges"></div>
+        <h2 id="drawer-title" style="font-size:1.1rem;font-weight:700;margin-top:0.3rem;">Task Details</h2>
+        <div id="drawer-subtitle" style="font-size:0.76rem;font-family:var(--font-mono);color:var(--text-secondary);margin-top:0.15rem;"></div>
+      </div>
+      <button type="button" id="drawer-close-btn" class="btn" aria-label="Close Inspector">✕ Close</button>
+    </div>
+    <div id="drawer-tabs" class="drawer-tabs" role="tablist"></div>
+    <div id="drawer-body" class="drawer-body"></div>
+  </aside>
+
+  <!-- Load initial data manifest (works on both file:// and http://) -->
+  <script src="board-data.js"></script>
+  <script>
+    (function () {
+      "use strict";
+
+      const state = {
+        data: window.__DEVFLOW_BOARD_DATA__ || null,
+        activeView: "kanban",
+        searchQuery: "",
+        isRefreshing: false,
+        pollTimer: null,
+        pollIntervalMs: 5000,
+        drawerMode: null, // "task" | "blueprint" | "adr"
+        selectedTaskId: null,
+        selectedAdrId: null,
+        activeDrawerTab: "timeline" // "timeline" | "task_md" | "plan_md" | "verification_md"
+      };
+
+      function escapeHtml(str) {
+        if (str === null || str === undefined) return "";
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function formatDuration(sec) {
+        const s = Math.max(0, Math.round(Number(sec) || 0));
+        if (s === 0) return "0s";
+        const d = Math.floor(s / 86400);
+        const h = Math.floor((s % 86400) / 3600);
+        const m = Math.floor((s % 3600) / 60);
+        const rem = s % 60;
+        const parts = [];
+        if (d > 0) parts.push(d + "d");
+        if (h > 0) parts.push(h + "h");
+        if (m > 0) parts.push(m + "m");
+        if (rem > 0 && d === 0) parts.push(rem + "s");
+        return parts.slice(0, 3).join(" ");
+      }
+
+      function formatTimestamp(iso) {
+        if (!iso) return "—";
+        return String(iso).replace("T", " ").replace("Z", " UTC");
+      }
+
+      function formatTokens(tok) {
+        const n = Number(tok) || 0;
+        if (n >= 1000000) return (n / 1000000).toFixed(2) + "M";
+        if (n >= 1000) return (n / 1000).toFixed(1) + "k";
+        return String(n);
+      }
+
+      // Safe, zero-dependency Markdown renderer supporting Frontmatter headers,
+      // Headings, Tables, Code blocks, Gherkin Given/When/Then, and Read-Only Checklists
+      function renderMarkdown(rawMd) {
+        if (!rawMd || !String(rawMd).trim()) {
+          return '<div class="col-empty">Document is empty or not yet generated for this task.</div>';
+        }
+
+        const lines = String(rawMd).replace(/\r\n/g, "\n").split("\n");
+        const metaBadges = [];
+        const bodyLines = [];
+        let inHeaderZone = true;
+
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          if (inHeaderZone && /^\*\*[A-Za-z0-9 _-]+:\*\*/.test(line)) {
+            const cleaned = line.replace(/<!--.*?-->/g, "").trim();
+            const m = cleaned.match(/^\*\*([^*]+):\*\*\s*(.*)$/);
+            if (m) {
+              metaBadges.push({ key: m[1].trim(), val: m[2].trim() });
+              continue;
+            }
+          }
+          if (inHeaderZone && line.trim() === "---" && metaBadges.length > 0) {
+            inHeaderZone = false;
+            continue;
+          }
+          if (line.startsWith("## ")) {
+            inHeaderZone = false;
+          }
+          bodyLines.push(line);
+        }
+
+        let html = '<div class="md-viewer">';
+        if (metaBadges.length > 0) {
+          html += '<div class="md-frontmatter-strip">';
+          for (const b of metaBadges) {
+            html += '<span class="meta-pill"><strong>' + escapeHtml(b.key) + ':</strong> ' + escapeHtml(b.val) + '</span>';
+          }
+          html += '</div>';
+        }
+
+        let inCodeBlock = false;
+        let codeLang = "";
+        let codeBuffer = [];
+        let inList = false;
+        let listTag = "ul";
+        let inTable = false;
+        let tableRows = [];
+
+        function flushList() {
+          if (inList) {
+            html += "</" + listTag + ">";
+            inList = false;
+          }
+        }
+
+        function flushTable() {
+          if (!inTable || tableRows.length === 0) return;
+          html += "<table>";
+          tableRows.forEach((row, idx) => {
+            const cells = row
+              .replace(/^\|/, "")
+              .replace(/\|$/, "")
+              .split("|")
+              .map((c) => c.trim());
+            if (idx === 1 && cells.every((c) => /^:?-+:$|^-$|^--+$/.test(c))) {
+              return; // separator row
+            }
+            const tag = idx === 0 ? "th" : "td";
+            if (idx === 0) html += "<thead>";
+            if (idx === 2) html += "<tbody>";
+            html += "<tr>";
+            for (const c of cells) {
+              html += "<" + tag + ">" + formatInline(c) + "</" + tag + ">";
+            }
+            html += "</tr>";
+            if (idx === 0) html += "</thead>";
+          });
+          if (tableRows.length > 2) html += "</tbody>";
+          html += "</table>";
+          inTable = false;
+          tableRows = [];
+        }
+
+        function formatInline(text) {
+          let s = escapeHtml(text);
+          // Inline code
+          s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
+          // Bold & italic
+          s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+          s = s.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+          // Links (keep label & safe href)
+          s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<span class="badge badge-status-ready" title="$2">$1</span>');
+          // Gherkin keywords (GIVEN / WHEN / THEN / AND)
+          s = s.replace(/\b(GIVEN|Given)\b/g, '<span class="gherkin-kw gherkin-given">$1</span>');
+          s = s.replace(/\b(WHEN|When)\b/g, '<span class="gherkin-kw gherkin-when">$1</span>');
+          s = s.replace(/\b(THEN|Then)\b/g, '<span class="gherkin-kw gherkin-then">$1</span>');
+          s = s.replace(/\b(AND|And)\b/g, '<span class="gherkin-kw gherkin-and">$1</span>');
+          // [done] / [pending] markers
+          s = s.replace(/\[done\]/gi, '<span class="badge badge-status-done">[done]</span>');
+          s = s.replace(/\[pending\]/gi, '<span class="badge badge-status-wip">[pending]</span>');
+          return s;
+        }
+
+        for (let i = 0; i < bodyLines.length; i++) {
+          const raw = bodyLines[i];
+          const trimmed = raw.trim();
+
+          if (trimmed.startsWith("```")) {
+            flushList();
+            flushTable();
+            if (!inCodeBlock) {
+              inCodeBlock = true;
+              codeLang = trimmed.slice(3).trim();
+              codeBuffer = [];
+            } else {
+              html += '<pre><code data-lang="' + escapeHtml(codeLang) + '">' + escapeHtml(codeBuffer.join("\n")) + "</code></pre>";
+              inCodeBlock = false;
+              codeLang = "";
+              codeBuffer = [];
+            }
+            continue;
+          }
+
+          if (inCodeBlock) {
+            codeBuffer.push(raw);
+            continue;
+          }
+
+          // Table row
+          if (trimmed.startsWith("|") && trimmed.endsWith("|")) {
+            flushList();
+            inTable = true;
+            tableRows.push(trimmed);
+            continue;
+          } else if (inTable) {
+            flushTable();
+          }
+
+          if (trimmed === "" || trimmed.startsWith("<!--")) {
+            flushList();
+            continue;
+          }
+
+          if (trimmed === "---") {
+            flushList();
+            html += "<hr />";
+            continue;
+          }
+
+          // Headings
+          const hMatch = trimmed.match(/^(#{1,4})\s+(.*)$/);
+          if (hMatch) {
+            flushList();
+            const level = hMatch[1].length;
+            html += "<h" + level + ">" + formatInline(hMatch[2]) + "</h" + level + ">";
+            continue;
+          }
+
+          // Checklists (- [x] or - [ ])
+          const chkMatch = trimmed.match(/^[-*]\s+\[([ xX~])\]\s+(.*)$/);
+          if (chkMatch) {
+            if (!inList || listTag !== "ul") {
+              flushList();
+              inList = true;
+              listTag = "ul";
+              html += '<ul style="list-style:none;padding-left:0.3rem;">';
+            }
+            const checked = chkMatch[1].toLowerCase() === "x" ? "checked" : "";
+            html += '<li><input type="checkbox" class="md-checkbox" disabled ' + checked + " />" + formatInline(chkMatch[2]) + "</li>";
+            continue;
+          }
+
+          // Bullet list
+          const ulMatch = trimmed.match(/^[-*]\s+(.*)$/);
+          if (ulMatch) {
+            if (!inList || listTag !== "ul") {
+              flushList();
+              inList = true;
+              listTag = "ul";
+              html += "<ul>";
+            }
+            html += "<li>" + formatInline(ulMatch[1]) + "</li>";
+            continue;
+          }
+
+          // Ordered list
+          const olMatch = trimmed.match(/^\d+\.\s+(.*)$/);
+          if (olMatch) {
+            if (!inList || listTag !== "ol") {
+              flushList();
+              inList = true;
+              listTag = "ol";
+              html += "<ol>";
+            }
+            html += "<li>" + formatInline(olMatch[1]) + "</li>";
+            continue;
+          }
+
+          flushList();
+          html += "<p>" + formatInline(trimmed) + "</p>";
+        }
+
+        flushList();
+        flushTable();
+        if (inCodeBlock) {
+          html += "<pre><code>" + escapeHtml(codeBuffer.join("\n")) + "</code></pre>";
+        }
+        html += "</div>";
+        return html;
+      }
+
+      function filterTasks(tasks) {
+        const q = state.searchQuery.trim().toLowerCase();
+        if (!q) return tasks;
+        return tasks.filter((t) => {
+          return (
+            (t.id && t.id.toLowerCase().includes(q)) ||
+            (t.title && t.title.toLowerCase().includes(q)) ||
+            (t.slug && t.slug.toLowerCase().includes(q)) ||
+            (t.branch && t.branch.toLowerCase().includes(q)) ||
+            (t.task_status && t.task_status.toLowerCase().includes(q)) ||
+            (t.plan_status && t.plan_status.toLowerCase().includes(q))
+          );
+        });
+      }
+
+      function renderHeader(data) {
+        const p = data.project || {};
+        document.getElementById("hdr-project-name").textContent = p.name || "DevFlow Project";
+        document.getElementById("hdr-branch").textContent = "⎇ " + (p.branch || "main");
+        document.getElementById("hdr-active-feature").textContent =
+          "⚡ active: " + (p.active_feature || "none") + (p.next_step && p.next_step !== "-" ? " → " + p.next_step : "");
+
+        document.getElementById("kpi-total-tasks").textContent = String(p.total_tasks || 0);
+        document.getElementById("kpi-tasks-sub").textContent =
+          (p.completed_tasks || 0) + " done · " + (p.in_progress_tasks || 0) + " active";
+        document.getElementById("kpi-completion-pct").textContent = (p.completion_pct || 0) + "%";
+        document.getElementById("kpi-blocked-sub").textContent = (p.blocked_tasks || 0) + " blocked";
+        document.getElementById("kpi-dev-time").textContent = formatDuration(p.total_development_sec || 0);
+        document.getElementById("kpi-lead-sub").textContent = "lead: " + formatDuration(p.total_lead_time_sec || 0);
+        document.getElementById("kpi-cost").textContent = "$" + Number(p.total_cost_usd || 0).toFixed(2);
+        document.getElementById("kpi-tokens").textContent = formatTokens(p.total_tokens || 0) + " tok";
+        document.getElementById("kpi-updated-at").textContent = formatTimestamp(data.generated_at);
+
+        // Render global document buttons (Blueprint + ADRs)
+        const docsBar = document.getElementById("global-docs-bar");
+        let docsHtml = "";
+        if (data.documents && data.documents.blueprint && data.documents.blueprint.content) {
+          docsHtml += '<button type="button" class="mini-btn" data-open-blueprint="true">🗺️ Project Blueprint</button>';
+        }
+        if (data.documents && Array.isArray(data.documents.adrs)) {
+          for (const adr of data.documents.adrs) {
+            docsHtml +=
+              '<button type="button" class="mini-btn" data-open-adr="' +
+              escapeHtml(adr.id) +
+              '">📐 ' +
+              escapeHtml(adr.id) +
+              "</button>";
+          }
+        }
+        docsBar.innerHTML = docsHtml;
+      }
+
+      function renderKanban(data) {
+        const grid = document.getElementById("kanban-grid");
+        const cols = data.columns || [
+          { id: "draft_clarified", label: "Draft / Clarified" },
+          { id: "planned_ready", label: "Planned / Ready" },
+          { id: "in_progress", label: "In Progress" },
+          { id: "implemented_verified", label: "Implemented / Verified" },
+          { id: "pr_opened_done", label: "PR Opened / Done" }
+        ];
+        const tasks = filterTasks(data.tasks || []);
+        const activeFeat = (data.project && data.project.active_feature) || "";
+
+        let html = "";
+        for (const col of cols) {
+          const colTasks = tasks.filter((t) => t.column === col.id);
+          html += '<div class="kanban-col col-' + escapeHtml(col.id) + '">';
+          html += '<div class="col-header">';
+          html += '<div class="col-header-left"><span class="col-dot"></span><span>' + escapeHtml(col.label) + "</span></div>";
+          html += '<span class="col-count">' + colTasks.length + "</span>";
+          html += "</div>";
+          html += '<div class="col-body">';
+
+          if (colTasks.length === 0) {
+            html += '<div class="col-empty">No tasks in ' + escapeHtml(col.label) + "</div>";
+          } else {
+            for (const t of colTasks) {
+              const isActive = activeFeat && (t.slug === activeFeat || t.id === activeFeat);
+              const cardClasses = [
+                "task-card",
+                isActive ? "is-active-feature" : "",
+                t.is_blocked ? "is-blocked" : "",
+                t.on_critical_path ? "is-critical" : ""
+              ]
+                .filter(Boolean)
+                .join(" ");
+
+              const taskBadgeCls =
+                t.task_status === "done"
+                  ? "badge-status-done"
+                  : t.task_status === "clarified"
+                  ? "badge-status-ready"
+                  : "badge-status-draft";
+              const planBadgeCls =
+                t.plan_status === "pr-opened" || t.plan_status === "shipped"
+                  ? "badge-status-done"
+                  : t.plan_status === "implementing" || t.plan_status === "implemented" || t.plan_status === "tested"
+                  ? "badge-status-wip"
+                  : t.plan_status === "ready"
+                  ? "badge-status-ready"
+                  : "badge-status-draft";
+
+              const slicesDone = (t.slices && t.slices.done) || 0;
+              const slicesTotal = (t.slices && t.slices.total) || 0;
+              const slicesPct = (t.slices && t.slices.pct) || 0;
+
+              html += '<article class="' + cardClasses + '" data-task-id="' + escapeHtml(t.id) + '">';
+              html += '<div class="card-top">';
+              html += '<span class="task-id-badge">' + escapeHtml(t.id) + "</span>";
+              html += '<div class="badge-row">';
+              html += '<span class="badge ' + taskBadgeCls + '" title="task.md Status">task: ' + escapeHtml(t.task_status) + "</span>";
+              if (t.plan_status && t.plan_status !== "none") {
+                html += '<span class="badge ' + planBadgeCls + '" title="plan.md Status">plan: ' + escapeHtml(t.plan_status) + "</span>";
+              }
+              if (t.complexity && t.complexity !== "none") {
+                html += '<span class="badge badge-status-draft" title="Complexity Score">⚙️ ' + escapeHtml(t.complexity) + "</span>";
+              }
+              html += "</div></div>";
+
+              html += '<h3 class="card-title">' + escapeHtml(t.title) + "</h3>";
+
+              html += '<div class="card-meta-paths">';
+              html += '<span title="Feature Directory">📁 devflow/features/' + escapeHtml(t.slug) + "</span>";
+              html += '<span title="Feature Branch">⎇ ' + escapeHtml(t.branch) + "</span>";
+              html += "</div>";
+
+              // Vertical slices progress
+              html += '<div class="slice-progress">';
+              html += '<div class="slice-progress-top">';
+              html += "<span>Vertical Slices [x]</span>";
+              html +=
+                "<span>" +
+                (slicesTotal > 0 ? slicesDone + "/" + slicesTotal + " (" + slicesPct + "%)" : t.column === "pr_opened_done" ? "Complete" : "Not planned") +
+                "</span>";
+              html += "</div>";
+              html += '<div class="progress-track"><div class="progress-fill" style="width:' + slicesPct + '%;"></div></div>';
+              html += "</div>";
+
+              // Blockers, Unlocks, ADRs
+              html += '<div class="relations-box">';
+              if (Array.isArray(t.blocker_details) && t.blocker_details.length > 0) {
+                for (const b of t.blocker_details) {
+                  const bCls = b.resolved ? "badge-unblocked" : "badge-blocked";
+                  const bIcon = b.resolved ? "🔓" : "🔒";
+                  html +=
+                    '<span class="badge ' +
+                    bCls +
+                    '" title="Blocker ' +
+                    escapeHtml(b.id) +
+                    (b.resolved ? " (Resolved)" : " (Blocking)") +
+                    '">' +
+                    bIcon +
+                    " Blocker: " +
+                    escapeHtml(b.id) +
+                    "</span>";
+                }
+              } else {
+                html += '<span class="badge badge-unblocked" title="No blocking dependencies">✓ Unblocked</span>';
+              }
+
+              if (Array.isArray(t.unlocks) && t.unlocks.length > 0) {
+                for (const u of t.unlocks) {
+                  html += '<span class="badge badge-status-ready" title="Unlocks downstream task">↳ Unlocks: ' + escapeHtml(u) + "</span>";
+                }
+              }
+
+              if (Array.isArray(t.adrs) && t.adrs.length > 0) {
+                for (const a of t.adrs) {
+                  html += '<span class="badge badge-status-draft" title="Linked ADR">📐 ' + escapeHtml(a.replace(/^docs\/adr\//, "")) + "</span>";
+                }
+              }
+
+              if (t.on_critical_path) {
+                html += '<span class="badge badge-critical" title="On DAG Critical Path">🔥 Critical Path</span>';
+              }
+              html += "</div>";
+
+              // Development time summary
+              const tm = t.timings || {};
+              html += '<div class="card-timings">';
+              html += '<div title="Total development duration">⏱️ Dev: <strong>' + formatDuration(tm.total_duration_sec || 0) + "</strong></div>";
+              html += '<div title="Lead time (task creation to done)">🏁 Lead: <strong>' + formatDuration(tm.lead_time_sec || 0) + "</strong></div>";
+              html += '<div title="First command started">▶ ' + escapeHtml((tm.first_started_at || "—").slice(0, 16).replace("T", " ")) + "</div>";
+              html += '<div title="Last command ended">⏹ ' + escapeHtml((tm.last_ended_at || "—").slice(0, 16).replace("T", " ")) + "</div>";
+              html += "</div>";
+
+              // Quick Document Tabs
+              html += '<div class="card-actions">';
+              html += '<button type="button" class="mini-btn" data-task-id="' + escapeHtml(t.id) + '" data-tab="timeline">⏱️ Timeline (' + ((tm.commands && tm.commands.length) || 0) + ")</button>";
+              if (t.files && t.files.task_path) {
+                html += '<button type="button" class="mini-btn" data-task-id="' + escapeHtml(t.id) + '" data-tab="task_md">📄 task.md</button>';
+              }
+              if (t.files && t.files.plan_path) {
+                html += '<button type="button" class="mini-btn" data-task-id="' + escapeHtml(t.id) + '" data-tab="plan_md">📐 plan.md</button>';
+              }
+              if (t.files && t.files.verification_path) {
+                html += '<button type="button" class="mini-btn" data-task-id="' + escapeHtml(t.id) + '" data-tab="verification_md">✅ verification.md</button>';
+              }
+              html += "</div>";
+              html += "</article>";
+            }
+          }
+          html += "</div></div>";
+        }
+        grid.innerHTML = html;
+      }
+
+      function renderDag(data) {
+        const tasks = data.tasks || [];
+        const dag = data.dag || { edges: [], critical_path: [], max_depth: 0 };
+        const critBanner = document.getElementById("dag-critical-banner");
+        const canvasWrap = document.getElementById("dag-canvas-wrap");
+        const matrixBody = document.getElementById("dag-matrix-body");
+
+        if (dag.critical_path && dag.critical_path.length > 0) {
+          critBanner.textContent = "🔥 Critical Path: " + dag.critical_path.join("  →  ");
+        } else {
+          critBanner.textContent = "🔥 Critical Path: (no tasks)";
+        }
+
+        if (tasks.length === 0) {
+          canvasWrap.innerHTML = '<div class="col-empty">No tasks found in <code>devflow/features/</code> to build the dependency graph.</div>';
+          matrixBody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);">No tasks recorded yet.</td></tr>';
+          return;
+        }
+
+        // Group tasks by dag_level
+        const levelsMap = {};
+        let maxLevel = 0;
+        for (const t of tasks) {
+          const lvl = Number(t.dag_level) || 0;
+          if (lvl > maxLevel) maxLevel = lvl;
+          if (!levelsMap[lvl]) levelsMap[lvl] = [];
+          levelsMap[lvl].push(t);
+        }
+
+        const nodeW = 230;
+        const nodeH = 86;
+        const colGap = 110;
+        const rowGap = 28;
+        let maxRows = 1;
+        for (const k of Object.keys(levelsMap)) {
+          if (levelsMap[k].length > maxRows) maxRows = levelsMap[k].length;
+        }
+
+        const svgW = Math.max(760, (maxLevel + 1) * (nodeW + colGap) + 60);
+        const svgH = Math.max(300, maxRows * (nodeH + rowGap) + 60);
+
+        const coords = {};
+        for (let lvl = 0; lvl <= maxLevel; lvl++) {
+          const colNodes = levelsMap[lvl] || [];
+          colNodes.forEach((t, idx) => {
+            const x = 30 + lvl * (nodeW + colGap);
+            const y = 30 + idx * (nodeH + rowGap);
+            coords[t.id] = { x, y, task: t };
+          });
+        }
+
+        let svg =
+          '<svg width="' +
+          svgW +
+          '" height="' +
+          svgH +
+          '" viewBox="0 0 ' +
+          svgW +
+          " " +
+          svgH +
+          '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Task Dependency Graph">';
+        svg +=
+          '<defs>' +
+          '<marker id="arrow-ok" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981"/></marker>' +
+          '<marker id="arrow-block" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#ef4444"/></marker>' +
+          '<marker id="arrow-crit" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#ec4899"/></marker>' +
+          "</defs>";
+
+        // Draw edges
+        for (const edge of dag.edges || []) {
+          const fromNode = coords[edge.from];
+          const toNode = coords[edge.to];
+          if (!fromNode || !toNode) continue;
+          const x1 = fromNode.x + nodeW;
+          const y1 = fromNode.y + nodeH / 2;
+          const x2 = toNode.x;
+          const y2 = toNode.y + nodeH / 2;
+          const dx = Math.max(40, Math.abs(x2 - x1) * 0.5);
+          const onCrit =
+            (dag.critical_path || []).includes(edge.from) && (dag.critical_path || []).includes(edge.to);
+          const stroke = onCrit ? "#ec4899" : edge.resolved ? "#10b981" : "#ef4444";
+          const marker = onCrit ? "url(#arrow-crit)" : edge.resolved ? "url(#arrow-ok)" : "url(#arrow-block)";
+          const dash = edge.resolved ? "" : 'stroke-dasharray="5,4"';
+          svg +=
+            '<path d="M ' +
+            x1 +
+            " " +
+            y1 +
+            " C " +
+            (x1 + dx) +
+            " " +
+            y1 +
+            ", " +
+            (x2 - dx) +
+            " " +
+            y2 +
+            ", " +
+            x2 +
+            " " +
+            y2 +
+            '" fill="none" stroke="' +
+            stroke +
+            '" stroke-width="' +
+            (onCrit ? "2.8" : "2") +
+            '" ' +
+            dash +
+            ' marker-end="' +
+            marker +
+            '" />';
+        }
+
+        // Draw nodes
+        for (const id of Object.keys(coords)) {
+          const { x, y, task: t } = coords[id];
+          let borderCol = "#38bdf8";
+          let statusLabel = "READY";
+          if (t.dag_state === "completed") {
+            borderCol = "#10b981";
+            statusLabel = "COMPLETED";
+          } else if (t.dag_state === "blocked") {
+            borderCol = "#ef4444";
+            statusLabel = "BLOCKED";
+          } else if (t.dag_state === "active") {
+            borderCol = "#f59e0b";
+            statusLabel = "IN PROGRESS";
+          }
+          const strokeCol = t.on_critical_path ? "#ec4899" : borderCol;
+          const shortTitle = t.title.length > 26 ? t.title.slice(0, 25) + "…" : t.title;
+          svg +=
+            '<g class="dag-node" role="button" tabindex="0" aria-label="Inspect ' +
+            escapeHtml(t.id + " " + t.title) +
+            '" data-task-id="' +
+            escapeHtml(t.id) +
+            '" style="cursor:pointer;" transform="translate(' +
+            x +
+            "," +
+            y +
+            ')">';
+          svg +=
+            '<rect width="' +
+            nodeW +
+            '" height="' +
+            nodeH +
+            '" rx="10" fill="var(--bg-card)" stroke="' +
+            strokeCol +
+            '" stroke-width="' +
+            (t.on_critical_path ? "2.5" : "1.8") +
+            '" />';
+          svg +=
+            '<text x="12" y="24" fill="var(--text-primary)" font-family="monospace" font-size="12" font-weight="bold">' +
+            escapeHtml(t.id) +
+            (t.on_critical_path ? " 🔥" : "") +
+            "</text>";
+          svg +=
+            '<text x="' +
+            (nodeW - 12) +
+            '" y="24" text-anchor="end" fill="' +
+            borderCol +
+            '" font-family="monospace" font-size="10" font-weight="bold">' +
+            statusLabel +
+            "</text>";
+          svg +=
+            '<text x="12" y="46" fill="var(--text-primary)" font-family="sans-serif" font-size="12" font-weight="600">' +
+            escapeHtml(shortTitle) +
+            "</text>";
+          svg +=
+            '<text x="12" y="68" fill="var(--text-secondary)" font-family="monospace" font-size="10">⏱️ ' +
+            formatDuration((t.timings && t.timings.total_duration_sec) || 0) +
+            " · slices: " +
+            ((t.slices && t.slices.done) || 0) +
+            "/" +
+            ((t.slices && t.slices.total) || 0) +
+            "</text>";
+          svg += "</g>";
+        }
+
+        svg += "</svg>";
+        canvasWrap.innerHTML = svg;
+
+        // Render Matrix Table
+        let rowsHtml = "";
+        for (const t of tasks) {
+          const stateBadge =
+            t.dag_state === "completed"
+              ? '<span class="badge badge-status-done">Completed</span>'
+              : t.dag_state === "blocked"
+              ? '<span class="badge badge-blocked">🔒 Blocked</span>'
+              : t.dag_state === "active"
+              ? '<span class="badge badge-status-wip">⚡ In Progress</span>'
+              : '<span class="badge badge-status-ready">Ready</span>';
+
+          const blockersHtml =
+            Array.isArray(t.blocker_details) && t.blocker_details.length > 0
+              ? t.blocker_details
+                  .map(
+                    (b) =>
+                      '<span class="badge ' +
+                      (b.resolved ? "badge-unblocked" : "badge-blocked") +
+                      '">' +
+                      (b.resolved ? "🔓 " : "🔒 ") +
+                      escapeHtml(b.id) +
+                      "</span>"
+                  )
+                  .join(" ")
+              : '<span style="color:var(--text-muted);">none</span>';
+
+          const unlocksHtml =
+            Array.isArray(t.unlocks) && t.unlocks.length > 0
+              ? t.unlocks.map((u) => '<span class="badge badge-status-ready">' + escapeHtml(u) + "</span>").join(" ")
+              : '<span style="color:var(--text-muted);">none</span>';
+
+          rowsHtml += '<tr style="cursor:pointer;" data-task-id="' + escapeHtml(t.id) + '">';
+          rowsHtml += '<td><span class="task-id-badge">' + escapeHtml(t.id) + "</span></td>";
+          rowsHtml +=
+            "<td><strong>" +
+            escapeHtml(t.title) +
+            '</strong><div style="font-size:0.72rem;font-family:var(--font-mono);color:var(--text-muted);">' +
+            escapeHtml(t.slug) +
+            "</div></td>";
+          rowsHtml += "<td>" + stateBadge + "</td>";
+          rowsHtml += "<td>" + blockersHtml + "</td>";
+          rowsHtml += "<td>" + unlocksHtml + "</td>";
+          rowsHtml +=
+            "<td>" +
+            (t.on_critical_path
+              ? '<span class="badge badge-critical">🔥 Critical (L' + (t.dag_level || 0) + ")</span>"
+              : '<span class="badge badge-status-draft">Level ' + (t.dag_level || 0) + "</span>") +
+            "</td>";
+          rowsHtml +=
+            '<td style="font-family:var(--font-mono);font-size:0.76rem;">' +
+            formatDuration((t.timings && t.timings.lead_time_sec) || 0) +
+            " / " +
+            formatDuration((t.timings && t.timings.total_duration_sec) || 0) +
+            "</td>";
+          rowsHtml += "</tr>";
+        }
+        matrixBody.innerHTML = rowsHtml;
+      }
+
+      function renderTimingsOverview(data) {
+        const tbody = document.getElementById("timings-overview-body");
+        const tasks = filterTasks(data.tasks || []);
+        if (tasks.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);">No tasks available.</td></tr>';
+          return;
+        }
+        let html = "";
+        for (const t of tasks) {
+          const tm = t.timings || {};
+          const cmds = tm.commands || [];
+          const cmdBadges = cmds
+            .map(
+              (c) =>
+                '<span class="badge badge-status-ready" title="' +
+                escapeHtml(c.started_at || "") +
+                " → " +
+                escapeHtml(c.ended_at || "") +
+                '">/devflow.' +
+                escapeHtml(c.command) +
+                " (" +
+                formatDuration(c.duration_sec || 0) +
+                ")</span>"
+            )
+            .join(" ");
+
+          html += '<tr style="cursor:pointer;" data-task-id="' + escapeHtml(t.id) + '" data-tab="timeline">';
+          html +=
+            '<td><span class="task-id-badge">' +
+            escapeHtml(t.id) +
+            '</span> <strong style="margin-left:0.35rem;">' +
+            escapeHtml(t.title) +
+            "</strong></td>";
+          html += '<td><span class="badge badge-status-draft">' + escapeHtml(t.task_status + " / " + t.plan_status) + "</span></td>";
+          html += '<td style="font-family:var(--font-mono);font-size:0.75rem;">' + formatTimestamp(tm.first_started_at) + "</td>";
+          html += '<td style="font-family:var(--font-mono);font-size:0.75rem;">' + formatTimestamp(tm.last_ended_at) + "</td>";
+          html += '<td style="font-family:var(--font-mono);font-weight:700;">' + formatDuration(tm.total_duration_sec || 0) + "</td>";
+          html += '<td style="font-family:var(--font-mono);">' + formatDuration(tm.lead_time_sec || 0) + "</td>";
+          html += "<td>" + (cmdBadges || '<span style="color:var(--text-muted);">—</span>') + "</td>";
+          html +=
+            '<td style="font-family:var(--font-mono);font-size:0.75rem;">' +
+            formatTokens(tm.total_tokens || 0) +
+            " tok · $" +
+            Number(tm.estimated_cost_usd || 0).toFixed(4) +
+            "</td>";
+          html += "</tr>";
+        }
+        tbody.innerHTML = html;
+      }
+
+      function openTaskDrawer(taskId, initialTab) {
+        const tasks = (state.data && state.data.tasks) || [];
+        const task = tasks.find((t) => t.id === taskId);
+        if (!task) return;
+
+        state.drawerMode = "task";
+        state.selectedTaskId = taskId;
+        state.activeDrawerTab = initialTab || "timeline";
+
+        renderDrawerContent();
+        document.getElementById("drawer-backdrop").classList.add("open");
+        document.getElementById("drawer-panel").classList.add("open");
+      }
+
+      function openBlueprintDrawer() {
+        if (!state.data || !state.data.documents || !state.data.documents.blueprint) return;
+        state.drawerMode = "blueprint";
+        renderDrawerContent();
+        document.getElementById("drawer-backdrop").classList.add("open");
+        document.getElementById("drawer-panel").classList.add("open");
+      }
+
+      function openAdrDrawer(adrId) {
+        state.drawerMode = "adr";
+        state.selectedAdrId = adrId;
+        renderDrawerContent();
+        document.getElementById("drawer-backdrop").classList.add("open");
+        document.getElementById("drawer-panel").classList.add("open");
+      }
+
+      function closeDrawer() {
+        document.getElementById("drawer-backdrop").classList.remove("open");
+        document.getElementById("drawer-panel").classList.remove("open");
+      }
+
+      function renderDrawerContent() {
+        const badgesEl = document.getElementById("drawer-badges");
+        const titleEl = document.getElementById("drawer-title");
+        const subEl = document.getElementById("drawer-subtitle");
+        const tabsEl = document.getElementById("drawer-tabs");
+        const bodyEl = document.getElementById("drawer-body");
+
+        if (state.drawerMode === "blueprint") {
+          const bp = state.data.documents.blueprint;
+          badgesEl.innerHTML = '<span class="task-id-badge">GLOBAL BLUEPRINT</span>';
+          titleEl.textContent = "Project Blueprint & Dependency Architecture";
+          subEl.textContent = bp.path || "devflow/plans/project-blueprint.md";
+          tabsEl.innerHTML = '<button type="button" class="tab-btn active">🗺️ project-blueprint.md</button>';
+          bodyEl.innerHTML = renderMarkdown(bp.content);
+          return;
+        }
+
+        if (state.drawerMode === "adr") {
+          const adrs = (state.data.documents && state.data.documents.adrs) || [];
+          const adr = adrs.find((a) => a.id === state.selectedAdrId) || adrs[0];
+          if (!adr) return;
+          badgesEl.innerHTML =
+            '<span class="task-id-badge">ADR</span><span class="badge badge-status-done">' + escapeHtml(adr.status) + "</span>";
+          titleEl.textContent = adr.title;
+          subEl.textContent = adr.path;
+          tabsEl.innerHTML = '<button type="button" class="tab-btn active">📐 ' + escapeHtml(adr.id) + ".md</button>";
+          bodyEl.innerHTML = renderMarkdown(adr.content);
+          return;
+        }
+
+        // Task mode
+        const tasks = (state.data && state.data.tasks) || [];
+        const t = tasks.find((x) => x.id === state.selectedTaskId);
+        if (!t) return;
+
+        badgesEl.innerHTML =
+          '<span class="task-id-badge">' +
+          escapeHtml(t.id) +
+          '</span><span class="badge badge-status-ready">task: ' +
+          escapeHtml(t.task_status) +
+          '</span><span class="badge badge-status-wip">plan: ' +
+          escapeHtml(t.plan_status) +
+          "</span>" +
+          (t.is_blocked ? '<span class="badge badge-blocked">🔒 Blocked</span>' : '<span class="badge badge-unblocked">✓ Unblocked</span>');
+        titleEl.textContent = t.title;
+        subEl.textContent = "📁 devflow/features/" + t.slug + "  ·  ⎇ " + t.branch;
+
+        const tabs = [
+          { id: "timeline", label: "⏱️ Command Timeline & Metrics", enabled: true },
+          { id: "task_md", label: "📄 task.md", enabled: Boolean(t.files && t.files.task_path) },
+          { id: "plan_md", label: "📐 plan.md", enabled: Boolean(t.files && t.files.plan_path) },
+          { id: "verification_md", label: "✅ verification.md", enabled: Boolean(t.files && t.files.verification_path) }
+        ];
+
+        tabsEl.innerHTML = tabs
+          .map(
+            (tb) =>
+              '<button type="button" class="tab-btn ' +
+              (state.activeDrawerTab === tb.id ? "active" : "") +
+              '" data-drawer-tab="' +
+              tb.id +
+              '" ' +
+              (tb.enabled ? "" : "disabled") +
+              ">" +
+              tb.label +
+              "</button>"
+          )
+          .join("");
+
+        if (state.activeDrawerTab === "task_md") {
+          bodyEl.innerHTML = renderMarkdown(t.files && t.files.task_md);
+          tryLiveMarkdownFetch(t.files && t.files.task_path, bodyEl);
+        } else if (state.activeDrawerTab === "plan_md") {
+          bodyEl.innerHTML = renderMarkdown(t.files && t.files.plan_md);
+          tryLiveMarkdownFetch(t.files && t.files.plan_path, bodyEl);
+        } else if (state.activeDrawerTab === "verification_md") {
+          bodyEl.innerHTML = renderMarkdown(t.files && t.files.verification_md);
+          tryLiveMarkdownFetch(t.files && t.files.verification_path, bodyEl);
+        } else {
+          // Command Timeline & Telemetry view
+          const tm = t.timings || {};
+          const cmds = tm.commands || [];
+          const maxDur = Math.max(1, ...cmds.map((c) => Number(c.duration_sec) || 0));
+
+          let tlHtml = '<div class="summary-strip" style="margin-top:0;padding-top:0;border-top:none;margin-bottom:1.1rem;">';
+          tlHtml +=
+            '<div class="kpi-box"><span class="kpi-label">Active Dev Time</span><div class="kpi-value">' +
+            formatDuration(tm.total_duration_sec || 0) +
+            "</div></div>";
+          tlHtml +=
+            '<div class="kpi-box"><span class="kpi-label">Task Lead Time</span><div class="kpi-value">' +
+            formatDuration(tm.lead_time_sec || 0) +
+            "</div></div>";
+          tlHtml +=
+            '<div class="kpi-box"><span class="kpi-label">First Command Start</span><div class="kpi-value" style="font-size:0.8rem;font-family:var(--font-mono);">' +
+            formatTimestamp(tm.first_started_at) +
+            "</div></div>";
+          tlHtml +=
+            '<div class="kpi-box"><span class="kpi-label">Last Command End</span><div class="kpi-value" style="font-size:0.8rem;font-family:var(--font-mono);">' +
+            formatTimestamp(tm.last_ended_at) +
+            "</div></div>";
+          tlHtml += "</div>";
+
+          tlHtml += '<h3 style="font-size:0.95rem;font-weight:700;">Executed DevFlow Commands Breakdown</h3>';
+          if (cmds.length === 0) {
+            tlHtml += '<div class="col-empty" style="margin-top:0.75rem;">No command execution timings recorded yet for this task.</div>';
+          } else {
+            tlHtml += '<div class="timeline-list">';
+            for (const c of cmds) {
+              const dur = Number(c.duration_sec) || 0;
+              const barPct = Math.max(4, Math.round((dur / maxDur) * 100));
+              tlHtml += '<div class="timeline-row">';
+              tlHtml += '<div class="timeline-row-top">';
+              tlHtml += '<span class="cmd-pill">/devflow.' + escapeHtml(c.command) + "</span>";
+              tlHtml += '<div style="display:flex;gap:0.6rem;align-items:center;font-family:var(--font-mono);font-size:0.78rem;">';
+              tlHtml += "<span>⏱️ <strong>" + formatDuration(dur) + "</strong> (" + dur + "s)</span>";
+              if (c.total_tokens > 0) {
+                tlHtml += '<span class="badge badge-status-draft">' + formatTokens(c.total_tokens) + " tok</span>";
+              }
+              if (c.estimated_cost_usd > 0) {
+                tlHtml += '<span class="badge badge-status-done">$' + Number(c.estimated_cost_usd).toFixed(4) + "</span>";
+              }
+              tlHtml += "</div></div>";
+              tlHtml +=
+                '<div style="font-family:var(--font-mono);font-size:0.74rem;color:var(--text-secondary);">started_at: ' +
+                formatTimestamp(c.started_at) +
+                "  →  ended_at: " +
+                formatTimestamp(c.ended_at) +
+                "</div>";
+              tlHtml += '<div class="progress-track"><div class="progress-fill" style="width:' + barPct + '%;"></div></div>';
+              tlHtml += "</div>";
+            }
+            tlHtml += "</div>";
+          }
+          bodyEl.innerHTML = tlHtml;
+        }
+      }
+
+      // Optional live fetch of raw .md files when served via local HTTP server
+      function tryLiveMarkdownFetch(relPath, targetEl) {
+        if (!relPath || !window.location.protocol.startsWith("http")) return;
+        fetch("../../" + relPath + "?t=" + Date.now(), { cache: "no-store" })
+          .then((res) => (res.ok ? res.text() : Promise.reject(new Error("HTTP " + res.status))))
+          .then((mdText) => {
+            if (mdText && mdText.trim()) {
+              targetEl.innerHTML = renderMarkdown(mdText);
+            }
+          })
+          .catch((err) => {
+            console.debug("[devflow-board] live markdown fetch fallback to board-data.js:", relPath, err);
+          });
+      }
+
+      function renderAll() {
+        if (!state.data) return;
+        renderHeader(state.data);
+        renderKanban(state.data);
+        renderDag(state.data);
+        renderTimingsOverview(state.data);
+        if (document.getElementById("drawer-panel").classList.contains("open")) {
+          renderDrawerContent();
+        }
+      }
+
+      function setRefreshingUI(inFlight) {
+        state.isRefreshing = inFlight;
+        const btn = document.getElementById("refresh-btn");
+        const icon = document.getElementById("refresh-icon");
+        const label = document.getElementById("refresh-label");
+        btn.disabled = inFlight;
+        if (inFlight) {
+          icon.innerHTML = '<span class="spinner"></span>';
+          label.textContent = "Syncing...";
+        } else {
+          icon.textContent = "↻";
+          label.textContent = "Refresh";
+        }
+      }
+
+      function showStatusBanner(msg) {
+        const banner = document.getElementById("status-banner");
+        const msgEl = document.getElementById("status-banner-msg");
+        if (!msg) {
+          banner.classList.remove("visible");
+          msgEl.textContent = "";
+        } else {
+          msgEl.textContent = msg;
+          banner.classList.add("visible");
+        }
+      }
+
+      // Supports both HTTP fetch('board-data.json') AND file:// script tag reload of board-data.js
+      function refreshBoardData() {
+        if (state.isRefreshing) return;
+        setRefreshingUI(true);
+
+        if (window.location.protocol.startsWith("http")) {
+          fetch("board-data.json?t=" + Date.now(), { cache: "no-store" })
+            .then((res) => {
+              if (!res.ok) throw new Error("HTTP " + res.status);
+              return res.json();
+            })
+            .then((json) => {
+              state.data = json;
+              window.__DEVFLOW_BOARD_DATA__ = json;
+              showStatusBanner("");
+              renderAll();
+              setRefreshingUI(false);
+            })
+            .catch((err) => {
+              console.debug("[devflow-board] board-data.json fetch fallback to script reload:", err);
+              reloadViaScriptTag();
+            });
+        } else {
+          reloadViaScriptTag();
+        }
+      }
+
+      function reloadViaScriptTag() {
+        const prevScript = document.getElementById("devflow-dynamic-data-script");
+        if (prevScript && prevScript.parentNode) {
+          prevScript.parentNode.removeChild(prevScript);
+        }
+        const s = document.createElement("script");
+        s.id = "devflow-dynamic-data-script";
+        s.src = "board-data.js?t=" + Date.now();
+        s.onload = function () {
+          if (window.__DEVFLOW_BOARD_DATA__) {
+            state.data = window.__DEVFLOW_BOARD_DATA__;
+          }
+          showStatusBanner("");
+          renderAll();
+          setRefreshingUI(false);
+        };
+        s.onerror = function () {
+          showStatusBanner("⚠️ Could not reload board-data.js. Run `devflow.board --sync` and retry.");
+          setRefreshingUI(false);
+        };
+        document.body.appendChild(s);
+      }
+
+      window.__DEVFLOW_ON_DATA_LOADED__ = function (newData) {
+        state.data = newData;
+        renderAll();
+      };
+
+      function setupPolling(ms) {
+        if (state.pollTimer) {
+          clearInterval(state.pollTimer);
+          state.pollTimer = null;
+        }
+        state.pollIntervalMs = ms;
+        if (ms > 0) {
+          state.pollTimer = setInterval(refreshBoardData, ms);
+        }
+      }
+
+      // Event Listeners
+      document.getElementById("refresh-btn").addEventListener("click", refreshBoardData);
+      document.getElementById("status-retry-btn").addEventListener("click", refreshBoardData);
+
+      document.getElementById("search-input").addEventListener("input", function (e) {
+        state.searchQuery = e.target.value || "";
+        renderAll();
+      });
+
+      document.getElementById("poll-select").addEventListener("change", function (e) {
+        setupPolling(Number(e.target.value) || 0);
+      });
+
+      document.getElementById("theme-btn").addEventListener("click", function () {
+        const root = document.documentElement;
+        const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+        root.setAttribute("data-theme", next);
+      });
+
+      document.querySelector(".view-tabs").addEventListener("click", function (e) {
+        const btn = e.target.closest("[data-view]");
+        if (!btn) return;
+        const view = btn.getAttribute("data-view");
+        state.activeView = view;
+        document.querySelectorAll(".view-tabs .tab-btn").forEach((b) => {
+          const active = b.getAttribute("data-view") === view;
+          b.classList.toggle("active", active);
+          b.setAttribute("aria-selected", String(active));
+        });
+        document.querySelectorAll(".view-panel").forEach((p) => {
+          p.classList.toggle("active", p.id === "view-" + view);
+        });
+      });
+
+      document.addEventListener("click", function (e) {
+        const bpBtn = e.target.closest("[data-open-blueprint]");
+        if (bpBtn) {
+          openBlueprintDrawer();
+          return;
+        }
+        const adrBtn = e.target.closest("[data-open-adr]");
+        if (adrBtn) {
+          openAdrDrawer(adrBtn.getAttribute("data-open-adr"));
+          return;
+        }
+        const drawerTabBtn = e.target.closest("[data-drawer-tab]");
+        if (drawerTabBtn && !drawerTabBtn.disabled) {
+          state.activeDrawerTab = drawerTabBtn.getAttribute("data-drawer-tab");
+          renderDrawerContent();
+          return;
+        }
+        const taskTrigger = e.target.closest("[data-task-id]");
+        if (taskTrigger) {
+          const tid = taskTrigger.getAttribute("data-task-id");
+          const tab = taskTrigger.getAttribute("data-tab") || "timeline";
+          openTaskDrawer(tid, tab);
+        }
+      });
+
+      document.getElementById("drawer-close-btn").addEventListener("click", closeDrawer);
+      document.getElementById("drawer-backdrop").addEventListener("click", closeDrawer);
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          closeDrawer();
+          return;
+        }
+        if (e.key === "Enter" || e.key === " ") {
+          const trigger = e.target && e.target.closest ? e.target.closest("[data-task-id]") : null;
+          if (trigger && trigger.tagName !== "BUTTON") {
+            e.preventDefault();
+            openTaskDrawer(trigger.getAttribute("data-task-id"), trigger.getAttribute("data-tab") || "timeline");
+          }
+        }
+      });
+
+      // Initial render & polling setup
+      if (state.data) {
+        renderAll();
+      } else {
+        showStatusBanner("⚠️ No board data loaded yet. Run `/devflow-board` to generate `devflow/board/board-data.js`.");
+      }
+      setupPolling(state.pollIntervalMs);
+    })();
+  </script>
+</body>
+</html>

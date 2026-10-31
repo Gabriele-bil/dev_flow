@@ -1,18 +1,15 @@
 name: Build Verify
 
-# Verifica che dist/ sia in sync con templates/ e scripts/.
-# Lancia build-plugin.sh e fallisce se il rebuild produce modifiche.
+# Verifica che dist/ sia in sync con templates/ e scripts/ e fa girare tutti i
+# quality gate. Nessun filtro sui path: README, docs/ e i file di release
+# hanno i loro controlli (validate-doc-links, sync dei manifest).
 
 on:
   pull_request:
     branches: [main]
-    paths:
-      - 'templates/**'
-      - 'scripts/**'
-      - 'dist/**'
-      - '.claude-plugin/**'
-      - '.antigravity-plugin/**'
-      - '.github/workflows/build-verify.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -31,20 +28,38 @@ jobs:
 
       - name: Check dist/ is in sync
         run: |
-          if ! git diff --quiet -- dist/ .claude-plugin/ .antigravity-plugin/; then
+          if [ -n "$(git status --porcelain -- dist/ .claude-plugin/ .antigravity-plugin/)" ]; then
             echo "::error::dist/ o marketplace.json out of sync. Esegui 'bash scripts/build-plugin.sh' localmente e committa il risultato."
-            git --no-pager diff --stat -- dist/ .claude-plugin/ .antigravity-plugin/
+            git status --short -- dist/ .claude-plugin/ .antigravity-plugin/
             exit 1
           fi
           echo "✓ dist/ in sync con templates/"
 
+      - name: Validate Claude Code plugin and marketplace
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude plugin validate dist/devflow
+          claude plugin validate .
+
   quality-gates:
     runs-on: ubuntu-latest
+    env:
+      CI: "true"   # yq-dependent suites fail instead of skipping
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install jq
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq jq
+      - name: Install jq, shellcheck, yq
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq jq shellcheck
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+          yq --version
+
+      - name: Shellcheck
+        run: |
+          shellcheck -S warning scripts/*.sh scripts/builders/*.sh \
+            templates/devflow/hooks/*.sh templates/devflow/hooks/lib/*.sh \
+            templates/devflow/hooks/tests/*.sh templates/devflow/scripts/*.sh
 
       - name: Validate SKILL.md structure (strict)
         run: bash templates/devflow/scripts/validate-skills.sh --strict

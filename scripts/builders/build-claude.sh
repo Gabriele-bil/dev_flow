@@ -14,7 +14,7 @@ rm -rf "$DIST_DIR"
 mkdir -p "$DIST_DIR/.claude-plugin"
 
 # Copia directory
-for DIR in skills adapters hooks agents commands contexts references templates; do
+for DIR in skills adapters hooks agents references templates; do
   SRC="$TEMPLATE_DIR/$DIR"
   if [ -d "$SRC" ]; then
     cp -r "$SRC" "$DIST_DIR/$DIR"
@@ -35,8 +35,68 @@ for FILE in config.md ETHOS.md AGENTS.md agent.yaml README.md; do
   fi
 done
 
+cp "$ROOT_DIR/LICENSE" "$DIST_DIR/LICENSE"
+ok "Copiato: LICENSE"
+
+# File di sviluppo del plugin, non per chi lo usa: test degli hook
+rm -rf "$DIST_DIR/hooks/tests"
+
 # Pulizia di sicurezza in dist/ per rimuovere file temporanei o di runtime
 find "$DIST_DIR" \( -name ".devflow-*" ! -name ".devflow-instincts.shared.yaml" -o -name ".DS_Store" -o -name "*.tmp" \) -exec rm -rf {} + 2>/dev/null || true
+
+# Percorsi del plugin. @devflow/<dir>/ è la notazione degli autori; nel progetto
+# consumer devflow/ contiene solo config.md e features/, quindi quei percorsi non
+# esistono. Claude Code sostituisce ${CLAUDE_PLUGIN_ROOT} solo nel testo di skill,
+# comandi e agenti caricati dall'host: lì il percorso diventa assoluto. Un file
+# letto con Read (references/, adapters/ e il SKILL.md che un
+# orchestratore fa leggere) resta letterale, e la variabile non esiste nell'ambiente di Bash:
+# la nota "Plugin root" in testa a skill e agenti dà al modello la
+# radice assoluta. @devflow/config.md resta com'è: è un file del progetto consumer.
+step "Percorsi @devflow/ → \${CLAUDE_PLUGIN_ROOT}"
+PLUGIN_DIRS_RE='(references|adapters|skills|agents|scripts)'
+PATHS_NOTE='> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.'
+for f in "$DIST_DIR"/skills/*/SKILL.md "$DIST_DIR"/agents/*.md; do
+  [ -f "$f" ] || continue
+  sed -E "s#@devflow/${PLUGIN_DIRS_RE}/#\${CLAUDE_PLUGIN_ROOT}/\1/#g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+done
+for f in "$DIST_DIR"/skills/*/SKILL.md "$DIST_DIR"/agents/*.md; do
+  [ -f "$f" ] || continue
+  awk -v note="$PATHS_NOTE" '{ print } $0 == "---" && ++n == 2 { print ""; print note }' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+done
+LEFT="$(grep -lE "@devflow/${PLUGIN_DIRS_RE}/" "$DIST_DIR"/skills/*/SKILL.md "$DIST_DIR"/agents/*.md 2>/dev/null || true)"
+[ -z "$LEFT" ] || fail "@devflow/ non riscritto in: $LEFT"
+ok "Percorsi del plugin risolti in skill e agenti"
+
+# Nomi slash. Le skill sono l'unico ingresso: name: devflow-<passo> diventa
+# name: <passo>, quindi /<plugin>:<passo> (es. /devflow:plan). Nei testi la
+# notazione degli autori /devflow.<passo> diventa lo stesso nome. Solo i passi
+# che hanno una skill: nessun altro /devflow.<x> viene toccato.
+step "Nomi slash → /$NAME:<passo>"
+STEPS_RE="$(find "$DIST_DIR/skills" -mindepth 1 -maxdepth 1 -type d -name 'devflow-*' | sed 's#.*/devflow-##' | sort -r | paste -sd'|' -)"
+for f in "$DIST_DIR"/skills/devflow-*/SKILL.md; do
+  awk 'NR > 1 && /^---$/ { fm = 1 } !fm && !done && /^name: devflow-/ { sub(/^name: devflow-/, "name: "); done = 1 } { print }' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+done
+while IFS= read -r f; do
+  sed -E "s#/devflow\.(${STEPS_RE})([^a-z-]|\$)#/${NAME}:\1\2#g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+done < <(grep -rlE "/devflow\.(${STEPS_RE})" "$DIST_DIR" --include='*.md' --include='*.sh' --include='*.yaml' --include='*.html' --include='*.json' 2>/dev/null)
+LEFT="$(grep -rlE "/devflow\.(${STEPS_RE})([^a-z-]|\$)" "$DIST_DIR" 2>/dev/null || true)"
+[ -z "$LEFT" ] || fail "/devflow.<passo> non riscritto in: $LEFT"
+[ "$(grep -l '^name: devflow-' "$DIST_DIR"/skills/devflow-*/SKILL.md 2>/dev/null | wc -l | tr -d ' ')" = 0 ] || fail "name: devflow-<passo> rimasto in una skill"
+ok "Skill invocabili come /$NAME:<passo>"
+
+# Strumento per le domande all'utente: nei sorgenti le skill scrivono entrambi i
+# nomi (`AskUserQuestion` / `ask_question`); qui resta quello di Claude Code. Le
+# righe di tabella etichettate per host (**Antigravity**) restano com'erano.
+step "Nomi dei tool → Claude Code"
+while IFS= read -r f; do
+  sed -E -e '/\*\*Antigravity\*\*/!{' \
+    -e 's#\*\*`AskUserQuestion`\*\* \(Claude Code\) or \*\*`ask_question`\*\* \(Antigravity\)#**`AskUserQuestion`**#g' \
+    -e 's#\*\*`AskUserQuestion`\*\* / \*\*`ask_question`\*\*#**`AskUserQuestion`**#g' \
+    -e 's#`AskUserQuestion` / `ask_question`#`AskUserQuestion`#g' -e '}' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+done < <(grep -rl 'ask_question' "$DIST_DIR/skills" "$DIST_DIR/references" "$DIST_DIR/agents" 2>/dev/null)
+LEFT="$(grep -rn 'ask_question' "$DIST_DIR/skills" "$DIST_DIR/references" "$DIST_DIR/agents" 2>/dev/null | grep -v '\*\*Antigravity\*\*' || true)"
+[ -z "$LEFT" ] || fail "ask_question rimasto fuori dalle righe per host: $LEFT"
+ok "Domande all'utente: AskUserQuestion"
 
 # Genera .claude-plugin/plugin.json da manifest
 step "Generazione .claude-plugin/plugin.json"
@@ -46,6 +106,7 @@ jq -n \
   --arg version     "$VERSION" \
   --arg description "$DESCRIPTION" \
   --arg author      "$AUTHOR" \
+  --arg license     "$LICENSE_ID" \
   --arg repository  "${REPOSITORY:-}" \
   --arg homepage    "${HOMEPAGE:-}" \
   --argjson keywords "${KEYWORDS_JSON:-[]}" \
@@ -53,12 +114,13 @@ jq -n \
     name:        $name,
     version:     $version,
     description: $description,
-    author:      { name: $author }
+    author:      { name: $author },
+    license:     $license
   }
   + (if $repository != "" then { repository: $repository } else {} end)
   + (if $homepage   != "" then { homepage:   $homepage }   else {} end)
   + (if ($keywords | length) > 0 then { keywords: $keywords } else {} end)
-  ' | python3 -c 'import sys, json; print(json.dumps(json.load(sys.stdin), ensure_ascii=False, indent=2))' > "$DIST_DIR/.claude-plugin/plugin.json"
+  ' > "$DIST_DIR/.claude-plugin/plugin.json" || fail "jq: generazione plugin.json fallita"
 
 ok "plugin.json generato (v$VERSION)"
 
@@ -68,10 +130,14 @@ step "Aggiornamento .claude-plugin/marketplace.json"
 MARKETPLACE="$ROOT_DIR/.claude-plugin/marketplace.json"
 
 if [ -f "$MARKETPLACE" ]; then
-  jq --arg name "$NAME" --arg src "./dist/$NAME" --arg ver "$VERSION" --arg desc "$DESCRIPTION" \
+  TMP="$(mktemp "${MARKETPLACE}.XXXXXX")"
+  if jq --arg name "$NAME" --arg src "./dist/$NAME" --arg ver "$VERSION" --arg desc "$DESCRIPTION" \
     '(.plugins[] | select(.name == $name)) |= (.source = $src | .version = $ver | .description = $desc)' \
-    "$MARKETPLACE" > "${MARKETPLACE}.tmp" \
-    && mv "${MARKETPLACE}.tmp" "$MARKETPLACE"
+    "$MARKETPLACE" > "$TMP"; then
+    mv "$TMP" "$MARKETPLACE"
+  else
+    rm -f "$TMP"; fail "jq: aggiornamento marketplace.json fallito"
+  fi
   ok "marketplace.json: source → ./dist/$NAME, version → $VERSION"
 else
   warn "marketplace.json non trovato — skip"

@@ -34,8 +34,7 @@ TOTAL=${#DOC_FILES[@]}
 ERRORS=0
 CHECKED=0
 
-VALID_VERBS=$( { ls "$REPO_ROOT/templates/devflow/commands" 2>/dev/null | sed 's/\.md$//'; \
-  ls "$REPO_ROOT/templates/devflow/skills" 2>/dev/null | sed -E 's/^devflow-/devflow./'; } | sort -u)
+VALID_VERBS=$(ls "$REPO_ROOT/templates/devflow/skills" 2>/dev/null | sed -E 's/^devflow-/devflow./' | sort -u)
 
 echo "Validating doc links in $TOTAL file(s)..."
 echo ""

@@ -22,10 +22,9 @@ OK=0
 ERRORS=0
 WARNINGS=0
 
-# Valid devflow.<verb> targets: every command, plus core skills without a
-# matching command (e.g. devflow-discovery, invoked internally as devflow.discovery)
-VALID_VERBS=$( { ls "$PLUGIN_ROOT/commands" 2>/dev/null | sed 's/\.md$//'; \
-  ls "$PLUGIN_ROOT/skills" 2>/dev/null | sed -E 's/^devflow-/devflow./'; } | sort -u)
+# Valid devflow.<verb> targets: every core skill dir
+# (devflow-<name> -> devflow.<name>) — skills are the only entry point
+VALID_VERBS=$(ls "$PLUGIN_ROOT/skills" 2>/dev/null | sed -E 's/^devflow-/devflow./' | sort -u)
 
 echo "Validating $TOTAL skill files..."
 echo ""
@@ -104,9 +103,12 @@ for FILE in "${SKILL_FILES[@]}"; do
   # Adapter skills (adapters/*/skills/) use numbered-section reference format:
   # only ## I/O Reference is required. Core skills (skills/) require full set.
   if echo "$REL" | grep -q "^adapters/"; then
-    # Adapter skill: require only I/O Reference
-    if ! grep -qF "## I/O Reference" "$FILE"; then
-      FILE_ERRORS+=("missing section \"## I/O Reference\"")
+    # Adapter skill: Purpose, When NOT to Use (with the trigger clause), I/O Reference
+    for SECTION in "## Purpose" "## When NOT to Use" "## I/O Reference"; do
+      grep -qF "$SECTION" "$FILE" || FILE_ERRORS+=("missing section \"$SECTION\"")
+    done
+    if grep -qF "## When NOT to Use" "$FILE" && ! sed -n '/^## When NOT to Use/,/^## /p' "$FILE" | grep -q 'steps/implement.md'; then
+      FILE_ERRORS+=("## When NOT to Use must say the skill does not apply when the file matches no row of steps/implement.md → skill load decision matrix")
     fi
   else
     # Core skill: require Purpose + Core Principles + I/O Reference; Workflow OR any Step heading
@@ -127,10 +129,21 @@ for FILE in "${SKILL_FILES[@]}"; do
 
   # ── Style checks (--strict only) ─────────────────────────────────────────────
   if [[ "$STRICT" == true ]]; then
+    # Core Principles: one Ethos line, never the four ETHOS.md bullets copied
+    if [[ "$REL" == skills/*/SKILL.md ]]; then
+      CP=$(sed -n '/^## Core Principles/,/^## [^C]/p' "$FILE")
+      printf '%s' "$CP" | grep -q '^- \*\*Ethos\*\*' || FILE_ERRORS+=("## Core Principles must start with the one-line '- **Ethos** — …' reference (CONTRIBUTING.md)")
+      printf '%s' "$CP" | grep -qE '^- \*\*(spec-first|traceability|vertical slices|token-lean)\*\*' && FILE_ERRORS+=("## Core Principles copies an ETHOS.md bullet — keep the one-line Ethos reference instead")
+    fi
+    # Core skills run in the main context: a model: switch there drops the
+    # prompt cache (references/model-selection.md → Rules)
+    if [[ "$REL" == skills/*/SKILL.md ]] && awk '/^---/{c++; if(c==2) exit; next} c==1' "$FILE" | grep -qE '^model:'; then
+      FILE_ERRORS+=("core skill sets model: — main context runs on the session model; use effort, or a subagent (references/model-selection.md)")
+    fi
     # Lines starting with "This section..." or "Note that..."
     if grep -qiE '^(This section|Note that)' "$FILE"; then
-      MATCHES=$(grep -inE '^(This section|Note that)' "$FILE" | head -3 | sed 's/^/      /')
-      FILE_WARNINGS+=("style: line(s) starting with 'This section...' or 'Note that...' (caveman-compress violation)")
+      MATCHES=$(grep -inE '^(This section|Note that)' "$FILE" | head -3 | cut -d: -f1 | paste -sd, -)
+      FILE_WARNINGS+=("style: line(s) $MATCHES start with 'This section...' or 'Note that...' (caveman-compress violation)")
     fi
 
     # Empty sections: a ## heading followed immediately by another ## heading or EOF
@@ -153,6 +166,11 @@ for FILE in "${SKILL_FILES[@]}"; do
         fi
       fi
     done < <(grep -nE '^## ' "$FILE")
+
+    # Line-count check: adapter skills hard cap 100 lines (CONTRIBUTING.md rule)
+    if echo "$REL" | grep -q "^adapters/" && [[ $LINES -gt 100 ]]; then
+      FILE_ERRORS+=("adapter SKILL.md is $LINES lines (>100) — move detail to references/<topic>.md in the skill dir and link it from SKILL.md")
+    fi
 
     # Line-count check: core skills over budget should extract to references/
     if ! echo "$REL" | grep -q "^adapters/" && [[ $LINES -gt 250 ]]; then

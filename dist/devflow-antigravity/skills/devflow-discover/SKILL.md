@@ -1,0 +1,126 @@
+---
+name: devflow-discover
+description: "Guides architectural discovery for greenfield applications or complex features, compares technical options, and records decisions in ADRs. Use when exploring architecture choices, evaluating trade-offs, or before devflow.setup or devflow.task."
+argument-hint: "[--app <name>] [--feature <slug>] [topic-or-scope]"
+---
+
+
+# Skill: devflow.discover
+
+**Arguments:** `$ARGUMENTS` — empty → ask the user which architectural choice or feature to explore.
+
+## Purpose
+
+Interactive architectural discovery for greenfield applications or complex features. Analyzes problems across six architectural axes, asks targeted context questions, compares technical options, and records decisions in `docs/adr/ADR-NNN-[title].md`.
+
+## Core Principles
+
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
+
+## When NOT to Use
+
+- Architecture already decided and documented in `constitution.md` or existing ADR — go to `devflow.task` or `devflow.plan`
+- Feature is small or standard extension following established codebase patterns without architectural unknowns — go to `devflow.task`
+- Fixing a bug or regression in existing code — use `devflow.backprop` or `devflow.hotfix`
+- Task is written and needs clarification on user requirements, not architecture — use `devflow.clarify`
+
+## Input contract
+
+Before proceeding, verify:
+
+- [ ] Free text argument, user prompt, or attached file provides topic or scope to explore
+- [ ] Monorepo: if `devflow/config.md` declares `## Apps`, target app resolved (`--app <name>` or asked)
+- [ ] Project directory accessible to inspect existing code (for feature mode) or write `docs/adr/`
+
+## Workflow
+
+### Step 1 — Detect discovery mode
+
+1. Check project root:
+   - No `constitution.md` / `docs/product.md`, or user prompt indicates new project ("create app", "new project", "choose stack") → **Greenfield App Mode**.
+   - `constitution.md` or `docs/product.md` exists, or `--feature <slug>` passed → **Feature Architecture Mode**.
+2. Monorepo check: read `@devflow/config.md`. If `## Apps` table present:
+   - Validate `--app <name>` against table or prompt user with `ask_question`.
+   - Scope architecture analysis to resolved app.
+
+### Step 2 — Multi-axis problem analysis
+
+Analyze the problem across six core architectural axes defined in `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-discover/references/discovery-axes.md`:
+
+1. **Scope & Boundaries:** Core problem, primary actors, key user flows, edge cases, out-of-scope boundaries.
+2. **Scale & Performance:** Concurrency, throughput, read/write ratio, latency budgets, real-time vs batch.
+3. **Data & Consistency:** Entity relationships, persistence engine, ACID vs eventual consistency, state ownership.
+4. **Integration Surface:** Touched services/modules, external APIs, protocols, breaking changes, blast radius.
+5. **Security & Resilience:** Auth/authz, tenant isolation, failure modes, retries, fallback strategy.
+6. **Operations & DX:** Team familiarity, operational burden, local development ergonomics, observability.
+
+Read existing project context (`docs/product.md`, `constitution.md`, `registry.md`, adapter rules) and inspect code modules to identify established patterns and high-ambiguity axes.
+
+### Step 3 — Interactive context-gathering Q&A loop
+
+Formulate prioritized, high-impact questions targeting the most critical or ambiguous axes identified in Step 2:
+
+1. Cap question queue at **≤5 questions** — keep only high-impact architectural forks.
+2. Ask with `ask_question` — independent axes batched in one call (1–4), an axis that depends on an earlier answer after it:
+   - State the architectural axis and concrete operational consequence.
+   - Provide a **recommended answer** with concise technical rationale.
+   - Offer bounded, distinct multiple-choice options when possible.
+3. Synthesize user answers into confirmed **Decision Drivers & Constraints** (preserving user-stated constraints vs inferred assumptions) before drafting options.
+
+### Step 4 — Formulate 2–3 architectural options
+
+Generate 2–3 distinct, viable architectural options grounded in the confirmed decision drivers (never include strawman options):
+
+1. **Architecture approach:** Component structure, communication pattern, state ownership, data flow — state concrete mechanisms, never empty buzzwords (`scalable`, `modern`, `seamless`).
+2. **Key technologies / libraries:** Specific tools, protocols, storage mechanisms.
+3. **Trade-off matrix:**
+   - Complexity (low / medium / high)
+   - Performance & scalability impact
+   - Maintenance & cognitive load
+   - Blast radius & migration risk
+4. **Pros, Cons, and Real Ceiling:** Concrete bullet points. Every option — including the recommended one — must state its strongest real limitation, operational cost, or failure mode (`Bad, because` / `Risks`).
+
+### Step 5 — Interactive architecture selection
+
+1. Present comparative options and trade-off matrix to user.
+2. Recommend best option with concise technical rationale grounded in confirmed decision drivers.
+3. Ask user to choose or adjust using `ask_question` tool (or chat prompt).
+4. If minor sub-decisions remain (e.g. storage engine, auth provider), resolve with maximum 2 concise follow-up questions.
+5. Confirm agreed architectural direction before writing files.
+
+### Step 6 — Write Architecture Decision Record (ADR)
+
+1. Determine ADR number:
+   - Check `docs/adr/ADR-*.md`. Find highest 3-digit prefix (`NNN`).
+   - If none exist, start with `001`. Next is `max + 1` zero-padded.
+2. Create directory `docs/adr/` if missing.
+3. Write `docs/adr/ADR-[NNN]-[title-slug].md` using template from `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-discover/references/adr-template.md`.
+   - Record Multi-Axis Context Analysis, Decision Drivers, Considered Options (all 2–3), Decision Outcome, Consequences, Blueprint diagram, and Next Steps.
+4. Update or create `docs/adr/README.md` index table with columns: `ADR | Title | Status | Date | Scope`.
+
+### Step 7 — Pipeline handoff
+
+- **Greenfield App Mode:**
+  - If chosen stack matches an adapter (Angular, Flutter, Next.js, NestJS), instruct user:
+    "Baseline architecture recorded in `docs/adr/ADR-[NNN]-[title-slug].md`. Run `/devflow-setup` to initialize project context and adapters."
+- **Feature Architecture Mode:**
+  - Instruct user:
+    "Feature architecture recorded in `docs/adr/ADR-[NNN]-[title-slug].md`. Run `/devflow-task [feature idea]` (referencing this ADR) to start implementation pipeline."
+
+## Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+| --- | --- | --- |
+| Leaving ADR in draft without user decision | Unresolved decisions stall downstream pipeline | Run interactive Q&A loop to reach explicit Accepted status |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
+
+## I/O Reference
+
+| | |
+| --- | --- |
+| Reads | `docs/product.md`, `constitution.md`, `registry.md`, `devflow/config.md`, existing code modules |
+| Reads (references) | `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-discover/references/discovery-axes.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-discover/references/adr-template.md` |
+| Reads (conditional) | `references/anti-patterns.md` (when unsure / retry) |
+| Writes | `docs/adr/ADR-[NNN]-[title-slug].md`, `docs/adr/README.md` |
+| Leads to | `devflow.setup` (greenfield app) or `devflow.task` (feature) |

@@ -1,11 +1,16 @@
 ---
-name: devflow-analyze
+name: analyze
 description: "Read-only check: task.md+plan.md+constitution.md+ADRs consistency. Flags traceability gaps, untestable ACs, terminology drift, layer violations, ADR misalignment. Use when user runs devflow.analyze — after devflow.plan (ready), before devflow.implement."
-model: haiku
+argument-hint: "[optional-feature-path]"
 effort: low
+disallowed-tools: Write, Edit, NotebookEdit
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Skill: devflow.analyze
+
+**Arguments:** `$ARGUMENTS` — empty → resolve the feature with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve` (exit 1 → ask the user).
 
 ## Purpose
 
@@ -13,10 +18,7 @@ Read-only cross-artifact consistency check. Verify `task.md` and `plan.md` are i
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 
 ## When NOT to Use
 
@@ -45,7 +47,7 @@ Read in order:
 3. `constitution.md` — extract: layer ordering rules and naming conventions
 4. `docs/adr/` (if referenced in `task.md`/`plan.md` or `docs/adr/README.md` exists) — extract accepted architectural decisions, rejected alternatives, and boundaries
 
-If no path is provided, resolve the highest `NNN_` prefix under `devflow/features/`.
+If no path is provided, resolve feature with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve` (exit 1 → ask).
 
 ### Step 2 — Run 7 detection passes
 
@@ -155,13 +157,10 @@ Blockers = Critical + Required findings.
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| "Traceability close enough" | Untraceable subtasks → silent bugs in `devflow.test` |
-| Vague acceptance criteria | `devflow.test` writes from ACs; vague ACs → untestable |
-| Skipping analyze ("plan looks fine") | 6-pass structural check; one read catches silent gaps |
-| Contradicting accepted ADRs | Plan re-introducing rejected alternative → Critical finding |
-| Running analyze mid-implementation | Run before `devflow.implement`; post-impl use `devflow.beautify` |
 | Waiving Critical findings without documentation | Document in `plan.md` Open questions |
 | Fixing findings in `plan.md` only | Check if root is in `task.md` first |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 
@@ -170,7 +169,7 @@ Blockers = Critical + Required findings.
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md` |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
 | Reads | `constitution.md` |
-| Reads (conditional) | `docs/adr/` (if present — active ADRs for Pass F check) |
+| Reads (conditional) | `docs/adr/` (if present — active ADRs for Pass F check); `references/anti-patterns.md` (when unsure / retry) |
 | Reads | `references/analyze-report-template.md` |
 | Writes | **Nothing** — strictly read-only |
 | Precedes | `devflow.implement` |

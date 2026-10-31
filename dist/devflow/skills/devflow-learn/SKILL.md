@@ -1,10 +1,14 @@
 ---
-name: devflow-learn
+name: learn
 description: Manage local and team instincts (.devflow-instincts.yaml, .devflow-instincts.shared.yaml) — log, search, list, check, prune, boost, or promote instincts (with optional Rigor check_cmd + ratchet_max) to team store and REGISTRY.md. Use when user asks to log a finding, search learnings, run rigor checks, manage instincts, or promote team patterns.
 argument-hint: "[log, search <query>, list, check, prune, boost <id>, promote <id>]"
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Skill: devflow.learn
+
+**Arguments:** `$ARGUMENTS` — empty → run `list`.
 
 ## Purpose
 
@@ -16,10 +20,7 @@ Read, write, and maintain persistent instincts across local and team stores:
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 
 ## When NOT to Use
 
@@ -127,7 +128,7 @@ jq -r --argjson shared "$SHARED_JSON" --argjson local "$LOCAL_JSON" '
     + "[" + (.confidence | tostring) + " " + (.domain // "general")
     + (if .scope == "team" then " 👥 team" else " 🏠 local" end)
     + "] " + .trigger + " → " + .action
-    + (if .scope == "local" and .confidence >= 0.85 then " (⭐ eligible: /devflow.learn promote " + .id + ")" else "" end)
+    + (if .scope == "local" and .confidence >= 0.85 then " (⭐ eligible: /devflow:learn promote " + .id + ")" else "" end)
 ' 2>/dev/null
 ```
 
@@ -147,7 +148,7 @@ Promote a high-confidence local instinct to `.devflow-instincts.shared.yaml` (co
 ENTRY=$(yq -o=json ".instincts[] | select(.id == \"<ID>\")" .devflow-instincts.yaml 2>/dev/null)
 ```
 
-If empty: "No local instinct with id `<ID>`. Use `/devflow.learn list`."
+If empty: "No local instinct with id `<ID>`. Use `/devflow:learn list`."
 
 #### Step 2 — Verify confidence threshold
 
@@ -232,8 +233,9 @@ Run executable `check_cmd` rules defined in `.devflow-instincts.shared.yaml`. Fo
 | --- | --- | --- |
 | Promoting low-confidence or unverified local instincts | Pollutes team shared context with premature rules | Require confidence ≥ 0.85 and multi-session validation |
 | Git-ignoring `.devflow-instincts.shared.yaml` | Team loses architectural gotchas discovered in earlier sessions | Keep shared file tracked in git; only local file is ignored |
-| Never pruning stale local instincts | Stale instincts mislead future sessions | Run `prune` periodically after major refactors |
 | Logging external docs or tutorials as instincts | Bloats prompt context with non-codebase knowledge | Only log codebase-specific behaviors observed during sessions |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 

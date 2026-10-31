@@ -40,6 +40,8 @@ CAP_NAME="$(tr '[:lower:]' '[:upper:]' <<< "${NAME:0:1}")${NAME:1}"
 cat <<EOF > "$TARGET_DIR/ADAPTER.md"
 # $CAP_NAME adapter (DevFlow)
 
+**Verified against:** $NAME@0.0 ($(date +%Y-%m-%d)) <!-- replace with the real npm packages (pub:<name>@x.y for pub.dev, sdk:<name>@x.y for SDKs) -->
+
 Single source of truth for $CAP_NAME behavior. Pipeline skills (\`devflow-plan\`, \`devflow-implement\`, \`devflow-beautify\`, \`devflow-test\`, \`devflow-pr\`) **must** read \`@devflow/config.md\`, resolve adapter, then load this core file **plus** the \`steps/<step>.md\` file for the active step (see **Step files** below). Do not load step files for other steps.
 
 Baseline: **$CAP_NAME**. Keep output token-lean and imperative.
@@ -268,8 +270,7 @@ cat <<EOF > "$TARGET_DIR/templates/AGENTS.template.md"
 
 - Required MCP baseline: {{mcp-baseline}}
 - Architecture: see \`constitution.md\`
-- Technology skills:
-  - \`@devflow/adapters/$NAME/skills/$NAME-architecture/SKILL.md\`
+- Technology skills load by file path — see the adapter's \`steps/implement.md\` → skill load decision matrix (never @-import skills here: they would load in every session)
 <!-- /devflow-managed: agents -->
 EOF
 
@@ -296,7 +297,10 @@ cat <<EOF > "$TARGET_DIR/templates/CONSTITUTION.template.md"
 2. Spec-driven development
 EOF
 
-# ── 9. skills/ ────────────────────────────────────────────────────────────────
+# ── 9. deprecated-apis.txt ────────────────────────────────────────────────────
+printf '# Banned APIs for %s: <extended regex><TAB><use instead>. validate-adapters.sh greps every .md\n# of the adapter; a match is allowed only on a line that says removed / deprecated / instead.\n' "$CAP_NAME" > "$TARGET_DIR/deprecated-apis.txt"
+
+# ── 10. skills/ ────────────────────────────────────────────────────────────────
 cat <<EOF > "$TARGET_DIR/skills/$NAME-architecture/SKILL.md"
 ---
 name: $NAME-architecture
@@ -309,6 +313,11 @@ disable-model-invocation: true
 ## Purpose
 
 Defines project structure, layer separation, and architectural boundaries for $CAP_NAME projects.
+
+## When NOT to Use
+
+- File matches no row of \`steps/implement.md\` → skill load decision matrix
+- Generic clean-code questions → \`common-clean-code\`
 
 ## Core Principles
 

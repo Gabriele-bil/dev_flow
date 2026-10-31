@@ -5,7 +5,9 @@
 # tsc, eslint, jest, vitest). Extend without editing this script:
 # DEVFLOW_FILTER_EXTRA=<ERE> — extra command-class regex, ORed with the built-in set.
 # Output over threshold → head + all error/warning lines + tail, emitted via
-# hookSpecificOutput.updatedToolOutput (replaces tool output in context, cap 10k chars).
+# hookSpecificOutput.updatedToolOutput as a Bash-shaped object
+# {stdout, stderr, interrupted, isImage} (a bare string is ignored by Claude
+# Code). Cap 10k chars. Claude Code only: Antigravity has no output rewrite.
 # Not applicable / under threshold → exit 0 silently (original output kept).
 # Savings telemetry: each filtered command appends one JSONL line to
 # .devflow-filter-stats.jsonl (DEVFLOW_FILTER_STATS=<path> overrides, =off disables).
@@ -25,15 +27,14 @@ TAIL_LINES="${DEVFLOW_FILTER_TAIL:-10}"              # always keep last N lines
 MAX_SIGNAL_LINES="${DEVFLOW_FILTER_SIGNALS:-40}"     # cap on kept error/warning lines
 MAX_OUTPUT_CHARS=9000                                # hard cap: updatedToolOutput limit is 10000
 
-command -v jq >/dev/null 2>&1 || exit 0
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOK_DIR/lib/payload.sh"
 
-RAW=$(cat)
-[ -z "$RAW" ] && exit 0
-
-TOOL=$(printf '%s' "$RAW" | jq -r '.tool_name // .tool_use.name // empty' 2>/dev/null)
-[ "$TOOL" = "Bash" ] || exit 0
-
-CMD=$(printf '%s' "$RAW" | jq -r '.tool_input.command // .tool_use.input.command // empty' 2>/dev/null)
+df_read_input || exit 0
+[ "$DF_HOST" = "claude" ] || exit 0
+[ "$DF_TOOL" = "shell" ] || exit 0
+RAW="$DF_RAW"
+CMD="$DF_CMD"
 [ -z "$CMD" ] && exit 0
 
 # Command classes: adapter Implement/Test/PR commands + git diff/log + generic dev tools.
@@ -60,7 +61,7 @@ OUTPUT=$(printf '%s' "$RAW" | jq -r '
 [ -z "$OUTPUT" ] && exit 0
 
 # ── Structured test-summary extraction (runs regardless of threshold) ────────
-SUMMARY_FILE="${DEVFLOW_TEST_SUMMARY:-.devflow-test-summary.json}"
+SUMMARY_FILE="${DEVFLOW_TEST_SUMMARY:-$DF_WORKSPACE/.devflow-test-summary.json}"
 if [ "$SUMMARY_FILE" != "off" ]; then
   T_FRAMEWORK="" T_PASSED="" T_FAILED="" T_SKIPPED=""
 
@@ -132,9 +133,7 @@ if [ "$SUMMARY_FILE" != "off" ]; then
       --argjson passed "$T_PASSED" --argjson failed "$T_FAILED" --argjson skipped "$T_SKIPPED" \
       '{ts:$ts, framework:$framework, cmd:$cmd, passed:$passed, failed:$failed, skipped:$skipped}' \
       > "$SUMMARY_FILE" 2>/dev/null || true
-    if [ -f .gitignore ] && ! grep -qF ".devflow-test-summary.json" .gitignore 2>/dev/null; then
-      printf '\n# devflow test summary\n.devflow-test-summary.json\n' >> .gitignore 2>/dev/null || true
-    fi
+    [ -z "${DEVFLOW_TEST_SUMMARY:-}" ] && df_gitignore ".devflow-test-summary.json"
   fi
 fi
 
@@ -168,26 +167,29 @@ RESULT="$FILTERED
 [devflow-filter] kept $KEPT of $TOTAL lines ($CHARS chars raw)"
 
 # ── Savings telemetry (one JSONL line per filtered command) ──────────────────
-STATS_FILE="${DEVFLOW_FILTER_STATS:-.devflow-filter-stats.jsonl}"
+STATS_FILE="${DEVFLOW_FILTER_STATS:-$DF_WORKSPACE/.devflow-filter-stats.jsonl}"
 if [ "$STATS_FILE" != "off" ]; then
-  if [ ! -f "$STATS_FILE" ] && [ -f .gitignore ] \
-     && ! grep -qF ".devflow-filter-stats.jsonl" .gitignore 2>/dev/null; then
-    printf '\n# devflow filter savings\n.devflow-filter-stats.jsonl\n' >> .gitignore 2>/dev/null || true
-  fi
+  [ -z "${DEVFLOW_FILTER_STATS:-}" ] && df_gitignore ".devflow-filter-stats.jsonl" ".devflow-filter-stats.jsonl.1"
   CMD_HEAD=$(printf '%s' "$CMD" | tr '\n' ' ' | head -c 60)
-  jq -cn --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || true)" \
+  ENTRY=$(jq -cn --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || true)" \
     --arg cmd "$CMD_HEAD" \
     --argjson raw "$CHARS" --argjson kept "${#RESULT}" \
     --argjson raw_lines "$TOTAL" --argjson kept_lines "$KEPT" \
-    '{ts:$ts,cmd:$cmd,raw_chars:$raw,kept_chars:$kept,raw_lines:$raw_lines,kept_lines:$kept_lines}' \
-    >> "$STATS_FILE" 2>/dev/null || true
+    '{ts:$ts,cmd:$cmd,raw_chars:$raw,kept_chars:$kept,raw_lines:$raw_lines,kept_lines:$kept_lines}' 2>/dev/null) || true
+  df_rotate "$STATS_FILE"
+  [ -n "$ENTRY" ] && df_append "$STATS_FILE" "$ENTRY"
 fi
 
-jq -n --arg out "$RESULT" '{
-  suppressOutput: true,
+# Bash-shaped replacement: filtered text in stdout, interrupted carried over.
+printf '%s' "$RAW" | jq --arg out "$RESULT" '{
   hookSpecificOutput: {
     hookEventName: "PostToolUse",
-    updatedToolOutput: $out
+    updatedToolOutput: {
+      stdout: $out,
+      stderr: "",
+      interrupted: ((.tool_response | objects | .interrupted) // false),
+      isImage: false
+    }
   }
 }'
 exit 0

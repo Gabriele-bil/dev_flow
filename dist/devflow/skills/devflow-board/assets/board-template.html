@@ -2101,7 +2101,7 @@
           setRefreshingUI(false);
         };
         s.onerror = function () {
-          showStatusBanner("⚠️ Could not reload board-data.js. Run `bash templates/devflow/scripts/board.sh --sync` and retry.");
+          showStatusBanner("⚠️ Could not reload board-data.js. Run `devflow.board --sync` and retry.");
           setRefreshingUI(false);
         };
         document.body.appendChild(s);
@@ -2202,7 +2202,7 @@
       if (state.data) {
         renderAll();
       } else {
-        showStatusBanner("⚠️ No board data loaded yet. Run `/devflow.board` to generate `devflow/board/board-data.js`.");
+        showStatusBanner("⚠️ No board data loaded yet. Run `/devflow:board` to generate `devflow/board/board-data.js`.");
       }
       setupPolling(state.pollIntervalMs);
     })();

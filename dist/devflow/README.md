@@ -6,22 +6,22 @@ AI agents write code fast and forget faster. Ask for a feature and you get files
 
 DevFlow turns that into a pipeline. Every feature starts as a **spec** (`task.md`), becomes a **file-ordered plan** with a traceability table (every subtask → acceptance criterion → file), gets implemented in **vertical slices**, then passes **explicit gates**: multi-axis review, tests, goal-backward verification of every acceptance criterion, and a parallel multi-agent ship gate — before a PR is opened. **You stay the orchestrator**: each step is a command you invoke, with an input contract that refuses to run on bad state. Stack knowledge comes from **adapters** (Flutter, Angular, Next.js) so the agent follows *your* stack's rules, not generic ones.
 
-This directory is the installable package: core pipeline skills, slash commands, hooks, references, and adapters.
+This directory is the installable package: core pipeline skills (the slash commands), hooks, references, and adapters.
 
 ## Quick start
 
 Three commands from idea to reviewed plan:
 
 ```text
-you>  /devflow.setup
+you>  /devflow:setup
       ✅ AGENTS.md + REGISTRY.md generated (adapter: flutter)
 
-you>  /devflow.task users can archive old projects
+you>  /devflow:task users can archive old projects
       ✅ Task created: devflow/features/007_archive-projects/task.md
       HMW: How might we let users declutter without deleting history?
       5 subtasks · 6 acceptance criteria · 1 [NEEDS CLARIFICATION] marker
 
-you>  /devflow.plan
+you>  /devflow:plan
       ✅ Plan created: devflow/features/007_archive-projects/plan.md
       8 files (2 create, 6 modify) · 3 vertical slices · traceability complete
       Continue to implementation? -> devflow.implement
@@ -33,7 +33,7 @@ Full setup:
 
 1. **Active stack** — edit [`config.md`](config.md); set **Adapter** to `flutter`, `angular`, `nextjs`, or `nestjs`.
 2. **Run setup once** — execute `devflow.setup` to generate root `AGENTS.md` and `REGISTRY.md` for the consumer project.
-3. **Run the pipeline** — invoke commands under [`commands/`](commands/) (e.g. `devflow.task`) or load as a plugin and use your host’s namespaced invocations.
+3. **Run the pipeline** — each step is a skill: `/devflow:<step>` on Claude Code (e.g. `/devflow:task`), `/devflow-<step>` on Antigravity CLI.
 4. **Enable code-review-graph** — install and configure once for all detected hosts:
    - `pipx install code-review-graph` (or `pip install code-review-graph`)
    - `code-review-graph install`
@@ -76,17 +76,11 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 - Local run: `claude --plugin-dir /path/to/devflow`
 - Docs: [Create plugins](https://code.claude.com/docs/en/plugins)
 
-## Cursor
-
-- Manifest: [`.cursor-plugin/plugin.json`](.cursor-plugin/plugin.json)
-- Local install: `ln -s /path/to/devflow ~/.cursor/plugins/local/devflow` then reload the window.
-- Docs: [Plugins](https://cursor.com/docs/plugins)
-
 ## Antigravity CLI (agy)
 
-- Manifest: [`.antigravity-plugin/plugin.json`](.antigravity-plugin/plugin.json)
-- Local install: `agy plugin install /path/to/devflow`
-- Validate: `agy plugin validate /path/to/devflow`
+- Build: `dist/devflow-antigravity/` in the DevFlow repo (manifest under .antigravity-plugin/, hooks in the root hooks.json)
+- Local install: `agy plugin install /path/to/dev_flow/dist/devflow-antigravity`
+- Validate: `agy plugin validate /path/to/dev_flow/dist/devflow-antigravity`
 
 ## Commands
 
@@ -101,7 +95,7 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 | `devflow.analyze` | `task.md` + `plan.md` → consistency report (traceability, AC testability, terminology, constitution alignment, coverage balance) |
 | `devflow.blueprint` | Large idea → multi-PR blueprint with dependency graph + adversarial review |
 | `devflow.implement` | Execute `plan.md` step by step, vertical slice by slice |
-| `devflow.beautify` | 7-axis polish: correctness, readability, security, performance, architecture, UI, a11y |
+| `devflow.beautify` | Polish: readability, conventions, design tokens, layout, a11y basics (correctness/security → `devflow.ship`; skipped in `quick` profile) |
 | `devflow.test` | Write and run unit + integration tests; bounded retry; goal-backward per-AC verification (`verification.md`) |
 | `devflow.ship` | Pre-merge gate: 1–5 agents in parallel per depth profile → Ship Gate Report → route to PR |
 | `devflow.pr` | Commit, push branch, open PR to main |
@@ -137,16 +131,6 @@ Fourteen hook registrations activate automatically — no user invocation requir
 | Stop | `stop-debug-check.sh` | Warns about `print()` / `console.log` in modified files |
 | Stop | `stop-learn-distill.sh` | Detects file churn (≥4 edits) in `.devflow-observe.jsonl`; appends to `.devflow-learnings.jsonl` |
 | Stop | `observe.sh stop` | Logs response-boundary events to `.devflow-observe.jsonl` |
-
-## Contexts
-
-Three context files in `devflow/contexts/` tune Claude's behavior per pipeline phase. The SessionStart hook suggests which one to load based on the active step.
-
-| Context | Suggested for | Focus |
-| --- | --- | --- |
-| `contexts/implement.md` | devflow.implement, devflow.beautify | Code-first, follow plan.md order, mark [done] |
-| `contexts/review.md` | devflow.ship | 7-axis review, severity-ordered findings |
-| `contexts/research.md` | devflow.task, devflow.plan | Explore before acting, no application code |
 
 ## Core Principles
 
@@ -189,7 +173,7 @@ Cross-adapter skills in `adapters/common/`:
 
 ## Plugin Catalog
 
-`agent.yaml` at the plugin root is a machine-readable index of all pipeline components — steps, agents, skills, adapters, hooks, contexts, references. Use it for tooling, automation, or quick reference.
+`agent.yaml` at the plugin root is a machine-readable index of all pipeline components — steps, agents, skills, adapters, hooks, references. Use it for tooling, automation, or quick reference.
 
 ## Features output
 

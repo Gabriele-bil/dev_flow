@@ -1,186 +1,85 @@
-# Next.js Testing — Code Patterns
+# Next.js Testing — project patterns
 
-## Baseline
+Loaded on demand from `../SKILL.md`. Check current Next.js testing docs with Context7 before changing Jest config.
 
-```bash
-pnpm add -D jest jest-environment-jsdom @testing-library/react @testing-library/user-event @testing-library/jest-dom ts-jest
-```
-
-## Jest Config
+## Jest config
 
 ```ts
 // jest.config.ts
 import type { Config } from 'jest'
-import nextJest from 'next/jest'
+import nextJest from 'next/jest.js'
 
 const createJestConfig = nextJest({ dir: './' })
 
 const config: Config = {
   testEnvironment: 'jsdom',
-  setupFilesAfterFramework: ['<rootDir>/jest.setup.ts'],
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/$1',
-  },
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  moduleNameMapper: { '^@/(.*)$': '<rootDir>/$1' },
+  testPathIgnorePatterns: ['<rootDir>/e2e/'],
+  collectCoverageFrom: [
+    '{app,components,lib}/**/*.{ts,tsx}',
+    '!**/*.d.ts',
+    '!**/*.stories.tsx',
+    '!app/layout.tsx',
+  ],
+  coverageThreshold: { global: { statements: 80, branches: 80, functions: 80, lines: 80 } },
 }
 
 export default createJestConfig(config)
 ```
 
-```ts
-// jest.setup.ts
-import '@testing-library/jest-dom'
-```
+`jest.setup.ts`: `import '@testing-library/jest-dom'`.
 
-## Testing Client Components
-
-```tsx
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { Counter } from './counter'
-
-describe('Counter', () => {
-  it('increments on click', async () => {
-    const user = userEvent.setup()
-    render(<Counter initialCount={0} />)
-
-    await user.click(screen.getByRole('button', { name: /increment/i }))
-
-    expect(screen.getByText('1')).toBeInTheDocument()
-  })
-})
-```
-
-- Always `userEvent.setup()` — never deprecated `userEvent.click()` direct call
-- Query priority: `getByRole` > `getByLabelText` > `getByText` > `getByTestId`
-- Use `waitFor` for async assertions
-
-## Testing Server Components
-
-```tsx
-import { render, screen } from '@testing-library/react'
-import { ProductList } from './product-list'
-
-// Mock fetch for Server Component
-global.fetch = jest.fn().mockResolvedValue({
-  ok: true,
-  json: async () => [{ id: '1', name: 'Product A' }],
-})
-
-describe('ProductList', () => {
-  it('renders products', async () => {
-    render(await ProductList())  // await async component
-    expect(screen.getByText('Product A')).toBeInTheDocument()
-  })
-})
-```
-
-## Mock `next/navigation`
+## Route Handler — invalid body is 400
 
 ```ts
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    back: jest.fn(),
-  }),
-  usePathname: () => '/dashboard',
-  useSearchParams: () => new URLSearchParams(),
-  useParams: () => ({ id: '123' }),
-}))
-```
-
-## Testing Server Actions
-
-- Server Actions are pure functions — test directly
-- Mock external dependencies (DB, fetch), not the action itself
-
-## Testing API Routes
-
-```ts
-import { GET, POST } from './route'
 import { NextRequest } from 'next/server'
+import { POST } from './route'
 
-describe('GET /api/items', () => {
-  it('returns items list', async () => {
-    const request = new NextRequest('http://localhost/api/items')
-    const response = await GET(request)
-    const data = await response.json()
-
-    expect(response.status).toBe(200)
-    expect(Array.isArray(data)).toBe(true)
+it('returns 400 for invalid body', async () => {
+  const req = new NextRequest('http://localhost/api/products', {
+    method: 'POST',
+    body: JSON.stringify({ name: '' }),
   })
-})
-
-describe('POST /api/items', () => {
-  it('returns 400 for invalid body', async () => {
-    const request = new NextRequest('http://localhost/api/items', {
-      method: 'POST',
-      body: JSON.stringify({ name: '' }),
-    })
-    const response = await POST(request)
-    expect(response.status).toBe(400)
-  })
-})
-
-describe('GET /api/items/[id]', () => {
-  it('handles async params in Next.js 16+', async () => {
-    const request = new NextRequest('http://localhost/api/items/123')
-    // Next.js 16 (and 15) requires params to be passed as a Promise:
-    const response = await GET(request, { params: Promise.resolve({ id: '123' }) })
-    expect(response.status).toBe(200)
-  })
+  const res = await POST(req)
+  expect(res.status).toBe(400)
 })
 ```
 
-## Testing Zustand Stores
+Dynamic segment handler: `await GET(req, { params: Promise.resolve({ id: '123' }) })`.
+
+## Server Action with cache calls mocked
 
 ```ts
-import { useCartStore } from '@/lib/stores/cart-store'
+jest.mock('next/cache', () => ({ updateTag: jest.fn(), revalidateTag: jest.fn(), refresh: jest.fn() }))
 
-describe('cartStore', () => {
-  beforeEach(() => {
-    useCartStore.setState({ items: [] })
-  })
-
-  it('adds item correctly', () => {
-    useCartStore.getState().addItem({ id: '1', name: 'Product', price: 10 })
-    expect(useCartStore.getState().items).toHaveLength(1)
-  })
+it('rejects invalid input', async () => {
+  const fd = new FormData()
+  fd.set('name', '')
+  const result = await createItem(null, fd)
+  expect(result).toMatchObject({ success: false })
 })
 ```
 
-## Testing React Hook Form
+## Form — user flow
 
 ```tsx
 it('shows validation error on empty submit', async () => {
   const user = userEvent.setup()
-  render(<ProfileForm />)
-
+  render(<ProfileForm initial={{ name: '', email: '' }} />)
   await user.click(screen.getByRole('button', { name: /save/i }))
   expect(await screen.findByText(/name required/i)).toBeInTheDocument()
 })
+```
 
-it('submits with valid data', async () => {
-  const user = userEvent.setup()
-  const mockAction = jest.fn().mockResolvedValue({ success: true })
-  render(<ProfileForm onSubmit={mockAction} />)
+## Async Server Component — Playwright
 
-  await user.type(screen.getByLabelText(/name/i), 'John Doe')
-  await user.type(screen.getByLabelText(/email/i), 'john@example.com')
-  await user.click(screen.getByRole('button', { name: /save/i }))
+```ts
+// e2e/dashboard.spec.ts
+import { test, expect } from '@playwright/test'
 
-  await waitFor(() => expect(mockAction).toHaveBeenCalledWith({
-    name: 'John Doe',
-    email: 'john@example.com',
-  }))
+test('dashboard shows metrics', async ({ page }) => {
+  await page.goto('/dashboard')
+  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible()
 })
 ```
-
-## Coverage
-
-```bash
-pnpm test -- --passWithNoTests --watchAll=false --coverage --collectCoverageFrom='src/**/*.{ts,tsx}'
-```
-
-- Threshold: 80% statements, branches, functions, lines
-- Exclude: `*.stories.tsx`, `*.config.ts`, `app/layout.tsx`, `app/globals.css`

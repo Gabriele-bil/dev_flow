@@ -11,21 +11,22 @@
 # which skill/profile is running — it's a floor-level safety net, not a
 # substitute for devflow-ship's own profile-aware fan-out logic.
 #
-# Triggered by: Agent tool (subagent launch — some Claude Code builds expose
-# it as "Task")
-# Input (stdin): JSON { "tool_use": { "name": "Agent", "input": {...} } }
-# Block output:  { "decision": "block", "reason": "..." } → stdout, exit 0
-# Allow output:  (silent) → exit 0
+# Triggered by: Agent|Task (Claude Code), invoke_subagent (Antigravity CLI)
+# Input: host payload, parsed by lib/payload.sh
+# Block output: lib/emit.sh df_deny → stdout, exit 0
+# Allow output: (silent) → exit 0
+# Parallel launches fire this hook concurrently: the counter update is locked
+# so N simultaneous calls count as N.
 
-set -euo pipefail
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOK_DIR/lib/payload.sh"
+. "$HOOK_DIR/lib/emit.sh"
 
-command -v jq >/dev/null 2>&1 || exit 0
+df_read_input || exit 0
+[ -z "$DF_RAW" ] && exit 0
 
-INPUT="$(cat 2>/dev/null || true)"
-[[ -z "$INPUT" ]] && exit 0
-
-WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-STATE_FILE="${CLAUDE_PROJECT_DIR:-${DEVFLOW_FANOUT_STATE_FILE:-$WORKSPACE_ROOT}}/.devflow-fanout-state.json"
+WORKSPACE_ROOT="$DF_WORKSPACE"
+STATE_FILE="${DEVFLOW_FANOUT_STATE_FILE:-$WORKSPACE_ROOT/.devflow-fanout-state.json}"
 WINDOW_MS="${DEVFLOW_FANOUT_WINDOW_MS:-10000}"
 MAX_FANOUT="${DEVFLOW_MAX_FANOUT:-5}"
 
@@ -34,28 +35,20 @@ now_ms() {
 }
 
 NOW=$(now_ms)
-LAST_TS=0
-COUNT=0
-if [[ -f "$STATE_FILE" ]]; then
-  LAST_TS=$(jq -r '.last_ts // 0' "$STATE_FILE" 2>/dev/null || echo 0)
-  COUNT=$(jq -r '.count // 0' "$STATE_FILE" 2>/dev/null || echo 0)
-fi
-[[ "$LAST_TS" =~ ^[0-9]+$ ]] || LAST_TS=0
+df_json_update "$STATE_FILE" '
+  (if ($now - ((.last_ts // 0) | tonumber? // 0)) > $window then .count = 0 else . end)
+  | .count = (((.count // 0) | tonumber? // 0) + 1)
+  | .last_ts = $now' \
+  --argjson now "$NOW" --argjson window "$WINDOW_MS"
+COUNT=$(jq -r '.count // 0' "$STATE_FILE" 2>/dev/null || echo 0)
 [[ "$COUNT" =~ ^[0-9]+$ ]] || COUNT=0
-
-GAP=$(( NOW - LAST_TS ))
-if (( GAP > WINDOW_MS )); then
-  COUNT=0
-fi
-COUNT=$(( COUNT + 1 ))
-
-jq -cn --argjson count "$COUNT" --argjson ts "$NOW" '{count:$count, last_ts:$ts}' > "$STATE_FILE" 2>/dev/null || true
+df_gitignore ".devflow-fanout-state.json"
 
 if (( COUNT > MAX_FANOUT )); then
   REASON="Blocked: agent fan-out cap ($MAX_FANOUT) exceeded within ${WINDOW_MS}ms.
 
 devflow.ship's thorough profile tops out at $MAX_FANOUT reviewer agents. Wait for the current batch's results before dispatching more, or reduce scope to the profile's actual agent count."
-  printf '%s' "$(jq -n --arg reason "$REASON" '{"decision":"block","reason":$reason}')"
+  df_deny "$REASON"
   exit 0
 fi
 

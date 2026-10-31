@@ -1,0 +1,26 @@
+# NestJS adapter — PR step
+
+Loaded by `devflow-pr` together with the adapter core (`ADAPTER.md`).
+
+## PR: verification
+
+Before push:
+
+```bash
+npm run lint
+npm test -- --passWithNoTests
+npm run test:e2e
+npm run build
+```
+
+### PR body checklist (copy into PR description)
+
+- [ ] Lint passing
+- [ ] Unit tests passing (`test` stamp)
+- [ ] No open coverage gaps on modified files (Ship Gate report — test-engineer)
+- [ ] E2E tests passing
+- [ ] Build passing
+- [ ] `nestjs-architecture` constraints respected (feature modules, constructor injection, no circular deps)
+- [ ] All new/changed endpoints documented with `@nestjs/swagger` decorators
+- [ ] All new input validated per `ADAPTER.md` → Project choices (DTO class or `@Body({ schema })`); guards applied to protected routes
+- [ ] `registry.md` updated if new patterns introduced

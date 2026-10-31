@@ -12,7 +12,7 @@ Loaded by `devflow-setup` together with the adapter core (`ADAPTER.md`).
 
 Template intent:
 
-- `AGENTS.template.md`: short operational rules + skill references (`@...`) only.
+- `AGENTS.template.md`: short operational rules + "when you touch X → read skill Y" list. No `@` skill imports — they load into every session.
 - `REGISTRY.template.md`: compact pattern registry and core conventions.
 
 Output must stay token-lean, imperative, filler-free.
@@ -23,7 +23,8 @@ Dependencies below are authoritative for `devflow.setup` auto-install.
 
 ### flutter-dependencies
 
-- `easy_localization`
+- `slang`
+- `slang_flutter`
 - `google_fonts`
 - `flutter_riverpod`
 - `riverpod_annotation`
@@ -31,10 +32,10 @@ Dependencies below are authoritative for `devflow.setup` auto-install.
 - `flutter_hooks`
 - `freezed_annotation`
 - `json_annotation`
-- `supabase_flutter`
 - `flutter_form_builder`
 - `form_builder_validators`
 - `skeletonizer`
+- `supabase_flutter` — only when the project uses Supabase (manifest or setup answer); skip otherwise
 
 ### flutter-dev-dependencies
 
@@ -42,4 +43,15 @@ Dependencies below are authoritative for `devflow.setup` auto-install.
 - `riverpod_generator`
 - `freezed`
 - `json_serializable`
-- `custom_lint`
+
+### Post-install config
+
+- `riverpod_lint` is an `analysis_server_plugin`, not a dev dependency (`custom_lint` removed from setup — do not use). Add to `analysis_options.yaml` next to `pubspec.yaml`:
+
+  ```yaml
+  plugins:
+    riverpod_lint: ^<latest from pub.dev>
+  ```
+
+- slang: `slang.yaml` with `input_directory: assets/i18n`; files `assets/i18n/<locale>.i18n.json`; generate with `dart run slang`.
+- `.skeleton(mock:)` extension: create `lib/core/async/async_value_skeleton.dart` from `flutter-riverpod` → `references/riverpod-patterns.md` if missing.

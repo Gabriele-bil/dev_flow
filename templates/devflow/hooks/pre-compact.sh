@@ -1,29 +1,39 @@
 #!/bin/bash
 # devflow pre-compact state save
 # Snapshots pipeline progress from plan.md [done]/[pending] markers before context compaction.
-# Saves .devflow-state.json at the consumer project root and outputs a context reminder for Claude.
+# Merges the snapshot into .devflow-state.json (never drops feature_path,
+# branch, task_status, app, ...) and tells the user state was saved.
+# PreCompact output never reaches the model; the post-compaction reminder is
+# emitted by session-start.sh (SessionStart matcher "compact").
+
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOK_DIR/lib/payload.sh"
+. "$HOOK_DIR/lib/emit.sh"
+
+df_read_input || exit 0
 
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+WORKSPACE_ROOT="$DF_WORKSPACE"
 STATE_FILE="${DEVFLOW_STATE_FILE:-$WORKSPACE_ROOT/.devflow-state.json}"
 
-if ! command -v jq >/dev/null 2>&1; then
-  printf '{"priority":"INFO","message":"devflow pre-compact: jq not found. Install jq (brew install jq) to enable pipeline state persistence."}\n'
-  exit 0
-fi
-
-# Find the most recently modified plan.md in devflow/features/
+# Active plan: feature recorded in state first (feature_path, then feature),
+# most recently modified plan.md only as a last resort.
 PLAN_FILE=""
-if [ -d "$WORKSPACE_ROOT/devflow/features" ]; then
-  PLAN_FILE=$(find "$WORKSPACE_ROOT/devflow/features" -name "plan.md" -type f 2>/dev/null \
-    | xargs ls -t 2>/dev/null \
+if [ -f "$STATE_FILE" ]; then
+  FP=$(jq -r '.feature_path // empty' "$STATE_FILE" 2>/dev/null) || FP=""
+  FN=$(jq -r '.feature // .active_feature // empty' "$STATE_FILE" 2>/dev/null) || FN=""
+  if [ -n "$FP" ] && [ -f "$WORKSPACE_ROOT/$FP/plan.md" ]; then
+    PLAN_FILE="$WORKSPACE_ROOT/$FP/plan.md"
+  elif [ -n "$FN" ] && [ -f "$WORKSPACE_ROOT/devflow/features/$FN/plan.md" ]; then
+    PLAN_FILE="$WORKSPACE_ROOT/devflow/features/$FN/plan.md"
+  fi
+fi
+if [ -z "$PLAN_FILE" ] && [ -d "$WORKSPACE_ROOT/devflow/features" ]; then
+  PLAN_FILE=$(find "$WORKSPACE_ROOT/devflow/features" -name "plan.md" -type f -exec ls -t {} + 2>/dev/null \
     | head -1)
 fi
 
-if [ -z "$PLAN_FILE" ]; then
-  printf '{"priority":"INFO","message":"devflow pre-compact: no active plan.md found. No pipeline state to save."}\n'
-  exit 0
-fi
+[ -z "$PLAN_FILE" ] && exit 0
 
 # Feature name from path: devflow/features/NNN_name/plan.md -> NNN_name
 FEATURE=$(echo "$PLAN_FILE" | sed "s|$WORKSPACE_ROOT/devflow/features/||" | sed 's|devflow/features/||' | sed 's|/plan.md||')
@@ -61,8 +71,9 @@ TOTAL=$((DONE_COUNT + PENDING_COUNT))
 # Compute next_feature_number from devflow/features/ directory
 NEXT_FEATURE_NUMBER="001"
 if [ -d "$WORKSPACE_ROOT/devflow/features" ]; then
-  HIGHEST=$(ls -1 "$WORKSPACE_ROOT/devflow/features" 2>/dev/null \
-    | grep -oE '^[0-9]{3}' | sort -n | tail -1)
+  HIGHEST=$(for d in "$WORKSPACE_ROOT"/devflow/features/[0-9][0-9][0-9]_*; do
+      [ -d "$d" ] && basename "$d" | cut -c1-3
+    done | sort -n | tail -1)
   if [ -n "$HIGHEST" ]; then
     NEXT_FEATURE_NUMBER=$(printf '%03d' $((10#$HIGHEST + 1)))
   fi
@@ -70,6 +81,7 @@ fi
 
 # Map plan status to the next devflow pipeline step.
 # Source of truth: references/state-machine.md — keep this case in sync.
+# Unknown status: keep whatever next_step the skills last wrote.
 case "$PLAN_STATUS" in
   "ready")        NEXT_STEP="devflow.implement" ;;
   "implementing") NEXT_STEP="devflow.implement" ;;
@@ -79,28 +91,17 @@ case "$PLAN_STATUS" in
   "shipped")      NEXT_STEP="devflow.pr"        ;;
   "pr-opened")    NEXT_STEP="devflow.task"      ;;
   "blocked")      NEXT_STEP="devflow.recovery"  ;;
-  *)              NEXT_STEP="devflow.implement" ;;
+  *)              NEXT_STEP="" ;;
 esac
 
-# Save state snapshot to project root
-jq -n \
-  --arg saved_at      "$TIMESTAMP"    \
-  --arg plan_path     "$PLAN_FILE"    \
-  --arg feature       "$FEATURE"      \
-  --arg plan_status   "$PLAN_STATUS"  \
-  --arg next_step     "$NEXT_STEP"    \
-  --argjson done_count    "$DONE_COUNT"    \
-  --argjson pending_count "$PENDING_COUNT" \
-  --argjson done_files    "$DONE_JSON"     \
-  --argjson pending_files "$PENDING_JSON"  \
-  --arg next_feature_number "$NEXT_FEATURE_NUMBER" \
-  '{
+# Merge snapshot into existing state (atomic, locked)
+df_json_update "$STATE_FILE" '
+  . + {
     saved_at:       $saved_at,
     plan_path:      $plan_path,
     feature:        $feature,
+    feature_path:   ("devflow/features/" + $feature),
     plan_status:    $plan_status,
-    next_step:      $next_step,
-    next_feature_number: $next_feature_number,
     progress: {
       done:    $done_count,
       pending: $pending_count,
@@ -108,12 +109,19 @@ jq -n \
     },
     done_files:    $done_files,
     pending_files: $pending_files
-  }' > "$STATE_FILE" 2>/dev/null
+  }
+  | del(.active_feature)
+  | (if $next_step != "" then .next_step = $next_step else . end)
+  | ((.next_feature_number // 0) | tonumber? // 0) as $cur
+  | (if $cur < $nfn then .next_feature_number = $nfn else .next_feature_number = $cur end)' \
+  --arg saved_at "$TIMESTAMP" --arg plan_path "${PLAN_FILE#"$WORKSPACE_ROOT/"}" \
+  --arg feature "$FEATURE" --arg plan_status "$PLAN_STATUS" --arg next_step "$NEXT_STEP" \
+  --argjson done_count "$DONE_COUNT" --argjson pending_count "$PENDING_COUNT" \
+  --argjson done_files "$DONE_JSON" --argjson pending_files "$PENDING_JSON" \
+  --argjson nfn "$((10#$NEXT_FEATURE_NUMBER))"
 
-# Ensure .devflow-state.json is gitignored in the consumer project
-if [ -f "$WORKSPACE_ROOT/.gitignore" ] && ! grep -qF ".devflow-state.json" "$WORKSPACE_ROOT/.gitignore" 2>/dev/null; then
-  printf '\n# devflow runtime state\n.devflow-state.json\n' >> "$WORKSPACE_ROOT/.gitignore"
-fi
+df_gitignore ".devflow-state.json"
+[ -z "$NEXT_STEP" ] && NEXT_STEP=$(jq -r '.next_step // "devflow.resume"' "$STATE_FILE" 2>/dev/null)
 
 # Build a human-readable pending list for the context message (max 10 entries)
 if [ "$PENDING_COUNT" -gt 0 ]; then
@@ -122,25 +130,8 @@ else
   PENDING_LINES="  (none — all files complete)"
 fi
 
-# Output context reminder injected into the compacted context
-jq -cn \
-  --arg feature       "$FEATURE"      \
-  --arg plan          "$PLAN_FILE"    \
-  --arg status        "$PLAN_STATUS"  \
-  --arg next_step     "$NEXT_STEP"    \
-  --argjson done      "$DONE_COUNT"    \
-  --argjson pending   "$PENDING_COUNT" \
-  --argjson total     "$TOTAL"         \
-  --arg pending_lines "$PENDING_LINES" \
-  '{
-    priority: "IMPORTANT",
-    message: (
-      "DevFlow state saved before compaction.\n\n"
-      + "Feature:    " + $feature + "\n"
-      + "Plan:       " + $plan + "\n"
-      + "Status:     " + $status + "  →  next: " + $next_step + "\n"
-      + "Progress:   " + ($done|tostring) + "/" + ($total|tostring) + " files done, " + ($pending|tostring) + " remaining\n\n"
-      + "Remaining files:\n" + $pending_lines + "\n\n"
-      + "On resume: run devflow.resume (reads state, cross-checks plan.md, confirms position) — or re-read plan.md → first [pending] entry → confirm position with user."
-    )
-  }'
+# User-visible notice (PreCompact output never reaches the model)
+df_notify "DevFlow state saved before compaction: $FEATURE — $PLAN_STATUS → next: $NEXT_STEP ($DONE_COUNT/$TOTAL files done).
+Remaining files:
+$PENDING_LINES"
+exit 0

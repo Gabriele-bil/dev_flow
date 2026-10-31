@@ -1,14 +1,17 @@
 ---
-name: devflow-worktree
+name: worktree
 description: "Creates, lists, or removes isolated git worktrees for parallel feature development, with automatic dev-server port-offset assignment and overlap detection. Use when the user asks to work on a feature in a separate worktree, run two features in parallel, or run devflow.worktree."
 argument-hint: "[create|remove|list] [feature-name]"
 disable-model-invocation: true
-model: haiku
 effort: low
 allowed-tools: "Bash(git worktree*) Bash(git branch*) Bash(git status*) Bash(git rev-parse*)"
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Skill: devflow.worktree
+
+**Arguments:** `$ARGUMENTS` — empty → run `create` for the active feature.
 
 ## Purpose
 
@@ -16,12 +19,7 @@ Create, list, or remove isolated git worktrees for parallel feature development.
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
-
----
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 
 ## When NOT to Use
 
@@ -44,7 +42,7 @@ Any item fails → stop, report which check failed.
 
 ### Step 1 - Parse arguments
 
-Parse `$ARGUMENTS` as `[create|remove|list] [feature-name]`. Default subcommand: `create`. `feature-name` defaults to the current feature under `devflow/features/[NNN]_[feature-name]/` when omitted.
+Parse `$ARGUMENTS` as `[create|remove|list] [feature-name]`. Default subcommand: `create`. `feature-name` omitted → feature resolved with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve`.
 
 ### Step 2 - List (early exit)
 
@@ -81,7 +79,7 @@ while jq -e --argjson o "$OFFSET" '.worktrees[] | select(.port_offset == $o)' .d
 done
 ```
 
-Resolve the adapter's base dev port (read `@devflow/adapters/<adapter>/ADAPTER.md`; fall back to this table when the adapter doc doesn't state one):
+Resolve the adapter's base dev port (read `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md`; fall back to this table when the adapter doc doesn't state one):
 
 | Adapter | Base port |
 | --- | --- |
@@ -127,29 +125,20 @@ cd ../[repo-name]-worktrees/[feature-name]
 
 ---
 
-## Common Rationalizations
-
-| Thought | Reality |
-| --- | --- |
-| "Only one worktree active, skip offset math" | Next worktree created later still needs a free slot — always write the offset, even at 0 |
-| "User didn't ask for port isolation, just a worktree" | Two worktrees on the default port collide the moment both dev servers run — assign offset unconditionally when the adapter has a dev server |
-| "Feature name matches an existing worktree, just reuse it silently" | Silent reuse hides that work is already in progress there — always report the existing worktree and let the user decide |
-| "Removing a worktree with uncommitted changes is fine, `--force` handles it" | `--force` discards that work — confirm with the user first |
-
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
 | --- | --- |
 | Creating a worktree without checking `.devflow-worktrees.json` for overlap | Step 4 overlap detection is mandatory, not optional |
-| Hardcoding port 3000 regardless of adapter | Resolve adapter base port from the table, then add the offset |
 | Leaving a stale entry in `.devflow-worktrees.json` after manual `git worktree remove` | `remove` subcommand must update both git and the state file together |
-| Branching a worktree from a dirty working tree without asking | Input contract requires clean status or explicit user override |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 
 | | |
 | --- | --- |
-| Reads | `.devflow-worktrees.json`, `@devflow/adapters/<adapter>/ADAPTER.md` (base dev port) |
+| Reads | `.devflow-worktrees.json`, `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (base dev port) |
 | Runs | `git worktree add` · `git worktree remove` · `git worktree list` · `git branch` |
 | Writes | `.devflow-worktrees.json` (add/remove entry) |
 | Next step | `devflow.implement` inside the new worktree (separate Claude Code session) |

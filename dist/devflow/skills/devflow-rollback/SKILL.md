@@ -1,11 +1,15 @@
 ---
-name: devflow-rollback
+name: rollback
 description: "Roll back the active DevFlow step (implement or beautify) to its pre-step checkpoint without corrupting pipeline state. Use when user runs devflow.rollback, wants to undo an implementation or beautification, or revert an agent hallucination."
 argument-hint: "[--to <step>] [--force]"
 disable-model-invocation: true
 ---
 
+> **Plugin root:** `${CLAUDE_PLUGIN_ROOT}` — in files you read, `@devflow/<references|adapters|skills|agents|scripts>/` and the CLAUDE_PLUGIN_ROOT variable resolve to this directory. `@devflow/config.md` and `devflow/features/` are project files.
+
 # Skill: devflow.rollback
+
+**Arguments:** `$ARGUMENTS` — empty → roll back the active feature's last step (skill Step 1 defaults).
 
 Reverts the active DevFlow step to its clean pre-step checkpoint, restoring code and state machine synchronization.
 
@@ -15,10 +19,7 @@ Safely discard unwanted changes made during `devflow.implement` or `devflow.beau
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved; rollback preserves `task.md` and `plan.md` intact
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 - **state-safety** — git reset alone corrupts pipeline state; rollback atomically updates git files, `plan.md` status, and `.devflow-state.json`
 - **explicit-confirmation** — destructive operations warn before discarding edits unless `--force` is provided
 
@@ -32,8 +33,7 @@ Safely discard unwanted changes made during `devflow.implement` or `devflow.beau
 
 ### Step 1 - Resolve Active Feature and Target Step
 
-1. Read `.devflow-state.json` and resolve `active_feature` and current `plan_status`.
-   - If `.devflow-state.json` is missing or idle: read latest `devflow/features/*/plan.md`.
+1. Resolve feature with `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" resolve` (exit 1 → ask); read current Status from its `plan.md` (authoritative — never from the state file).
 2. Determine target rollback destination:
    - If `$ARGUMENTS` contains `--to <step>`: use the specified step (`implement` or `beautify`).
    - If unspecified:
@@ -64,11 +64,9 @@ Safely discard unwanted changes made during `devflow.implement` or `devflow.beau
    - Ensure `devflow/features/[NNN]_[name]/task.md` and `plan.md` are preserved.
    - If rolling back from `implement`:
      - In `plan.md`: replace all `- [x] \` or `### [done]` markers in `## File List` with `### [pending]`.
-     - In `plan.md`: set `**Status:** ready`.
-     - In `.devflow-state.json`: set `plan_status: "ready"` and `next_step: "devflow.implement"`.
+     - `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" set plan ready`.
    - If rolling back from `beautify`:
-     - In `plan.md`: set `**Status:** implemented`.
-     - In `.devflow-state.json`: set `plan_status: "implemented"` and `next_step: "devflow.beautify"`.
+     - `bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" set plan implemented`.
 3. Remove stale `.checkpoint.json` and `.handoff.md` from the feature directory if present:
 
    ```bash
@@ -94,9 +92,10 @@ Next step:   [devflow.implement|devflow.beautify]
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Running `git reset --hard` without updating `plan.md` | Always sync `plan.md` status and `.devflow-state.json` so the pipeline knows where it is. |
 | Deleting `task.md` or `plan.md` during rollback | Rollback only touches code files and status markers; specifications are preserved. |
 | Rolling back committed PRs | Rollback is strictly for local in-progress feature branches before `devflow.pr`. |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 

@@ -1,0 +1,24 @@
+# Angular adapter — PR step
+
+Loaded by `devflow-pr` together with the adapter core (`ADAPTER.md`).
+
+## PR: verification
+
+Before push:
+
+```bash
+pnpm run lint
+pnpm run test -- --watch=false
+pnpm run build
+```
+
+### PR body checklist (copy into PR description)
+
+- [ ] Lint passing
+- [ ] Unit tests passing
+- [ ] E2E passing (if present in project)
+- [ ] Build passing
+- [ ] `angular-architecture` constraints respected
+- [ ] Relevant Angular skills applied for changed scope
+- [ ] `registry.md` updated if new patterns were introduced
+- [ ] Ephemeral UI screenshot attached for visual changes (bypassed if non-UI or headless)

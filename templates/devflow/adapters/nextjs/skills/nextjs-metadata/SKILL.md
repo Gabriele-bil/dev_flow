@@ -1,69 +1,45 @@
 ---
 name: nextjs-metadata
-description: Metadata API, SEO, OG images, file-based metadata. Load when touching generateMetadata, opengraph-image, or head files.
+description: Metadata API, SEO, OG images, file-based metadata (robots, sitemap, icons), viewport. Load when touching generateMetadata, metadata exports, opengraph-image, robots.ts, or sitemap.ts.
 ---
 
 # Skill: Next.js Metadata
 
-Use when implementing SEO metadata, Open Graph images, or file-based metadata conventions.
+## Purpose
 
-Full code examples: `references/metadata-patterns.md`.
+Project rules for SEO metadata, OG images and file-based metadata in App Router. Examples: `references/metadata-patterns.md`.
 
-## 1) Static Metadata
+## When NOT to Use
 
-Export `metadata` object from `page.tsx` or `layout.tsx` — `title`, `description`, `openGraph`, `twitter`. Only Server Components can export `metadata`. Full code → `references/metadata-patterns.md`.
+- File matches no row of `steps/implement.md` → skill load decision matrix
+- Page data fetching itself → `nextjs-server`
+- Image/font performance → `nextjs-performance`
 
-## 2) Dynamic Metadata — `generateMetadata`
+## Rules
 
-Use for pages where title/description depend on fetched data. In Next.js 16+, `params` is async (`await params`). Fetch inside `generateMetadata` is automatically deduped with the same fetch in `page.tsx` if using the same cache key; use React's `cache()` to dedup non-fetch data functions. Full code → `references/metadata-patterns.md`.
+- Metadata only through the Metadata API (`metadata` export or `generateMetadata`) — no hand-written `<meta>` / `<title>` in components. Server Components only.
+- Root `app/layout.tsx`: `metadataBase`, `title: { template: '%s | <App>', default: '<App>' }`, default `description`, `openGraph.siteName`.
+- Pages set `title` + `description`; data-driven pages use `generateMetadata({ params })` with `await params`.
+- Data shared by `generateMetadata` and page → one `lib/` function wrapped in `React.cache()` (or `'use cache'`), called from both — no double query.
+- Viewport / `themeColor` → separate `viewport` / `generateViewport` export, never inside `metadata`.
+- OG images: file-based `opengraph-image.tsx` with `ImageResponse` from `next/og` next to the page; static `opengraph-image.png` when content does not vary. Route-based `app/api/og/route.tsx` only for query-driven images.
+- `robots.ts` + `sitemap.ts` at `app/` root, typed with `MetadataRoute`. >50k URLs → `generateSitemaps`.
+- Icons: `app/icon.svg`, `app/apple-icon.png`, `app/favicon.ico` — files, no code.
+- Private / auth routes: `robots: { index: false }` in `(app)/layout.tsx`.
 
-## 3) OG Image Generation — `next/og`
+## Review checklist
 
-Two approaches: **file-based** (`opengraph-image.tsx` alongside `page.tsx`, Next.js auto-generates route + meta tag) for simple cases, or **route-based** (`app/api/og/route.tsx`) for more control (e.g. query-param driven images). Both use `ImageResponse` from `next/og`. Full code → `references/metadata-patterns.md`.
-
-## 4) Metadata Templates — `title.template`
-
-Set `title: { template: '%s | My App', default: 'My App' }` in root layout to avoid repeating site name on every page. Full code → `references/metadata-patterns.md`.
-
-## 5) File-Based Metadata Conventions
-
-Place these files in `app/` (or route folders) — no code needed:
-
-| File | Output |
-| --- | --- |
-| `favicon.ico` | `<link rel="icon">` |
-| `icon.png` / `icon.svg` | `<link rel="icon">` |
-| `apple-icon.png` | `<link rel="apple-touch-icon">` |
-| `opengraph-image.png` | `<meta property="og:image">` |
-| `twitter-image.png` | `<meta name="twitter:image">` |
-| `robots.txt` | `/robots.txt` |
-| `sitemap.xml` | `/sitemap.xml` |
-
-Dynamic versions use `.ts` extension (`robots.ts`, `sitemap.ts`). Full code → `references/metadata-patterns.md`.
-
-## 6) Viewport — `generateViewport`
-
-Separate viewport from metadata for better tree-shaking. Export `generateViewport` (dynamic, e.g. based on `params`) or `viewport` (static). Full code → `references/metadata-patterns.md`.
-
-## 7) Multiple Sitemaps — `generateSitemaps`
-
-For large sites (>50k URLs), split into multiple sitemaps with `generateSitemaps` — Next.js generates `/sitemap/0.xml`, `/sitemap/1.xml`, etc. Full code → `references/metadata-patterns.md`.
-
-## 8) Multiple OG Images — `generateImageMetadata`
-
-Generate multiple OG image variants for a single route (e.g. dark/light, locale). Full code → `references/metadata-patterns.md`.
-
-## 9) Anti-Patterns
-
-- Do NOT manually add `<meta>` tags in components — use the Metadata API.
-- Do NOT fetch the same data twice in `generateMetadata` and `page.tsx` — use `cache()` for dedup.
-- Do NOT put `metadata` export in Client Components — only Server Components export metadata.
-- Do NOT forget `title.template` in root layout — causes repeated site name in every page title.
-- Do NOT mix `viewport` inside `metadata` export — use separate `generateViewport` or `viewport` export.
+- [ ] No manual `<meta>` tags
+- [ ] `title.template` + `metadataBase` in root layout
+- [ ] `generateMetadata` reuses cached data function
+- [ ] Viewport exported separately
+- [ ] `robots.ts` / `sitemap.ts` present for public sites
 
 ## I/O Reference
 
 | | |
 | --- | --- |
-| Invoked by | `devflow-implement` when touching `generateMetadata`, `generateViewport`, `generateSitemaps`, `generateImageMetadata`, `opengraph-image`, `robots.ts`, `sitemap.ts`, or metadata-related config |
+| Invoked by | `devflow-implement` via `steps/implement.md` → skill load decision matrix (`generateMetadata`, `metadata` export, `opengraph-image.*`, `twitter-image.*`, `robots.ts`, `sitemap.ts`, `icon.*`) |
+| Reads | `references/metadata-patterns.md` |
+| Writes | Metadata exports, OG image routes, `robots.ts`, `sitemap.ts` |
 | Related | `nextjs-server`, `nextjs-architecture` |

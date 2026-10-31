@@ -10,11 +10,11 @@ Include these in `plan.md` when applicable (after core sections from `devflow-pl
 
 Order the **File list** bottom-up by layer ownership:
 
-1. Database migrations and TypeORM `@Entity()` definitions (`entities/`, `migrations/`)
-2. DTOs and validation schemas (`dto/`)
-3. Repositories and custom data access providers (`repositories/`)
-4. Services and business logic (`services/`)
-5. Controllers and route handlers (`controllers/`)
+1. Schema + migrations for the project ORM (`ADAPTER.md` → Project choices): TypeORM `entities/` + `migrations/`, or Prisma `prisma/schema.prisma` + `prisma/migrations/`
+2. DTOs or Standard Schema validation schemas (`dto/`)
+3. Repositories / data access providers (`<feature>.repository.ts`)
+4. Services and business logic (`<feature>.service.ts`)
+5. Controllers and route handlers (`<feature>.controller.ts`)
 6. Module definitions and wiring (`*.module.ts`, `app.module.ts`)
 7. Unit tests and e2e integration tests (`*.spec.ts`, `*.e2e-spec.ts`)
 
@@ -38,7 +38,7 @@ src/
     ├── <feature>.controller.ts
     ├── <feature>.service.ts
     ├── <feature>.repository.ts
-    ├── entities/
+    ├── entities/          # TypeORM only; Prisma models live in prisma/schema.prisma
     └── dto/
 ```
 
@@ -55,7 +55,7 @@ For each controller endpoint introduced or modified:
 
 ### Data model (omit if no new persistent entities)
 
-When `devflow-plan` Step 4c generates `data-model.md`: use it as the single source of truth for entity definitions before writing any TypeORM `@Entity()` class, DTO, or migration. Fields in `data-model.md` map to entity columns and DTO properties — do not invent property names or types that diverge from the data model.
+When `devflow-plan` Step 4c generates `data-model.md`: use it as the single source of truth before writing any TypeORM `@Entity()` class or Prisma `model`, DTO, or migration. Fields in `data-model.md` map to columns and DTO properties — do not invent property names or types that diverge from the data model.
 
 ### Sync vs async processing decision
 

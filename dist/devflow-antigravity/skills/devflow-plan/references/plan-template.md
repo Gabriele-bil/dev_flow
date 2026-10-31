@@ -1,0 +1,157 @@
+# Plan file template
+
+Used by `devflow.plan` Step 5 — write `devflow/features/[NNN]_[feature-name]/plan.md` using this format.
+
+```markdown
+# Plan - [Feature Name]
+
+**ID:** PLAN-[NNN]
+**Task:** [link to task.md]
+**App:** [name] <!-- omit entire line in single-app repos (no ## Apps table in devflow/config.md) -->
+**ADRs:** [docs/adr/ADR-NNN-...md or "none"] <!-- copied from task.md or resolved during planning -->
+**Date:** [YYYY-MM-DD]
+**Status:** ready
+**Complexity:** [N] ([quick | standard | thorough])
+
+---
+
+## Overview
+
+[3-5 sentences. What this feature does, how it fits the architecture,
+and any non-obvious implementation decisions. If subtasks are layer-shaped,
+state the vertical-slice execution order here.]
+
+---
+
+## Architecture decisions
+
+- **ADR alignment:** [e.g. Aligned with ADR-001 (Chosen Option X), or "None / standard codebase patterns"]
+- **[Decision title]**: [One-line rationale.]
+- [2-5 bullets total; omit only if truly trivial]
+
+---
+
+## Risks and mitigations
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| [Risk — seeded from task.md ## Assumptions & Risks] | High / Med / Low | [Concrete mitigation] |
+
+[Use 2-4 rows for non-trivial work; one row acceptable for small plans.]
+
+---
+
+## Open questions
+
+[Omit this entire section if `task.md` is `ready` and there are no planning blockers.]
+
+- [ ] [Question — resolve before `devflow.implement` or update `task.md`.]
+
+---
+
+## Traceability
+
+| Use Case / Subtask | Acceptance criteria | File(s) |
+|---------------------|---------------------|---------|
+| [UC-N title from task.md] | [AC-N: GIVEN ... WHEN ... THEN ... from task.md] | [file path(s)] |
+| ... | ... | ... |
+
+
+---
+
+## File List
+
+Ordered by implementation sequence. Each file must be implemented
+in this order to respect dependencies.
+
+**Batch hints (optional):** Before the first `###` of a dependency group, add one line:
+`**Batch:** S | M | L` (S ≈ 1-2 files, M ≈ 3-5, L ≈ 6+). For `L`, add `— split across `devflow.implement` sessions if needed`.
+
+**Parallelism markers (optional):** Mark parallelizable leaf files with a `[P]` prefix on the entry line. A file is `[P]`-eligible only when: (1) no other `[P]` file in the same batch touches it, and (2) it does not modify shared contracts, migrations, or state-management contracts. `[P]` coexists with `[pending]`/`[done]` — `[P]` = parallelism potential, status markers = completion state. Do not mark files that touch shared contracts, migrations, or state-management contracts.
+
+**Slice dependency annotations (optional):** When file entries are grouped
+under vertical slices, head each group with a bold slice line:
+`**Slice N — [name]** (deps: none | N, M) [route: light | mid | strong]`. `deps:` lists slice numbers that
+must be fully `[done]` before this slice starts; omit the annotation when
+slices are strictly sequential (each depends on the previous). Same notation
+as the `devflow.blueprint` dependency graph, one level down. Read by
+`devflow.resume` (resume ordering), `devflow.backprop` (re-implementation
+scoped to affected slice + dependents), and any future parallel slice
+execution.
+
+**Contracts First rule:** Shared contracts (types, interfaces, DTOs, DB schemas, state contracts) shared across ≥2 slices or `[P]` files MUST sit in `Slice 1` (`deps: none`). Parallel slices/files consume contracts via `--after` / `deps:` and never copy or redeclare another slice's contract.
+
+**Subtask model routing (`[route: light | mid | strong]`, optional):** Tag slices or individual file entries with the cheapest model tier capable of building them (`$HOME/.gemini/antigravity-cli/plugins/devflow/references/model-selection.md`). Entries tagged `[route: light]` MUST include all 4 brief lines below (`Change`, `Contract`, `Test`, `Out of scope`); omit `[route: ...]` to use the default step model.
+
+**4-Part File Brief (recommended for `standard`/`thorough` and mandatory for `[route: light]`):**
+Under each `### [NNN].` heading, write four compact bullets so a cold agent can implement and verify the file without guessing:
+- **Change:** concrete behavior added/modified (1-2 lines)
+- **Contract:** exported symbols/signatures or consumed shared types
+- **Test:** exact test file + assertion that proves this file's change
+- **Out of scope:** files, layers, or dependencies this entry must not touch
+
+**Slice 1 — [name]** (deps: none) [route: strong]
+
+### [NNN]. `[path/to/file.ext]` - [create | modify] [pending]
+- **Change:** [what this file does and why it exists]
+- **Contract:** [exported/consumed types or signatures]
+- **Test:** [`path/to/test.ext` — what assertion pins this change]
+- **Out of scope:** [every other file; no new dependencies]
+
+### [NNN]. [P] `[path/to/file.ext]` - [create | modify] [pending] [route: light]
+- **Change:** [`[P]` eligible for parallel implementation; mechanical wiring]
+- **Contract:** [consumes Slice 1 contract]
+- **Test:** [`path/to/test.ext` — expected output]
+- **Out of scope:** [shared contracts, unrelated modules]
+...
+
+---
+
+## Implementation checkpoints
+
+[For trivial 1-2 file plans, omit this section or use a single checkpoint.]
+
+- **After [milestone / batch]:** use verification commands from `ADAPTER.md` (e.g. analyze / test); add short manual smoke if relevant
+- [2-4 checkpoints for larger plans]
+
+---
+
+## Adapter-specific sections
+
+After **Implementation checkpoints**, append **every extra plan section** required by the active `ADAPTER.md` (see its heading **Plan: extra sections and templates**). Use the exact headings and table formats from that file. Omit adapter sections only when `ADAPTER.md` says they do not apply.
+
+---
+
+## Edge Cases & Error Handling
+
+- **[Scenario]**: [how it is handled]
+- **[Scenario]**: [how it is handled]
+
+---
+
+## Pre-implement checklist
+
+- [ ] Constitution Gate passed (Step 0b) — no Critical violations
+- [ ] Every `task.md` use case / subtask appears in **Traceability** with its acceptance criterion
+- [ ] Every **File List** entry maps to ≥1 **Traceability** row — no orphan/gold-plated files
+- [ ] **File list** order respects **Dependency ordering** (and any stated exceptions)
+- [ ] All **adapter-specific sections** from `ADAPTER.md` are present or correctly omitted per adapter rules (e.g. i18n keys for UI)
+- [ ] **Implementation checkpoints** are actionable (commands per `ADAPTER.md` — analyze / tests / smoke)
+- [ ] **Open questions** are empty or resolved if **Status** is `ready`
+- [ ] Existing shared components checked; no duplication of a component already in `shared/`
+- [ ] New reusable components identified in this plan are listed under their `shared/` path in the **File List**
+- [ ] `devflow.analyze` run (or explicitly waived) — no Critical findings
+- [ ] If feature touches persistent entities → `data-model.md` exists and is non-empty
+- [ ] `**Complexity:**` recorded per `references/complexity-scoring.md` — profile floor applied (auth/migrations/input → minimum `standard`)
+
+<!-- Sections below are appended later by pipeline skills — never written by devflow.plan:
+## Deviations        — devflow.implement Step 7b / escalation Level 3: `[file]`: [planned] → [actual] — [reason]
+## Decision flags    — run mode only, format per $HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md
+-->
+```
+
+Format rules:
+
+- Adapter-specific sections: follow `ADAPTER.md` layout exactly (optional/required blocks, localization/data rules).
+- Language: English. All written documents must be in English regardless of conversation language.
+- Compression: caveman-compress — drop articles/filler/hedging; keep technical terms/paths/commands exact.

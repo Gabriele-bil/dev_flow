@@ -17,10 +17,10 @@ pnpm build
 Profile only when plan flags performance or **Critical**-severity hotspot:
 
 - Use React DevTools Profiler for slow components before refactoring rendering.
-- Run `next build --debug` + Bundle Analyzer to inspect bundle weight.
+- Run `pnpm exec next analyze` (Turbopack bundle analyzer) to inspect bundle weight.
 - Check Server Component vs Client Component ratio — unnecessary `use client` increases JS bundle.
 - Apply `dynamic()` import for heavy components below the fold.
-- Use `<Image>` with `priority` only for LCP element.
+- Use `<Image preload>` only for LCP element (`priority` deprecated in Next 16).
 
 Default beautify uses heuristics. Profile only when warranted.
 
@@ -29,16 +29,18 @@ Default beautify uses heuristics. Profile only when warranted.
 Apply core `devflow-beautify` axes, then evaluate touched code with relevant Next.js skills:
 
 - `nextjs-architecture` — boundaries, colocation, route structure
-- `nextjs-server` — fetch strategy, caching, action granularity
+- `nextjs-server` — `'use cache'` scope, invalidation call per mutation, action granularity
 - `nextjs-components` — `use client` scope minimized
 - `nextjs-state` — store size, no server data in Zustand
 - `nextjs-ui` — token usage, dark mode parity, responsiveness
 - `nextjs-forms` — validation schema, error display, progressive enhancement
 - `nextjs-testing` — coverage, test quality
+- `nextjs-metadata` — Metadata API only, `title.template`, OG images
+- `nextjs-performance` — `next/image` `preload` + `sizes`, `next/font`, scripts
 
 ### Beautify: web interface guidelines
 
-Trigger: edit to `**/components/**`, `**/app/**/page.tsx`, `**/app/**/layout.tsx`, files importing `@/components/ui`.
+Trigger: `common-web-interface-guidelines` row of `steps/implement.md` → skill load decision matrix (also files importing `@/components/ui`).
 
 1. Load `@devflow/adapters/common/skills/common-web-interface-guidelines/SKILL.md`
 2. Read modified UI files

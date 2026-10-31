@@ -6,7 +6,7 @@ How the plugin is put together and why. Companion to [`docs/comparison.md`](comp
 
 Three constraints shape everything below:
 
-1. **Markdown + bash/jq only.** No runtime engine, no Node dependency. Skills are prompts an agent follows; hooks are POSIX-ish shell scripts. This keeps the plugin portable across hosts (Claude Code, Cursor, Antigravity) and auditable at a glance.
+1. **Markdown + bash/jq only.** No runtime engine, no Node dependency. Skills are prompts an agent follows; hooks are POSIX-ish shell scripts. This keeps the plugin portable across hosts (Claude Code, Antigravity CLI) and auditable at a glance.
 2. **User-gated by default.** Each pipeline step is a command the user invokes. Skills verify their own input contract and refuse to run on bad state; they do not invoke each other (the one exception: `devflow.ship` routes to `devflow.pr` on gate pass).
 3. **Adapters own stack truth.** Core skills are stack-agnostic; every stack-specific rule (commands, file layout, technology skills) lives in `adapters/<stack>/ADAPTER.md`.
 
@@ -98,7 +98,7 @@ Core skills read `devflow/config.md` → resolve the active adapter → follow i
 ```text
 templates/devflow/   ← source of truth (edit here)
 dist/devflow/        ← build output, committed (install this)
-scripts/build-plugin.sh  ← manifest-driven build for Claude Code / Cursor / Antigravity
+scripts/build-plugin.sh  ← manifest-driven build for Claude Code / Antigravity CLI
 ```
 
 Quality tooling on the plugin itself:

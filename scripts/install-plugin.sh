@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 # install-plugin.sh — Unified installation script for DevFlow plugin.
-# Installs DevFlow across Antigravity, Cursor, and Claude Code environments.
+# Installs DevFlow across Antigravity CLI and Claude Code environments.
 #
 # Usage: bash scripts/install-plugin.sh [target] [options]
 #
 # Targets:
 #   antigravity, agy, gemini   Install to Antigravity (global ~/.gemini or workspace .agents)
-#   cursor                     Install to Cursor (~/.cursor/plugins/local/devflow)
 #   claude, claudecode         Configure/install for Claude Code
 #   all                        Install across all detected platforms (default)
 #
 # Options:
-#   -t, --target <name>        Target platform: antigravity | cursor | claude | all
+#   -t, --target <name>        Target platform: antigravity | claude | all
 #   -m, --mode <link|copy>     Install mode: link (symlink, default) or copy (directory copy)
 #   -s, --scope <scope>        Antigravity scope: global (default) or workspace
 #   -w, --workspace-dir <dir>  Target workspace path for workspace scope (default: pwd)
@@ -26,6 +25,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 BUILDERS_DIR="$SCRIPT_DIR/builders"
 DIST_DIR="$ROOT_DIR/dist/devflow"
+AGY_DIST_DIR="$ROOT_DIR/dist/devflow-antigravity"
 
 source "$BUILDERS_DIR/common.sh"
 
@@ -47,12 +47,11 @@ Usage:
 
 Targets:
   antigravity, agy, gemini   Install to Antigravity (global ~/.gemini or workspace .agents)
-  cursor                     Install to Cursor (~/.cursor/plugins/local/devflow)
   claude, claudecode         Configure/install for Claude Code
   all                        Install/configure for all detected platforms (default)
 
 Options:
-  -t, --target <name>        Target platform (antigravity | cursor | claude | all)
+  -t, --target <name>        Target platform (antigravity | claude | all)
   -m, --mode <link|copy>     Install mode: link (symlink, default) or copy
   -s, --scope <scope>        Scope for Antigravity: global (default) or workspace
   -w, --workspace-dir <dir>  Workspace directory for workspace scope (default: current directory)
@@ -65,7 +64,6 @@ Options:
 Examples:
   bash scripts/install-plugin.sh antigravity
   bash scripts/install-plugin.sh antigravity --scope workspace
-  bash scripts/install-plugin.sh cursor --mode link
   bash scripts/install-plugin.sh claude
   bash scripts/install-plugin.sh all --build --validate
   bash scripts/install-plugin.sh --uninstall --target antigravity
@@ -113,7 +111,7 @@ while [[ $# -gt 0 ]]; do
       exit 0
       ;;
     *)
-      if [[ -z "${POSITIONAL[*]:-}" ]] && [[ "$1" =~ ^(antigravity|agy|gemini|cursor|claude|claudecode|all)$ ]]; then
+      if [[ -z "${POSITIONAL[*]:-}" ]] && [[ "$1" =~ ^(antigravity|agy|gemini|claude|claudecode|all)$ ]]; then
         TARGET="$1"
         shift
       else
@@ -130,9 +128,6 @@ case "$TARGET" in
   antigravity|agy|gemini)
     TARGET="antigravity"
     ;;
-  cursor)
-    TARGET="cursor"
-    ;;
   claude|claudecode)
     TARGET="claude"
     ;;
@@ -140,7 +135,7 @@ case "$TARGET" in
     TARGET="all"
     ;;
   *)
-    fail "Unknown target: $TARGET. Choose: antigravity | cursor | claude | all"
+    fail "Unknown target: $TARGET. Choose: antigravity | claude | all"
     ;;
 esac
 
@@ -179,24 +174,31 @@ validate_plugin() {
     bash "$ROOT_DIR/templates/devflow/scripts/validate-skills.sh" --strict
   fi
 
-  if command -v agy >/dev/null 2>&1 && [ -d "$DIST_DIR" ]; then
-    agy plugin validate "$DIST_DIR"
+  if command -v agy >/dev/null 2>&1 && [ -d "$AGY_DIST_DIR" ]; then
+    agy plugin validate "$AGY_DIST_DIR"
   fi
   ok "Validation passed"
 }
 
 # ── Install / Uninstall: Antigravity ─────────────────────────────────────────
 install_antigravity() {
+  # dist/devflow-antigravity/ is the Antigravity build (root hooks.json,
+  # rules/). Global scope goes through agy itself, which stages
+  # plugins under ~/.gemini/antigravity-cli/plugins/<name>/.
   local TARGET_DIR
   if [ "$SCOPE" = "workspace" ]; then
     TARGET_DIR="$WORKSPACE_DIR/.agents/plugins/devflow"
   else
-    TARGET_DIR="$HOME/.gemini/config/plugins/devflow"
+    TARGET_DIR="$HOME/.gemini/antigravity-cli/plugins/devflow"
   fi
+
+  [ -d "$AGY_DIST_DIR" ] || fail "Missing $AGY_DIST_DIR — run with --build first"
 
   if [ "$UNINSTALL" = true ]; then
     step "Uninstalling DevFlow from Antigravity ($SCOPE: $TARGET_DIR)..."
-    if [ -d "$TARGET_DIR" ] || [ -L "$TARGET_DIR" ]; then
+    if [ "$SCOPE" != "workspace" ] && command -v agy >/dev/null 2>&1; then
+      run_cmd agy plugin uninstall devflow || warn "agy plugin uninstall reported an error"
+    elif [ -d "$TARGET_DIR" ] || [ -L "$TARGET_DIR" ]; then
       run_cmd rm -rf "$TARGET_DIR"
       ok "DevFlow removed from $TARGET_DIR"
     else
@@ -207,94 +209,27 @@ install_antigravity() {
 
   step "Installing DevFlow to Antigravity ($SCOPE: $TARGET_DIR)..."
 
-  local TARGET_PARENT
-  TARGET_PARENT="$(dirname "$TARGET_DIR")"
-  run_cmd mkdir -p "$TARGET_PARENT"
+  if [ "$SCOPE" != "workspace" ] && [ "$MODE" = "copy" ] && command -v agy >/dev/null 2>&1; then
+    run_cmd agy plugin install "$AGY_DIST_DIR"
+    ok "DevFlow installed with agy plugin install"
+    return 0
+  fi
 
+  run_cmd mkdir -p "$(dirname "$TARGET_DIR")"
+  run_cmd rm -rf "$TARGET_DIR"
   if [ "$MODE" = "link" ]; then
-    run_cmd rm -rf "$TARGET_DIR"
-    run_cmd mkdir -p "$TARGET_DIR"
-
-    # Link all component directories and top-level files
-    for ITEM in skills agents commands adapters references contexts hooks; do
-      if [ -d "$DIST_DIR/$ITEM" ]; then
-        run_cmd ln -sfn "$DIST_DIR/$ITEM" "$TARGET_DIR/$ITEM"
-      fi
-    done
-
-    for FILE in config.md ETHOS.md AGENTS.md agent.yaml README.md; do
-      if [ -f "$DIST_DIR/$FILE" ]; then
-        run_cmd ln -sf "$DIST_DIR/$FILE" "$TARGET_DIR/$FILE"
-      fi
-    done
-
-    # Antigravity requires plugin.json at the root of the plugin directory
-    if [ -f "$DIST_DIR/plugin.json" ]; then
-      run_cmd cp "$DIST_DIR/plugin.json" "$TARGET_DIR/plugin.json"
-    elif [ -f "$DIST_DIR/.antigravity-plugin/plugin.json" ]; then
-      run_cmd cp "$DIST_DIR/.antigravity-plugin/plugin.json" "$TARGET_DIR/plugin.json"
-    fi
-
-    # Antigravity requires hooks.json at the root of the plugin directory with ANTIGRAVITY_PLUGIN_ROOT
-    if [ -f "$DIST_DIR/hooks/hooks.antigravity.json" ]; then
-      run_cmd cp "$DIST_DIR/hooks/hooks.antigravity.json" "$TARGET_DIR/hooks.json"
-    fi
-
-    ok "DevFlow linked to $TARGET_DIR"
+    run_cmd ln -sfn "$AGY_DIST_DIR" "$TARGET_DIR"
+    ok "DevFlow linked: $TARGET_DIR → $AGY_DIST_DIR"
   else
-    run_cmd rm -rf "$TARGET_DIR"
-    run_cmd cp -R "$DIST_DIR" "$TARGET_DIR"
-
-    # Ensure root plugin.json & hooks.json for Antigravity
-    if [ -f "$DIST_DIR/hooks/hooks.antigravity.json" ]; then
-      run_cmd cp "$DIST_DIR/hooks/hooks.antigravity.json" "$TARGET_DIR/hooks.json"
-    fi
-    if [ -f "$DIST_DIR/.antigravity-plugin/plugin.json" ]; then
-      run_cmd cp "$DIST_DIR/.antigravity-plugin/plugin.json" "$TARGET_DIR/plugin.json"
-    fi
-
+    run_cmd cp -R "$AGY_DIST_DIR" "$TARGET_DIR"
     ok "DevFlow copied to $TARGET_DIR"
   fi
 
-  # Validate installed directory if agy CLI is present
   if command -v agy >/dev/null 2>&1 && [ "$DRY_RUN" = false ]; then
     echo ""
     echo "  Running 'agy plugin validate' on installed target..."
     agy plugin validate "$TARGET_DIR" || warn "agy validation reported notices (see above)"
   fi
-}
-
-# ── Install / Uninstall: Cursor ──────────────────────────────────────────────
-install_cursor() {
-  local TARGET_DIR="$HOME/.cursor/plugins/local/devflow"
-
-  if [ "$UNINSTALL" = true ]; then
-    step "Uninstalling DevFlow from Cursor ($TARGET_DIR)..."
-    if [ -d "$TARGET_DIR" ] || [ -L "$TARGET_DIR" ]; then
-      run_cmd rm -rf "$TARGET_DIR"
-      ok "DevFlow removed from Cursor"
-    else
-      warn "DevFlow directory not found at $TARGET_DIR"
-    fi
-    return 0
-  fi
-
-  step "Installing DevFlow to Cursor ($TARGET_DIR)..."
-
-  local TARGET_PARENT="$HOME/.cursor/plugins/local"
-  run_cmd mkdir -p "$TARGET_PARENT"
-
-  if [ "$MODE" = "link" ]; then
-    run_cmd rm -rf "$TARGET_DIR"
-    run_cmd ln -sfn "$DIST_DIR" "$TARGET_DIR"
-    ok "DevFlow linked: $TARGET_DIR → $DIST_DIR"
-  else
-    run_cmd rm -rf "$TARGET_DIR"
-    run_cmd cp -R "$DIST_DIR" "$TARGET_DIR"
-    ok "DevFlow copied to $TARGET_DIR"
-  fi
-
-  echo "  Note: Reload Cursor window to activate changes (Cmd+Shift+P > Developer: Reload Window)"
 }
 
 # ── Install / Configure: Claude Code ────────────────────────────────────────
@@ -346,9 +281,6 @@ main() {
     antigravity)
       install_antigravity
       ;;
-    cursor)
-      install_cursor
-      ;;
     claude)
       install_claude
       ;;
@@ -361,12 +293,6 @@ main() {
         INSTALLED_ANY=true
       fi
 
-      # Cursor: check ~/.cursor
-      if [ -d "$HOME/.cursor" ]; then
-        install_cursor
-        INSTALLED_ANY=true
-      fi
-
       # Claude Code: check ~/.claude or claude binary
       if [ -d "$HOME/.claude" ] || command -v claude >/dev/null 2>&1; then
         install_claude
@@ -374,7 +300,7 @@ main() {
       fi
 
       if [ "$INSTALLED_ANY" = false ]; then
-        warn "No target platforms detected automatically (~/.gemini, ~/.cursor, ~/.claude)."
+        warn "No target platforms detected automatically (~/.gemini, ~/.claude)."
         echo "Installing to Antigravity global config by default..."
         install_antigravity
       fi

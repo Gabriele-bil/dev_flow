@@ -9,7 +9,7 @@
     "negative": [
       { "prompt": "Just show me the current pipeline state without continuing", "owner": "devflow-status" },
       { "prompt": "The state file is corrupted and the pipeline is stuck, diagnose it", "owner": "devflow-recovery" },
-      { "prompt": "Where do I begin with devflow on a brand new project?", "owner": "devflow-discovery" }
+      { "prompt": "Show token cost and savings metrics for this feature", "owner": "devflow-metrics" }
     ]
   }
 }

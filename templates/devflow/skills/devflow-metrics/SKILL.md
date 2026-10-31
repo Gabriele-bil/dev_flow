@@ -1,10 +1,13 @@
 ---
 name: devflow-metrics
-description: Display token savings dashboard, estimated cost per feature, pass@k success rate, and step durations. Use when inspecting pipeline metrics, token consumption, or running devflow.metrics.
-argument-hint: "[--json, --feature <name>]"
+description: Display token savings dashboard, estimated cost per feature, pass@1 first-pass success rate, and step durations (which pipeline step takes longest on average). Use when inspecting pipeline metrics, token consumption, step timing, or running devflow.metrics.
+argument-hint: "[--json] [--feature <name>]"
+disallowed-tools: Write, Edit, NotebookEdit
 ---
 
 # Skill: devflow.metrics
+
+**Arguments:** `$ARGUMENTS` — empty → show the dashboard for all features.
 
 ## Purpose
 
@@ -17,10 +20,7 @@ Aggregate and visualize local telemetry across token optimization, estimated LLM
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` approved
-- **traceability** — every subtask → acceptance criterion → file(s)
-- **vertical slices** — end-to-end increments, never layers
-- **token-lean** — caveman-compress: drop articles/hedging/filler; keep precision
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 
 ## When NOT to Use
 
@@ -50,13 +50,7 @@ Identify flags from user invocation:
 Run the standalone telemetry aggregator:
 
 ```bash
-PLUGIN_ROOT="$(dirname "$(dirname "$(dirname "$0")")")"
-SCRIPT_PATH="$PLUGIN_ROOT/scripts/metrics.sh"
-if [ ! -f "$SCRIPT_PATH" ]; then
-  SCRIPT_PATH="scripts/metrics.sh"
-fi
-
-bash "$SCRIPT_PATH" "$@"
+bash "@devflow/scripts/metrics.sh" $ARGUMENTS
 ```
 
 ### Step 3 — Interpret key indicators
@@ -73,9 +67,10 @@ When presenting or inspecting dashboard numbers:
 | Anti-Pattern | Problem | Fix |
 | --- | --- | --- |
 | Treating estimated USD costs as exact invoices | Pricing tables drift and exclude provider-specific discounts | Treat telemetry costs as relative indicators between features |
-| Disabling filter telemetry | Blind to token bloat caused by verbose test outputs | Keep `.devflow-filter-stats.jsonl` active to measure filter ROI |
 | Ignoring low pass@1 rates | Hidden build or test flakes slow down pipeline execution | Inspect `.devflow-observe.jsonl` to identify failing tool calls |
 | Committing local metric JSONL files | Pollutes git history with developer-specific telemetry | Keep `.devflow-metrics.jsonl` and filter stats gitignored |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 

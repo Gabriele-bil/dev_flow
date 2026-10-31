@@ -15,7 +15,8 @@ pnpm build
 ### PR body checklist (copy into PR description)
 
 - [ ] Lint passing
-- [ ] Tests passing (coverage ≥ 80% on modified areas)
+- [ ] Tests passing (`test` stamp)
+- [ ] No open coverage gaps on modified files (Ship Gate report — test-engineer)
 - [ ] Build passing
 - [ ] `nextjs-architecture` constraints respected
 - [ ] Server/Client boundary documented for new components

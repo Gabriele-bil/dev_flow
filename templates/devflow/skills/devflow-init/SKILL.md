@@ -3,11 +3,12 @@ name: devflow-init
 description: "Bootstraps greenfield projects end-to-end: conducts a multi-phase interview, scaffolds evergreen workspaces (Nx, Angular, Next.js, Flutter, NestJS), generates plugin context and ADR-001, and writes an ordered multi-task roadmap with inter-task dependencies. Use when user runs devflow.init or starts a brand-new project from scratch."
 argument-hint: "[optional-project-name-or-brief] [--mcp]"
 disable-model-invocation: true
-model: opus
 effort: high
 ---
 
 # Skill: devflow.init
+
+**Arguments:** `$ARGUMENTS` — empty → start the interview (project name/brief asked there).
 
 ## Quick Start
 
@@ -23,10 +24,7 @@ Bootstrap greenfield software projects end-to-end: structured discovery intervie
 
 ## Core Principles
 
-- **spec-first** — no code before `task.md` + `plan.md` are written and approved
-- **traceability** — every subtask maps to an acceptance criterion; every acceptance criterion maps to one or more files
-- **vertical slices** — for plans with >5 files: implement end-to-end user-visible increments, never layers
-- **token-lean** — caveman-compress all written output: drop articles, hedging, filler, linking phrases; keep technical terms, file paths, commands, verbs, negations, conditions exact
+- **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 
 ## When NOT to Use
 
@@ -58,13 +56,13 @@ Notice: Deep architectural and planning workflow. Takes all necessary time to ex
 ```
 
 2. Parse `$ARGUMENTS` for optional project name/brief and `--mcp` flag.
-3. Ask target directory mode via `AskQuestion` / `ask_question` (create `<project-slug>/` subfolder vs initialize in current directory) and whether to run **full technology file scaffolding** (Nx, Angular, Next.js, Flutter, NestJS) in addition to DevFlow plugin files.
+3. Ask target directory mode via `AskUserQuestion` / `ask_question` (create `<project-slug>/` subfolder vs initialize in current directory) and whether to run **full technology file scaffolding** (Nx, Angular, Next.js, Flutter, NestJS) in addition to DevFlow plugin files.
 
 ### Step 1 — Multi-Phase Structured Interview
 
 Execute the 3-phase interview per `@devflow/skills/devflow-init/references/interview-protocol.md`:
 
-- Ask **one question at a time** via `AskQuestion` / `ask_question` (2–4 options, first option prefixed `(Recommended)` with 1-sentence technical rationale).
+- Ask via `AskUserQuestion` / `ask_question` — independent questions batched (1–4 per call), dependent ones after their answer (2–4 options, first option prefixed `(Recommended)` with 1-sentence technical rationale).
 - **Phase A (Product & Scope):** Project name/slug, domain, target personas (real human/external actors, never technical roles), primary outcome, complete feature inventory (core + secondary flows), async/edge expectations.
 - **Phase B (Architecture, Workspace & Technology Stack):**
   - Workspace topology: Single-app vs Monorepo (explicitly supporting **Nx workspace** orchestration alongside standard multi-app folders).
@@ -77,7 +75,7 @@ Execute the 3-phase interview per `@devflow/skills/devflow-init/references/inter
 
 Execute directory initialization and optional technology scaffolding per `@devflow/skills/devflow-init/references/scaffolding-matrix.md`:
 
-1. **Workspace & Git init:** Create `<project-slug>/` (if subfolder mode), `cd` into root, run `git init -b main` (if `.git` absent), write `.gitignore` (stack ignores + `.devflow-state.json`, `.devflow-run.json`, `.devflow-*.jsonl`, `.devflow-*.tmp`), and create `devflow/features/`, `devflow/plans/`, `docs/adr/`.
+1. **Workspace & Git init:** Create `<project-slug>/` (if subfolder mode), `cd` into root, run `git init -b main` (if `.git` absent), write `.gitignore` (stack ignores + `.devflow-state.json`, `.devflow-run.json`, `.devflow-verify.json`, `.devflow-verify/`, `.devflow-review-packet.md`, `.devflow-*.jsonl`, `.devflow-*.tmp`), and create `devflow/features/`, `devflow/plans/`, `docs/adr/`.
 2. **If technology scaffolding is enabled, enforce the Always Up-to-Date rule:**
    - **Zero hardcoded stale versions:** Never write static templates with outdated package versions or legacy config schemas (e.g. no `.eslintrc.json`, no Angular NgModules, no Next.js Pages router).
    - **Live version & config resolution:** Query `context7` MCP (or stack MCPs: `dart`, `angular-cli`, `next-devtools`) and live registries (`npm view <pkg> version`, `flutter pub outdated`) to confirm current latest stable conventions before generating files.
@@ -105,37 +103,20 @@ Decompose project and generate all tasks on `main` per `@devflow/skills/devflow-
    - Pre-populate `**Branch:** feat/[NNN]_[feature-name]` in each `task.md` header (`devflow.implement` creates/switches to the branch when that task executes).
    - For every feature `001` through `NNN` in ascending topological order, write `devflow/features/[NNN]_[feature-name]/task.md` following `@devflow/skills/devflow-task/references/task-template.md`, including `**ADRs:** docs/adr/ADR-001-initial-architecture.md`, `**Blockers:**`, `**Unlocks:**`, Connextra User Story, Read/Write isolated `UC-1..UC-N`, single-`When` BDD Gherkin `AC-1..AC-N` with explicit async states, Scope Boundaries, and Assumptions & Risks.
 5. **Populate `docs/product.md`:** Fill the `devflow-managed:feature-status` table with all tasks `001..NNN` in topological order (`status: planned`, blocker notes, and `App` column in monorepo mode).
-6. **Final State Initialization (MUST run after all `task.md` writes):** Because `post-task-create.sh` updates `.devflow-state.json` on each `task.md` write, write `.devflow-state.json` one final time after `NNN` finishes:
-   - `active_feature`: `"001_<first-feature>"`
-   - `feature_path`: `"devflow/features/001_<first-feature>"`
-   - `branch`: `"feat/001_<first-feature>"`
-   - `task_status`: `"draft"`
-   - `next_feature_number`: `"<NNN+1 zero-padded>"`
-   - `next_step`: `"devflow.plan"`
+6. **Final State Initialization (MUST run after all `task.md` writes):** `post-task-create.sh` updates `.devflow-state.json` on each `task.md` write, so point the cache back at the first feature once `NNN` finishes: `bash "@devflow/scripts/devflow-state.sh" sync 001`.
 
 ### Step 5 — Completion Summary & Handoff
 
 Emit consolidated initialization report: project root, topology & stack(s), scaffolded apps + analysis verdict, generated context/ADR files, total tasks (`001..NNN`) + parallel-safe count in `devflow/plans/project-blueprint.md`, and next step (`/devflow.plan` — automatically resolves `001_<first-feature>`).
 
-## Common Rationalizations
-
-| Thought | Reality |
-| --- | --- |
-| "Hardcode standard package versions in package.json/pubspec.yaml to save time" | Hardcoded versions rot immediately. Query `context7` / registry and use `@latest` CLIs |
-| "Generate only task 001 now and let user run devflow.task later" | `devflow.init` contract requires full project decomposition (`001..NNN`) with verified DAG upfront |
-| "Create and switch git branches for each task during batch generation" | Switching branches N times leaves tasks scattered or dirty. Stay on `main` and record `**Branch:**` in `task.md` |
-| "Skip final `.devflow-state.json` write since `post-task-create.sh` runs automatically" | Hook only sets `next_feature_number` from last task `NNN`; final write is required to point `active_feature` to `001` |
-| "Write `tsconfig.json` or `eslint.config.mjs` directly via Write tool" | `pre-config-protect.sh` blocks Write/Edit on linter/tsconfig files; scaffold via official CLI commands in Bash |
-
 ## Anti-Patterns
 
 | Anti-Pattern | Problem | Fix |
 | --- | --- | --- |
-| Dumping all interview questions in one wall of text | Overwhelms user and skips adaptive follow-ups | Ask one bounded question at a time via `AskQuestion` with `(Recommended)` first |
-| Using legacy stack flags (`--no-standalone`, Pages router, `.eslintrc.json`) | Violates adapter rules and modern stack baselines | Follow `@devflow/skills/devflow-init/references/scaffolding-matrix.md` and live `context7` docs |
 | Leaving circular blockers between tasks (`002` ↔ `003`) | Deadlocks planning and implementation order | Extract shared contracts/types into foundation task `001` before consumers |
-| Omitting `**Blockers:**` / `**Unlocks:**` in generated `task.md` files | Downstream `devflow.plan` cannot verify unblocked execution order | Populate explicit `**Blockers:**` and `**Unlocks:**` headers in every roadmap `task.md` |
-| Writing Technical Personas ("As a backend developer") in `task.md` | Violates `devflow-task` product-only spec discipline | Use real human or external system actors and functional BDD Gherkin ACs |
+| Using legacy stack flags (`--no-standalone`, Pages router, `.eslintrc.json`) | Violates adapter rules and modern stack baselines | Follow `@devflow/skills/devflow-init/references/scaffolding-matrix.md` and live `context7` docs |
+
+Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
 ## I/O Reference
 
@@ -144,6 +125,7 @@ Emit consolidated initialization report: project root, topology & stack(s), scaf
 | Reads | `@devflow/skills/devflow-init/references/interview-protocol.md`, `@devflow/skills/devflow-init/references/scaffolding-matrix.md`, `@devflow/skills/devflow-init/references/roadmap-generation.md` |
 | Reads | `@devflow/adapters/<adapter>/ADAPTER.md`, `@devflow/adapters/<adapter>/steps/setup.md`, `@devflow/skills/devflow-setup/references/config-template.md`, `@devflow/skills/devflow-setup/references/placeholder-map.md` |
 | Reads | `@devflow/skills/devflow-discover/references/discovery-axes.md`, `@devflow/skills/devflow-discover/references/adr-template.md`, `@devflow/references/mcp-catalog.md`, `@devflow/skills/devflow-task/references/task-template.md` |
+| Reads (conditional) | `references/anti-patterns.md` (when unsure / retry) |
 | Writes | `<project-slug>/` technology scaffold (optional: Nx, Angular, Next.js, Flutter, NestJS), `.gitignore`, `@devflow/config.md`, `AGENTS.md`, `REGISTRY.md`, `constitution.md`, `docs/product.md` |
 | Writes | `docs/adr/ADR-001-initial-architecture.md`, `docs/adr/README.md`, `devflow/plans/project-blueprint.md`, `devflow/features/[NNN]_[feature-name]/task.md` (`001..NNN`), `.devflow-state.json` |
 | Next step | `devflow.plan` (resolves `001_<first-feature>`) |

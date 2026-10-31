@@ -23,7 +23,7 @@ run_hook() {
   local command="$1"
   local branch="${2:-${DEVFLOW_CURRENT_BRANCH:-}}"
   local payload
-  payload=$(jq -cn --arg c "$command" '{tool_use: {name: "Bash", input: {command: $c}}}')
+  payload=$(jq -cn --arg c "$command" '{hook_event_name: "PreToolUse", session_id: "s1", tool_name: "Bash", tool_input: {command: $c}}')
   printf '%s' "$payload" | DEVFLOW_CURRENT_BRANCH="$branch" bash "$HOOK" 2>/dev/null || true
 }
 
@@ -31,7 +31,7 @@ expect_block() {
   local label="$1" command="$2" branch="${3:-${DEVFLOW_CURRENT_BRANCH:-}}"
   local out
   out=$(run_hook "$command" "$branch")
-  echo "$out" | grep -qE '"decision"[[:space:]]*:[[:space:]]*"block"' \
+  echo "$out" | grep -qE '"permissionDecision"[[:space:]]*:[[:space:]]*"deny"' \
     && assert "$label blocked" pass \
     || assert "$label blocked (output: '$out')" fail
 }
@@ -70,7 +70,30 @@ echo "--- T4: commit hook/signature bypass blocked ---"
 expect_block "commit --no-verify"    "git commit -m x --no-verify"
 expect_block "commit --no-gpg-sign"  "git commit --no-gpg-sign -m x"
 
+echo "--- T4b: bypasses of the naive patterns ---"
+expect_block "rm -rf /*"                  "rm -rf /*"
+expect_block 'rm -rf "$HOME"'             'rm -rf "$HOME"'
+expect_block 'rm -rf ${HOME}/'            'rm -rf ${HOME}/'
+expect_block "rm -r -f /"                 "rm -r -f /"
+expect_block "rm --recursive --force ~"   "rm --recursive --force ~"
+expect_block "sudo rm -fr /"              "sudo rm -fr /"
+expect_block "chained: cd x && rm -rf ."  "cd x && rm -rf ."
+expect_block "git -C . reset --hard"      "git -C . reset --hard"
+expect_block "git -c x=y reset --hard"    "git -c color.ui=false reset --hard"
+expect_block "git push origin +main"      "git push origin +main"
+expect_block "git push origin +HEAD:main" "git push origin +HEAD:main"
+expect_block "git push -uf origin main"   "git push -uf origin main"
+expect_block "git commit -n"              "git commit -n -m x"
+expect_block "git commit -anm"            "git commit -anm x"
+expect_block "git -c core.hooksPath"      "git -c core.hooksPath=/dev/null commit -m x"
+expect_block "git checkout -f"            "git checkout -f"
+
 echo "--- T5: scoped/normal commands allowed ---"
+expect_allow "message mentioning -n"             "git commit -m 'fix -n flag'"
+expect_allow "rm -rf ./build"                    "rm -rf ./build"
+expect_allow "rm -rf \$HOME/.cache/foo"          'rm -rf $HOME/.cache/foo'
+expect_allow "push +feature"                     "git push origin +feature-x"
+expect_allow "git -C repo status"                "git -C repo status"
 expect_allow "rm -rf node_modules"               "rm -rf node_modules"
 expect_allow "rm -rf dist/build"                 "rm -rf dist/build"
 expect_allow "rm single file"                    "rm file.txt"
@@ -86,7 +109,7 @@ expect_allow "soft git reset"                    "git reset HEAD~1"
 echo "--- T6: degenerate input allowed silently ---"
 out=$(printf '' | bash "$HOOK" 2>/dev/null || true)
 [ -z "$out" ] && assert "empty stdin allowed" pass || assert "empty stdin allowed" fail
-out=$(printf '{"tool_use":{"input":{}}}' | bash "$HOOK" 2>/dev/null || true)
+out=$(printf '{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{}}' | bash "$HOOK" 2>/dev/null || true)
 [ -z "$out" ] && assert "missing command allowed" pass || assert "missing command allowed" fail
 
 echo ""

@@ -1,0 +1,132 @@
+{
+  "devflow": {
+    "SessionStart": [
+      {
+        "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=SessionStart bash \"hooks/session-start.sh\""
+      },
+      {
+        "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=SessionStart bash \"hooks/session-start-learnings.sh\""
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "replace_file_content|multi_replace_file_content|edit_file|write_to_file|write_file",
+        "hooks": [
+          {
+            "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=PreToolUse bash \"hooks/pre-config-protect.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "replace_file_content|multi_replace_file_content|edit_file|write_to_file|write_file",
+        "hooks": [
+          {
+            "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=PreToolUse bash \"hooks/pre-scope-guard.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=PreToolUse bash \"hooks/pre-bash-destructive-guard.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "read_url_content",
+        "hooks": [
+          {
+            "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=PreToolUse bash \"hooks/pre-fetch-cache.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "invoke_subagent",
+        "hooks": [
+          {
+            "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=PreToolUse bash \"hooks/pre-agent-fanout-cap.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=PreToolUse bash \"hooks/observe.sh\" pre"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=PostToolUse bash \"hooks/observe.sh\" post"
+          }
+        ]
+      },
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=PostToolUse bash \"hooks/post-bash-output-filter.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "replace_file_content|multi_replace_file_content|edit_file|write_to_file|write_file",
+        "hooks": [
+          {
+            "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=PostToolUse bash \"hooks/post-edit-accumulate.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "replace_file_content|multi_replace_file_content|edit_file|write_to_file|write_file",
+        "hooks": [
+          {
+            "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=PostToolUse bash \"hooks/post-edit-instinct-context.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "write_to_file|write_file",
+        "hooks": [
+          {
+            "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=PostToolUse bash \"hooks/post-task-create.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "read_url_content",
+        "hooks": [
+          {
+            "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=PostToolUse bash \"hooks/post-fetch-cache.sh\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=Stop bash \"hooks/stop-format-typecheck.sh\""
+      },
+      {
+        "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=Stop bash \"hooks/stop-notify.sh\""
+      },
+      {
+        "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=Stop bash \"hooks/stop-debug-check.sh\""
+      },
+      {
+        "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=Stop bash \"hooks/stop-learn-distill.sh\""
+      },
+      {
+        "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=Stop bash \"hooks/observe.sh\" stop"
+      },
+      {
+        "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=Stop bash \"hooks/stop-metrics.sh\""
+      }
+    ]
+  }
+}

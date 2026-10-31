@@ -27,9 +27,9 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 
 ---
 
-## Commands (entry points)
+## Pipeline steps (entry points)
 
-| Command | Skill | Input → Output |
+| Step | Skill | Input → Output |
 | -------- | -------- | ---------------- |
 | `devflow.init` | [`templates/devflow/skills/devflow-init/SKILL.md`](templates/devflow/skills/devflow-init/SKILL.md) | Project brief + interview → greenfield repo + live tech scaffold (Nx, Angular, Next.js, Flutter, NestJS) + `AGENTS.md` + `REGISTRY.md` + `constitution.md` + `ADR-001` + `project-blueprint.md` + ordered `001..NNN` `task.md` files |
 | `devflow.setup` | [`templates/devflow/skills/devflow-setup/SKILL.md`](templates/devflow/skills/devflow-setup/SKILL.md) | Consumer repo context + adapter templates → root `AGENTS.md` + `REGISTRY.md` |
@@ -42,7 +42,7 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 | `devflow.implement` | [`templates/devflow/skills/devflow-implement/SKILL.md`](templates/devflow/skills/devflow-implement/SKILL.md) | `plan.md` → code on `feat \| fix \| …/[NNN]_[name]` |
 | `devflow.beautify` | [`templates/devflow/skills/devflow-beautify/SKILL.md`](templates/devflow/skills/devflow-beautify/SKILL.md) | Implemented files → polished code |
 | `devflow.test` | [`templates/devflow/skills/devflow-test/SKILL.md`](templates/devflow/skills/devflow-test/SKILL.md) | Feature → unit + integration tests |
-| `devflow.ship` | [`templates/devflow/commands/devflow.ship.md`](templates/devflow/commands/devflow.ship.md) | Feature → parallel review (code + security + tests + a11y + docs) → gate before PR |
+| `devflow.ship` | [`templates/devflow/skills/devflow-ship/SKILL.md`](templates/devflow/skills/devflow-ship/SKILL.md) | Feature → parallel review (code + security + tests + a11y + docs) → gate before PR |
 | `devflow.pr` | [`templates/devflow/skills/devflow-pr/SKILL.md`](templates/devflow/skills/devflow-pr/SKILL.md) | Branch → PR to `main` |
 | `devflow.status` | [`templates/devflow/skills/devflow-status/SKILL.md`](templates/devflow/skills/devflow-status/SKILL.md) | — → current pipeline state dashboard |
 | `devflow.doctor` | [`templates/devflow/skills/devflow-doctor/SKILL.md`](templates/devflow/skills/devflow-doctor/SKILL.md) | — → pre-flight diagnostic (MCP reachability, CLI tools, pipeline state) |
@@ -53,7 +53,14 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 | `devflow.board` | [`templates/devflow/skills/devflow-board/SKILL.md`](templates/devflow/skills/devflow-board/SKILL.md) | — → static, read-only, auto-updating HTML project board (`devflow/board/index.html`) with Kanban, Dependency DAG, Markdown viewer, and command timings |
 | `devflow.recovery` | [`templates/devflow/skills/devflow-recovery/SKILL.md`](templates/devflow/skills/devflow-recovery/SKILL.md) | Stuck pipeline → diagnosis + targeted recovery path |
 
-Command wrappers live in [`templates/devflow/commands/`](templates/devflow/commands/).
+Skills are the only entry point (3.0.0): there are no command wrappers. Each step `devflow.<step>` is invoked as:
+
+| Host | Slash name | Example |
+| --- | --- | --- |
+| Claude Code | `/devflow:<step>` | `/devflow:plan 003` |
+| Antigravity CLI | `/devflow-<step>` | `/devflow-plan 003` |
+
+**Migrating from 2.x (Claude Code):** `/devflow:devflow.<step>` (command) and `/devflow:devflow-<step>` (skill) both become `/devflow:<step>` — e.g. `/devflow:devflow.ship` → `/devflow:ship`. The skill now runs with its own frontmatter (`effort`, `disable-model-invocation`) instead of being read as text by a command. Antigravity CLI names are unchanged (`/devflow-<step>`).
 
 ---
 
@@ -85,7 +92,6 @@ dev_flow/
 │       ├── hooks/
 │       │   ├── hooks.json           # Lifecycle hook config
 │       │   └── *.sh                 # Hook scripts
-│       ├── commands/                # Slash-command entry points
 │       ├── skills/                  # Core pipeline skills (devflow-*)
 │       │   ├── devflow-analyze/
 │       │   ├── devflow-beautify/
@@ -93,7 +99,6 @@ dev_flow/
 │       │   ├── devflow-blueprint/
 │       │   ├── devflow-board/
 │       │   ├── devflow-discover/
-│       │   ├── devflow-discovery/
 │       │   ├── devflow-implement/
 │       │   ├── devflow-init/
 │       │   ├── devflow-learn/
@@ -128,18 +133,20 @@ dev_flow/
 │           ├── validate-adapters.sh
 │           └── validate-skills.sh
 ├── dist/
-│   └── devflow/                     # Build output — do not edit directly
-│       ├── .claude-plugin/          # Claude Code plugin manifest (generated)
-│       ├── .cursor-plugin/          # Cursor plugin manifest (generated)
-│       ├── .antigravity-plugin/     # Antigravity CLI plugin manifest (generated, plugin.json confined here — never at dist root)
-│       └── ...                      # Mirror of templates/devflow/ (minus dev-only files)
+│   ├── devflow/                     # Claude Code build — do not edit directly
+│   │   ├── .claude-plugin/          # Claude Code plugin manifest (generated)
+│   │   └── ...                      # Mirror of templates/devflow/ (minus dev-only files)
+│   └── devflow-antigravity/         # Antigravity CLI build — do not edit directly
+│       ├── .antigravity-plugin/     # plugin.json (generated)
+│       ├── hooks.json               # hooks/hooks.json translated to agy events/tools
+│       ├── rules/                   # devflow-orientation.md (static routing rule)
+│       └── ...                      # skills/agents with Claude-only frontmatter removed
 ├── scripts/
 │   ├── build-plugin.sh              # Orchestrator: reads manifest.json, calls builders
 │   └── builders/
 │       ├── common.sh                # Shared helpers (ok/warn/fail/step)
-│       ├── build-claude.sh          # Generates dist/ for Claude Code
-│       ├── build-cursor.sh          # Adds Cursor layer on dist/
-│       └── build-antigravity.sh     # Adds Antigravity CLI layer on dist/
+│       ├── build-claude.sh          # Generates dist/devflow/ for Claude Code
+│       └── build-antigravity.sh     # Generates dist/devflow-antigravity/ from dist/devflow/
 ├── .github/
 │   └── workflows/
 │       ├── build-verify.yml         # CI: verify dist/ is in sync on every PR
@@ -155,7 +162,7 @@ Feature folders (in the consumer project) use zero-padded ids (`001`, `002`, …
 
 ## Build system
 
-The plugin uses a manifest-driven build: source lives in `templates/devflow/`, built output in `dist/devflow/` (committed). Run the build after any change to skills, adapters, or hooks:
+The plugin uses a manifest-driven build: source lives in `templates/devflow/`, built output in `dist/devflow/` (Claude Code) and `dist/devflow-antigravity/` (Antigravity CLI), both committed. Run the build after any change to skills, adapters, or hooks:
 
 ```bash
 # Rebuild dist/ after any source change
@@ -168,25 +175,42 @@ bash templates/devflow/scripts/validate-skills.sh
 bash templates/devflow/scripts/validate-adapters.sh
 ```
 
-The build is **idempotent** — it recreates `dist/devflow/` from scratch on every run. Requires `jq` (`brew install jq`).
+The build is **idempotent** — it recreates both `dist/` trees from scratch on every run. Requires `jq` (`brew install jq`); runs `agy plugin validate` on the Antigravity tree when `agy` is installed.
 
 ---
 
-## Plugins (Claude Code, Cursor & Antigravity CLI)
+## Plugins (Claude Code & Antigravity CLI)
 
-The [`dist/devflow/`](dist/devflow/) folder is a **multi-platform plugin**: same tree loads in Claude Code, Cursor, and Antigravity CLI (`agy`).
+DevFlow ships one build per host, generated from the same source: [`dist/devflow/`](dist/devflow/) for Claude Code and [`dist/devflow-antigravity/`](dist/devflow-antigravity/) for Antigravity CLI (`agy`). Cursor is no longer supported (removed in 2.0.0).
+
+### What works on each host
+
+| Feature | Claude Code | Antigravity CLI |
+| --- | --- | --- |
+| Pipeline skills, adapters, references | ✅ `/devflow:<step>` | ✅ `/devflow-<step>` |
+| User-only skills (`disable-model-invocation`: pr, rollback, ship, auto, …) | ✅ run only on `/` | ✅ run only on `/` (honored by agy 1.4.9) |
+| Read-only skills (`disallowed-tools`: status, metrics, analyze, resume) | ✅ Write/Edit denied | ⚠️ field stripped — read-only by the skill's rules only |
+| Review subagents (`agents/`) | ✅ read-only tools, `model: sonnet` | ✅ read-only tools (`tools` translated to agy's allowlist, verified on agy 1.4.10), host default model |
+| Destructive-command / config-protect / scope guards | ✅ | ✅ (`run_command`, file-write tools) |
+| Observe log, instincts, churn learning | ✅ | ✅ |
+| Format + typecheck on Stop, debug-print check | ✅ (shown as `systemMessage`) | ✅ (results in the agy log only) |
+| Token/cost metrics | ✅ tokens + cost | ✅ tokens (no price table for Gemini) |
+| Session-start orientation + instincts | ✅ injected as context | ⚠️ static `dist/devflow-antigravity/rules/devflow-orientation.md`; dynamic state not injected |
+| Pre-compaction state snapshot | ✅ | ❌ no PreCompact event |
+| Model-switch guard + audit | ✅ | ❌ no model-switch events |
+| Retry-loop detection on failed tools | ✅ (`PostToolUseFailure`) | ✅ (`error` field) |
+| Bash output filtering, WebFetch cache | ✅ | ❌ no output rewrite / no tool output in payload |
 
 ### Unified Installer (Recommended)
 
-Install or link DevFlow across all detected platforms (Antigravity, Cursor, Claude Code) with a single command:
+Install or link DevFlow across all detected platforms (Antigravity, Claude Code) with a single command:
 
 ```bash
-# Install to all detected platforms (auto-detects ~/.gemini, ~/.cursor, ~/.claude)
+# Install to all detected platforms (auto-detects ~/.gemini, ~/.claude)
 bash scripts/install-plugin.sh
 
 # Or install to a specific platform:
 bash scripts/install-plugin.sh antigravity
-bash scripts/install-plugin.sh cursor
 bash scripts/install-plugin.sh claude
 ```
 
@@ -205,28 +229,26 @@ Skills are namespaced — use them as `/devflow:task`, `/devflow:plan`, etc.
 claude --plugin-dir ./dist/devflow
 ```
 
-### Install locally (Cursor)
-
-Symlink `~/.cursor/plugins/local/devflow` → this repo's `dist/devflow` directory, then reload the window — see [Plugins](https://cursor.com/docs/plugins).
-
 ### Install locally (Antigravity CLI / agy)
 
 ```bash
 # Validate the plugin files first
-agy plugin validate ./dist/devflow
+agy plugin validate ./dist/devflow-antigravity
 
 # Install the plugin locally
-agy plugin install ./dist/devflow
+agy plugin install ./dist/devflow-antigravity
 ```
+
+Check the hooks with `/hooks` inside `agy`. Hook payload fixtures and capture notes: [`templates/devflow/hooks/tests/fixtures/antigravity/README.md`](templates/devflow/hooks/tests/fixtures/antigravity/README.md).
 
 More detail: [`templates/devflow/README.md`](templates/devflow/README.md).
 
 ### Recommended companion plugin: code-review-graph
 
-Use `code-review-graph` for blast-radius aware reviews in both Cursor and Claude with one setup:
+Use `code-review-graph` for blast-radius aware reviews with one setup:
 
 - `pipx install code-review-graph` (or `pip install code-review-graph`)
-- `code-review-graph install` (auto-detects configured platforms including Cursor and Claude Code)
+- `code-review-graph install` (auto-detects configured platforms, including Claude Code)
 - `code-review-graph build` (initial graph indexing per repository)
 
 ### Required MCP baseline
@@ -246,6 +268,7 @@ Specialized agents live in [`templates/devflow/agents/`](templates/devflow/agent
 
 | Agent | File | Role |
 | ------- | ------ | ------ |
+| Step Runner | [`agents/step-runner.md`](templates/devflow/agents/step-runner.md) | Runs one pipeline step in its own context for `devflow.run` / `devflow.auto` (Claude Code: per-step model); returns a `RESULT:` line |
 | Code Reviewer | [`agents/code-reviewer.md`](templates/devflow/agents/code-reviewer.md) | 5-axis code review: correctness, readability, architecture, security, performance |
 | Security Auditor | [`agents/security-auditor.md`](templates/devflow/agents/security-auditor.md) | Exploitable vulnerabilities, threat modeling, secure coding |
 | Test Engineer | [`agents/test-engineer.md`](templates/devflow/agents/test-engineer.md) | Coverage gap analysis, test strategy, test quality |
@@ -284,6 +307,7 @@ Baseline: **Flutter · Riverpod · Supabase**. Commands: `flutter analyze`, `flu
 
 | Skill | Purpose |
 | ------- | --------- |
+| `flutter-architecture` | Feature folders, layers, scaffold, cross-layer moves |
 | `flutter-supabase` | Database read/write/auth, schema, RLS |
 | `flutter-supabase-migrations` | Schema migrations, SQL |
 | `flutter-theme` | UI screens, visual styling |
@@ -292,7 +316,7 @@ Baseline: **Flutter · Riverpod · Supabase**. Commands: `flutter analyze`, `flu
 | `flutter-layout` | Layout, breakpoints, scrollables |
 | `flutter-form` | Form/wizard flows |
 
-Feature pages: use `lib/features/<feature>/pages/` with entry file named `page.dart`.
+Feature pages: `lib/features/<feature>/pages/<name>_page.dart` (one page) or `pages/<page>/` per page (several) — see `flutter-architecture`.
 
 ### Angular (`templates/devflow/adapters/angular/`)
 
@@ -310,7 +334,7 @@ Baseline: standalone + signals-first. Commands: `pnpm run lint`, `pnpm run test`
 
 ### Next.js (`templates/devflow/adapters/nextjs/`)
 
-Baseline: **Next.js 15+ App Router · Zustand · Tailwind CSS + shadcn/ui · Server Actions + API Routes · Jest + RTL**. Commands: `pnpm lint`, `pnpm test`, `pnpm build`.
+Baseline: **Next.js 16 App Router (Cache Components) · Zustand · Tailwind CSS 4 + shadcn/ui · Server Actions + API Routes · Jest + RTL · Playwright**. Commands: `pnpm lint`, `pnpm test`, `pnpm build`.
 
 | Skill | Purpose |
 | ------- | --------- |
@@ -326,7 +350,7 @@ Baseline: **Next.js 15+ App Router · Zustand · Tailwind CSS + shadcn/ui · Ser
 
 ### NestJS (`templates/devflow/adapters/nestjs/`)
 
-Baseline: **NestJS · TypeORM · class-validator/class-transformer · @nestjs/swagger · @nestjs/jwt + Passport · @nestjs/testing + Supertest**. Commands: `npm run lint`, `npm run test`, `npm run build`.
+Baseline: **NestJS 12 · TypeORM 1 or Prisma 7 · class-validator or Standard Schema · @nestjs/swagger · @nestjs/jwt + Passport · @nestjs/testing + Supertest**. Commands: `npm run lint`, `npm run test`, `npm run build`.
 
 | Skill | Purpose |
 | ------- | --------- |
@@ -334,7 +358,7 @@ Baseline: **NestJS · TypeORM · class-validator/class-transformer · @nestjs/sw
 | `nestjs-error-handling` | HTTP exceptions, exception filters, async error handling, structured logging |
 | `nestjs-security` | Input validation, guards, JWT auth, rate limiting, output sanitization |
 | `nestjs-performance` | Async lifecycle hooks, lazy loading, query optimization, caching, graceful shutdown |
-| `nestjs-database` | N+1 avoidance, migrations, transactions (TypeORM) |
+| `nestjs-database` | N+1 avoidance, migrations, transactions (TypeORM 1 or Prisma 7 — project choice) |
 | `nestjs-api-design` | DTOs/serialization, interceptors, pipes, versioning, API-consumer accessibility (OpenAPI, RFC 7807 errors) |
 | `nestjs-testing` | `TestingModule` unit tests, Supertest e2e, mocking external services |
 | `nestjs-microservices` | `@MessagePattern`/`@EventPattern`, BullMQ queues, Terminus health checks |
