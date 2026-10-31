@@ -1,5 +1,67 @@
 # Changelog
 
+## [2.0.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.19.0...devflow-v2.0.0) (2026-10-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* on Claude Code /devflow:devflow.<step> and /devflow:devflow-<step> are replaced by /devflow:<step>. Antigravity CLI names (/devflow-<step>) are unchanged. The dev-only lint-skills command is removed; run scripts/validate-skills.sh directly.
+* Antigravity users install from dist/devflow-antigravity (agy plugin install ./dist/devflow-antigravity); dist/devflow no longer contains plugin.json, .antigravity-plugin/ or hooks.antigravity.json.
+* the Cursor plugin (.cursor-plugin/, hooks.cursor.json) is no longer built or installable. Cursor users should remove ~/.cursor/plugins/local/devflow and switch to Claude Code or Antigravity CLI.
+
+### Features
+
+* **adapters:** Keep adapters reachable, current and free of removed APIs ([e45adb0](https://github.com/Gabriele-bil/dev_flow/commit/e45adb06cf7cc54c3e4effa955bf62cd443a00fb))
+* Add 'scripts' directory to installation process for Antigravity ([da8baa5](https://github.com/Gabriele-bil/dev_flow/commit/da8baa5e2e527d6d380b3832644994c473cafb97))
+* Add new 'init' command modes and refactor command options ([c7cc911](https://github.com/Gabriele-bil/dev_flow/commit/c7cc911bd87e6773c5185f0dbe17bf0c144d6658))
+* **build:** Name each host's own question tool in its build ([95b2909](https://github.com/Gabriele-bil/dev_flow/commit/95b2909e237a2915ca49059fb3ebba087656e671))
+* DevFlow v2 skills-first architecture, multi-host builds, and adapter updates ([bd56cc5](https://github.com/Gabriele-bil/dev_flow/commit/bd56cc54574a9bd13a2c10d185467ec7d78b47ca))
+* Drop Cursor support ([7f93ca2](https://github.com/Gabriele-bil/dev_flow/commit/7f93ca297d2e2759ac443e0fd41adbba2db04b67))
+* Improvements ([f621664](https://github.com/Gabriele-bil/dev_flow/commit/f6216643bc9733da46c277e95e8d3e104827e452))
+* Make skills the only entry point, invoked as /devflow:&lt;step&gt; ([6cf8d97](https://github.com/Gabriele-bil/dev_flow/commit/6cf8d97a3c8b7929b5359cc5f690345ff98c78f7))
+* **models:** Session model in the main context, per-step models in subagents ([a759df2](https://github.com/Gabriele-bil/dev_flow/commit/a759df29a68dd671dc6d2385224f78a91bbbc650))
+* Ship a dedicated Antigravity CLI build with working hooks ([c4b3585](https://github.com/Gabriele-bil/dev_flow/commit/c4b35851552769df28b4d60d9eb7f43f14e01fbd))
+* **ship:** Give reviewers one review packet instead of five cold starts ([c778720](https://github.com/Gabriele-bil/dev_flow/commit/c778720e4c7171dd3877c42f38cf0356af4bc51a))
+* **skills:** Deny file writes in read-only skills on Claude Code ([d3265ec](https://github.com/Gabriele-bil/dev_flow/commit/d3265ecd779b02e4d63c66e1d7f278be441640e3))
+* **state:** Move pipeline state into devflow-state.sh ([6ef76e6](https://github.com/Gabriele-bil/dev_flow/commit/6ef76e677f820c5900f1fe92ea19425f65c02531))
+* **verify:** Run each check once per state of the code ([a01c107](https://github.com/Gabriele-bil/dev_flow/commit/a01c1074e24cdb51380e69c4ec5b0c28dea43537))
+
+
+### Bug Fixes
+
+* **adapters/angular:** Bring the Angular adapter up to Angular 22 and trim it ([4623ff2](https://github.com/Gabriele-bil/dev_flow/commit/4623ff25ac61d76ac32042c07710b5999f71b54a))
+* **adapters/angular:** Code samples that fail with Angular 22 ([90cb110](https://github.com/Gabriele-bil/dev_flow/commit/90cb11035da23261dd3b2817fd4127da347386dd))
+* **adapters/common:** Framework-neutral, consistent shared skills ([ab68a40](https://github.com/Gabriele-bil/dev_flow/commit/ab68a4029a0c916f75c3e497f6a519b09313f69b))
+* **adapters/flutter:** Bring the Flutter adapter up to date and trim it ([9690008](https://github.com/Gabriele-bil/dev_flow/commit/96900083a5feb03d208896845cb2b7404cfbd071))
+* **adapters/flutter:** Code samples that fail with freezed 3 and Riverpod 3 ([772bb8e](https://github.com/Gabriele-bil/dev_flow/commit/772bb8ea8cc6417f60be822ad0ed14eebaeb519f))
+* **adapters/nestjs:** Bring the NestJS adapter up to NestJS 12 and trim it ([d919d52](https://github.com/Gabriele-bil/dev_flow/commit/d919d52dad557d2ad466c75355d21904bf4385a4))
+* **adapters/nestjs:** Code samples that fail with NestJS 12, BullMQ and Jest 30 ([644f630](https://github.com/Gabriele-bil/dev_flow/commit/644f630c19e01ce6d4af5a04e0d1e0db3063e2e7))
+* **adapters/nextjs:** Bring the Next.js adapter up to Next 16.4 and trim it ([32e530b](https://github.com/Gabriele-bil/dev_flow/commit/32e530b857a567a6b4ebd623946a15a56445ea17))
+* **adapters/nextjs:** Code samples that fail with Next.js 16, Zod 4 and Jest 30 ([d31f6f5](https://github.com/Gabriele-bil/dev_flow/commit/d31f6f5072cfc84248a2a54cb15c9f059b890cf0))
+* **agy:** Keep disable-model-invocation so user-only skills stay manual ([fb097a1](https://github.com/Gabriele-bil/dev_flow/commit/fb097a163e376335bb4ddef7e57917645537545f))
+* **agy:** Keep ship reviewers read-only on Antigravity ([890c445](https://github.com/Gabriele-bil/dev_flow/commit/890c445de662829ddcea356ffce85663697d4b34))
+* **build:** Resolve @devflow/ plugin paths for each host ([1c5a624](https://github.com/Gabriele-bil/dev_flow/commit/1c5a6248f7c2a68e9e96ca32310732447dcba673))
+* **doctor:** Report optional dependencies, Antigravity hook install and canonical state ([aa82e14](https://github.com/Gabriele-bil/dev_flow/commit/aa82e14d5f42c5df7011cb88b54a107c37f7dbaa))
+* **hooks:** Close destructive-guard bypasses and repair instinct and accumulator hooks ([1e38077](https://github.com/Gabriele-bil/dev_flow/commit/1e380773f8bd9c91bddae4a00666f03e24307974))
+* **hooks:** Parse real host payloads and emit host-correct output ([fe4709d](https://github.com/Gabriele-bil/dev_flow/commit/fe4709dfc89bb70d4ecf637925e3567e0131d83d))
+* **hooks:** Suggest the slash command that exists on each host ([812f2c4](https://github.com/Gabriele-bil/dev_flow/commit/812f2c4a0735ce08f4dda13c20d4199e25c43337))
+* **pipeline:** Repair re-entry, ship loop, hotfix and recovery contracts ([6082055](https://github.com/Gabriele-bil/dev_flow/commit/6082055c5c2d04610b27641e0126897212675bc8))
+* **pr:** Stage expected paths only and build the PR body from evidence ([c2fb97b](https://github.com/Gabriele-bil/dev_flow/commit/c2fb97b5a295404a24239205459e155da130899b))
+* **quality:** Back every checklist item and report count with evidence ([8bcf7eb](https://github.com/Gabriele-bil/dev_flow/commit/8bcf7eb9cbe683de21020d23e5ca3d230621cc31))
+* **skills:** Resolve instructions that contradicted each other ([aa94710](https://github.com/Gabriele-bil/dev_flow/commit/aa94710b58b29aba1d344fd5ed9704df19b58143))
+* **state:** Canonical state schema and single active-feature resolution ([db5afe4](https://github.com/Gabriele-bil/dev_flow/commit/db5afe4d340c2e917717b5861e14e646363e4bf8))
+
+
+### Performance Improvements
+
+* **beautify:** Polish only, skip it in the quick profile, ask once ([e06e8b1](https://github.com/Gabriele-bil/dev_flow/commit/e06e8b13ea9cca4605939ccf31e8f8cc95837bce))
+* **hooks:** Send each instinct once per session ([49fc26e](https://github.com/Gabriele-bil/dev_flow/commit/49fc26e247543c0c331419fe0a342fd3d8629ff1))
+* **pipeline:** Run independent work in parallel ([a679918](https://github.com/Gabriele-bil/dev_flow/commit/a679918b107beff5635626f3f4d6d959f93e89a0))
+* **ship:** Re-review and re-verify only what the fix changed ([1fa5e74](https://github.com/Gabriele-bil/dev_flow/commit/1fa5e7481e8ad37b220f90220a897217f312fbd6))
+* **skills:** Batch independent questions in one call ([accbb74](https://github.com/Gabriele-bil/dev_flow/commit/accbb7401e1ff84d6b5a814d58f7eb3a48680e0f))
+* **skills:** Load anti-pattern catalogs on demand, slim devflow-task ([6818c15](https://github.com/Gabriele-bil/dev_flow/commit/6818c15af5be964aaaa77326aac5d42d9c05ec25))
+* **skills:** Reference the ethos in one line instead of copying it ([76799b0](https://github.com/Gabriele-bil/dev_flow/commit/76799b0ae500adedb58e74dd98acc3e58a3f1690))
+
 ## [1.19.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.18.0...devflow-v1.19.0) (2026-10-26)
 
 
