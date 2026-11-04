@@ -1,6 +1,8 @@
 #!/bin/bash
 # devflow observe hook — continuous learning observer
-# Captures tool events to .devflow-observe.jsonl for pattern analysis.
+# Captures tool events to .devflow-observe.jsonl for pattern analysis, and one
+# telemetry row per tool call to .devflow-metrics/tools.jsonl (duration from the
+# pre→post pair keyed by tool_use_id, output size, skill/subagent/MCP used).
 # Usage:
 #   bash .../observe.sh pre   — PreToolUse  (before tool call, async)
 #   bash .../observe.sh post  — PostToolUse / PostToolUseFailure (async)
@@ -75,6 +77,17 @@ if [ "$EVENT" = "pre" ]; then
     INFERRED_CMD="test"
   fi
 
+  # Skill tool loading a devflow skill → exact command attribution
+  if [ -z "$INFERRED_CMD" ] && [ -n "$DF_SKILL" ]; then
+    case "$DF_SKILL" in *devflow*) INFERRED_CMD=$(printf '%s' "$DF_SKILL" | sed -E 's/^.*devflow[-.]//') ;; esac
+  fi
+
+  # Tool-call start, matched by observe.sh post through the call id
+  if [ -n "$DF_CALL_ID" ] && df_metrics_dir; then
+    mkdir -p "$DF_METRICS_DIR/.pending" 2>/dev/null \
+      && df_now_ms > "$DF_METRICS_DIR/.pending/$(printf '%s' "$DF_CALL_ID" | tr -cd 'A-Za-z0-9_.-')" 2>/dev/null || true
+  fi
+
   STEP_CMD=""
   case "$STEP" in
     devflow.task|devflow.clarify|devflow.plan|devflow.analyze|devflow.implement|devflow.beautify|devflow.test|devflow.ship|devflow.pr|devflow.hotfix)
@@ -118,6 +131,35 @@ elif [ "$EVENT" = "post" ]; then
     '{ts: $ts, event: $event, tool: $tool, kind: $kind, session: $session, is_error: $is_error}
      | with_entries(select(.value != ""))' 2>/dev/null) || true
   [ -n "$ENTRY" ] && df_append "$LOG_FILE" "$ENTRY"
+
+  # Tool telemetry row (.devflow-metrics/tools.jsonl)
+  if df_metrics_dir; then
+    NOW_MS=$(df_now_ms)
+    DUR_MS=""
+    PENDING="$DF_METRICS_DIR/.pending/$(printf '%s' "$DF_CALL_ID" | tr -cd 'A-Za-z0-9_.-')"
+    if [ -n "$DF_CALL_ID" ] && [ -f "$PENDING" ]; then
+      START_MS=$(cat "$PENDING" 2>/dev/null) || START_MS=""
+      rm -f "$PENDING" 2>/dev/null || true
+      [[ "$START_MS" =~ ^[0-9]+$ ]] && [[ "$NOW_MS" =~ ^[0-9]+$ ]] && [ "$NOW_MS" -ge "$START_MS" ] \
+        && DUR_MS=$(( NOW_MS - START_MS ))
+    fi
+    MCP_SERVER=""
+    case "$TOOL" in mcp__*) MCP_SERVER=$(printf '%s' "$TOOL" | awk -F'__' '{print $2}') ;; esac
+    TOOL_ROW=$(jq -cn \
+      --arg ts "$TS" --arg session "$SESSION" --arg host "$DF_HOST" \
+      --arg tool "$TOOL" --arg kind "$KIND" --arg skill "$DF_SKILL" \
+      --arg subagent_type "$DF_SUBAGENT_TYPE" --arg mcp_server "$MCP_SERVER" \
+      --arg agent_type "$DF_AGENT_TYPE" --arg command "$(obs_get '.active_command // empty')" \
+      --arg step "$STEP" --arg feature "$FEATURE" --argjson is_error "$IS_ERROR" \
+      --arg duration_ms "$DUR_MS" --argjson output_chars "${DF_RESPONSE_CHARS:-0}" \
+      '{ts:$ts, session:$session, host:$host, tool:$tool, kind:$kind, skill:$skill,
+        subagent_type:$subagent_type, mcp_server:$mcp_server, agent_type:$agent_type,
+        command:$command, step:$step, feature:$feature, is_error:$is_error,
+        duration_ms:($duration_ms | tonumber? // null),
+        output_chars:$output_chars, output_tokens_est:(($output_chars / 4) | ceil)}
+       | with_entries(select(.value != "" and .value != null))' 2>/dev/null) || true
+    df_metric tools "$TOOL_ROW"
+  fi
 
   # Strategic-compact counter: cumulative tool calls per session (reset on new session)
   df_json_update "$OBS_STATE" '

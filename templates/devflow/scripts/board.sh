@@ -11,7 +11,7 @@
 #     - Generates devflow/board/board-data.js (window.__DEVFLOW_BOARD_DATA__)
 #       and devflow/board/board-data.json from devflow/features/**,
 #       devflow/plans/project-blueprint.md, docs/adr/*.md, .devflow-state.json,
-#       .devflow-metrics.jsonl, and .devflow-timings.jsonl.
+#       .devflow-metrics/turns.jsonl, and .devflow-metrics/timings.jsonl.
 #   --sync:
 #     - Fast incremental sync invoked by hooks or user.
 #     - If devflow/board/index.html does not exist and --quiet is passed, exits 0.
@@ -175,8 +175,12 @@ PROJECT_NAME=$(basename "$WORKSPACE_ROOT")
 CURRENT_BRANCH=$(git -C "$WORKSPACE_ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
 
 STATE_FILE="${DEVFLOW_STATE_FILE:-$WORKSPACE_ROOT/.devflow-state.json}"
-METRICS_FILE="${DEVFLOW_METRICS_LOG:-$WORKSPACE_ROOT/.devflow-metrics.jsonl}"
-TIMINGS_FILE="${DEVFLOW_TIMINGS_LOG:-$WORKSPACE_ROOT/.devflow-timings.jsonl}"
+# Telemetry folder (hooks/lib/payload.sh df_metrics_dir); pre-2.1 root files as fallback
+METRICS_DIR="${DEVFLOW_METRICS_DIR:-$WORKSPACE_ROOT/.devflow-metrics}"
+METRICS_FILE="${DEVFLOW_METRICS_LOG:-$METRICS_DIR/turns.jsonl}"
+TIMINGS_FILE="${DEVFLOW_TIMINGS_LOG:-$METRICS_DIR/timings.jsonl}"
+[[ -f "$METRICS_FILE" ]] || [[ ! -f "$WORKSPACE_ROOT/.devflow-metrics.jsonl" ]] || METRICS_FILE="$WORKSPACE_ROOT/.devflow-metrics.jsonl"
+[[ -f "$TIMINGS_FILE" ]] || [[ ! -f "$WORKSPACE_ROOT/.devflow-timings.jsonl" ]] || TIMINGS_FILE="$WORKSPACE_ROOT/.devflow-timings.jsonl"
 
 STATE_JSON="{}"
 if [[ -f "$STATE_FILE" ]] && jq -e . "$STATE_FILE" >/dev/null 2>&1; then
@@ -870,10 +874,10 @@ printf '%s\n' "$FINAL_PAYLOAD" > "${DATA_JSON}.tmp" && mv "${DATA_JSON}.tmp" "$D
   printf 'if (typeof window.__DEVFLOW_ON_DATA_LOADED__ === "function") { window.__DEVFLOW_ON_DATA_LOADED__(window.__DEVFLOW_BOARD_DATA__); }\n'
 } > "${DATA_JS}.tmp" && mv "${DATA_JS}.tmp" "$DATA_JS"
 
-# Ensure devflow/board/ and .devflow-timings.jsonl are gitignored in consumer repo
+# Ensure devflow/board/ and the telemetry folder are gitignored in consumer repo
 if [[ -f "$WORKSPACE_ROOT/.gitignore" ]]; then
-  if ! grep -qF ".devflow-timings.jsonl" "$WORKSPACE_ROOT/.gitignore" 2>/dev/null; then
-    printf '\n# devflow command timing telemetry\n.devflow-timings.jsonl\n' >> "$WORKSPACE_ROOT/.gitignore" 2>/dev/null || true
+  if ! grep -qxF ".devflow-metrics/" "$WORKSPACE_ROOT/.gitignore" 2>/dev/null; then
+    printf '\n# devflow local telemetry\n.devflow-metrics/\n' >> "$WORKSPACE_ROOT/.gitignore" 2>/dev/null || true
   fi
   if ! grep -qF "devflow/board/" "$WORKSPACE_ROOT/.gitignore" 2>/dev/null; then
     printf '\n# devflow generated local HTML board\ndevflow/board/\n' >> "$WORKSPACE_ROOT/.gitignore" 2>/dev/null || true

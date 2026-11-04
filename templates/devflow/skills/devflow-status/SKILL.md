@@ -64,7 +64,7 @@ Plan:        devflow/features/<feature>/plan.md
 Status:      <plan_status>  →  next: <next_step>
 Drift:       state file says <state_plan_status> — plan.md wins   <!-- only on drift -->
 Progress:    <done>/<total> files done (<pending> remaining)
-Metrics:     token savings, est. cost, pass@1 → devflow.metrics   <!-- only when .devflow-filter-stats.jsonl or .devflow-metrics.jsonl exists -->
+Metrics:     token savings, est. cost, pass@1 → devflow.metrics   <!-- only when .devflow-metrics/ exists -->
 Learnings:   <n> auto-detected (retry loops etc.) · <m> contested instincts — see devflow.learn list
 
 Pending files:
@@ -100,7 +100,7 @@ DevFlow not configured. Run: /devflow.setup
 
 ## Metrics pointer (optional)
 
-Savings/cost/pass@1 are owned by `devflow.metrics` — status never recomputes them. `Metrics:` line only when `.devflow-filter-stats.jsonl` or `.devflow-metrics.jsonl` exists; both absent → omit line.
+Savings/cost/pass@1 are owned by `devflow.metrics` — status never recomputes them. `Metrics:` line only when the `.devflow-metrics/` folder exists; absent → omit line.
 
 ## Learnings line (optional)
 
@@ -127,7 +127,7 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | | |
 | --- | --- |
 | Reads | `.devflow-state.json`, `devflow/config.md`, `devflow/features/*/plan.md`, `@devflow/references/adapter-resolution.md`, `@devflow/references/state-machine.md`, `@devflow/references/status-schema.md` (`--json` mode) |
-| Reads (optional) | `.devflow-filter-stats.jsonl`, `.devflow-metrics.jsonl` — existence only (Metrics pointer line) |
+| Reads (optional) | `.devflow-metrics/` — existence only (Metrics pointer line) |
 | Reads (optional) | `.devflow-learnings.jsonl`, `.devflow-instincts.yaml` — auto-detected/contested learnings count (Learnings line) |
 | Writes | nothing |
 | Related | `@devflow/references/orientation.md` (full routing tree), `devflow-resume` (session re-entry), `devflow-recovery` (corrupted state), `devflow-learn` (full learnings detail), `devflow-metrics` (savings, cost, pass@1) |

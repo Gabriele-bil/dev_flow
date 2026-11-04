@@ -42,9 +42,10 @@ Ensure `.gitignore` includes stack-standard ignores plus DevFlow runtime state i
 .devflow-instincts.yaml
 !.devflow-instincts.shared.yaml
 .devflow-observe.jsonl*
-.devflow-filter-stats.jsonl
+.devflow-observe-state.json
 .devflow-test-summary.json
-.devflow-metrics.jsonl
+# devflow local telemetry (usage, durations, tokens, context) — never versioned
+.devflow-metrics/
 .devflow-fetch-cache/
 .devflow-init-answers.tmp
 *.tmp

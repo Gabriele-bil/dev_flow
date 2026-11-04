@@ -310,6 +310,17 @@ if [[ -f "$WORKSPACE_ROOT/.gitignore" ]]; then
       REMEDIATIONS+=("Auto-fix: Appended .devflow-state.json to .gitignore")
     fi
   fi
+  if grep -qxF ".devflow-metrics/" "$WORKSPACE_ROOT/.gitignore"; then
+    PIPELINE_RESULTS+=("Telemetry Folder|OK|.devflow-metrics/ is ignored")
+  else
+    PIPELINE_RESULTS+=("Telemetry Folder|WARN|.devflow-metrics/ not in .gitignore")
+    WARNINGS=$((WARNINGS + 1))
+    REMEDIATIONS+=("Add .devflow-metrics/ to .gitignore")
+    if [[ "$FIX_MODE" == true ]]; then
+      echo -e "\n# devflow local telemetry\n.devflow-metrics/" >> "$WORKSPACE_ROOT/.gitignore"
+      REMEDIATIONS+=("Auto-fix: Appended .devflow-metrics/ to .gitignore")
+    fi
+  fi
 fi
 
 # Antigravity plugin install: hooks are read only from <plugin>/hooks.json

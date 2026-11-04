@@ -6,6 +6,9 @@
       },
       {
         "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=SessionStart bash \"hooks/session-start-learnings.sh\""
+      },
+      {
+        "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=SessionStart bash \"hooks/metrics-collect.sh\" session-start"
       }
     ],
     "PreToolUse": [

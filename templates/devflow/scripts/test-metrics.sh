@@ -116,6 +116,60 @@ assert_equals "quality: pass@1 rate 66.7%" "$(echo "$JSON_OUT" | jq -r '.quality
 assert_equals "quality: retry loops" "$(echo "$JSON_OUT" | jq -r '.quality.retry_loops_detected')" "1"
 teardown
 
+# T6: .devflow-metrics/ folder — commands, context, tools, subagents, usage, --since
+setup
+mkdir .devflow-metrics
+cat > .devflow-metrics/turns.jsonl <<'JSONL'
+{"ts":"2026-05-01T10:00:00Z","session":"s1","command":"plan","feature":"cards","duration_sec":30,"input_tokens":10,"output_tokens":100,"cache_creation_tokens":0,"cache_read_tokens":900,"context_tokens":40000,"peak_context_tokens":50000,"tool_calls":{"Read":3},"estimated_cost_usd":0.01}
+{"ts":"2026-05-02T10:00:00Z","session":"s1","command":"plan","feature":"cards","duration_sec":90,"input_tokens":10,"output_tokens":100,"cache_creation_tokens":0,"cache_read_tokens":900,"context_tokens":60000,"peak_context_tokens":70000,"tool_calls":{"Read":1},"estimated_cost_usd":0.02}
+{"ts":"2026-05-03T10:00:00Z","session":"s2","command":"ship","feature":"cards","duration_sec":10,"input_tokens":5,"output_tokens":5,"cache_creation_tokens":0,"cache_read_tokens":0,"context_tokens":10000}
+JSONL
+cat > .devflow-metrics/tools.jsonl <<'JSONL'
+{"ts":"2026-05-01T10:00:00Z","tool":"Read","kind":"read","is_error":false,"duration_ms":100,"output_tokens_est":500}
+{"ts":"2026-05-01T10:00:01Z","tool":"Read","kind":"read","is_error":true,"duration_ms":300,"output_tokens_est":0}
+{"ts":"2026-05-01T10:00:02Z","tool":"Skill","kind":"other","skill":"devflow:devflow-plan","is_error":false}
+{"ts":"2026-05-01T10:00:03Z","tool":"mcp__serena__find_symbol","kind":"other","mcp_server":"serena","is_error":false}
+JSONL
+cat > .devflow-metrics/context.jsonl <<'JSONL'
+{"ts":"2026-05-01T10:00:00Z","hook":"session-start","est_tokens":150}
+{"ts":"2026-05-01T10:00:00Z","hook":"session-start-learnings","est_tokens":400}
+{"ts":"2026-05-02T10:00:00Z","hook":"session-start","est_tokens":150}
+JSONL
+cat > .devflow-metrics/sessions.jsonl <<'JSONL'
+{"ts":"2026-05-01T09:59:00Z","event":"session_start","session":"s1","host":"claude","source":"startup","plugin_version":"2.0.0"}
+{"ts":"2026-05-02T09:00:00Z","event":"compact","session":"s1","trigger":"auto","context_tokens":160000,"tool_calls_in_session":80}
+JSONL
+cat > .devflow-metrics/subagents.jsonl <<'JSONL'
+{"ts":"2026-05-03T10:00:00Z","agent_type":"code-reviewer","command":"ship","input_tokens":100,"output_tokens":100,"duration_ms":20000,"estimated_cost_usd":0.005}
+JSONL
+cat > .devflow-metrics/prompts.jsonl <<'JSONL'
+{"ts":"2026-05-01T10:00:00Z","est_tokens":10,"slash_command":"devflow:devflow-plan","command":"plan"}
+{"ts":"2026-05-02T10:00:00Z","est_tokens":30}
+JSONL
+JSON_OUT=$(bash "$METRICS_SH" --json)
+assert_equals "folder: turns read from .devflow-metrics/" "$(echo "$JSON_OUT" | jq -r '.cost_telemetry.total_turns')" "3"
+assert_equals "commands: plan first by total duration" "$(echo "$JSON_OUT" | jq -r '.commands[0].command')" "plan"
+assert_equals "commands: plan avg duration" "$(echo "$JSON_OUT" | jq -r '.commands[0].avg_duration_sec')" "60"
+assert_equals "commands: plan avg context" "$(echo "$JSON_OUT" | jq -r '.commands[0].avg_context_tokens')" "50000"
+assert_equals "commands: ship subagent runs" "$(echo "$JSON_OUT" | jq -r '.commands[] | select(.command=="ship") | .subagent_runs')" "1"
+assert_equals "context: peak" "$(echo "$JSON_OUT" | jq -r '.context.peak_context_tokens')" "70000"
+assert_equals "context: auto compactions" "$(echo "$JSON_OUT" | jq -r '.context.auto_compactions')" "1"
+assert_equals "context: injected total" "$(echo "$JSON_OUT" | jq -r '.context.injected_total_tokens')" "700"
+assert_equals "context: top injector" "$(echo "$JSON_OUT" | jq -r '.context.injected_by_hook[0].hook')" "session-start-learnings"
+assert_equals "tools: Read error pct" "$(echo "$JSON_OUT" | jq -r '.tools.by_tool[] | select(.tool=="Read") | .error_pct')" "50"
+assert_equals "tools: Read avg ms" "$(echo "$JSON_OUT" | jq -r '.tools.by_tool[] | select(.tool=="Read") | .avg_ms')" "200"
+assert_equals "tools: skill counted" "$(echo "$JSON_OUT" | jq -r '.tools.skills[0].name')" "devflow:devflow-plan"
+assert_equals "tools: mcp server counted" "$(echo "$JSON_OUT" | jq -r '.tools.mcp_servers[0].name')" "serena"
+assert_equals "usage: slash command pct" "$(echo "$JSON_OUT" | jq -r '.usage.slash_command_pct')" "50"
+assert_equals "usage: plugin version" "$(echo "$JSON_OUT" | jq -r '.usage.plugin_versions[0].name')" "2.0.0"
+SINCE_JSON=$(bash "$METRICS_SH" --json --since 2026-05-02)
+assert_equals "since: drops older turns" "$(echo "$SINCE_JSON" | jq -r '.cost_telemetry.total_turns')" "2"
+TEXT_OUT=$(bash "$METRICS_SH")
+assert_contains "text: commands section" "$TEXT_OUT" "Commands (duration"
+assert_contains "text: context section" "$TEXT_OUT" "Context Window & Memory"
+assert_contains "text: subagents line" "$TEXT_OUT" "code-reviewer: 1 runs"
+teardown
+
 echo ""
 echo "Results: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]

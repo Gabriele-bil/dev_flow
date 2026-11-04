@@ -775,13 +775,18 @@ hooks:
     script: hooks/observe.sh
     args: pre
     async: true
-    description: Log pre-tool-call events to .devflow-observe.jsonl for pattern analysis
+    description: >-
+      Log pre-tool-call events to .devflow-observe.jsonl for pattern analysis;
+      mark tool-call start for duration telemetry
   - event: PostToolUse
     matcher: '*'
     script: hooks/observe.sh
     args: post
     async: true
-    description: Log post-tool-call events to .devflow-observe.jsonl for pattern analysis
+    description: >-
+      Log post-tool-call events to .devflow-observe.jsonl for pattern analysis;
+      one row per tool call (duration, output size, skill/MCP/subagent) to
+      .devflow-metrics/tools.jsonl
   - event: PostToolUse
     matcher: Bash
     script: hooks/post-bash-output-filter.sh
@@ -841,3 +846,39 @@ hooks:
     description: >-
       Inject past learnings from .devflow-learnings.jsonl into session context,
       filtered by active feature
+  - event: Stop
+    script: hooks/stop-metrics.sh
+    async: true
+    description: >-
+      Per-turn tokens, estimated cost, context window in use, tool mix, skills
+      and duration to .devflow-metrics/turns.jsonl and timings.jsonl
+  - event: SessionStart
+    script: hooks/metrics-collect.sh
+    args: session-start
+    async: true
+    description: >-
+      Session start telemetry (source, model, plugin version, adapter) to .devflow-metrics/sessions.jsonl; sweeps stale tool-call marks
+  - event: UserPromptSubmit
+    script: hooks/metrics-collect.sh
+    args: prompt
+    async: true
+    description: >-
+      Prompt size and slash command (never the text) to .devflow-metrics/prompts.jsonl; marks turn start and devflow command for stop-metrics
+  - event: PreCompact
+    script: hooks/metrics-collect.sh
+    args: pre-compact
+    async: true
+    description: >-
+      Compaction trigger and context size to .devflow-metrics/sessions.jsonl
+  - event: SubagentStop
+    script: hooks/metrics-collect.sh
+    args: subagent-stop
+    async: true
+    description: >-
+      Subagent tokens, duration and estimated cost to .devflow-metrics/subagents.jsonl
+  - event: SessionEnd
+    script: hooks/metrics-collect.sh
+    args: session-end
+    async: true
+    description: >-
+      Session end reason to .devflow-metrics/sessions.jsonl

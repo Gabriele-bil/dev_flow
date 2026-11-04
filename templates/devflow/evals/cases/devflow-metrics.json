@@ -13,6 +13,10 @@
       {
         "prompt": "Which pipeline step takes the longest on average?",
         "top_k": 3
+      },
+      {
+        "prompt": "How much context window and how many tokens does each devflow command use?",
+        "top_k": 3
       }
     ],
     "negative": [

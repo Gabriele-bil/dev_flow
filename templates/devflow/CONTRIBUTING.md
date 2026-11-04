@@ -157,6 +157,9 @@ df_read_input || exit 0        # returns 1 without jq → fail open
 | `PreModelSwitch` | no | `{"decision":"block","reason":"..."}` — high-confidence, narrowly-scoped rules only (see `pre-model-switch.sh`); fail-open |
 | `PostModelSwitch` | no | Audit/log only — async |
 | `PreCompact` | no | Output never reaches the model — `df_notify` for the user; post-compaction context goes through `SessionStart` |
+| `UserPromptSubmit` | no | Telemetry only (`metrics-collect.sh prompt`) — async, never store the prompt text |
+| `SubagentStop` | no | Telemetry only — `agent_type`, `agent_transcript_path` |
+| `SessionEnd` | no | Telemetry only — `reason` |
 | `Stop` | yes | `df_notify` → `systemMessage` (the only visible channel). Never echo stdin back |
 
 Antigravity also has `PreInvocation` / `PostInvocation` (per model call). Payload fixtures for both hosts: `hooks/tests/fixtures/`.
@@ -171,6 +174,7 @@ Antigravity also has `PreInvocation` / `PostInvocation` (per model call). Payloa
 - Async hooks: `"async": true` in hooks.json (Claude Code does not enforce `timeout` on async hooks)
 - Optional tools (`yq`, `timeout`/`gtimeout`, `curl`): check with `command -v` and degrade silently; add them to `scripts/doctor.sh`
 - Runtime artefacts: `df_gitignore <entry...>`
+- Telemetry: `df_metric <name> <json-row>` appends to `.devflow-metrics/<name>.jsonl` (gitignored folder, rotation, `DEVFLOW_METRICS_DIR=off` included) — never a new root-level `.devflow-*.jsonl`. Sizes and names only, never prompt text, file content or tool output. Document new fields in `skills/devflow-metrics/references/telemetry-schema.md`
 
 **Naming convention:** `<event>-<purpose>.sh` — e.g. `pre-config-protect.sh`, `stop-format-typecheck.sh`
 

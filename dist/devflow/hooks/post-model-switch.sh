@@ -1,7 +1,7 @@
 #!/bin/bash
 # post-model-switch.sh — PostModelSwitch hook: audit log of model switches.
 # Async, non-blocking — records what pre-model-switch.sh only decides on.
-# Appends one JSONL line per switch to .devflow-model-switch.jsonl (gitignored).
+# Appends one JSONL line per switch to .devflow-metrics/model-switch.jsonl (gitignored).
 # Read by devflow.status / devflow.learn for after-the-fact review of model
 # changes mid-pipeline; not required for any gating decision.
 
@@ -26,7 +26,7 @@ if [ -f "$STATE_FILE" ]; then
   FEATURE=$(jq -r '.feature // .active_feature // empty' "$STATE_FILE" 2>/dev/null) || true
 fi
 
-LOG_FILE="${DEVFLOW_MODEL_SWITCH_LOG:-$WORKSPACE_ROOT/.devflow-model-switch.jsonl}"
+LOG_FILE="${DEVFLOW_MODEL_SWITCH_LOG:-}"
 [ "$LOG_FILE" = "off" ] && exit 0
 
 TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ") || true
@@ -37,8 +37,11 @@ ENTRY=$(jq -cn \
   '{ts:$ts, from:$from, to:$to, session:(if $session!="" then $session else null end),
     step:(if $step!="" then $step else null end), feature:(if $feature!="" then $feature else null end)}
    | with_entries(select(.value != null))' 2>/dev/null) || true
-df_rotate "$LOG_FILE"
-[ -n "$ENTRY" ] && df_append "$LOG_FILE" "$ENTRY"
-df_gitignore ".devflow-model-switch.jsonl" ".devflow-model-switch.jsonl.1"
+if [ -n "$LOG_FILE" ]; then
+  df_rotate "$LOG_FILE"
+  [ -n "$ENTRY" ] && df_append "$LOG_FILE" "$ENTRY"
+else
+  df_metric model-switch "$ENTRY"
+fi
 
 exit 0

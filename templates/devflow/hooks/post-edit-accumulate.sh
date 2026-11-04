@@ -27,7 +27,7 @@ df_gitignore ".devflow-changed-files.tmp"
 
 # Auto-sync DevFlow Board if a feature doc, blueprint, ADR, or state file changed
 if [ -f "$WORKSPACE_ROOT/devflow/board/index.html" ]; then
-  if echo "$FILE_PATH" | grep -qE '(devflow/features/|devflow/plans/|docs/adr/|\.devflow-state\.json|\.devflow-timings\.jsonl|\.devflow-metrics\.jsonl)'; then
+  if echo "$FILE_PATH" | grep -qE '(devflow/features/|devflow/plans/|docs/adr/|\.devflow-state\.json|\.devflow-metrics/)'; then
     BOARD_SH="$SCRIPT_DIR/../scripts/board.sh"
     [ ! -f "$BOARD_SH" ] && BOARD_SH="$WORKSPACE_ROOT/templates/devflow/scripts/board.sh"
     if [ -f "$BOARD_SH" ]; then
