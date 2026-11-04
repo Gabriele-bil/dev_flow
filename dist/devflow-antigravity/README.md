@@ -107,21 +107,21 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 | `devflow.run` | Opt-in autonomy: chain implement → beautify → test unattended; decision flags; stop before ship |
 | `devflow.backprop` | Backpropagate escaped bug into spec — classify gap, tighten AC, add regression test |
 | `devflow.learn` | Manage instincts — log / search / list / prune / boost / promote to team store |
-| `devflow.metrics` | Telemetry dashboard — bash filter savings, estimated cost, pass@1, step duration |
+| `devflow.metrics` | Local telemetry dashboard (`.devflow-metrics/`, gitignored) — tokens, cost, command durations, context window and compactions, hook-injected context, tool/skill/subagent usage, pass@1 |
 | `devflow.board` | Static, read-only, auto-updating HTML project board (`devflow/board/index.html`) — Kanban pipeline, dependency DAG critical path, Markdown viewer, and command timings |
 | `devflow.recovery` | Diagnose + recover a stuck or corrupted pipeline |
 
 ## Hooks
 
-Fourteen hook registrations activate automatically — no user invocation required. Behavioral tests: `hooks/tests/`, run via `scripts/run-hook-tests.sh`.
+Hook registrations (`hooks/hooks.json`) activate automatically — no user invocation required. Behavioral tests: `hooks/tests/`, run via `scripts/run-hook-tests.sh`.
 
 | Event | Script | What it does |
 | --- | --- | --- |
 | SessionStart | `session-start.sh` | Injects discovery skill + suggests context file based on active pipeline step |
 | SessionStart | `session-start-learnings.sh` | Injects past learnings from `.devflow-learnings.jsonl` into session context |
 | PreToolUse | `pre-config-protect.sh` | Blocks edits to linter/analyzer config files |
-| PreToolUse | `observe.sh pre` | Logs tool calls to `.devflow-observe.jsonl` |
-| PostToolUse | `observe.sh post` | Logs tool results to `.devflow-observe.jsonl` |
+| PreToolUse | `observe.sh pre` | Logs tool calls to `.devflow-observe.jsonl`; marks tool-call start for timing |
+| PostToolUse | `observe.sh post` | Logs tool results to `.devflow-observe.jsonl`; one telemetry row per call (duration, output size, skill/MCP/subagent) to `.devflow-metrics/tools.jsonl` |
 | PostToolUse | `post-bash-output-filter.sh` | Compresses verbose adapter command output (flutter/dart/pnpm/ng/git diff) past 2k chars: head + error/warning lines + tail |
 | PostToolUse | `post-edit-accumulate.sh` | Tracks modified files for batch format check |
 | PostToolUse | `post-task-create.sh` | Updates `next_feature_number` in `.devflow-state.json` after task.md writes |
@@ -131,6 +131,10 @@ Fourteen hook registrations activate automatically — no user invocation requir
 | Stop | `stop-debug-check.sh` | Warns about `print()` / `console.log` in modified files |
 | Stop | `stop-learn-distill.sh` | Detects file churn (≥4 edits) in `.devflow-observe.jsonl`; appends to `.devflow-learnings.jsonl` |
 | Stop | `observe.sh stop` | Logs response-boundary events to `.devflow-observe.jsonl` |
+| Stop | `stop-metrics.sh` | Per-turn tokens, cost, context window, tool mix, duration → `.devflow-metrics/turns.jsonl`, `timings.jsonl` |
+| SessionStart · UserPromptSubmit · PreCompact · SubagentStop · SessionEnd | `metrics-collect.sh` | Lifecycle telemetry (sessions, prompt size + slash command, compactions, subagent cost) → `.devflow-metrics/` |
+
+All telemetry is local, under the gitignored `.devflow-metrics/` folder (`DEVFLOW_METRICS_DIR=off` disables it). Schema: `skills/devflow-metrics/references/telemetry-schema.md`; dashboard: `/devflow-metrics`.
 
 ## Core Principles
 

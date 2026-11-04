@@ -34,7 +34,7 @@ run_hook() {
 # ── T1: appends one JSONL line with from/to on a real switch ───────────────
 d=$(tmpdir)
 run_hook "$d" '{"to_model":"claude-opus-5","from_model":"claude-sonnet-5","session_id":"abc123"}'
-LOG="$d/.devflow-model-switch.jsonl"
+LOG="$d/.devflow-metrics/model-switch.jsonl"
 [ -f "$LOG" ] && [ "$(wc -l < "$LOG" | tr -d '[:space:]')" = "1" ] \
   && assert "T1: appends one JSONL line" pass \
   || assert "T1: appends one JSONL line" fail
@@ -48,7 +48,7 @@ rm -rf "$d"
 # ── T2: no model fields → no file written ───────────────────────────────────
 d=$(tmpdir)
 run_hook "$d" '{}'
-[ ! -f "$d/.devflow-model-switch.jsonl" ] \
+[ ! -f "$d/.devflow-metrics/model-switch.jsonl" ] \
   && assert "T2: no file written when both model fields absent" pass \
   || assert "T2: no file written when both model fields absent" fail
 rm -rf "$d"
@@ -57,7 +57,7 @@ rm -rf "$d"
 d=$(tmpdir)
 : > "$d/.gitignore"
 run_hook "$d" '{"to_model":"claude-sonnet-5","from_model":"claude-opus-5"}'
-grep -qF ".devflow-model-switch.jsonl" "$d/.gitignore" \
+grep -qxF ".devflow-metrics/" "$d/.gitignore" \
   && assert "T3: gitignore entry added" pass \
   || assert "T3: gitignore entry added" fail
 rm -rf "$d"
@@ -65,7 +65,7 @@ rm -rf "$d"
 # ── T4: DEVFLOW_MODEL_SWITCH_LOG=off disables logging ───────────────────────
 d=$(tmpdir)
 (cd "$d" && DEVFLOW_MODEL_SWITCH_LOG=off bash "$HOOK" <<<'{"to_model":"claude-sonnet-5","from_model":"claude-opus-5"}' >/dev/null 2>&1) || true
-[ ! -f "$d/.devflow-model-switch.jsonl" ] \
+[ ! -f "$d/.devflow-metrics/model-switch.jsonl" ] \
   && assert "T4: DEVFLOW_MODEL_SWITCH_LOG=off disables logging" pass \
   || assert "T4: DEVFLOW_MODEL_SWITCH_LOG=off disables logging" fail
 rm -rf "$d"

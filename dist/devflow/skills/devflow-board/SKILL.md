@@ -65,7 +65,7 @@ bash "${CLAUDE_PLUGIN_ROOT}/scripts/board.sh" $ARGUMENTS
 What `board.sh` executes deterministically:
 
 1. **Template Initialization:** On first run (or when `devflow/board/index.html` is absent), copies `${CLAUDE_PLUGIN_ROOT}/skills/devflow-board/assets/board-template.html` byte-for-byte to `devflow/board/index.html`. Never generates custom per-project HTML/CSS.
-2. **Artifact & Telemetry Parsing:** Scans `devflow/features/[NNN]_*/` (`task.md`, `plan.md`, `verification.md`), `devflow/plans/project-blueprint.md`, `docs/adr/*.md`, `.devflow-state.json`, `.devflow-metrics.jsonl`, and `.devflow-timings.jsonl`.
+2. **Artifact & Telemetry Parsing:** Scans `devflow/features/[NNN]_*/` (`task.md`, `plan.md`, `verification.md`), `devflow/plans/project-blueprint.md`, `docs/adr/*.md`, `.devflow-state.json`, `.devflow-metrics/turns.jsonl`, and `.devflow-metrics/timings.jsonl`.
 3. **Kanban & Dependency DAG Computation:**
    - Assigns each task to one of 5 read-only columns (`Draft / Clarified`, `Planned / Ready`, `In Progress`, `Implemented / Verified`, `PR Opened / Done`).
    - Resolves `**Blockers:**` and `**Unlocks:**`, marks blocked vs ready tasks, and computes the topological **Critical Path**.
@@ -92,7 +92,7 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 
 | | |
 | --- | --- |
-| Reads | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-board/assets/board-template.html`, `devflow/features/*/task.md`, `plan.md`, `verification.md`, `devflow/plans/project-blueprint.md`, `docs/adr/*.md`, `.devflow-state.json`, `.devflow-metrics.jsonl`, `.devflow-timings.jsonl` |
+| Reads | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-board/assets/board-template.html`, `devflow/features/*/task.md`, `plan.md`, `verification.md`, `devflow/plans/project-blueprint.md`, `docs/adr/*.md`, `.devflow-state.json`, `.devflow-metrics/turns.jsonl`, `.devflow-metrics/timings.jsonl` |
 | Writes | `devflow/board/index.html` (initial setup), `devflow/board/board-data.js`, `devflow/board/board-data.json` (initial + `--sync`) |
 | Executes | `${CLAUDE_PLUGIN_ROOT}/scripts/board.sh` |
 | Related | `devflow.status`, `devflow.metrics`, `hooks/stop-metrics.sh`, `hooks/post-task-create.sh`, `hooks/post-edit-accumulate.sh` |

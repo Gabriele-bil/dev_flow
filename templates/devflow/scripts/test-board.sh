@@ -198,7 +198,7 @@ MD
 HOOK_PAYLOAD=$(jq -cn --arg fp "$T/devflow/features/004_notifications/task.md" '{tool_use:{name:"Write",input:{file_path:$fp}}}')
 (cd "$T" && printf '%s' "$HOOK_PAYLOAD" | bash "$HOOKS_DIR/post-task-create.sh")
 assert_equals "T4a: post-task-create.sh auto-synced TASK-004 into board-data.json" "$(jq -r '.project.total_tasks' "$DATA")" "4"
-assert_equals "T4b: post-task-create.sh recorded initial task timing entry" "$(jq -r 'select(.active_feature=="004_notifications") | .command' "$T/.devflow-timings.jsonl")" "task"
+assert_equals "T4b: post-task-create.sh recorded initial task timing entry" "$(jq -r 'select(.active_feature=="004_notifications") | .command' "$T/.devflow-metrics/timings.jsonl")" "task"
 
 # T5: planned_ready & implemented_verified columns + post-edit-accumulate.sh sync + error handling
 cat > "$T/devflow/features/003_ui-dashboard/plan.md" <<'MD'

@@ -28,7 +28,10 @@ NEXT=$(printf '%03d' $((10#$NNN + 1)))
 WORKSPACE_ROOT="$DF_WORKSPACE"
 STATE_FILE="${DEVFLOW_STATE_FILE:-$WORKSPACE_ROOT/.devflow-state.json}"
 OBS_STATE="${DEVFLOW_OBSERVE_STATE_FILE:-$WORKSPACE_ROOT/.devflow-observe-state.json}"
-TIMINGS_FILE="${DEVFLOW_TIMINGS_LOG:-$WORKSPACE_ROOT/.devflow-timings.jsonl}"
+TIMINGS_FILE="${DEVFLOW_TIMINGS_LOG:-}"
+if [ -z "$TIMINGS_FILE" ]; then
+  if df_metrics_dir; then TIMINGS_FILE="$DF_METRICS_DIR/timings.jsonl"; else TIMINGS_FILE="off"; fi
+fi
 TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || echo "")
 STARTED_AT="$TS"
 STARTED_EPOCH=0
@@ -51,7 +54,7 @@ df_json_update "$STATE_FILE" '
   --argjson n "$((10#$NEXT))" --arg f "$FEATURE_SLUG"
 df_gitignore ".devflow-state.json"
 
-# Record initial task command timing entry in .devflow-timings.jsonl if not already present for this feature
+# Record initial task command timing entry in .devflow-metrics/timings.jsonl if not already present for this feature
 if [ "$TIMINGS_FILE" != "off" ] && [ -n "$FEATURE_SLUG" ]; then
   EXISTING_TASK_TIMING=""
   if [ -f "$TIMINGS_FILE" ]; then

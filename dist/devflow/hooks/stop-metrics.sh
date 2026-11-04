@@ -1,6 +1,8 @@
 #!/bin/bash
-# stop-metrics.sh — Stop hook: per-turn token/cost estimate + command timing,
-# appended to .devflow-metrics.jsonl and .devflow-timings.jsonl (gitignored).
+# stop-metrics.sh — Stop hook: per-turn usage, context, cost and timing,
+# appended to .devflow-metrics/turns.jsonl and .devflow-metrics/timings.jsonl
+# (gitignored folder; DEVFLOW_METRICS_LOG / DEVFLOW_TIMINGS_LOG override a file,
+# DEVFLOW_METRICS_DIR=off disables both).
 # Also triggers board.sh --sync --quiet when devflow/board/index.html exists.
 # Async, no stdout.
 #
@@ -10,10 +12,14 @@
 # Claude Code transcript: assistant entries with .message.usage.
 # Antigravity transcript: PLANNER_RESPONSE entries with input/output/
 # cache_read_tokens (model from the Stop payload; no price → cost omitted).
+# Beyond tokens each row carries: context_tokens (prompt size of the last model
+# call = context window in use), peak_context_tokens, thinking_tokens,
+# api_calls, tool_calls by name, skills loaded, slash commands typed,
+# compactions. Duration: UserPromptSubmit mark (metrics-collect.sh prompt), else
+# first transcript timestamp of the turn, else first tool call of the turn.
 #
-# Cost: USD per million tokens, per model family, with cache writes and cache
-# reads priced separately. Local estimate for relative tracking, not billing.
-# Override with DEVFLOW_PRICING_JSON='{"opus":{"in":4,"out":20,"cache_write":5,"cache_read":0.2}, ...}'
+# Cost: lib/payload.sh df_estimate_cost (USD/MTok per model family; local
+# estimate for relative tracking, not billing; DEVFLOW_PRICING_JSON overrides).
 
 HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
 . "$HOOK_DIR/lib/payload.sh"
@@ -24,8 +30,14 @@ RAW="$DF_RAW"
 
 SCRIPT_DIR="$HOOK_DIR"
 WORKSPACE_ROOT="$DF_WORKSPACE"
-LOG_FILE="${DEVFLOW_METRICS_LOG:-$WORKSPACE_ROOT/.devflow-metrics.jsonl}"
-TIMINGS_FILE="${DEVFLOW_TIMINGS_LOG:-$WORKSPACE_ROOT/.devflow-timings.jsonl}"
+LOG_FILE="${DEVFLOW_METRICS_LOG:-}"
+TIMINGS_FILE="${DEVFLOW_TIMINGS_LOG:-}"
+if df_metrics_dir; then
+  LOG_FILE="${LOG_FILE:-$DF_METRICS_DIR/turns.jsonl}"
+  TIMINGS_FILE="${TIMINGS_FILE:-$DF_METRICS_DIR/timings.jsonl}"
+else
+  LOG_FILE="off" TIMINGS_FILE="off"
+fi
 
 SESSION="$DF_SESSION"
 
@@ -37,6 +49,7 @@ ACTIVE_FEATURE=""
 ACTIVE_CMD=""
 STARTED_AT=""
 STARTED_EPOCH=0
+PROMPT_MS=0
 if [ -f "$STATE_FILE" ]; then
   STEP=$(jq -r '.next_step // empty' "$STATE_FILE" 2>/dev/null) || true
   ACTIVE_FEATURE=$(jq -r '.feature // .active_feature // empty' "$STATE_FILE" 2>/dev/null) || true
@@ -46,7 +59,9 @@ if [ -f "$OBS_STATE" ]; then
   ACTIVE_CMD=$(jq -r '.active_command // empty' "$OBS_STATE" 2>/dev/null) || true
   STARTED_AT=$(jq -r '.turn_started_at // empty' "$OBS_STATE" 2>/dev/null) || true
   STARTED_EPOCH=$(jq -r '.turn_started_epoch // 0' "$OBS_STATE" 2>/dev/null) || STARTED_EPOCH=0
+  PROMPT_MS=$(jq -r '.prompt_started_ms // 0' "$OBS_STATE" 2>/dev/null) || PROMPT_MS=0
 fi
+[[ "$PROMPT_MS" =~ ^[0-9]+$ ]] || PROMPT_MS=0
 
 # Normalize command name (task, clarify, plan, analyze, implement, beautify, test, ship, pr, hotfix)
 COMMAND="$ACTIVE_CMD"
@@ -71,6 +86,16 @@ elif [ "$STARTED_AT" != "$ENDED_AT" ]; then
     2>/dev/null || echo 0)
   [ -z "$DURATION_SEC" ] && DURATION_SEC=0
 fi
+# Prompt-submit mark is the precise turn start (covers thinking before the first tool)
+NOW_MS=$(df_now_ms)
+[[ "$NOW_MS" =~ ^[0-9]+$ ]] || NOW_MS=$(( ENDED_EPOCH * 1000 ))
+DURATION_MS=$(( DURATION_SEC * 1000 ))
+if [ "$PROMPT_MS" -gt 0 ] && [ "$NOW_MS" -ge "$PROMPT_MS" ]; then
+  DURATION_MS=$(( NOW_MS - PROMPT_MS ))
+  DURATION_SEC=$(( (DURATION_MS + 500) / 1000 ))
+fi
+EXTRA_JSON='{}'
+PLUGIN_VERSION=$(df_plugin_version)
 
 TRANSCRIPT="$DF_TRANSCRIPT"
 
@@ -104,21 +129,43 @@ if [ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ] && [ "$LOG_FILE" != "off" ]; the
   # START from the size cap) fails to parse and is skipped by fromjson?.
   USAGE_JSON=$(tail -c +$((START + 1)) "$TRANSCRIPT" 2>/dev/null | head -c $((SIZE - START)) \
     | jq -R 'fromjson? // empty' 2>/dev/null | jq -s --arg agy_model "$(printf '%s' "$RAW" | jq -r '.modelName // empty' 2>/dev/null)" '
+    def ms: (sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601? // null) as $s
+      | if $s == null then null else $s * 1000 + ((capture("\\.(?<f>[0-9]{1,3})") | .f + "00" | .[0:3] | tonumber) // 0) end;
     ( [ .[] | select(.type == "assistant" and .message.usage != null) ]
       | unique_by(.message.id // (.message.usage | tostring))
-      | map({in: (.message.usage.input_tokens // 0), out: (.message.usage.output_tokens // 0),
-             cw: (.message.usage.cache_creation_input_tokens // 0), cr: (.message.usage.cache_read_input_tokens // 0),
-             model: (.message.model // "")}) ) as $cc
+      | map(.message.usage as $u
+          | {in: ($u.input_tokens // 0), out: ($u.output_tokens // 0),
+             cw: ($u.cache_creation_input_tokens // 0), cr: ($u.cache_read_input_tokens // 0),
+             think: ($u.output_tokens_details.thinking_tokens // 0),
+             web: ($u.server_tool_use.web_search_requests // 0),
+             side: (.isSidechain // false), model: (.message.model // "")}) ) as $cc
     | ( [ .[] | select(.type == "PLANNER_RESPONSE" and (.input_tokens != null or .output_tokens != null)) ]
       | map({in: (.input_tokens // 0), out: (.output_tokens // 0), cw: 0,
-             cr: (.cache_read_tokens // 0), model: $agy_model}) ) as $agy
+             cr: (.cache_read_tokens // 0), think: 0, web: 0, side: false, model: $agy_model}) ) as $agy
     | ($cc + $agy) as $m
+    | ( [ .[] | select(.type == "assistant") | (.message.content // [])[]? | select(type == "object" and .type == "tool_use") ]
+        | unique_by(.id // tostring) ) as $tu
+    | ( [ .[] | select(.type == "PLANNER_RESPONSE") | (.tool_calls // [])[]? | {name: (.name // "")} ] ) as $agy_tu
+    | ( [ .[] | select(.type == "user") | .message.content | if type == "string" then . else ([.[]? | .text? // empty] | join(" ")) end
+          | [scan("<command-name>/?([^<]+)</command-name>") | .[0]] | .[] ] ) as $slash
+    | ( [ .[] | (.timestamp // .created_at // empty) | strings | ms | numbers ] ) as $times
     | {
         input:  ($m | map(.in) | add // 0),
         output: ($m | map(.out) | add // 0),
         cache_creation: ($m | map(.cw) | add // 0),
         cache_read: ($m | map(.cr) | add // 0),
-        model: ($m | map(.model | select(. != "")) | last // "")
+        thinking: ($m | map(.think) | add // 0),
+        web_searches: ($m | map(.web) | add // 0),
+        api_calls: ($m | length),
+        context: (($m | map(select(.side | not)) | last // {in:0,cw:0,cr:0}) | .in + .cw + .cr),
+        peak_context: ($m | map(select(.side | not) | .in + .cw + .cr) | max // 0),
+        model: ($m | map(.model | select(. != "")) | last // ""),
+        tool_calls: (($tu + $agy_tu) | map(.name // "") | map(select(. != "")) | group_by(.) | map({key: .[0], value: length}) | from_entries),
+        skills: ($tu | map(select(.name == "Skill") | .input.skill // empty) | unique),
+        slash_commands: ($slash | unique),
+        compactions: ([ .[] | select(.type == "system" and .subtype == "compact_boundary") ] | length),
+        first_ts_ms: ($times | min // 0),
+        last_ts_ms: ($times | max // 0)
       }' 2>/dev/null)
 
   if [ -n "$USAGE_JSON" ]; then
@@ -127,41 +174,29 @@ if [ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ] && [ "$LOG_FILE" != "off" ]; the
     CACHE_CREATE_TOK=$(printf '%s' "$USAGE_JSON" | jq -r '.cache_creation // 0' 2>/dev/null)
     CACHE_READ_TOK=$(printf '%s' "$USAGE_JSON" | jq -r '.cache_read // 0' 2>/dev/null)
     MODEL=$(printf '%s' "$USAGE_JSON" | jq -r '.model // empty' 2>/dev/null)
+    EXTRA_JSON=$(printf '%s' "$USAGE_JSON" | jq -c '{thinking_tokens: .thinking, web_searches, api_calls,
+      context_tokens: .context, peak_context_tokens: .peak_context, tool_calls, skills, slash_commands, compactions}
+      | with_entries(select(.value != 0 and .value != [] and .value != {}))' 2>/dev/null) || EXTRA_JSON='{}'
+    [ -n "$EXTRA_JSON" ] || EXTRA_JSON='{}'
+    FIRST_TS_MS=$(printf '%s' "$USAGE_JSON" | jq -r '.first_ts_ms // 0' 2>/dev/null) || FIRST_TS_MS=0
+    [[ "$FIRST_TS_MS" =~ ^[0-9]+$ ]] || FIRST_TS_MS=0
+    # No prompt mark and no tool-call mark (e.g. Antigravity outside a devflow
+    # project): time the turn from its first transcript entry (≤ 6h sanity cap)
+    if [ "$PROMPT_MS" -eq 0 ] && [ "${STARTED_EPOCH:-0}" -eq 0 ] && [ "$FIRST_TS_MS" -gt 0 ] \
+       && [ "$NOW_MS" -ge "$FIRST_TS_MS" ] && [ $(( NOW_MS - FIRST_TS_MS )) -le 21600000 ]; then
+      DURATION_MS=$(( NOW_MS - FIRST_TS_MS ))
+      DURATION_SEC=$(( (DURATION_MS + 500) / 1000 ))
+    fi
+    # Command typed as /devflow.<step> but not yet attributed → use it
+    if [ -z "$COMMAND" ]; then
+      COMMAND=$(printf '%s' "$USAGE_JSON" | jq -r '[.slash_commands[] | select(test("devflow"))] | first // empty' 2>/dev/null \
+        | sed -E 's/^.*devflow[-.]//') || COMMAND=""
+    fi
 
     TOTAL_TOK=$(( ${INPUT_TOK:-0} + ${OUTPUT_TOK:-0} + ${CACHE_CREATE_TOK:-0} + ${CACHE_READ_TOK:-0} ))
     if [ "$TOTAL_TOK" -gt 0 ]; then
       HAS_TRANSCRIPT_USAGE=1
-      # Latest generation per family (Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 5.5),
-      # USD/MTok. cache_write = 1.25 × input (5-minute cache).
-      DEFAULT_PRICING='{
-        "fable":  {"in": 10,  "out": 50,  "cache_write": 12.5,  "cache_read": 0.25},
-        "opus":   {"in": 4,   "out": 20,  "cache_write": 5,     "cache_read": 0.2},
-        "sonnet": {"in": 2,   "out": 10,  "cache_write": 2.5,   "cache_read": 0.2},
-        "haiku":  {"in": 0.1, "out": 0.5, "cache_write": 0.125, "cache_read": 0.01}
-      }'
-      PRICING="${DEVFLOW_PRICING_JSON:-$DEFAULT_PRICING}"
-
-      RATE_KEY="unknown"
-      case "$MODEL" in
-        *fable*|*mythos*) RATE_KEY="fable" ;;
-        *opus*)   RATE_KEY="opus" ;;
-        *sonnet*) RATE_KEY="sonnet" ;;
-        *haiku*)  RATE_KEY="haiku" ;;
-      esac
-
-      if [ "$RATE_KEY" != "unknown" ]; then
-        COST=$(jq -n --argjson p "$PRICING" --arg k "$RATE_KEY" \
-          --argjson in_tok "$INPUT_TOK" --argjson out_tok "$OUTPUT_TOK" \
-          --argjson cache_c "$CACHE_CREATE_TOK" --argjson cache_r "$CACHE_READ_TOK" \
-          '($p[$k] // null) as $rate
-           | if $rate == null then null
-             else (($in_tok * $rate.in
-                    + $out_tok * $rate.out
-                    + $cache_c * ($rate.cache_write // $rate.in)
-                    + $cache_r * ($rate.cache_read // ($rate.in / 10))) / 1000000)
-             end' 2>/dev/null)
-        [ -z "$COST" ] && COST=null
-      fi
+      COST=$(df_estimate_cost "$MODEL" "$INPUT_TOK" "$OUTPUT_TOK" "$CACHE_CREATE_TOK" "$CACHE_READ_TOK")
 
       ENTRY=$(jq -cn \
         --arg ts "$ENDED_AT" --arg session "$SESSION" --arg step "$STEP" \
@@ -169,28 +204,31 @@ if [ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ] && [ "$LOG_FILE" != "off" ]; the
         --arg started_at "$STARTED_AT" --arg ended_at "$ENDED_AT" --argjson duration_sec "$DURATION_SEC" \
         --arg model "$MODEL" --argjson input "$INPUT_TOK" --argjson output "$OUTPUT_TOK" \
         --argjson cache_creation "$CACHE_CREATE_TOK" --argjson cache_read "$CACHE_READ_TOK" \
-        --argjson cost "$COST" \
+        --argjson cost "$COST" --argjson duration_ms "$DURATION_MS" --argjson extra "$EXTRA_JSON" \
+        --arg host "$DF_HOST" --arg plugin_version "$PLUGIN_VERSION" \
         '{ts:$ts, session:(if $session!="" then $session else null end),
+          host:(if $host!="" then $host else null end),
+          plugin_version:(if $plugin_version!="" then $plugin_version else null end),
           step:(if $step!="" then $step else null end),
           command:(if $command!="" then $command else null end),
           feature:(if $feature!="" then $feature else null end),
           active_feature:(if $active_feature!="" then $active_feature else null end),
           started_at:(if $started_at!="" then $started_at else null end),
           ended_at:(if $ended_at!="" then $ended_at else null end),
-          duration_sec:$duration_sec,
+          duration_sec:$duration_sec, duration_ms:$duration_ms,
           model:(if $model!="" then $model else null end),
           input_tokens:$input, output_tokens:$output,
           cache_creation_tokens:$cache_creation, cache_read_tokens:$cache_read,
           estimated_cost_usd:$cost}
+         + $extra
          | with_entries(select(.value != null))' 2>/dev/null) || true
       df_rotate "$LOG_FILE" 2097152
       [ -n "$ENTRY" ] && df_append "$LOG_FILE" "$ENTRY"
-      df_gitignore ".devflow-metrics.jsonl" ".devflow-metrics.jsonl.1"
     fi
   fi
 fi
 
-# Record command timing entry in .devflow-timings.jsonl when active feature or command is present
+# Record command timing entry in timings.jsonl when active feature or command is present
 # (or when transcript usage was recorded)
 if [ "$TIMINGS_FILE" != "off" ] && [ "$LOG_FILE" != "off" ]; then
   if [ "$HAS_TRANSCRIPT_USAGE" -eq 1 ] || [ -n "$ACTIVE_FEATURE" ] || [ -n "$COMMAND" ]; then
@@ -225,7 +263,6 @@ if [ "$TIMINGS_FILE" != "off" ] && [ "$LOG_FILE" != "off" ]; then
       } | with_entries(select(.value != null))' 2>/dev/null) || true
     df_rotate "$TIMINGS_FILE" 2097152
     [ -n "$ENTRY" ] && df_append "$TIMINGS_FILE" "$ENTRY"
-    df_gitignore ".devflow-timings.jsonl" ".devflow-timings.jsonl.1"
   fi
 fi
 
@@ -233,7 +270,7 @@ fi
 # (last_command survives so pre-model-switch.sh knows which step ran last)
 [ -f "$OBS_STATE" ] && df_json_update "$OBS_STATE" \
   '(if (.active_command // "") != "" then .last_command = .active_command else . end)
-   | del(.turn_started_at, .turn_started_epoch, .active_command)'
+   | del(.turn_started_at, .turn_started_epoch, .active_command, .prompt_started_ms)'
 
 # Auto-sync DevFlow Board if already initialized in workspace
 if [ -f "$WORKSPACE_ROOT/devflow/board/index.html" ]; then
