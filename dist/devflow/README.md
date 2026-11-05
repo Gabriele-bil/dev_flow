@@ -100,8 +100,10 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 | `devflow.doctor` | Diagnose environment readiness, MCP servers reachability, CLI toolchains, and pipeline state integrity |
 | `devflow.hotfix` | Fast-track bugfix: compact task+plan → failing regression test → fix → full suite + verification → PR (no beautify, no ship review) |
 | `devflow.resume` | Resume interrupted or blocked session — read state, cross-check plan.md, resync drift / unblock (user-confirmed), re-enter correct step |
+| `devflow.auto` | Full autonomy from raw idea to opened PR: task → plan (+ consistency check) → implement → [beautify] → test → ship → pr; halts only on Critical discrepancies |
 | `devflow.run` | Opt-in autonomy: chain implement → beautify → test unattended; decision flags; stop before ship |
 | `devflow.backprop` | Backpropagate escaped bug into spec — classify gap, tighten AC, add regression test |
+| `devflow.worktree` | Create / list / remove isolated git worktrees for parallel features, with dev-server port offset and overlap detection |
 | `devflow.learn` | Manage instincts — log / search / list / prune / boost / promote to team store |
 | `devflow.metrics` | Local telemetry dashboard (`.devflow-metrics/`, gitignored) — tokens, cost, command durations, context window and compactions, hook-injected context, tool/skill/subagent usage, pass@1 |
 | `devflow.board` | Static, read-only, auto-updating HTML project board (`devflow/board/index.html`) — Kanban pipeline, dependency DAG critical path, Markdown viewer, and command timings |

@@ -7,7 +7,7 @@ How the plugin is put together and why. Companion to [`docs/comparison.md`](comp
 Three constraints shape everything below:
 
 1. **Markdown + bash/jq only.** No runtime engine, no Node dependency. Skills are prompts an agent follows; hooks are POSIX-ish shell scripts. This keeps the plugin portable across hosts (Claude Code, Antigravity CLI) and auditable at a glance.
-2. **User-gated by default.** Each pipeline step is a command the user invokes. Skills verify their own input contract and refuse to run on bad state; they do not invoke each other (the one exception: `devflow.ship` routes to `devflow.pr` on gate pass).
+2. **User-gated by default.** Each pipeline step is a command the user invokes. Skills verify their own input contract and refuse to run on bad state; they do not invoke each other, with three exceptions: `devflow.implement` runs the optional beautify step when the user accepts it, `devflow.ship` routes to `devflow.pr` on gate pass, and the orchestrators `devflow.run` / `devflow.auto` chain steps on purpose.
 3. **Adapters own stack truth.** Core skills are stack-agnostic; every stack-specific rule (commands, file layout, technology skills) lives in `adapters/<stack>/ADAPTER.md`.
 
 ## Pipeline
@@ -16,11 +16,12 @@ Three constraints shape everything below:
 flowchart LR
     setup[devflow.setup] --> task[devflow.task]
     task --> plan[devflow.plan]
+    plan -.optional.-> check[consistency check]
     plan --> implement[devflow.implement]
     implement -.optional.-> beautify[beautify step]
     beautify -.-> test
     implement --> test["devflow.test<br/>(+ goal-backward verification)"]
-    test --> ship["devflow.ship<br/>(agent fan-out)"]
+    test --> ship["devflow.ship<br/>(code + security review)"]
     ship --> pr[devflow.pr]
     task -.3+ PRs.-> blueprint[devflow.blueprint] -.per step.-> plan
 ```
@@ -40,7 +41,7 @@ Every feature lives in `devflow/features/NNN_name/`:
 
 | Artifact | Written by | Contains |
 | --- | --- | --- |
-| `task.md` | task/clarify | HMW framing, scope, subtasks, acceptance criteria |
+| `task.md` | task | HMW framing, scope, subtasks, acceptance criteria |
 | `plan.md` | plan (then updated by every step) | Architecture decisions, **Traceability table** (subtask → AC → files), ordered File List with `[done]`/`[pending]` markers, `**Status:**` |
 | `data-model.md` | plan (conditional) | Technology-agnostic entity definitions |
 | `verification.md` | test Step 6b | Per-AC verdict table (existence / substantive / wired / runtime) |
@@ -48,9 +49,9 @@ Every feature lives in `devflow/features/NNN_name/`:
 **`plan.md` is the authoritative state.** `.devflow-state.json` at the consumer root is a derived cache written by hooks and by skills at step boundaries. Statuses and legal transitions are defined once in [`references/state-machine.md`](../templates/devflow/references/state-machine.md):
 
 ```text
-task.md: draft → clarified → done
-plan.md: ready → implementing → implemented → beautified → tested → shipped → pr-opened
-         any active status → blocked (escalation ladder) → recovery
+task.md: draft → done          (legacy `clarified` still read)
+plan.md: ready → implementing → implemented → [beautified] → tested → shipped → pr-opened
+         any active status → blocked (escalation ladder) → devflow.resume (user-confirmed reset)
 ```
 
 Failure handling is a single bounded ladder ([`references/escalation-ladder.md`](../templates/devflow/references/escalation-ladder.md)): 3 retries → debug mode (max 2 hypotheses) → re-approach the plan → decompose the slice → block with a structured stuck-report.
@@ -59,9 +60,12 @@ Failure handling is a single bounded ladder ([`references/escalation-ladder.md`]
 
 Forward-looking and goal-backward checks are deliberately separate:
 
+- **plan consistency check** — optional Step 5b of `devflow.plan` (always on in `devflow.auto`): traceability, AC testability, terminology, constitution and ADR alignment, product fidelity. Read-only.
+
 - **beautify** — optional step offered at implement exit (not a command): readability, conventions, design tokens, layout, a11y basics.
 - **test** — adapter unit/integration targets, plus **goal-backward verification** ([`references/verification-levels.md`](../templates/devflow/references/verification-levels.md)): start from each acceptance criterion, locate its files via the Traceability table, prove it exists, is real code (not a stub), is wired into the app, and — where the adapter defines runtime targets — behaves end-to-end.
-- **ship** — parallel specialist agents (code review incl. scope fidelity, security, test coverage) synthesized into a gate report; Critical findings block.
+- **ship** — `code-reviewer` (incl. scope fidelity) plus `security-auditor` from the `standard` profile up, in parallel, synthesized into one gate report; Critical findings block. Coverage is already gated by test.
+- **hotfix** — no beautify, no ship review: a regression test seen failing then passing, the full suite and `verification.md` are the gate.
 
 ## Hook map
 

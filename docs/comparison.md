@@ -10,7 +10,7 @@ Honest positioning against the three closest alternatives: [Forge](https://githu
 | Runtime | Markdown + bash/jq, no engine | Node.js engine + JS hooks | CLI (Python) + templates | none |
 | Spec format | task.md: HMW, scope, subtasks, ACs + traceability table in plan.md | R-numbered requirements with testable ACs | spec.md + plan.md + tasks.md | none enforced |
 | Stack awareness | **Adapters** (Flutter/Angular/Next.js): commands, tech skills, per-step checklists | generic | generic (constitution file) | generic |
-| Verification | Tests + goal-backward per-AC verification + multi-agent ship gate | Goal-backward 4-level verifier + reviewer loop | checklist-driven, manual | whatever you ask for |
+| Verification | Tests + goal-backward per-AC verification + code/security ship gate | Goal-backward 4-level verifier + reviewer loop | checklist-driven, manual | whatever you ask for |
 | Spec feedback loop | `devflow.backprop` + instincts log | backprop phase + gap patterns | none | none |
 | Failure handling | Bounded escalation ladder (retry → debug → re-approach → block) | 7-level circuit breakers incl. cross-model rescue | none | none |
 | Recovery/resume | state machine + `devflow.resume` (re-entry, resync, unblock) | on-disk state machine, checkpoints, forensic rebuild | none | compaction summary only |
@@ -29,13 +29,13 @@ Honest positioning against the three closest alternatives: [Forge](https://githu
 
 - **Adapters** — the only one of the four with per-stack contracts (commands, technology skills loaded by file-path trigger, per-step checklists).
 - **Traceability as an enforcement tool, not documentation** — the subtask → AC → file table is what makes goal-backward verification and backprop nearly free.
-- **Layered gates** — beautify (multi-axis), test (+ per-AC verification), ship (parallel specialist agents incl. scope-fidelity/anti-over-engineering review).
+- **Layered gates** — optional plan consistency check and beautify, test (+ per-AC verification), ship (`code-reviewer` incl. scope-fidelity/anti-over-engineering review, + `security-auditor` from `standard` up).
 - **Self-testing plugin** — structural lint plus deterministic trigger/collision evals on the skills themselves.
 - **No runtime** — auditable markdown and shell; works on three hosts.
 
 ## Trade-offs we accept
 
-- **Ceremony is mostly fixed-cost** — a one-line fix pays more overhead than it should (depth profiles are on the roadmap; Forge already scales rigor by complexity score).
+- **Ceremony still has a floor** — complexity profiles (`quick` / `standard` / `thorough`) scale beautify, test and ship, and `devflow.hotfix` covers small fixes, but a one-line change still needs a `task.md` and `plan.md`.
 - **Gates cost wall-clock time** — you approve steps Forge would chain through autonomously. That's the point, but it's real friction.
 - **No multiplayer** — Forge's claim-lease collaboration has no DevFlow equivalent.
 - **Hook logic is lightly tested** — Forge's engine has an order of magnitude more self-tests than DevFlow's hook scripts.
