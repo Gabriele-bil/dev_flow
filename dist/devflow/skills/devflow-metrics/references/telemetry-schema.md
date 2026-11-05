@@ -68,3 +68,7 @@ Duration source, first available: UserPromptSubmit mark → first tool call of t
 | Context injected by hooks | yes | yes |
 | Session start | yes | yes |
 | Prompts, compactions, session end, subagents | yes | no (events not available) |
+
+### .devflow-observe.jsonl (workspace root, written by `observe.sh`)
+
+One row per tool call event (`pre` / `post` / `stop`): `ts`, `event`, `tool`, `kind` (`shell`, `write`, `edit`, `read`, …), `session`, `step`, `feature`, `file` (written/edited path — churn learning), `read` (read path, relative to the workspace — re-read counting), `cmd` (shell command, first 300 chars), `is_error` (`post`). `metrics.sh` derives `quality.duplicate_reads` (reads of a file already read in the same session), `quality.unstamped_checks` (test/lint/analyze/format/e2e/build commands run outside `verify-stamp.sh`) and `quality.calls_by_step`.

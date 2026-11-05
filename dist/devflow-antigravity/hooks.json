@@ -37,6 +37,14 @@
         ]
       },
       {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=PreToolUse bash \"hooks/pre-bash-stamp-guard.sh\""
+          }
+        ]
+      },
+      {
         "matcher": "read_url_content",
         "hooks": [
           {

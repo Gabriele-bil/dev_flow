@@ -116,6 +116,22 @@ assert_equals "quality: pass@1 rate 66.7%" "$(echo "$JSON_OUT" | jq -r '.quality
 assert_equals "quality: retry loops" "$(echo "$JSON_OUT" | jq -r '.quality.retry_loops_detected')" "1"
 teardown
 
+# T5b: re-reads, unstamped checks, calls per step
+setup
+cat > .devflow-observe.jsonl <<'JSONL'
+{"event":"pre","tool":"Read","kind":"read","session":"s1","step":"devflow.test","read":"src/a.ts","ts":"2026-05-01T10:00:00Z"}
+{"event":"pre","tool":"Read","kind":"read","session":"s1","step":"devflow.test","read":"src/a.ts","ts":"2026-05-01T10:00:01Z"}
+{"event":"pre","tool":"Read","kind":"read","session":"s2","step":"devflow.ship","read":"src/a.ts","ts":"2026-05-01T10:00:02Z"}
+{"event":"pre","tool":"Bash","kind":"shell","session":"s1","step":"devflow.test","cmd":"pnpm --filter web test","ts":"2026-05-01T10:00:03Z"}
+{"event":"pre","tool":"Bash","kind":"shell","session":"s1","step":"devflow.test","cmd":"bash verify-stamp.sh run test -- pnpm test","ts":"2026-05-01T10:00:04Z"}
+{"event":"pre","tool":"Bash","kind":"shell","session":"s1","step":"devflow.test","cmd":"git status","ts":"2026-05-01T10:00:05Z"}
+JSONL
+JSON_OUT=$(bash "$METRICS_SH" --json)
+assert_equals "quality: duplicate reads (same session only)" "$(echo "$JSON_OUT" | jq -r '.quality.duplicate_reads')" "1"
+assert_equals "quality: unstamped checks" "$(echo "$JSON_OUT" | jq -r '.quality.unstamped_checks')" "1"
+assert_equals "quality: busiest step" "$(echo "$JSON_OUT" | jq -r '.quality.calls_by_step[0] | "\(.name)=\(.count)"')" "devflow.test=5"
+teardown
+
 # T6: .devflow-metrics/ folder — commands, context, tools, subagents, usage, --since
 setup
 mkdir .devflow-metrics

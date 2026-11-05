@@ -79,6 +79,8 @@ Before writing any test, enumerate coverage gaps:
 
 Report gap inventory before writing tests so user can see what will and will not be covered. If adapter defines `test-coverage-threshold`, flag any public surface that would cause feature to fall below it.
 
+**Run mode** (`.devflow-run.json` present): no inventory in output — nobody reads it. Only surfaces left without a test go to `verification.md` → `## Coverage gaps` (one line each: `symbol` — `file` — reason).
+
 ### Step 3 through 6 - Author and run tests
 
 Read `task.md` **Acceptance criteria** section first — derive at least one test case per criterion. Then use `plan.md`, the coverage gap inventory from Step 2b, and the implement/beautify summaries:
@@ -111,7 +113,7 @@ Failure handling:
 After all tests pass, verify **backwards from the spec** per `${CLAUDE_PLUGIN_ROOT}/references/verification-levels.md`:
 
 1. For each acceptance criterion in `task.md`: locate implementing file(s) via `plan.md` → **Traceability** table.
-2. Run the verification levels:
+2. Run the verification levels (L1–L3 from targeted lookups — one index query or `grep -n` per symbol, registration and caller; L2 stub scan = one `grep -nE 'TODO|FIXME|not implemented|placeholder'` over the **Traceability** files; never full-file reads for L1–L3):
    - **Level 1 (Existence)**: file on disk, symbol defined, route present.
    - **Level 2 (Substantive)**: no stubs, placeholder comments, or hardcoded returns.
    - **Level 3 (Wired)**: reachable in app flow, registered route/provider, not dead code.
@@ -170,7 +172,7 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | Reads (optional) | `${CLAUDE_PLUGIN_ROOT}/references/testing-patterns.md` — stack-agnostic patterns reference |
 | Reads (optional) | `.devflow-test-summary.json` — structured pass/fail/skipped counts from the most recent recognized test-runner command (written by `post-bash-output-filter.sh`; cross-check only, not evidence of record) |
 | Writes | Test output paths per the adapter test step file |
-| Writes | `devflow/features/[NNN]_[feature-name]/verification.md` — per-AC verdict table |
+| Writes | `devflow/features/[NNN]_[feature-name]/verification.md` — per-AC verdict table; `## Coverage gaps` (run mode) |
 | Writes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json` — `errors_tried` on retry loops, via `${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh` |
 | Writes (conditional) | `devflow/features/[NNN]_[feature-name]/handoff.md` — on context pressure (state-machine.md → Handoff file) |
 | Writes | `plan.md` — `**Status:** tested` (only when tests pass + verification has no FAIL) |

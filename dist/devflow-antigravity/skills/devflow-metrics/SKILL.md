@@ -19,7 +19,7 @@ Aggregate and visualize the local telemetry folder `.devflow-metrics/` (gitignor
 - **Context & memory**: context window in use per turn (avg/peak), prompt-cache reads, compactions (auto vs manual, context size at compaction), tokens injected by each devflow hook (orientation, instincts).
 - **Tools**: calls, error %, avg duration, output tokens fed back per tool; skills loaded, MCP servers, subagent runs.
 - **Usage**: sessions by source/host/plugin version/model/adapter, prompts, share of slash commands, devflow commands typed.
-- **Quality & stability**: first-pass tool invocation success (`pass@1`) and retry loop counts from `observe.sh`.
+- **Quality & stability**: first-pass tool invocation success (`pass@1`), retry loop counts, re-reads of the same file, checks run outside `verify-stamp.sh`, and tool calls per pipeline step, from `observe.sh`.
 
 File-by-file schema: `references/telemetry-schema.md`.
 
