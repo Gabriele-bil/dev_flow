@@ -1,8 +1,8 @@
 name: devflow
 version: 2.0.0
 description: >-
-  Spec-driven development pipeline: task → [clarify] → plan → [analyze] →
-  implement → beautify → test → ship → pr
+  Spec-driven development pipeline: task → plan → implement → beautify →
+  test → ship → pr
 pipeline:
   steps:
     - id: init
@@ -43,26 +43,12 @@ pipeline:
         and architecture context, optionally stress-testing scope, and
         generating a user story with HMW framing, scope boundaries, key
         assumptions, and verifiable subtasks
-    - id: clarify
-      command: /devflow:clarify
-      skill: devflow-clarify
-      description: >-
-        Optional step between task and plan: resolves [NEEDS CLARIFICATION: ...]
-        markers in task.md via incremental Q&A (8D scan, up to 5 questions) and
-        sets Status clarified
     - id: plan
       command: /devflow:plan
       skill: devflow-plan
       description: >-
         Transforms a structured DevFlow task into a detailed, file-oriented
         implementation plan for devflow.implement
-    - id: analyze
-      command: /devflow:analyze
-      skill: devflow-analyze
-      description: >-
-        Optional read-only consistency check between plan and implement: flags
-        traceability gaps, untestable acceptance criteria, terminology drift,
-        and constitution violations across task.md + plan.md + constitution.md
     - id: implement
       command: /devflow:implement
       skill: devflow-implement
@@ -94,11 +80,9 @@ pipeline:
     command: /devflow:ship
     skill: devflow-ship
     description: >-
-      Pre-merge gate before devflow.pr. Dispatches 1–5 review agents in parallel
-      per complexity profile (quick: code-reviewer; standard: +
-      security-auditor, test-engineer; thorough: + accessibility-auditor,
-      docs-reviewer), synthesizes reports, and routes to devflow.pr if no
-      blockers
+      Pre-merge gate before devflow.pr. Dispatches code-reviewer (quick) or
+      code-reviewer + security-auditor (standard, thorough) in parallel,
+      synthesizes one report, and routes to devflow.pr if no blockers
   utility:
     - command: /devflow:status
       skill: devflow-status
@@ -110,17 +94,12 @@ pipeline:
       description: >-
         Manage local and team instincts — log, search, list, check (Rigor
         check_cmd/ratchet), prune, boost, promote to team store and REGISTRY.md
-    - command: /devflow:recovery
-      skill: devflow-recovery
-      description: >-
-        Diagnose and recover a stuck or corrupted DevFlow pipeline — reads
-        state, observe log, and feature files to identify failure and propose a
-        targeted recovery
     - command: /devflow:resume
       skill: devflow-resume
       description: >-
-        Resume an interrupted DevFlow session — read saved state, cross-check
-        plan.md markers, confirm position, re-enter the correct pipeline step
+        Resume an interrupted or blocked DevFlow session — read saved state,
+        cross-check plan.md markers, resync drifted state, unblock (user-confirmed),
+        re-enter the correct pipeline step
     - command: /devflow:run
       skill: devflow-run
       description: >-
@@ -129,7 +108,7 @@ pipeline:
     - command: /devflow:auto
       skill: devflow-auto
       description: >-
-        Full-cycle autonomous delivery: chains task → plan → analyze → implement
+        Full-cycle autonomous delivery: chains task → plan → implement
         → beautify → test → ship → pr in total autonomy from idea to opened pull
         request
     - command: /devflow:backprop
@@ -148,16 +127,12 @@ pipeline:
       description: >-
         Diagnose environment readiness, MCP servers reachability, CLI
         toolchains, and pipeline state integrity
-    - command: /devflow:rollback
-      skill: devflow-rollback
-      description: >-
-        Roll back the active DevFlow step (implement or beautify) to its
-        pre-step checkpoint without corrupting pipeline state
     - command: /devflow:hotfix
       skill: devflow-hotfix
       description: >-
         Fast-track pipeline for critical bugfixes, targeted patches, or hotfixes
-        — compact task+plan, implement, targeted test, and quick ship gate
+        — compact task+plan, failing regression test, fix, full suite +
+        verification, PR (no beautify, no ship review)
         directly to PR
     - command: /devflow:metrics
       skill: devflow-metrics
@@ -190,26 +165,6 @@ agents:
       Security engineer focused on exploitable vulnerabilities, threat modeling,
       and secure coding. Use for security-focused review or via devflow.ship
       fan-out
-    invoked_by: devflow.ship
-  - id: test-engineer
-    path: agents/test-engineer.md
-    description: >-
-      QA engineer focused on test strategy, coverage gap analysis, and test
-      quality. Use for coverage review, test design, or via devflow.ship fan-out
-    invoked_by: devflow.ship
-  - id: accessibility-auditor
-    path: agents/accessibility-auditor.md
-    description: >-
-      Accessibility engineer focused on WCAG 2.1 AA compliance across
-      keyboard/focus, screen readers, visual contrast, touch targets, and forms.
-      Use for UI/component review or via devflow.ship fan-out
-    invoked_by: devflow.ship
-  - id: docs-reviewer
-    path: agents/docs-reviewer.md
-    description: >-
-      Documentation engineer focused on public API coverage, accuracy,
-      README/CHANGELOG sync, and plan traceability. Use for documentation drift
-      review or via devflow.ship fan-out
     invoked_by: devflow.ship
 skills:
   core:
@@ -276,12 +231,6 @@ skills:
         (.devflow-instincts.shared.yaml) instincts. Sub-commands: log, search,
         list, check (run Rigor check_cmd with optional ratchet_max), prune,
         boost, promote (team store + REGISTRY.md)
-    - id: devflow-recovery
-      path: skills/devflow-recovery/SKILL.md
-      description: >-
-        Diagnoses and recovers a stuck or corrupted DevFlow pipeline. Reads
-        state, observe log, and feature files to identify failure category and
-        propose a targeted recovery action
     - id: devflow-resume
       path: skills/devflow-resume/SKILL.md
       description: >-
@@ -297,7 +246,7 @@ skills:
     - id: devflow-auto
       path: skills/devflow-auto/SKILL.md
       description: >-
-        Full-cycle autonomous delivery: chains task → plan → analyze → implement
+        Full-cycle autonomous delivery: chains task → plan → implement
         → beautify → test → ship → pr in total autonomy from idea to opened pull
         request
     - id: devflow-backprop
@@ -312,18 +261,6 @@ skills:
         Transforms a large objective into a multi-PR blueprint with dependency
         graph, parallel-step detection, and adversarial review. For features
         requiring 3+ PRs, spanning sessions, or needing parallel workstreams
-    - id: devflow-clarify
-      path: skills/devflow-clarify/SKILL.md
-      description: >-
-        Resolves [NEEDS CLARIFICATION: ...] markers in task.md via incremental
-        Q&A — 8D scan, up to 5 questions, updates task.md, sets Status clarified
-    - id: devflow-analyze
-      path: skills/devflow-analyze/SKILL.md
-      description: >-
-        Read-only consistency check across task.md + plan.md + constitution.md —
-        flags traceability gaps, untestable acceptance criteria, terminology
-        drift, layer violations. Runs after devflow.plan, before
-        devflow.implement
     - id: devflow-ship
       path: skills/devflow-ship/SKILL.md
       description: >-
@@ -347,16 +284,12 @@ skills:
         Pre-flight diagnostic tool for DevFlow. Checks MCP server reachability,
         CLI toolchains, active adapter configuration, and pipeline state
         integrity. Supports --json and --fix
-    - id: devflow-rollback
-      path: skills/devflow-rollback/SKILL.md
-      description: >-
-        Roll back the active DevFlow step (implement or beautify) to its
-        pre-step checkpoint without corrupting pipeline state
     - id: devflow-hotfix
       path: skills/devflow-hotfix/SKILL.md
       description: >-
         Fast-track pipeline for critical bugfixes, targeted patches, or hotfixes
-        — compact task+plan, implement, targeted test, and quick ship gate
+        — compact task+plan, failing regression test, fix, full suite +
+        verification, PR (no beautify, no ship review)
         directly to PR
     - id: devflow-metrics
       path: skills/devflow-metrics/SKILL.md
@@ -700,7 +633,7 @@ references:
       Pipeline state machine — canonical task.md/plan.md statuses, legal
       transitions, next-step mapping, state update snippet. State file schema,
       active feature resolution. Single source of truth for orientation, status,
-      resume, recovery, and hooks
+      resume, and hooks
   - id: escalation-ladder
     path: references/escalation-ladder.md
     description: >-

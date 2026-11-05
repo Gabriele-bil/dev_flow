@@ -88,9 +88,9 @@ teardown
 
 setup
 for i in $(seq 1 400); do echo "line $i of a long generated file" ; done > src/big.ts
-bash "$RP" --max-diff-kb 2 --profile thorough --roster "code-reviewer docs-reviewer" >/dev/null 2>&1
+bash "$RP" --max-diff-kb 2 --profile thorough --roster "code-reviewer security-auditor" >/dev/null 2>&1
 has "diff cap announced" .devflow-review-packet.md "Cut at 2 KB"
-has "profile and roster flags" .devflow-review-packet.md "Depth profile: thorough · roster: code-reviewer docs-reviewer"
+has "profile and roster flags" .devflow-review-packet.md "Depth profile: thorough · roster: code-reviewer security-auditor"
 teardown
 
 setup

@@ -10,6 +10,5 @@ Branch: [feat/fix/chore/doc/ecc...]/[number-of-task-is-present]_[feature-name]
 
 docs/product.md: [updated | not found — create with devflow.setup]
 
-[[NEEDS CLARIFICATION] markers present? → devflow.clarify (recommended before devflow.plan)]
 Continue to planning? → devflow.plan
 ```

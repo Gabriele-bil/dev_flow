@@ -28,7 +28,7 @@ Read `templates/devflow/CONTRIBUTING.md` for quality bar and style guidelines be
 ## Token & Context Economy
 
 - History/past-work questions ("did we already...", "how was X implemented", "what changed in Y") → use claude-mem's `mem-search` skill / `smart_search` MCP tool first, before falling back to `git log`, `grep`, or full-file `Read` on old commits
-- Review-heavy tasks (pre-merge correctness/security/style pass) → default to `devflow.ship`'s subagent fan-out (`code-reviewer`, `security-auditor`, `test-engineer`, etc.) instead of reviewing inline in the main thread
+- Review-heavy tasks (pre-merge correctness/security/style pass) → default to `devflow.ship`'s subagent fan-out (`code-reviewer`, `security-auditor`) instead of reviewing inline in the main thread
 - Large file/log/command output you only need to reference later, not reread → `headroom_compress` it and pull it back with `headroom_retrieve` instead of re-reading it in full
 - Shell commands (git/grep/find/ls/etc.) are already routed through RTK (`~/.claude/hooks/rtk-rewrite.sh`, global, not devflow-specific) — no action needed here; check savings anytime with `rtk gain`
 

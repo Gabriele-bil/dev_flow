@@ -12,8 +12,9 @@ DIST_ROOT="$REPO_ROOT/dist/devflow"
 
 # Docs excluded from scanning: comparative/gap-analysis write-ups that cite
 # *other* projects' internal file paths as sources — those paths never
-# resolve inside this repo by design, not by drift.
-DOC_EXCLUDE=("docs/tokless-gap-analysis.md")
+# resolve inside this repo by design, not by drift. Also dated planning
+# notes that name commands since removed (clarify, analyze) on purpose.
+DOC_EXCLUDE=("docs/tokless-gap-analysis.md" "docs/miglioramenti-plugin.md" "docs/new.md")
 
 DOC_FILES=()
 for f in "$REPO_ROOT/README.md" "$REPO_ROOT/CONTRIBUTING.md" \

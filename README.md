@@ -10,20 +10,18 @@ The workflow is **technology-agnostic**: stack-specific rules live in **adapters
 
 ```text
 idea
-  └── devflow.task
-        └── [devflow.clarify]  (optional — resolve [NEEDS CLARIFICATION] markers)
-              └── devflow.plan
-                    └── devflow.analyze  (recommended — cross-artifact consistency check)
-                          └── devflow.implement
-                          └── devflow.beautify
-                                └── devflow.test
-                                      └── devflow.ship
-                                            └── devflow.pr
+  └── devflow.task   (resolves [NEEDS CLARIFICATION] markers inline)
+        └── devflow.plan   (optional consistency check before implement)
+              └── devflow.implement
+                    └── devflow.beautify
+                          └── devflow.test
+                                └── devflow.ship
+                                      └── devflow.pr
 ```
 
 Each step produces an artifact that feeds the next. Do not skip steps.
 
-**Autonomous entry point:** `devflow.auto <idea>` chains `task → plan → analyze → implement → beautify → test → ship → pr` in total autonomy from a raw idea to an opened pull request (defensible defaults + decision flags instead of clarification pauses; halts only on major discrepancies like Critical blockers, and documents minor discrepancies in the PR body).
+**Autonomous entry point:** `devflow.auto <idea>` chains `task → plan → implement → beautify → test → ship → pr` in total autonomy from a raw idea to an opened pull request (defensible defaults + decision flags instead of clarification pauses; halts only on major discrepancies like Critical blockers, and documents minor discrepancies in the PR body).
 
 ---
 
@@ -35,23 +33,19 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 | `devflow.setup` | [`templates/devflow/skills/devflow-setup/SKILL.md`](templates/devflow/skills/devflow-setup/SKILL.md) | Consumer repo context + adapter templates → root `AGENTS.md` + `REGISTRY.md` |
 | `devflow.task` | [`templates/devflow/skills/devflow-task/SKILL.md`](templates/devflow/skills/devflow-task/SKILL.md) | Idea → `devflow/features/[NNN]_[name]/task.md` |
 | `devflow.plan` | [`templates/devflow/skills/devflow-plan/SKILL.md`](templates/devflow/skills/devflow-plan/SKILL.md) | `task.md` → `plan.md` |
-| `devflow.clarify` | [`templates/devflow/skills/devflow-clarify/SKILL.md`](templates/devflow/skills/devflow-clarify/SKILL.md) | `task.md` (with markers) → resolved `task.md` (Status: clarified) — optional step between task and plan |
-| `devflow.analyze` | [`templates/devflow/skills/devflow-analyze/SKILL.md`](templates/devflow/skills/devflow-analyze/SKILL.md) | `task.md` + `plan.md` → consistency report (traceability, AC testability, terminology, constitution alignment, coverage balance) |
 | `devflow.blueprint` | [`templates/devflow/skills/devflow-blueprint/SKILL.md`](templates/devflow/skills/devflow-blueprint/SKILL.md) | Large idea → multi-PR blueprint with dependency graph + adversarial review |
 | `devflow.auto` | [`templates/devflow/skills/devflow-auto/SKILL.md`](templates/devflow/skills/devflow-auto/SKILL.md) | Raw idea → full pipeline (`task → ... → pr`) in total autonomy to opened PR |
 | `devflow.implement` | [`templates/devflow/skills/devflow-implement/SKILL.md`](templates/devflow/skills/devflow-implement/SKILL.md) | `plan.md` → code on `feat \| fix \| …/[NNN]_[name]` |
 | `devflow.beautify` | [`templates/devflow/skills/devflow-beautify/SKILL.md`](templates/devflow/skills/devflow-beautify/SKILL.md) | Implemented files → polished code |
 | `devflow.test` | [`templates/devflow/skills/devflow-test/SKILL.md`](templates/devflow/skills/devflow-test/SKILL.md) | Feature → unit + integration tests |
-| `devflow.ship` | [`templates/devflow/skills/devflow-ship/SKILL.md`](templates/devflow/skills/devflow-ship/SKILL.md) | Feature → parallel review (code + security + tests + a11y + docs) → gate before PR |
+| `devflow.ship` | [`templates/devflow/skills/devflow-ship/SKILL.md`](templates/devflow/skills/devflow-ship/SKILL.md) | Feature → parallel review (code-reviewer + security-auditor from `standard` up) → gate before PR |
 | `devflow.pr` | [`templates/devflow/skills/devflow-pr/SKILL.md`](templates/devflow/skills/devflow-pr/SKILL.md) | Branch → PR to `main` |
 | `devflow.status` | [`templates/devflow/skills/devflow-status/SKILL.md`](templates/devflow/skills/devflow-status/SKILL.md) | — → current pipeline state dashboard |
 | `devflow.doctor` | [`templates/devflow/skills/devflow-doctor/SKILL.md`](templates/devflow/skills/devflow-doctor/SKILL.md) | — → pre-flight diagnostic (MCP reachability, CLI tools, pipeline state) |
-| `devflow.hotfix` | [`templates/devflow/skills/devflow-hotfix/SKILL.md`](templates/devflow/skills/devflow-hotfix/SKILL.md) | Bug description → fast-track task+plan+implement+test+quick ship → PR |
-| `devflow.rollback` | [`templates/devflow/skills/devflow-rollback/SKILL.md`](templates/devflow/skills/devflow-rollback/SKILL.md) | — → revert active step (implement/beautify) to pre-step checkpoint |
+| `devflow.hotfix` | [`templates/devflow/skills/devflow-hotfix/SKILL.md`](templates/devflow/skills/devflow-hotfix/SKILL.md) | Bug description → compact task+plan → failing regression test → fix → full suite + verification → PR (no beautify, no ship review) |
 | `devflow.learn` | [`templates/devflow/skills/devflow-learn/SKILL.md`](templates/devflow/skills/devflow-learn/SKILL.md) | — → manage instincts (local vs shared team gotchas, promote to REGISTRY.md) |
 | `devflow.metrics` | [`templates/devflow/skills/devflow-metrics/SKILL.md`](templates/devflow/skills/devflow-metrics/SKILL.md) | — → telemetry dashboard (bash filter savings, cost est., pass@1, step duration) |
 | `devflow.board` | [`templates/devflow/skills/devflow-board/SKILL.md`](templates/devflow/skills/devflow-board/SKILL.md) | — → static, read-only, auto-updating HTML project board (`devflow/board/index.html`) with Kanban, Dependency DAG, Markdown viewer, and command timings |
-| `devflow.recovery` | [`templates/devflow/skills/devflow-recovery/SKILL.md`](templates/devflow/skills/devflow-recovery/SKILL.md) | Stuck pipeline → diagnosis + targeted recovery path |
 
 Skills are the only entry point (3.0.0): there are no command wrappers. Each step `devflow.<step>` is invoked as:
 
@@ -93,9 +87,7 @@ dev_flow/
 │       │   ├── hooks.json           # Lifecycle hook config
 │       │   └── *.sh                 # Hook scripts
 │       ├── skills/                  # Core pipeline skills (devflow-*)
-│       │   ├── devflow-analyze/
 │       │   ├── devflow-beautify/
-│       │   ├── devflow-clarify/
 │       │   ├── devflow-blueprint/
 │       │   ├── devflow-board/
 │       │   ├── devflow-discover/
@@ -104,7 +96,6 @@ dev_flow/
 │       │   ├── devflow-learn/
 │       │   ├── devflow-plan/
 │       │   ├── devflow-pr/
-│       │   ├── devflow-recovery/
 │       │   ├── devflow-setup/
 │       │   ├── devflow-ship/
 │       │   ├── devflow-status/
@@ -120,9 +111,7 @@ dev_flow/
 │       ├── agents/
 │       │   ├── code-reviewer.md
 │       │   ├── security-auditor.md
-│       │   ├── test-engineer.md
-│       │   ├── accessibility-auditor.md
-│       │   └── docs-reviewer.md
+│       │   └── step-runner.md
 │       ├── references/
 │       │   ├── accessibility-checklist.md
 │       │   ├── model-selection.md
@@ -271,11 +260,8 @@ Specialized agents live in [`templates/devflow/agents/`](templates/devflow/agent
 | Step Runner | [`agents/step-runner.md`](templates/devflow/agents/step-runner.md) | Runs one pipeline step in its own context for `devflow.run` / `devflow.auto` (Claude Code: per-step model); returns a `RESULT:` line |
 | Code Reviewer | [`agents/code-reviewer.md`](templates/devflow/agents/code-reviewer.md) | 5-axis code review: correctness, readability, architecture, security, performance |
 | Security Auditor | [`agents/security-auditor.md`](templates/devflow/agents/security-auditor.md) | Exploitable vulnerabilities, threat modeling, secure coding |
-| Test Engineer | [`agents/test-engineer.md`](templates/devflow/agents/test-engineer.md) | Coverage gap analysis, test strategy, test quality |
-| Accessibility Auditor | [`agents/accessibility-auditor.md`](templates/devflow/agents/accessibility-auditor.md) | WCAG 2.1 AA: keyboard/focus, screen readers, contrast, touch targets |
-| Docs Reviewer | [`agents/docs-reviewer.md`](templates/devflow/agents/docs-reviewer.md) | Public API coverage, README/CHANGELOG sync, plan traceability |
 
-`devflow.ship` runs all five in parallel, synthesizes reports into a Ship Gate Report, and routes to `devflow.pr` only if no blockers are found.
+`devflow.ship` runs `code-reviewer` (plus `security-auditor` on `standard`/`thorough` profiles) in parallel, synthesizes reports into a Ship Gate Report, and routes to `devflow.pr` only if no blockers are found.
 
 ---
 

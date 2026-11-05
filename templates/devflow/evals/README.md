@@ -44,7 +44,7 @@ One file per core skill: `evals/cases/<skill-name>.json`.
       { "prompt": "I have an idea for a new feature, help me turn it into a proper task spec", "top_k": 3 }
     ],
     "negative": [
-      { "prompt": "Check consistency between task, plan and constitution before implementing", "owner": "devflow-analyze" }
+      { "prompt": "What should I run next in the pipeline?", "owner": "devflow-status" }
     ]
   }
 }

@@ -1,6 +1,6 @@
 ---
 name: devflow-hotfix
-description: Fast-track pipeline for critical bugfixes, targeted patches, or hotfixes. Chains compact task+plan, implement, targeted test, and quick single-agent ship gate directly into PR. Use when user runs devflow.hotfix, provides an urgent bug fix, or asks for a quick patch without full 8-step overhead.
+description: Fast-track pipeline for critical bugfixes, targeted patches, or hotfixes. Chains compact task+plan, failing regression test, minimal fix, full test suite + verification, then PR — no beautify, no ship review. Use when user runs devflow.hotfix, provides an urgent bug fix, or asks for a quick patch without full pipeline overhead.
 argument-hint: "<bug-or-issue-description>"
 disable-model-invocation: true
 ---
@@ -8,23 +8,22 @@ disable-model-invocation: true
 
 # Skill: devflow.hotfix
 
-Accelerated DevFlow pipeline execution for urgent bugfixes and targeted patches.
-
 ## Purpose
 
-Provides a streamlined, token-efficient pipeline for critical bugs, regressions, or hotfixes where running all 8 manual pipeline steps is disproportionate to the fix scope. Generates a compact task and plan, implements the fix, verifies with targeted regression tests, runs a focused single-agent ship review (`code-reviewer`), and opens the PR.
+Fast path for critical bugs and regressions: compact `task.md` + `plan.md`, regression test red → green, minimal fix, full suite + `verification.md`, PR. Skips `beautify` and the `ship` review — the failing-then-passing regression test and the green suite are the gate; the PR review is the human one.
 
 ## Core Principles
 
 - **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
-- **regression-tested** — every hotfix includes at least one test proving the defect is resolved
-- **safe-acceleration** — skips `beautify` and multi-agent fan-out, while keeping linter/compiler checks, single-agent review, and PR traceability
+- **regression-tested** — every hotfix ships a test that failed before the fix and passes after
+- **minimal scope** — root cause only, 1–3 files; anything bigger is a feature
 
 ## When NOT to Use
 
-- New feature development or large architectural refactors — use standard `devflow.task` or `devflow.auto`
-- Multi-PR features or migrations — use `devflow.blueprint`
-- When you are already in the middle of a standard feature pipeline — continue with normal steps
+- New feature or refactor — use `devflow.task` or `devflow.auto`
+- Multi-PR work or migrations — use `devflow.blueprint`
+- Fix touches auth, payments, or security boundaries — use the full pipeline (ship's `security-auditor` gate)
+- Already mid-pipeline on a feature — continue its normal steps
 
 ## Input contract
 
@@ -36,39 +35,29 @@ Any item fails → stop, report check, touch nothing.
 
 ## Workflow
 
-Fast-track transitions: `ready → implementing → implemented → tested → shipped → pr-opened` (beautify skipped). Every boundary: `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set plan <status>` (legal for the fast-track).
+Transitions: `ready → implementing → implemented → tested → shipped → pr-opened`. Every boundary: `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set plan <status>`.
 
-### Step 1 - Compact task + plan from real templates
+### Step 1 - Diagnose + compact spec
 
-1. `NNN` = `.devflow-state.json` `next_feature_number`, else highest `devflow/features/` prefix + 1 (never reuse). Dir `[NNN]_hotfix-[kebab-name]`; branch `fix/[NNN]_hotfix-[kebab-name]`.
-2. Diagnose root cause (file/function) before writing anything — read-only.
-3. `task.md` from `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-task/references/task-template.md`: full header (`**ID:**`, `**Date:**`, `**Status:** draft`, `**Branch:**`, `**App:**` monorepo only); Goal & Value (Problem = symptom, Objective = fixed behavior); `UC-1` fixed path; `AC-1 (UC-1)` fixed behavior (Gherkin); `AC-2 (UC-1)` regression test fails before fix, passes after; root cause in `## Notes`. Other template sections: one line or `none`.
-4. `plan.md` from `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-plan/references/plan-template.md`: header (`**Task:**`, `**App:**` copied, `**Status:** ready`, `**Complexity:** N (quick)`); Overview = root cause; **Traceability** row per AC → file(s); **File List** 1–3 entries `[pending]`, regression test file first; Implementation checkpoints = adapter test + analyze commands.
-5. Branch from the up-to-date base branch: `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" branch fix/[NNN]_hotfix-[name]`.
+1. Diagnose root cause (file/function) read-only, before writing anything.
+2. `NNN` = `.devflow-state.json` `next_feature_number`, else highest `devflow/features/` prefix + 1 (never reuse). Dir `[NNN]_hotfix-[kebab-name]`.
+3. `task.md` from `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-task/references/task-template.md`: full header (`**Status:** draft`, `**Branch:** fix/[NNN]_hotfix-[kebab-name]`, `**App:**` monorepo only); Problem = symptom, Objective = fixed behavior; `UC-1`; `AC-1 (UC-1)` fixed behavior (Gherkin); `AC-2 (UC-1)` regression test fails before fix, passes after; root cause in `## Notes`. Other sections: one line or `none`.
+4. `plan.md` from `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-plan/references/plan-template.md`: header (`**Status:** ready`, `**Complexity:** N (quick)`, `**App:**` copied); Overview = root cause; Traceability row per AC; File List 1–3 `[pending]` entries, regression test first.
+5. `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" branch fix/[NNN]_hotfix-[kebab-name]`.
 
-### Step 2 - Checkpoint, then failing test first
+### Step 2 - Failing test, then fix
 
-1. Resolve adapter + app per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md`; read `steps/test.md`, `steps/implement.md`.
-2. **Before any code edit:** `git tag -f "devflow-checkpoint/$(git branch --show-current)/implement" HEAD`; Status `implementing`.
-3. Write regression test (AC-2) per adapter test conventions; run it. Must FAIL for the reported reason (Prove-It). Passes → root cause wrong → back to Step 1.2; never fix against a green test.
+1. Resolve adapter + app per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md`; read `steps/test.md`, `steps/implement.md`. Status `implementing`.
+2. Write regression test (AC-2); run it. Must FAIL for the reported reason (Prove-It). Passes → root cause wrong → back to Step 1.1.
+3. Minimal fix at root cause, File List files only. Needs >3 files or design → stop, route `devflow.task`.
+4. Regression test passes; adapter format + analyze clean (monorepo: `(cd "<app-path>" && …)`). Mark entries `[done]`; Status `implemented`.
 
-### Step 3 - Fix
-
-1. Minimal change at root cause; only File List files. Scope grows beyond 3 files or needs design → stop, route `devflow.task`.
-2. Regression test passes; adapter format + analyze clean (monorepo: `(cd "<app-path>" && …)`).
-3. Mark entries `[done]`; Status `implemented`.
-
-### Step 4 - Verify
+### Step 3 - Verify
 
 1. Full adapter test suite; failures per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/escalation-ladder.md` (max 3 bounded attempts → block).
-2. Write `verification.md` per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/verification-levels.md` — AC-1, AC-2 with evidence; zero FAIL.
-3. Status `tested`.
+2. `verification.md` per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/verification-levels.md` — AC-1, AC-2 with evidence, zero FAIL. Status `tested`, then `shipped`.
 
-### Step 5 - Quick ship gate
-
-Dispatch `$HOME/.gemini/antigravity-cli/plugins/devflow/agents/code-reviewer.md` (= `devflow.ship` `quick` profile) on touched files. Critical/Required → fix → back to Step 3 (tests + `verification.md` regenerated). Clean → Status `shipped`.
-
-### Step 6 - PR
+### Step 4 - PR
 
 Execute `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-pr/SKILL.md` exactly — base-branch detection, artifact cleanup, commit, push, PR body, `pr-opened` + task `done`. Never hand-roll `gh pr create`.
 
@@ -76,8 +65,8 @@ Execute `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-pr/SKILL.m
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Skipping regression test or writing it green-first | Failing test before fix, every time |
-| Expanding hotfix scope to unrelated refactors | Strictly scoped; separate tasks for cleanups |
+| Regression test written green-first | Failing test before fix, every time |
+| Scope creep into refactors | Root cause only; cleanups get their own task |
 
 Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
@@ -87,6 +76,6 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | --- | --- |
 | Reads | Bug report from `$ARGUMENTS`, codebase, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md`, adapter `steps/test.md` + `steps/implement.md` |
 | Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-task/references/task-template.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-plan/references/plan-template.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/verification-levels.md` |
-| Writes | `devflow/features/[NNN]_hotfix-[name]/task.md`, `plan.md`, `verification.md`, fix files, regression test, `.devflow-state.json` (merge) |
-| Side effects | Branch `fix/*` from `origin/<default>`, tag `devflow-checkpoint/<branch>/implement` |
-| Next step | `devflow-pr` (executed in Step 6) |
+| Writes | `devflow/features/[NNN]_hotfix-[name]/task.md`, `plan.md`, `verification.md`, fix files, regression test, `.devflow-state.json` (via `devflow-state.sh`) |
+| Side effects | Branch `fix/*` from up-to-date base |
+| Next step | `devflow-pr` (executed in Step 4) |

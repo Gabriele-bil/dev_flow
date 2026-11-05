@@ -27,7 +27,7 @@ you>  /devflow.plan
       Continue to implementation? -> devflow.implement
 ```
 
-Then `devflow.implement` → `devflow.beautify` → `devflow.test` (tests + per-AC verification) → `devflow.ship` (parallel agent fan-out) → `devflow.pr`. Interrupted? `devflow.resume`. Bug escaped? `devflow.backprop` fixes the spec, not just the code. Want the middle unattended? `devflow.run` chains implement → beautify → test with decision flags and stops before ship.
+Then `devflow.implement` → `devflow.beautify` → `devflow.test` (tests + per-AC verification) → `devflow.ship` (parallel agent fan-out) → `devflow.pr`. Interrupted or blocked? `devflow.resume`. Bug escaped? `devflow.backprop` fixes the spec, not just the code. Want the middle unattended? `devflow.run` chains implement → beautify → test with decision flags and stops before ship.
 
 Full setup:
 
@@ -90,26 +90,22 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 | `devflow.discover` | Explore architectural choices for app creation or complex features → comparative trade-offs + formal ADR |
 | `devflow.setup` | Generate `AGENTS.md`, `REGISTRY.md`, and `docs/product.md` from adapter templates |
 | `devflow.task` | Raw idea → structured task with HMW framing and verifiable subtasks |
-| `devflow.plan` | `task.md` → file-ordered implementation plan with traceability |
-| `devflow.clarify` | `task.md` (with markers) → resolved `task.md` (Status: clarified) — optional step between task and plan |
-| `devflow.analyze` | `task.md` + `plan.md` → consistency report (traceability, AC testability, terminology, constitution alignment, coverage balance) |
+| `devflow.plan` | `task.md` → file-ordered implementation plan with traceability; optional consistency check (traceability, AC testability, terminology, constitution/ADR alignment) |
 | `devflow.blueprint` | Large idea → multi-PR blueprint with dependency graph + adversarial review |
 | `devflow.implement` | Execute `plan.md` step by step, vertical slice by slice |
 | `devflow.beautify` | Polish: readability, conventions, design tokens, layout, a11y basics (correctness/security → `devflow.ship`; skipped in `quick` profile) |
 | `devflow.test` | Write and run unit + integration tests; bounded retry; goal-backward per-AC verification (`verification.md`) |
-| `devflow.ship` | Pre-merge gate: 1–5 agents in parallel per depth profile → Ship Gate Report → route to PR |
+| `devflow.ship` | Pre-merge gate: `code-reviewer` (+ `security-auditor` from `standard` up) in parallel → Ship Gate Report → route to PR |
 | `devflow.pr` | Commit, push branch, open PR to main |
 | `devflow.status` | Show current pipeline state (active feature, next step, progress) |
 | `devflow.doctor` | Diagnose environment readiness, MCP servers reachability, CLI toolchains, and pipeline state integrity |
-| `devflow.hotfix` | Fast-track pipeline for critical bugfixes, targeted patches, or hotfixes |
-| `devflow.rollback` | Roll back active step (implement/beautify) to pre-step checkpoint |
-| `devflow.resume` | Resume interrupted session — read state, cross-check plan.md, re-enter correct step |
+| `devflow.hotfix` | Fast-track bugfix: compact task+plan → failing regression test → fix → full suite + verification → PR (no beautify, no ship review) |
+| `devflow.resume` | Resume interrupted or blocked session — read state, cross-check plan.md, resync drift / unblock (user-confirmed), re-enter correct step |
 | `devflow.run` | Opt-in autonomy: chain implement → beautify → test unattended; decision flags; stop before ship |
 | `devflow.backprop` | Backpropagate escaped bug into spec — classify gap, tighten AC, add regression test |
 | `devflow.learn` | Manage instincts — log / search / list / prune / boost / promote to team store |
 | `devflow.metrics` | Local telemetry dashboard (`.devflow-metrics/`, gitignored) — tokens, cost, command durations, context window and compactions, hook-injected context, tool/skill/subagent usage, pass@1 |
 | `devflow.board` | Static, read-only, auto-updating HTML project board (`devflow/board/index.html`) — Kanban pipeline, dependency DAG critical path, Markdown viewer, and command timings |
-| `devflow.recovery` | Diagnose + recover a stuck or corrupted pipeline |
 
 ## Hooks
 

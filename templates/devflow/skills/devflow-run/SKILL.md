@@ -34,7 +34,7 @@ Run-mode contract (marker, autonomy table `run` column, decision flags, discrepa
 - `task.md` / `plan.md` not yet approved — upstream gates are human; run `devflow.task` / `devflow.plan` first
 - First feature on unfamiliar stack or low-confidence plan — run steps interactively
 - User wants to review each beautify proposal — run `devflow.beautify` directly
-- Interrupted run to continue — `devflow.resume`; corrupted state — `devflow.recovery`
+- Interrupted run, blocked or corrupted state — `devflow.resume`
 - `plan.md` Status already past `--until` step — nothing to chain; `devflow.status`
 
 ## Input contract
@@ -42,7 +42,7 @@ Run-mode contract (marker, autonomy table `run` column, decision flags, discrepa
 - [ ] Feature resolved — explicit `NNN_name` argument, else `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask)
 - [ ] `task.md` + `plan.md` exist at `devflow/features/[NNN]_[feature-name]/`
 - [ ] `plan.md` **Status** satisfies the `--from` step's input contract (`implement` → `ready`; `beautify` → `implemented`; `test` → `beautified` or `implemented`)
-- [ ] No active `.devflow-run.json` (stale marker from crashed run → confirm deletion with user, or route `devflow.recovery`)
+- [ ] No active `.devflow-run.json` (stale marker from crashed run → confirm deletion with user, or route `devflow.resume`)
 
 Any item fails → stop, report which check failed, do not arm run mode.
 
@@ -62,7 +62,7 @@ Ambiguity → defensible default + flag in plan.md ## Decision flags (you review
 Proceed? (yes / no)
 ```
 
-On yes: `bash "@devflow/scripts/devflow-state.sh" run arm --orchestrator devflow.run --from <from> --until <until> --feature <NNN_name>` (exit 2 = stale marker → ask the user: delete or `devflow.recovery`).
+On yes: `bash "@devflow/scripts/devflow-state.sh" run arm --orchestrator devflow.run --from <from> --until <until> --feature <NNN_name>` (exit 2 = stale marker → ask the user: delete (`run disarm`) or `devflow.resume`).
 
 ### Step 1 - Chain steps
 
@@ -120,4 +120,4 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | Writes | `plan.md` — `## Decision flags` entries |
 | Executes | `devflow-implement`, `devflow-beautify`, `devflow-test` skills in order (+ `devflow-ship` with `--until ship`) |
 | Next step | `devflow.ship` (human) — or `devflow.pr` when `--until ship` passed |
-| Related | `devflow-resume` (interrupted run), `devflow-recovery` (stale marker/corrupted state) |
+| Related | `devflow-resume` (interrupted run, stale marker, blocked/corrupted state) |

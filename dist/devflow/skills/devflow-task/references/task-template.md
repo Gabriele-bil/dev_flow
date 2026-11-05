@@ -106,7 +106,7 @@ Format rules:
 - **Language**: English. All written documents must be in English regardless of conversation language.
 - **Compression**: caveman-compress — drop articles/filler/hedging; keep technical and domain terms exact.
 - **Unknown values**: use `[NEEDS CLARIFICATION: <reason>]` inline; never guess.
-- **Status**: `draft` (initial), `clarified` (post `devflow.clarify`), `done` (pipeline complete).
+- **Status**: `draft` (initial), `done` (pipeline complete). `clarified` = legacy value from older features, read as `draft`.
 - **Branch**: set automatically by `devflow.task` following `[feat/fix/chore/doc/ecc...]/[number-of-task-is-present]_[name]` (e.g. `feat/002_cart-checkout` or `fix/login-crash`). Never asked to the user.
 - **App**: present only in monorepo repos (`devflow/config.md` has a `## Apps` table); value must match an App name in that table exactly. Never present in single-app repos.
 - **ADRs**: optional path(s) to ADRs from `docs/adr/` governing or constraining this feature, or "none".

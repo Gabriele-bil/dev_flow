@@ -38,7 +38,7 @@ Bootstrap greenfield software projects end-to-end: structured discovery intervie
 Before proceeding, verify:
 
 - [ ] Target directory is accessible and writable (current working directory or parent of `<project-slug>/`)
-- [ ] No active `.devflow-run.json` from a crashed autonomous session (if present, confirm cleanup or route `devflow.recovery`)
+- [ ] No active `.devflow-run.json` from a crashed autonomous session (if present, confirm cleanup or route `devflow.resume`)
 - [ ] If target directory already contains `constitution.md` or `devflow/features/`, ask user whether to run DevFlow-only roadmap/context initialization or stop and route to `devflow.setup` / `devflow.task`
 
 If any item fails → stop, report which check failed, do not write files.

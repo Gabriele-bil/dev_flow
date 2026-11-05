@@ -31,7 +31,7 @@ Failure fits no family → tag `other` with a 2-3 word label; recurring `other` 
 
 3+ instincts sharing a `backprop-[family]` domain in `.devflow-instincts.yaml` → the gap is systemic to this project, not incidental:
 
-1. Propose the family's standard question (table above, adapted to project vocabulary) as a standing `devflow.clarify` question.
+1. Propose the family's standard question (table above, adapted to project vocabulary) as a standing `devflow.task` Step 4 clarification question.
 2. On user acceptance: log as instinct — `domain: clarify`, `trigger: "clarifying any task.md"`, `action: "ask: [question]"`, confidence 0.9. The `session-start-learnings` hook injects it; clarify's 8D scan picks it up.
 
 ## Worked example

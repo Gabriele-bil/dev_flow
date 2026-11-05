@@ -7,7 +7,7 @@ Read before invoking any devflow command.
 ## Pipeline
 
 ```text
-task → [clarify] → plan → [analyze] → implement → beautify → test → ship → pr
+task → plan → implement → beautify → test → ship → pr
 ```
 
 Bracketed steps optional. Each step has a strict input contract; status lives in `plan.md` (`references/state-machine.md`). Hotfix fast-track: compact task+plan → implement → test → quick ship → pr.
@@ -21,16 +21,14 @@ Bracketed steps optional. Each step has a strict input contract; status lives in
 | Architectural choice / ADR | `devflow.discover` | Trade-offs unresolved |
 | Large objective, multiple PRs | `devflow.blueprint` | Before task |
 | Raw feature idea | `devflow.task` | No `task.md` yet |
-| `task.md` has `[NEEDS CLARIFICATION]` | `devflow.clarify` | task `draft` |
-| `task.md` ready | `devflow.plan` | task `draft` (no markers) / `clarified` |
+| `task.md` ready | `devflow.plan` | task `draft`, no `[NEEDS CLARIFICATION]` markers (else back to `devflow.task`) |
 | Plan ready / implement interrupted | `devflow.implement` | plan `ready` / `implementing` |
 | Implementation done | `devflow.beautify` | plan `implemented` |
 | Review done | `devflow.test` | plan `beautified` |
 | Tests + verification pass | `devflow.ship` | plan `tested` |
 | Ship gate passed | `devflow.pr` | plan `shipped` |
 | Where am I / what next | `devflow.status` | any |
-| Session interrupted | `devflow.resume` | state consistent |
-| Stuck, `blocked`, or inconsistent state | `devflow.recovery` | — |
+| Session interrupted, `blocked`, or inconsistent state | `devflow.resume` | — |
 | Urgent bugfix | `devflow.hotfix` | small, root cause known |
 
 Active feature without explicit argument → `bash scripts/devflow-state.sh resolve` (rules: `references/state-machine.md` → **Active feature resolution**); status writes → `scripts/devflow-state.sh set`. Session orientation → `references/orientation.md`.

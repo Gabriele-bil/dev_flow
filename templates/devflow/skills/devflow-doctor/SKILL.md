@@ -25,7 +25,7 @@ Validate that the consumer environment satisfies all DevFlow operational prerequ
 ## When NOT to Use
 
 - User wants to resume an interrupted feature — use `devflow.resume`
-- User wants to diagnose a failing test or pipeline step — use `devflow.recovery` or `devflow.backprop`
+- User wants to diagnose a failing test or pipeline step — use `devflow.resume` (blocked/inconsistent state) or `devflow.backprop`
 
 ## Workflow
 

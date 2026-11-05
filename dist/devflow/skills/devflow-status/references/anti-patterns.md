@@ -4,7 +4,7 @@
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Editing `.devflow-state.json` directly | Use `devflow-recovery`; never hand-edit state |
+| Editing `.devflow-state.json` directly | Use `devflow-resume` (`devflow-state.sh sync`); never hand-edit state |
 | Prose or dashboard around `--json` output | Single JSON object on stdout — consumers parse it (see `status-schema.md`) |
 | Reporting status from memory | Always read `plan.md` at invocation time |
 | Reporting state-file status over `plan.md` | `plan.md` authoritative; state file only feeds the Drift line |

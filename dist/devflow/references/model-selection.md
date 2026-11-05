@@ -14,9 +14,7 @@ Where each pipeline step runs, and with which model and effort. One table — sk
 | Step | Interactive (main context) | `devflow.run` / `devflow.auto` | Effort |
 | --- | --- | --- | --- |
 | `devflow-task` | session model | step-runner, `sonnet` | medium |
-| `devflow-clarify` | session model | — (interactive only) | low |
 | `devflow-plan` | session model | step-runner, `sonnet` (`thorough`: `opus`) | high |
-| `devflow-analyze` | session model | step-runner, `sonnet` | low |
 | `devflow-implement` | session model | step-runner, `sonnet` (`thorough`: `opus`) | medium |
 | `devflow-beautify` | session model | step-runner, `sonnet` | medium |
 | `devflow-test` | session model | step-runner, `sonnet` | medium |
@@ -32,9 +30,6 @@ Skills not listed run on the session model with the effort in their frontmatter 
 | --- | --- | --- | --- |
 | `code-reviewer` | `sonnet` | high | per-call `model: opus` |
 | `security-auditor` | `sonnet` | high | per-call `model: opus` |
-| `test-engineer` | `sonnet` | medium | — |
-| `accessibility-auditor` | `sonnet` | medium | — |
-| `docs-reviewer` | `sonnet` | low | — |
 
 Never below `sonnet` for ship reviewers — `hooks/pre-model-switch.sh` blocks the switch.
 

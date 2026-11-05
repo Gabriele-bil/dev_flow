@@ -15,12 +15,8 @@ Three constraints shape everything below:
 ```mermaid
 flowchart LR
     setup[devflow.setup] --> task[devflow.task]
-    task -.optional.-> clarify[devflow.clarify]
-    clarify -.-> plan[devflow.plan]
-    task --> plan
-    plan -.optional.-> analyze[devflow.analyze]
-    analyze -.-> implement[devflow.implement]
-    plan --> implement
+    task --> plan[devflow.plan]
+    plan --> implement[devflow.implement]
     implement --> beautify[devflow.beautify]
     beautify --> test["devflow.test<br/>(+ goal-backward verification)"]
     test --> ship["devflow.ship<br/>(agent fan-out)"]
@@ -32,8 +28,7 @@ Cross-cutting entry points, outside the happy path:
 
 | Command | When |
 | --- | --- |
-| `devflow.resume` | Session interrupted (restart, compaction, break) — re-enters correct step |
-| `devflow.recovery` | State corrupted or step stuck — diagnoses, proposes repair |
+| `devflow.resume` | Session interrupted (restart, compaction, break), plan `blocked`, or state drifted — resyncs/unblocks (user-confirmed), re-enters correct step |
 | `devflow.backprop` | Bug escaped the pipeline — traces it to the acceptance criterion, tightens the spec, adds a regression test |
 | `devflow.status` | Read-only snapshot |
 | `devflow.learn` | Persistent project instincts (log/search/prune) |

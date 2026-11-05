@@ -43,7 +43,7 @@ Malicious instructions embedded in content the agent reads (tickets, docs, API r
 **Defense**:
 
 - `post-task-create.sh` is the only writer — scripts, not Claude
-- `devflow-recovery` detects corrupt state before resuming
+- `devflow-resume` detects corrupt state (cross-check vs `plan.md`) before resuming
 
 ### 3. Memory Poisoning
 
@@ -96,7 +96,7 @@ tail -50 .devflow-observe.jsonl | jq '.tool_name, .file_path // empty'
 
 ## Incident Response (Pipeline Compromise Suspected)
 
-1. Run `devflow-recovery` — diagnose state
+1. Run `devflow-resume` — cross-check and resync state
 2. Review `.devflow-observe.jsonl` for anomalous writes
 3. Check `.devflow-learnings.jsonl` for injected entries
 4. Reset state: `rm .devflow-state.json` → rerun from `devflow-task`

@@ -16,7 +16,7 @@ pnpm build
 
 - [ ] Lint passing
 - [ ] Tests passing (`test` stamp)
-- [ ] No open coverage gaps on modified files (Ship Gate report — test-engineer)
+- [ ] Every AC verified in `verification.md` (zero FAIL)
 - [ ] Build passing
 - [ ] `nextjs-architecture` constraints respected
 - [ ] Server/Client boundary documented for new components

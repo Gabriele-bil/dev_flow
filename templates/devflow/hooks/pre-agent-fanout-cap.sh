@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # pre-agent-fanout-cap.sh
 # PreToolUse hook for Claude Code: deterministic backstop on subagent fan-out.
-# devflow-ship's thorough profile caps fan-out at 5 agents (code-reviewer,
-# security-auditor, test-engineer, accessibility-auditor, docs-reviewer) but
-# that cap lives only in skill prose today — a model can miscount or ignore
-# it. This hook enforces a hard ceiling regardless of skill compliance.
+# devflow-ship dispatches at most 2 reviewers (code-reviewer, security-auditor),
+# and devflow-implement/devflow-run dispatch subagents too, but those counts
+# live only in skill prose — a model can miscount or ignore them.
+# This hook enforces a hard ceiling regardless of skill compliance.
 #
 # Counts Agent/Task tool calls within a sliding window (resets after a gap
 # with no such calls) and blocks once the ceiling is exceeded. Not aware of

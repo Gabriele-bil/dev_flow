@@ -24,7 +24,7 @@ Close the loop between runtime failures and `task.md`: trace behavior → accept
 - Bug is a pure implementation slip fully covered by an existing AC (AC correct, code wrong) — fix code + regression test directly, no spec change
 - Feature has no `task.md`/`plan.md` (pre-DevFlow code) — open a `devflow.task` for the fix instead
 - User wants new behavior, not a fixed gap — scope change belongs in `devflow.task`
-- Pipeline is stuck or state corrupted — `devflow.recovery`
+- Pipeline is stuck or state corrupted — `devflow.resume`
 
 ## Input contract
 
@@ -75,7 +75,7 @@ Name it before writing: `[test file path] :: [test name referencing the AC]`. Te
 
 1. Derive a structured `cause_key` (`gap:<family>:<short-slug>` or `test:<file>::<title>`). Log instinct via `devflow.learn log`: trigger = gap family + `cause_key`, action = the tightened-criterion pattern, domain = `backprop-[family]`.
 2. **Rigor repeat check (2+ occurrences or `--never-again`):** Count existing instincts with the same `cause_key` or `backprop-[family]` domain. On **2+ entries** (or immediately if user says "never again"):
-   - Propose an executable `check_cmd` (with optional `ratchet_max` count for legacy code) that fails on the pre-fix state (*Red*) and passes on the fixed state (*Green*), OR a standing `devflow.clarify` question if not statically checkable.
+   - Propose an executable `check_cmd` (with optional `ratchet_max` count for legacy code) that fails on the pre-fix state (*Red*) and passes on the fixed state (*Green*), OR a standing `devflow.task` Step 4 clarification question if not statically checkable.
    - Once approved by user, promote to `.devflow-instincts.shared.yaml` (`devflow.learn promote`).
 
 ### Step 7 — Notify
@@ -110,4 +110,4 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | Writes | `plan.md` — Traceability row for changed AC |
 | Writes | regression test file per adapter conventions |
 | Writes | `.devflow-instincts.yaml` via `devflow.learn log` |
-| Related | `devflow-learn` (instinct store), `devflow-clarify` (receives proposed standard questions), `devflow-test` (verification feeds backprop candidates) |
+| Related | `devflow-learn` (instinct store), `devflow-task` (Step 4 receives proposed standard questions), `devflow-test` (verification feeds backprop candidates) |

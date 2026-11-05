@@ -287,7 +287,7 @@ if [[ -f "$STATE_FILE" ]]; then
   else
     PIPELINE_RESULTS+=("Pipeline State|FAIL|Corrupted JSON in .devflow-state.json")
     CRITICAL_ERRORS=$((CRITICAL_ERRORS + 1))
-    REMEDIATIONS+=("Repair pipeline state with 'devflow.recovery' or reset .devflow-state.json")
+    REMEDIATIONS+=("Repair pipeline state with 'devflow.resume' (resyncs .devflow-state.json from plan.md)")
     if [[ "$FIX_MODE" == true ]]; then
       echo '{}' > "$STATE_FILE"
       REMEDIATIONS+=("Auto-fix: Reset corrupted .devflow-state.json to valid idle state")

@@ -13,7 +13,7 @@ Honest positioning against the three closest alternatives: [Forge](https://githu
 | Verification | Tests + goal-backward per-AC verification + multi-agent ship gate | Goal-backward 4-level verifier + reviewer loop | checklist-driven, manual | whatever you ask for |
 | Spec feedback loop | `devflow.backprop` + instincts log | backprop phase + gap patterns | none | none |
 | Failure handling | Bounded escalation ladder (retry → debug → re-approach → block) | 7-level circuit breakers incl. cross-model rescue | none | none |
-| Recovery/resume | state machine + `devflow.resume` / `devflow.recovery` | on-disk state machine, checkpoints, forensic rebuild | none | compaction summary only |
+| Recovery/resume | state machine + `devflow.resume` (re-entry, resync, unblock) | on-disk state machine, checkpoints, forensic rebuild | none | compaction summary only |
 | Multi-machine collaboration | none | claim leases, flags, transports | none | none |
 | Hosts | Claude Code, Antigravity CLI | Claude Code | Copilot, Claude Code, Gemini, Cursor + | Claude Code |
 

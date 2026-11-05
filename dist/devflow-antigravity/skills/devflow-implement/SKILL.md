@@ -51,7 +51,7 @@ If any item fails → stop, report which check failed, do not touch application 
 
 ## Re-entry mode (`--fix`)
 
-Targeted rework after the plan was already implemented. Callers: `devflow.ship` fix loop, `devflow.backprop` Step 5, `devflow.recovery`, user with explicit findings.
+Targeted rework after the plan was already implemented. Callers: `devflow.ship` fix loop, `devflow.backprop` Step 5, user with explicit findings.
 
 - Input: list of findings (`file:line` + description) or File List paths. Empty list → stop.
 - Entry: `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set plan implementing` (documented backward transition).
@@ -156,7 +156,7 @@ Supporting rules:
 
 ### Checkpoint at slice boundaries
 
-After completing each vertical slice (or every 5 files on unsliced plans), record working context `[done]` markers cannot hold — read by `devflow.resume` / `devflow.recovery` after crash or compaction: `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" checkpoint --step devflow.implement --slice "<slice>" [--decision "…"] [--constraint "…"] [--error "…"]` (flags repeatable; arrays are appended).
+After completing each vertical slice (or every 5 files on unsliced plans), record working context `[done]` markers cannot hold — read by `devflow.resume` after crash or compaction: `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" checkpoint --step devflow.implement --slice "<slice>" [--decision "…"] [--constraint "…"] [--error "…"]` (flags repeatable; arrays are appended).
 
 ### Save point (for large plans)
 

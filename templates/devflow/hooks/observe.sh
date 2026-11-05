@@ -90,7 +90,7 @@ if [ "$EVENT" = "pre" ]; then
 
   STEP_CMD=""
   case "$STEP" in
-    devflow.task|devflow.clarify|devflow.plan|devflow.analyze|devflow.implement|devflow.beautify|devflow.test|devflow.ship|devflow.pr|devflow.hotfix)
+    devflow.task|devflow.plan|devflow.implement|devflow.beautify|devflow.test|devflow.ship|devflow.pr|devflow.hotfix)
       STEP_CMD="${STEP#devflow.}" ;;
   esac
 

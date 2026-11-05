@@ -93,7 +93,7 @@ case "$PLAN_STATUS" in
   tested)             NEXT="devflow.ship"      ;;
   shipped)            NEXT="devflow.pr"        ;;
   pr-opened)          NEXT="devflow.task"      ;;
-  blocked)            NEXT="devflow.recovery"  ;;
+  blocked)            NEXT="devflow.resume"    ;;
   *)                  NEXT="unknown"           ;;
 esac
 

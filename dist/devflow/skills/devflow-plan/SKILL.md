@@ -56,7 +56,7 @@ Before proceeding, verify:
 
 - [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md`
 - [ ] `task.md` has non-empty goal section (`## Goal & Value` or `## Summary`) and functional requirements (`## Use Cases & Scenarios` or `## Subtasks`)
-- [ ] `task.md` Status is `draft` (no `[NEEDS CLARIFICATION: ...]` markers) or `clarified` — if unresolved markers exist → stop, suggest `devflow.clarify`
+- [ ] `task.md` Status is `draft` (or legacy `clarified`) with no `[NEEDS CLARIFICATION: ...]` markers — markers left → stop, route back to `devflow.task` to resolve them
 
 If any item fails → stop, report which check failed, do not write `plan.md`.
 
@@ -196,6 +196,12 @@ Format rules:
 
 **Run mode** (`.devflow-run.json` present, contract `${CLAUDE_PLUGIN_ROOT}/references/run-mode.md`): a genuine **Open questions** entry (plan-level ambiguity, not a constitution violation) does not escalate — default + `## Decision flags` entry per its **Decision flags**; keep Status `ready`. Constitution Gate Critical/Required violations above are the one exception — those stop regardless of mode.
 
+### Step 5b - Consistency check (optional)
+
+Read-only cross-check of `task.md` + `plan.md` + `constitution.md` + ADRs — passes, severity, report: `references/consistency-check.md`.
+- Interactive: ask `Run consistency check before implement? (Recommended for standard/thorough)`. Yes → run, report; Critical/Required → fix `plan.md` (or `task.md`), re-run failing passes. No → skip.
+- Run mode (`devflow.auto`): always run. Critical → stop (major discrepancy); Required → fix `plan.md` or waiver in `## Decision flags`.
+
 ### Step 6 - Notify user
 
 Respond with:
@@ -234,7 +240,7 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | Reads (adapter) | `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`, `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core) + `steps/plan.md`; technology skills per ADAPTER table |
 | Reads | `${CLAUDE_PLUGIN_ROOT}/references/complexity-scoring.md` (Step 4d — score + profile) |
 | Reads | `${CLAUDE_PLUGIN_ROOT}/references/token-economy.md` (Step 1 — index-first exploration) |
-| Reads (conditional) | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-plan/references/plan-anti-patterns.md` (Anti-patterns catalog — when unsure / retry) |
+| Reads (conditional) | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-plan/references/plan-anti-patterns.md` (when unsure / retry); `references/consistency-check.md` (Step 5b) |
 | Runs | `${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh` (`resolve`, `sync`) |
 | Writes | `devflow/features/[NNN]_[feature-name]/plan.md`, `.devflow-state.json` (merge) |
 | Writes (conditional) | `plan.md` `## Decision flags` (run mode — resolved Open questions) |

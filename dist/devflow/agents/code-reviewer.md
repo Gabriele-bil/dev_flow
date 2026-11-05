@@ -157,5 +157,5 @@ Use dev-flow taxonomy throughout the report:
 
 - **Invoke directly:** user asks for review of specific change or PR
 - **Invoke via:** `devflow.hotfix` Step 5 (alone — all seven axes)
-- **Invoke via:** `devflow.ship` fan-out per complexity profile — `quick`: `code-reviewer` alone; `standard`: + `security-auditor`, `test-engineer`; `thorough`: + `accessibility-auditor`, `docs-reviewer`
+- **Invoke via:** `devflow.ship` fan-out per complexity profile — `quick`: `code-reviewer` alone; `standard` / `thorough`: + `security-auditor`
 - **Do not invoke other personas.** Flag security/test concerns in your report; orchestration belongs to `devflow.ship`, not personas

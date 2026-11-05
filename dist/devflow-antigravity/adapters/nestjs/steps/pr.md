@@ -17,7 +17,7 @@ npm run build
 
 - [ ] Lint passing
 - [ ] Unit tests passing (`test` stamp)
-- [ ] No open coverage gaps on modified files (Ship Gate report — test-engineer)
+- [ ] Every AC verified in `verification.md` (zero FAIL)
 - [ ] E2E tests passing
 - [ ] Build passing
 - [ ] `nestjs-architecture` constraints respected (feature modules, constructor injection, no circular deps)

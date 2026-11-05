@@ -22,7 +22,7 @@ Interactive architectural discovery for greenfield applications or complex featu
 - Architecture already decided and documented in `constitution.md` or existing ADR — go to `devflow.task` or `devflow.plan`
 - Feature is small or standard extension following established codebase patterns without architectural unknowns — go to `devflow.task`
 - Fixing a bug or regression in existing code — use `devflow.backprop` or `devflow.hotfix`
-- Task is written and needs clarification on user requirements, not architecture — use `devflow.clarify`
+- Task is written and needs clarification on user requirements, not architecture — use `devflow.task` (Step 4 clarification)
 
 ## Input contract
 

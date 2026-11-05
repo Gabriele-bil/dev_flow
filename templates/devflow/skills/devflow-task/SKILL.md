@@ -75,7 +75,7 @@ Structured elicitation rules:
 - **High-stakes filter:** ask ONLY when the answer changes user-visible behavior, scope, safety, or data/cost boundaries. If a sensible, cheap-to-reverse default exists, record it in `## Assumptions & Risks` instead of asking
 - Use **`AskUserQuestion`** / **`ask_question`**: offer 2–4 options with first option marked `(Recommended)` and a 1-sentence rationale; fallback to chat prompt if tool unavailable
 - Skip entirely if idea is already clear enough
-- Full protocol `@devflow/skills/devflow-clarify/references/interactive-interview.md` — read only when a question fits none of these rules
+- Full protocol `references/interactive-interview.md` — read only when a question fits none of these rules
 
 **Run mode** (`.devflow-run.json` present): do not stop — pick defensible default (repo precedent > `docs/product.md` > conservative reading), record each as bullet in `task.md` **`## Assumptions & Risks`**; never leave raw `[NEEDS CLARIFICATION]` marker. Missing **App** on monorepo still hard-stops.
 
@@ -189,7 +189,7 @@ Rows restating Step 8 checklist items live only in the catalog. Full catalog —
 | | |
 | --- | --- |
 | Reads | `devflow/config.md` (Apps table, monorepo only); `docs/product.md` (required); `constitution.md`, `registry.md` (as needed); `DESIGN.md` / `docs/design.md` (if present); `references/task-template.md`, `references/notify-template.md` |
-| Reads (conditional) | `docs/adr/` (if present — active ADRs); `.devflow-run.json` (run-mode switch); `refinement-hints.md`, `references/invest-criteria.md`, `references/story-splitting.md`, `references/bdd-acceptance-criteria.md` (Step 5, on need); `@devflow/skills/devflow-clarify/references/interactive-interview.md` (Step 4, question fits no inline rule); `examples.md` (Step 8 checklist fails); `references/anti-patterns.md` (when unsure / retry) |
+| Reads (conditional) | `docs/adr/` (if present — active ADRs); `.devflow-run.json` (run-mode switch); `refinement-hints.md`, `references/invest-criteria.md`, `references/story-splitting.md`, `references/bdd-acceptance-criteria.md` (Step 5, on need); `references/interactive-interview.md` (Step 4, question fits no inline rule); `examples.md` (Step 8 checklist fails); `references/anti-patterns.md` (when unsure / retry) |
 | Writes | `devflow/features/[NNN]_[feature-name]/task.md`, `.devflow-state.json` (merge: feature, feature_path, branch, task_status, next_step) |
 | Side effects | Creates (from `origin/<default>`) and switches git branch `[feat/fix/chore/doc/ecc...]/[number-of-task-is-present]_[name]` |
 | Next step | `devflow.plan` → `plan.md` (full template in `devflow/skills/devflow-plan/SKILL.md`) |

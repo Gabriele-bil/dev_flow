@@ -37,8 +37,8 @@ Order (plan.md authoritative, state file = derived cache):
 
 1. `devflow/config.md` — absent → Case C. Active adapter (single-app) or `## Apps` table (monorepo)
 2. Active feature — resolve with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask)
-3. Resolved feature's `plan.md` — `**Status:**`, `**App:**`, File List `[done]`/`[pending]` progress; no `plan.md` → `task.md` `**Status:**` (next step `devflow.plan`, or `devflow.clarify` when markers open)
-4. `.devflow-state.json` — drift check only: its `plan_status` ≠ `plan.md` Status → add `Drift:` line (plan.md wins; `devflow.recovery` resyncs)
+3. Resolved feature's `plan.md` — `**Status:**`, `**App:**`, File List `[done]`/`[pending]` progress; no `plan.md` → `task.md` `**Status:**` (next step `devflow.plan`, or `devflow.task` when `[NEEDS CLARIFICATION]` markers open)
+4. `.devflow-state.json` — drift check only: its `plan_status` ≠ `plan.md` Status → add `Drift:` line (plan.md wins; `devflow.resume` resyncs)
 
 Status semantics and next-step mapping: `@devflow/references/state-machine.md` (authoritative). Adapter/app resolution: `@devflow/references/adapter-resolution.md`.
 
@@ -89,7 +89,7 @@ DevFlow Status
 Adapter: <adapter>   <!-- monorepo: "Apps: <N> configured (web→nextjs, mobile→flutter, …)" instead -->
 No open feature (all terminal, blocked, or none yet).
 
-Start a feature: devflow.task   <!-- blocked features listed → devflow.recovery -->
+Start a feature: devflow.task   <!-- blocked features listed → devflow.resume -->
 ```
 
 **Case C — no `devflow/config.md`:**
@@ -117,7 +117,7 @@ Both files absent → omit line, zero behavior change. Turns raw JSONL/YAML into
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Editing `.devflow-state.json` directly | Use `devflow-recovery`; never hand-edit state |
+| Editing `.devflow-state.json` directly | Use `devflow-resume` (`devflow-state.sh sync`); never hand-edit state |
 | Reporting status from memory | Always read `plan.md` at invocation time |
 
 Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
@@ -130,4 +130,4 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | Reads (optional) | `.devflow-metrics/` — existence only (Metrics pointer line) |
 | Reads (optional) | `.devflow-learnings.jsonl`, `.devflow-instincts.yaml` — auto-detected/contested learnings count (Learnings line) |
 | Writes | nothing |
-| Related | `@devflow/references/orientation.md` (full routing tree), `devflow-resume` (session re-entry), `devflow-recovery` (corrupted state), `devflow-learn` (full learnings detail), `devflow-metrics` (savings, cost, pass@1) |
+| Related | `@devflow/references/orientation.md` (full routing tree), `devflow-resume` (session re-entry), `devflow-resume` also repairs blocked/corrupted state, `devflow-learn` (full learnings detail), `devflow-metrics` (savings, cost, pass@1) |

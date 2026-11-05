@@ -5,7 +5,8 @@
 | Anti-Pattern | Fix |
 | --- | --- |
 | Resuming from memory of previous session | Read `.devflow-state.json` + `plan.md` fresh at invocation |
-| Repairing corrupted state inline | Resume routes; `devflow.recovery` repairs — separate concerns |
+| Editing `**Status:**` or `.devflow-state.json` by hand to repair | `devflow-state.sh sync` / `set plan <status> --force` — the script writes markdown + cache together |
+| Unblocking without user confirmation | Step 2b always shows cause + proposed status and waits |
 | Skipping user confirmation on resume position | Always confirm Step 3 — cheapest wrong-direction insurance |
 | Re-running completed pipeline steps "to be safe" | Statuses per `state-machine.md` are authoritative; enter at `next_step` only |
 

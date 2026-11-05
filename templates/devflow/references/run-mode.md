@@ -9,7 +9,7 @@ Single source for unattended execution. Orchestrators: `devflow.run` (middle pip
 - Armed only by an orchestrator's Step 0 — never by a step skill, never mid-conversation.
 - `devflow.run`: armed after one explicit user confirmation.
 - `devflow.auto`: armed immediately; every input needing the user (idea text, monorepo `--app`, stale-marker cleanup) collected **before** arming.
-- Stale marker found before arming → ask user: delete, or route `devflow.recovery`.
+- Stale marker found before arming → ask user: delete (`run disarm`), or route `devflow.resume`.
 - Arm with `bash "@devflow/scripts/devflow-state.sh" run arm …` (refuses a stale marker, appends `.devflow-run.json` to `.gitignore`); disarm with `run disarm`.
 
 ## Autonomy policy
@@ -44,7 +44,7 @@ Precedence: repo precedent > `constitution.md` > adapter convention (`devflow.ta
 | Major — hard stop (both orchestrators) | Minor — flag + continue |
 | --- | --- |
 | Constitution Gate Critical/Required (`devflow-plan` Step 0b) | Ambiguity / unspecified behavior |
-| `devflow.analyze` Critical | `devflow.analyze` Required / Nit (`auto`: waiver flag) |
+| `devflow-plan` Step 5b consistency check Critical | Step 5b Required / Nit (`auto`: waiver flag) |
 | `escalation-ladder.md` Level 4 (decompose needs approval → Level 5) and Level 5 block | Beautify opinable proposal |
 | `devflow.ship` Critical | Ship Required at loop cap — `run`: surface report; `auto`: exceptions flag → PR body |
 | Step input contract fails | Idea vs codebase mismatch → `## Deviations` + flag |
