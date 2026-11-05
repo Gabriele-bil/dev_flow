@@ -21,7 +21,7 @@ idea
 
 Each step produces an artifact that feeds the next. Do not skip steps.
 
-**Autonomous entry point:** `devflow.auto <idea>` chains `task → plan → implement → [beautify] → test → ship → pr` in total autonomy from a raw idea to an opened pull request (defensible defaults + decision flags instead of clarification pauses; halts only on major discrepancies like Critical blockers, and documents minor discrepancies in the PR body).
+**Autonomous entry point:** `devflow.auto <idea>` chains `task → plan → implement → [beautify] → test → ship → pr` (beautify only with `--beautify`) in total autonomy from a raw idea to an opened pull request (defensible defaults + decision flags instead of clarification pauses; halts only on major discrepancies like Critical blockers, and documents minor discrepancies in the PR body).
 
 ---
 
@@ -123,6 +123,7 @@ dev_flow/
 │       │   └── common/              # common-clean-code, -web-interface-guidelines, -caveman, -state-patterns
 │       ├── agents/
 │       │   ├── code-reviewer.md
+│       │   ├── finding-validator.md
 │       │   ├── security-auditor.md
 │       │   └── step-runner.md
 │       ├── references/
@@ -194,6 +195,7 @@ DevFlow ships one build per host, generated from the same source: [`dist/devflow
 | Hidden steps (`user-invocable: false`: beautify, offered by implement) | ✅ not in the `/` menu | ⚠️ field stripped — still listed as `/devflow-beautify` |
 | Read-only skills (`disallowed-tools`: status, metrics, resume) | ✅ Write/Edit denied | ⚠️ field stripped — read-only by the skill's rules only |
 | Review subagents (`agents/`) | ✅ read-only tools, `model: sonnet` | ✅ read-only tools (`tools` translated to agy's allowlist, verified on agy 1.4.10), host default model |
+| Per-step model in `devflow.run` / `devflow.auto` | ✅ `sonnet` step-runners, `opus` only on `thorough` | ⚠️ every step-runner and reviewer on the session model — `devflow.auto` costs more; pick a mid-tier session model for unattended runs |
 | Destructive-command / config-protect / scope guards | ✅ | ✅ (`run_command`, file-write tools) |
 | Observe log, instincts, churn learning | ✅ | ✅ |
 | Format + typecheck on Stop, debug-print check | ✅ (shown as `systemMessage`) | ✅ (results in the agy log only) |
@@ -271,7 +273,8 @@ Specialized agents live in [`templates/devflow/agents/`](templates/devflow/agent
 
 | Agent | File | Role |
 | ------- | ------ | ------ |
-| Step Runner | [`agents/step-runner.md`](templates/devflow/agents/step-runner.md) | Runs one pipeline step in its own context for `devflow.run` / `devflow.auto` (Claude Code: per-step model); returns a `RESULT:` line |
+| Step Runner | [`agents/step-runner.md`](templates/devflow/agents/step-runner.md) | Runs one pipeline step — or a step group (`task → plan` in `devflow.auto`, `implement --fix → test` in the ship fix loop) — in its own context for `devflow.run` / `devflow.auto` (Claude Code: per-step model); returns a `RESULT:` line |
+| Finding Validator | [`agents/finding-validator.md`](templates/devflow/agents/finding-validator.md) | Re-checks each Critical/Required ship finding against the cited `file:line`; discards only what the code disproves, so a false positive never starts a fix loop |
 | Code Reviewer | [`agents/code-reviewer.md`](templates/devflow/agents/code-reviewer.md) | 5-axis code review: correctness, readability, architecture, security, performance |
 | Security Auditor | [`agents/security-auditor.md`](templates/devflow/agents/security-auditor.md) | Exploitable vulnerabilities, threat modeling, secure coding |
 

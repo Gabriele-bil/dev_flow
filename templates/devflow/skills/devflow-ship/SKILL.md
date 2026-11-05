@@ -83,9 +83,17 @@ Merge, dedupe (same `file:line` → one entry, list reviewers). Contradiction (o
 (from plan.md ## Decision flags — omit when none)
 - F[N] — [decision]; alternatives: [...]; files: [...]
 
+### Discarded by validator
+(omit when none — Step 3b)
+- [agent] `[file:line]` — [finding] — discarded: [evidence]
+
 ---
 Profile: [quick | standard | thorough] · Reviewed by: [agents dispatched]
 ```
+
+### Step 3b - Validate blocking findings
+
+Any **Critical** or **Required** in the report → dispatch `@devflow/agents/finding-validator.md` once (Claude Code: Agent, `subagent_type: "devflow:finding-validator"`; Antigravity: `invoke_subagent`, subagent `finding-validator`) with the packet path and the numbered Critical + Required list. `DISCARDED` entries move to **Discarded by validator** with their evidence and stop gating; `CONFIRMED` stay. Re-compute the verdict. Nit/FYI never validated. Step 4b re-reviews validate their new blocking findings the same way.
 
 ### Step 4 - Gate decision
 
@@ -101,11 +109,11 @@ Code edit after `devflow.test` invalidates `verification.md` — never patch inl
 
 Run mode only (Required-only verdicts; Critical never loops autonomously): `bash "@devflow/scripts/devflow-state.sh" run bump` — exit 3 = cap reached → under `devflow.run`: present report, return control; under `devflow.auto`: remaining Required → `## Decision flags` as documented exceptions, Step 5.
 
-Each iteration (run mode: each skill in a `step-runner` subagent per `@devflow/references/run-mode.md` → **Step dispatch**; interactive: execute here):
+Each iteration (run mode: steps 1–2 in **one** `step-runner` subagent — group `implement --fix` → `test --changed`, per `@devflow/references/run-mode.md` → **Step dispatch**; interactive: execute here):
 
-1. `@devflow/skills/devflow-implement/SKILL.md` `--fix <findings>` (`file:line` + description) — `tested` → `implementing` → `implemented`.
+1. `@devflow/skills/devflow-implement/SKILL.md` `--fix <findings>` (confirmed findings only, `file:line` + description) — `tested` → `implementing` → `implemented`.
 2. `@devflow/skills/devflow-test/SKILL.md` `--changed <files the fix touched>` (`thorough`: no `--changed`) — `implemented` → `tested` only with zero FAIL. Fails → stop loop, present report + failure (`@devflow/references/escalation-ladder.md`); never set `shipped`.
-3. Re-run Step 1 with the **same roster**, packet built with `--since <previous tree>` (`thorough`: full packet) → Steps 2–4. Critical on any iteration → hard stop regardless of budget.
+3. Re-review the delta — packet built with `--since <previous tree>`, roster = `code-reviewer` + every agent whose confirmed findings this iteration fixed (`thorough`: full packet, same roster as Step 1) → Steps 2–4 (Step 3b on new blocking findings). Critical on any iteration → hard stop regardless of budget.
 
 ### Step 5 - Route to devflow.pr
 
@@ -131,6 +139,6 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | Reads | `task.md`, `plan.md` (`**Complexity:**`, `## Decision flags`), `verification.md` in `devflow/features/[NNN]_[feature-name]/`; `@devflow/references/complexity-scoring.md`, `@devflow/references/adapter-resolution.md`, `@devflow/references/token-economy.md` |
 | Reads (conditional) | `.devflow-run.json` (`until`/`orchestrator`, grader budget); `references/anti-patterns.md` |
 | Runs | `@devflow/scripts/review-packet.sh` → `.devflow-review-packet.md` (every fan-out, incl. Step 4b) |
-| Dispatches | `code-reviewer` (+ `security-auditor` on `standard`/`thorough`), parallel; Step 4b chains `devflow.implement --fix` → `devflow.test` |
+| Dispatches | `code-reviewer` (+ `security-auditor` on `standard`/`thorough`), parallel; `finding-validator` on Critical/Required (Step 3b); Step 4b chains `devflow.implement --fix` → `devflow.test` (run mode: one step-runner) |
 | Writes | `plan.md` `**Status:** shipped` + `.devflow-state.json` via `devflow-state.sh`; `## Decision flags` (documented exceptions); `.devflow-run.json` grader count (run mode) |
 | Routes to | `devflow-pr` on gate pass |

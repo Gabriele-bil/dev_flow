@@ -149,7 +149,8 @@ agents:
     path: agents/step-runner.md
     description: >-
       Runs one pipeline step (one skill) in its own context for devflow.run /
-      devflow.auto and returns a RESULT line + short report
+      devflow.auto (or one step group: task → plan, implement --fix → test)
+      and returns a RESULT line + short report
     invoked_by: devflow.run, devflow.auto, devflow.ship
   - id: code-reviewer
     path: agents/code-reviewer.md
@@ -157,6 +158,12 @@ agents:
       Staff-engineer-level code reviewer. Seven-axis review across correctness,
       readability, architecture, security, performance, scope fidelity,
       simplicity. Use before merge or via devflow.ship fan-out
+    invoked_by: devflow.ship
+  - id: finding-validator
+    path: agents/finding-validator.md
+    description: >-
+      Re-checks every Critical and Required devflow.ship finding against the
+      cited file and line; discards only what the code disproves
     invoked_by: devflow.ship
   - id: security-auditor
     path: agents/security-auditor.md

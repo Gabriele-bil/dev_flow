@@ -77,7 +77,8 @@ Hooks are automation the agent doesn't have to remember. All in `templates/devfl
 | SessionStart | `session-start-learnings.sh` | Inject past learnings |
 | PreToolUse | `pre-config-protect.sh` | Block linter/analyzer config edits |
 | PreToolUse | `pre-bash-destructive-guard.sh` | Block catastrophic `rm -rf`, hard-reset/clean/discard, force-push to main/master, `commit --no-verify`/`--no-gpg-sign` |
-| PreToolUse / PostToolUse | `observe.sh` | Tool-call log (`.devflow-observe.jsonl`), Bash command capture, retry-loop detection |
+| PreToolUse | `pre-bash-stamp-guard.sh` | Run mode only: deny test/lint/analyze/format/e2e/build commands not wrapped by `verify-stamp.sh` (`DEVFLOW_STAMP_GUARD=off` disables) |
+| PreToolUse / PostToolUse | `observe.sh` | Tool-call log (`.devflow-observe.jsonl`: edited and read paths, Bash commands), retry-loop detection |
 | PostToolUse | `post-edit-accumulate.sh` | Track modified files for batch checks |
 | PostToolUse | `post-task-create.sh` | Maintain feature-number counter |
 | PreCompact | `pre-compact.sh` | Snapshot plan progress → `.devflow-state.json` + resume reminder |

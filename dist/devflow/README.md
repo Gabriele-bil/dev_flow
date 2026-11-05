@@ -94,13 +94,13 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 | `devflow.blueprint` | Large idea → multi-PR blueprint with dependency graph + adversarial review |
 | `devflow.implement` | Execute `plan.md` step by step, vertical slice by slice; at exit offers the optional beautify step (readability, conventions, design tokens, layout, a11y basics — not a slash command; default off in `quick` profile) |
 | `devflow.test` | Write and run unit + integration tests; bounded retry; goal-backward per-AC verification (`verification.md`) |
-| `devflow.ship` | Pre-merge gate: `code-reviewer` (+ `security-auditor` from `standard` up) in parallel → Ship Gate Report → route to PR |
+| `devflow.ship` | Pre-merge gate: `code-reviewer` (+ `security-auditor` from `standard` up) in parallel → `finding-validator` on blocking findings → Ship Gate Report → route to PR |
 | `devflow.pr` | Commit, push branch, open PR to main |
 | `devflow.status` | Show current pipeline state (active feature, next step, progress) |
 | `devflow.doctor` | Diagnose environment readiness, MCP servers reachability, CLI toolchains, and pipeline state integrity |
 | `devflow.hotfix` | Fast-track bugfix: compact task+plan → failing regression test → fix → full suite + verification → PR (no beautify, no ship review) |
 | `devflow.resume` | Resume interrupted or blocked session — read state, cross-check plan.md, resync drift / unblock (user-confirmed), re-enter correct step |
-| `devflow.auto` | Full autonomy from raw idea to opened PR: task → plan (+ consistency check) → implement → [beautify] → test → ship → pr; halts only on Critical discrepancies |
+| `devflow.auto` | Full autonomy from raw idea to opened PR: task → plan (+ consistency check, one step-runner) → implement → [beautify, `--beautify` only] → test → ship → pr; halts only on Critical discrepancies |
 | `devflow.run` | Opt-in autonomy: chain implement → beautify → test unattended; decision flags; stop before ship |
 | `devflow.backprop` | Backpropagate escaped bug into spec — classify gap, tighten AC, add regression test |
 | `devflow.worktree` | Create / list / remove isolated git worktrees for parallel features, with dev-server port offset and overlap detection |

@@ -187,7 +187,7 @@ Shared by two orchestrators, distinguished by `from`/`until` vocabulary:
 Lifecycle:
 
 - Written by `devflow.run` Step 0 (after user confirmation) or `devflow.auto` Step 0 (immediately on execution) with `devflow-state.sh run arm --orchestrator <o> --from <x> --until <y> [--feature F]`; no other skill arms run mode. `run arm` refuses a stale marker (exit 2), adds the file to `.gitignore`
-- Deleted by the owning orchestrator (`devflow.run` or `devflow.auto`) on every exit path (complete, contract failure, block, handoff) — `devflow-state.sh run disarm`; `run feature <NNN_name>` sets `feature` after `devflow.auto`'s task step; `run status` prints it
+- Deleted by the owning orchestrator (`devflow.run` or `devflow.auto`) on every exit path (complete, contract failure, block, handoff) — `devflow-state.sh run disarm`; `run feature <NNN_name>` sets `feature` after `devflow.auto`'s task step (written by the `task → plan` step-runner); `run status` prints it
 - Never committed — the arming orchestrator appends it to `.gitignore` when present
 - Stale marker (found at session start, no run in progress) → `devflow.resume` asks: continue interactively (delete marker) or re-arm the orchestrator named in `from`/`until` (`devflow.run` or `devflow.auto`); corrupted → `devflow-state.sh run disarm` (user-confirmed)
 

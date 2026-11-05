@@ -271,15 +271,23 @@ QUALITY_JSON=$(
   TOTAL_CALLS=0
   FAILED_CALLS=0
   RETRY_LOOPS=0
+  OBS_STATS='{"total":0,"failed":0,"duplicate_reads":0,"unstamped_checks":0,"calls_by_step":[]}'
 
   if [ -f "$OBSERVE_LOG_FILE" ] && [ -s "$OBSERVE_LOG_FILE" ]; then
     OBS_STATS=$(jq -s '
       [ .[] | select(.event == "post") ] as $posts |
+      [ .[] | select(.event == "pre") ] as $pres |
+      [ $pres[] | select((.read // "") != "") ] as $reads |
       {
         total: ($posts | length),
-        failed: ($posts | map(select(.is_error == true)) | length)
+        failed: ($posts | map(select(.is_error == true)) | length),
+        duplicate_reads: (($reads | length) - ($reads | map([.session, .read]) | unique | length)),
+        unstamped_checks: ($pres | map(select(.kind == "shell" and ((.cmd // "") | test("verify-stamp") | not)
+          and ((.cmd // "") | test("(^|[;&|[:space:]])((pnpm|npm|yarn|bun)( [^;&|]*)? (run )?(test|t|lint|typecheck|build|format|e2e)([:[:space:]]|$)|(npx|bunx) (tsc|eslint|prettier|jest|vitest|playwright test)|flutter (test|analyze)|dart analyze)")))) | length),
+        calls_by_step: ($pres | map(select((.step // "") != "")) | group_by(.step)
+          | map({name: .[0].step, count: length}) | sort_by(-.count))
       }
-    ' "$OBSERVE_LOG_FILE" 2>/dev/null || echo '{"total":0,"failed":0}')
+    ' "$OBSERVE_LOG_FILE" 2>/dev/null || echo "$OBS_STATS")
     TOTAL_CALLS=$(printf '%s' "$OBS_STATS" | jq -r '.total // 0')
     FAILED_CALLS=$(printf '%s' "$OBS_STATS" | jq -r '.failed // 0')
   fi
@@ -298,12 +306,16 @@ QUALITY_JSON=$(
     --argjson failed "$FAILED_CALLS" \
     --argjson retries "$RETRY_LOOPS" \
     --argjson test_rate "$TEST_RATE" \
+    --argjson obs "$OBS_STATS" \
     '{
       total_tool_calls: $total,
       failed_tool_calls: $failed,
       pass_at_1_rate: (if $total > 0 then ((((($total - $failed) / $total) * 1000) | round) / 10) else 100.0 end),
       retry_loops_detected: $retries,
-      test_suite_pass_pct: $test_rate
+      test_suite_pass_pct: $test_rate,
+      duplicate_reads: ($obs.duplicate_reads // 0),
+      unstamped_checks: ($obs.unstamped_checks // 0),
+      calls_by_step: ($obs.calls_by_step // [])
     }'
 )
 
@@ -455,6 +467,9 @@ if [ "$TOOL_CALLS" -gt 0 ] || [ "$RETRY_COUNT" -gt 0 ]; then
   printf '  Tool Invocations:    %s (Errors: %s)\n' "$TOOL_CALLS" "$(q '.quality.failed_tool_calls // 0')"
   printf '  First-Pass Success:  %s%% pass@1\n' "$(q '.quality.pass_at_1_rate // 100')"
   printf '  Detected Retry Loops: %s\n' "$RETRY_COUNT"
+  printf '  Re-reads (same file, same session): %s · Checks run outside verify-stamp: %s\n' \
+    "$(q '.quality.duplicate_reads // 0')" "$(q '.quality.unstamped_checks // 0')"
+  q '.quality.calls_by_step[]? | "    • " + .name + ": " + (.count | tostring) + " tool calls"'
 
   TEST_PCT=$(q '.quality.test_suite_pass_pct // empty')
   if [ -n "$TEST_PCT" ]; then

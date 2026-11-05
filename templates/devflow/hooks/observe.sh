@@ -106,15 +106,17 @@ if [ "$EVENT" = "pre" ]; then
       --arg ts "$TS" --argjson epoch "$NOW_EPOCH" --arg inferred "$INFERRED_CMD" --arg stepcmd "$STEP_CMD"
   fi
 
-  # Don't pollute the churn log with read paths
-  [ "$KIND" = "read" ] && FILE_PATH=""
+  # Read paths go to their own key: the churn log (`file`) stays edit-only,
+  # while devflow.metrics counts re-reads of the same file per session
+  READ_PATH=""
+  if [ "$KIND" = "read" ]; then READ_PATH=$(df_rel_path "$FILE_PATH"); FILE_PATH=""; fi
 
   ENTRY=$(jq -cn \
     --arg ts "$TS" --arg event "$EVENT" --arg tool "$TOOL" --arg kind "$KIND" \
     --arg session "$SESSION" --arg step "$STEP" --arg feature "$FEATURE" \
-    --arg file "$FILE_PATH" --arg cmd "$CMD" \
+    --arg file "$FILE_PATH" --arg read "$READ_PATH" --arg cmd "$CMD" \
     '{ts: $ts, event: $event, tool: $tool, kind: $kind, session: $session,
-      step: $step, feature: $feature, file: $file, cmd: $cmd}
+      step: $step, feature: $feature, file: $file, read: $read, cmd: $cmd}
      | with_entries(select(.value != ""))' 2>/dev/null) || true
   [ -n "$ENTRY" ] && df_append "$LOG_FILE" "$ENTRY"
 
