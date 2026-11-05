@@ -103,7 +103,7 @@ rm -rf "$D"
 
 # T3: status → next_step mapping (per state-machine.md)
 echo "--- T3: status to next_step mapping ---"
-for pair in "ready:devflow.implement" "implemented:devflow.beautify" "beautified:devflow.test" \
+for pair in "ready:devflow.implement" "implemented:devflow.test" "beautified:devflow.test" \
             "tested:devflow.ship" "shipped:devflow.pr" "blocked:devflow.resume"; do
   status="${pair%%:*}"; expected="${pair##*:}"
   D=$(tmpdir)

@@ -57,7 +57,7 @@ Targeted rework after the plan was already implemented. Callers: `devflow.ship` 
 - Entry: `bash "@devflow/scripts/devflow-state.sh" set plan implementing` (documented backward transition).
 - Scope: edit only files named by the findings (+ their direct callers when the fix changes a contract). Never touch other `[done]` markers; never re-implement untouched files; new file needed → add File List entry `[done]` + **Traceability** row + `## Deviations` entry.
 - Skip Step 3 branch creation (verify only) and Step 7 registry unless a shared element changed.
-- Run Steps 5–6 (codegen, format, analyze) on touched files; exit via Step 8 (`**Status:** implemented`). Next step stays `devflow.beautify` → `devflow.test` — re-entry never skips them.
+- Run Steps 5–6 (codegen, format, analyze) on touched files; exit via Step 8 (`**Status:** implemented`). Next step `devflow.test` (beautify offered per Step 8) — re-entry never skips test.
 
 ## Workflow
 
@@ -201,13 +201,15 @@ Read by `devflow.beautify` and `devflow.pr`. Omit if fully aligned.
 
 `bash "@devflow/scripts/devflow-state.sh" set plan implemented`.
 
-Respond using template in `references/notify-template.md`. **Run mode** (`.devflow-run.json` present): emit the notify block but do not wait for user — control returns to the orchestrator (`devflow.run` or `devflow.auto`).
+Respond using template in `references/notify-template.md`, then offer the optional beautify step (not a slash command): `Run beautify (readability, conventions, design tokens, a11y basics) before test? (Recommended for standard/thorough)` — `quick` profile: default no. Yes → execute `@devflow/skills/devflow-beautify/SKILL.md` exactly (`implemented` → `beautified`). No → next `devflow.test` (`implemented → tested` is legal). `--fix` re-entry: offer only when the fix touched UI or conventions.
+
+**Run mode** (`.devflow-run.json` present): emit the notify block but do not wait for user — control returns to the orchestrator (`devflow.run` or `devflow.auto`).
 
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Fixing beautify/test issues during implement | Log in `## Deviations` (Step 7b); fix in `devflow.beautify` |
+| Fixing beautify/test issues during implement | Log in `## Deviations` (Step 7b); fix in the beautify step (Step 8 offer) |
 | Skipping codegen, localization, or loading/error states | Adapter rules apply from first line; hardcoded copy/colors fail beautify |
 
 Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
@@ -224,5 +226,5 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | Writes (conditional) | `devflow/features/[NNN]_[feature-name]/handoff.md` — on context pressure (state-machine.md → Handoff file) |
 | Writes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json` — slice-boundary working context (state-machine.md → Checkpoint file) |
 | Writes | `registry.md` (mandatory for shared-folder elements; proposed for architectural patterns) |
-| Next step | `devflow.beautify` |
+| Next step | optional beautify (Step 8 offer → `@devflow/skills/devflow-beautify/SKILL.md`), then `devflow.test` |
 | Related skills | Per active `ADAPTER.md` → **Technology skills** |

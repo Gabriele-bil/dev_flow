@@ -1,8 +1,9 @@
 ---
 name: devflow-beautify
-description: "Polishes devflow.implement output: readability, conventions, design tokens, layout, accessibility basics — correctness and security stay with devflow.ship. Use when user runs devflow.beautify, polishes implementation output, or fourth pipeline step."
+description: "Optional polish step offered by devflow.implement at exit (and chained by devflow.run / devflow.auto per profile): readability, conventions, design tokens, layout, accessibility basics — correctness and security stay with devflow.ship. Not a slash command. Use when the user accepts the beautify offer at devflow.implement exit, or devflow.run / devflow.auto chain it."
 argument-hint: "[optional-plan-path]"
 disable-model-invocation: true
+user-invocable: false
 effort: medium
 ---
 
@@ -10,14 +11,13 @@ effort: medium
 
 ## Quick Start
 
-Run `/devflow.beautify [optional plan path]`.
+Not a slash command — entered from `devflow.implement` Step 8 (user accepts the beautify offer) or chained by `devflow.run` / `devflow.auto`.
 
-- If an argument is passed, use it as the `plan.md` path
-- If no argument is passed, resolve feature with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask)
+- Caller passes the `plan.md` path; none → resolve feature with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask)
 
 ## Purpose
 
-Polish `devflow.implement` output: readability/simplification, project conventions, design-token consistency, responsive layout, accessibility basics. Correctness, security and performance are `devflow.ship`'s review — not repeated here. Fourth DevFlow step; skipped in the `quick` profile.
+Polish `devflow.implement` output: readability/simplification, project conventions, design-token consistency, responsive layout, accessibility basics. Correctness, security and performance are `devflow.ship`'s review — not repeated here. Optional step between implement and test; offered by `devflow.implement`, skipped by default in the `quick` profile.
 
 ## Core Principles
 

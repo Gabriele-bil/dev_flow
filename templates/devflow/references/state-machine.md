@@ -86,8 +86,8 @@ clarified → done      (legacy: features created before devflow.clarify was fol
 | --- | --- | --- | --- |
 | `ready` | Plan approved, not started | `devflow.plan` Step 5 | `devflow.implement` |
 | `implementing` | Implement in progress (first pass or `--fix` re-entry) | `devflow.implement` entry (Step 4) / re-entry mode | `devflow.implement` (resume) |
-| `implemented` | All File List entries `[done]` | `devflow.implement` exit (Step 8) | `devflow.beautify` (`quick` profile: `devflow.test`) |
-| `beautified` | Multi-axis review applied | `devflow.beautify` exit (Step 6) | `devflow.test` |
+| `implemented` | All File List entries `[done]` | `devflow.implement` exit (Step 8) | `devflow.test` — beautify is an optional step offered at implement exit, not a command |
+| `beautified` | Beautify step applied | `devflow-beautify` exit (Step 6) | `devflow.test` |
 | `tested` | Tests pass + `verification.md` has no FAIL | `devflow.test` exit (Step 7) | `devflow.ship` |
 | `shipped` | Ship gate passed | `devflow.ship` Step 5 | `devflow.pr` |
 | `pr-opened` | PR open toward main | `devflow.pr` Step 6 | — (pipeline complete) |
@@ -97,7 +97,7 @@ clarified → done      (legacy: features created before devflow.clarify was fol
 
 ```text
 ready → implementing → implemented → beautified → tested → shipped → pr-opened
-hotfix fast-track and `quick` profile: ready → implementing → implemented → tested → shipped → pr-opened (beautify skipped)
+beautify declined, `quick` profile, hotfix fast-track: ready → implementing → implemented → tested → shipped → pr-opened
 any active status → blocked          (escalation ladder Level 5)
 blocked → <reset status> | ready  (devflow.resume Step 2b, user-confirmed plan.md reset)
 implemented | beautified | tested | shipped → implementing   (devflow.implement --fix re-entry)
@@ -116,8 +116,8 @@ Used by `devflow.resume` Step 2b for `blocked`, an invalid status, or `implement
 | Blocked during | Reset `plan.md` Status to | Resume step |
 | --- | --- | --- |
 | `devflow.implement` | `implementing` (`ready` when no `[done]` yet) | `devflow.implement` |
-| `devflow.beautify` | `implemented` | `devflow.beautify` |
-| `devflow.test` | `beautified` (`implemented` on hotfix fast-track / `quick`) | `devflow.test` |
+| beautify step | `implemented` | `@devflow/skills/devflow-beautify/SKILL.md` (re-offered, user may decline → `devflow.test`) |
+| `devflow.test` | `beautified` (`implemented` when beautify was skipped) | `devflow.test` |
 | `devflow.ship` | `tested` | `devflow.ship` |
 | unknown | `[pending]` left → `implementing`; all `[done]` → `implemented` | per status table |
 

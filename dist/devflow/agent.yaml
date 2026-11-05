@@ -1,7 +1,7 @@
 name: devflow
 version: 2.0.0
 description: >-
-  Spec-driven development pipeline: task → plan → implement → beautify →
+  Spec-driven development pipeline: task → plan → implement → [beautify] →
   test → ship → pr
 pipeline:
   steps:
@@ -57,12 +57,11 @@ pipeline:
         architecture conventions, MCP-assisted API validation, and verification
         steps
     - id: beautify
-      command: /devflow:beautify
       skill: devflow-beautify
       description: >-
-        Reviews and improves devflow.implement output across correctness,
-        readability, security, performance, architecture compliance, and UI
-        consistency
+        Optional step offered by devflow.implement at exit (not a slash
+        command): readability, conventions, design tokens, layout,
+        accessibility basics
     - id: test
       command: /devflow:test
       skill: devflow-test

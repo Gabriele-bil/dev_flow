@@ -67,7 +67,7 @@ if [ "$EVENT" = "pre" ]; then
 
   NOW_EPOCH=$(date +%s 2>/dev/null || echo 0)
   INFERRED_CMD=""
-  if echo "$FILE_PATH" | grep -qE 'skills/devflow-(task|clarify|plan|analyze|implement|beautify|test|ship|pr|hotfix)/SKILL\.md'; then
+  if echo "$FILE_PATH" | grep -qE 'skills/devflow-(task|plan|implement|beautify|test|ship|pr|hotfix)/SKILL\.md'; then
     INFERRED_CMD=$(echo "$FILE_PATH" | sed -E 's|.*skills/devflow-([a-z]+)/SKILL\.md.*|\1|')
   elif echo "$FILE_PATH" | grep -qE 'devflow/features/[0-9]{3}_[^/]+/task\.md$' && [ "$KIND" != "read" ]; then
     INFERRED_CMD="task"

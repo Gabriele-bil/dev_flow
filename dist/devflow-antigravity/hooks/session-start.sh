@@ -66,7 +66,7 @@ fi
 KNOWN_STEP=false
 case "$NEXT_STEP" in
   devflow.discover|devflow.setup|devflow.task|devflow.blueprint|devflow.plan| \
-  devflow.implement|devflow.beautify|devflow.test|devflow.ship| \
+  devflow.implement|devflow.test|devflow.ship| \
   devflow.pr|devflow.resume|devflow.backprop|devflow.run)
     KNOWN_STEP=true
     ;;

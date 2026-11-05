@@ -85,7 +85,7 @@ fi
 case "$PLAN_STATUS" in
   "ready")        NEXT_STEP="devflow.implement" ;;
   "implementing") NEXT_STEP="devflow.implement" ;;
-  "implemented")  NEXT_STEP="devflow.beautify"  ;;
+  "implemented")  NEXT_STEP="devflow.test"      ;;
   "beautified")   NEXT_STEP="devflow.test"      ;;
   "tested")       NEXT_STEP="devflow.ship"      ;;
   "shipped")      NEXT_STEP="devflow.pr"        ;;

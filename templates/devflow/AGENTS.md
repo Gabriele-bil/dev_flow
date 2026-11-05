@@ -7,7 +7,7 @@ Read before invoking any devflow command.
 ## Pipeline
 
 ```text
-task → plan → implement → beautify → test → ship → pr
+task → plan → implement → [beautify] → test → ship → pr   ([beautify] = optional step offered by implement, not a command)
 ```
 
 Bracketed steps optional. Each step has a strict input contract; status lives in `plan.md` (`references/state-machine.md`). Hotfix fast-track: compact task+plan → implement → test → quick ship → pr.
@@ -23,8 +23,7 @@ Bracketed steps optional. Each step has a strict input contract; status lives in
 | Raw feature idea | `devflow.task` | No `task.md` yet |
 | `task.md` ready | `devflow.plan` | task `draft`, no `[NEEDS CLARIFICATION]` markers (else back to `devflow.task`) |
 | Plan ready / implement interrupted | `devflow.implement` | plan `ready` / `implementing` |
-| Implementation done | `devflow.beautify` | plan `implemented` |
-| Review done | `devflow.test` | plan `beautified` |
+| Implementation done (beautify accepted or declined) | `devflow.test` | plan `implemented` / `beautified` |
 | Tests + verification pass | `devflow.ship` | plan `tested` |
 | Ship gate passed | `devflow.pr` | plan `shipped` |
 | Where am I / what next | `devflow.status` | any |

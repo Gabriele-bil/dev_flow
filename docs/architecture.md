@@ -17,8 +17,9 @@ flowchart LR
     setup[devflow.setup] --> task[devflow.task]
     task --> plan[devflow.plan]
     plan --> implement[devflow.implement]
-    implement --> beautify[devflow.beautify]
-    beautify --> test["devflow.test<br/>(+ goal-backward verification)"]
+    implement -.optional.-> beautify[beautify step]
+    beautify -.-> test
+    implement --> test["devflow.test<br/>(+ goal-backward verification)"]
     test --> ship["devflow.ship<br/>(agent fan-out)"]
     ship --> pr[devflow.pr]
     task -.3+ PRs.-> blueprint[devflow.blueprint] -.per step.-> plan
@@ -58,7 +59,7 @@ Failure handling is a single bounded ladder ([`references/escalation-ladder.md`]
 
 Forward-looking and goal-backward checks are deliberately separate:
 
-- **beautify** — multi-axis review of what was written (correctness, readability, security, performance, architecture, UI, a11y).
+- **beautify** — optional step offered at implement exit (not a command): readability, conventions, design tokens, layout, a11y basics.
 - **test** — adapter unit/integration targets, plus **goal-backward verification** ([`references/verification-levels.md`](../templates/devflow/references/verification-levels.md)): start from each acceptance criterion, locate its files via the Traceability table, prove it exists, is real code (not a stub), is wired into the app, and — where the adapter defines runtime targets — behaves end-to-end.
 - **ship** — parallel specialist agents (code review incl. scope fidelity, security, test coverage) synthesized into a gate report; Critical findings block.
 

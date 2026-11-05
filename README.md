@@ -13,7 +13,7 @@ idea
   └── devflow.task   (resolves [NEEDS CLARIFICATION] markers inline)
         └── devflow.plan   (optional consistency check before implement)
               └── devflow.implement
-                    └── devflow.beautify
+                    └── [beautify]   (optional — offered at implement exit, not a command)
                           └── devflow.test
                                 └── devflow.ship
                                       └── devflow.pr
@@ -21,7 +21,7 @@ idea
 
 Each step produces an artifact that feeds the next. Do not skip steps.
 
-**Autonomous entry point:** `devflow.auto <idea>` chains `task → plan → implement → beautify → test → ship → pr` in total autonomy from a raw idea to an opened pull request (defensible defaults + decision flags instead of clarification pauses; halts only on major discrepancies like Critical blockers, and documents minor discrepancies in the PR body).
+**Autonomous entry point:** `devflow.auto <idea>` chains `task → plan → implement → [beautify] → test → ship → pr` in total autonomy from a raw idea to an opened pull request (defensible defaults + decision flags instead of clarification pauses; halts only on major discrepancies like Critical blockers, and documents minor discrepancies in the PR body).
 
 ---
 
@@ -36,7 +36,7 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 | `devflow.blueprint` | [`templates/devflow/skills/devflow-blueprint/SKILL.md`](templates/devflow/skills/devflow-blueprint/SKILL.md) | Large idea → multi-PR blueprint with dependency graph + adversarial review |
 | `devflow.auto` | [`templates/devflow/skills/devflow-auto/SKILL.md`](templates/devflow/skills/devflow-auto/SKILL.md) | Raw idea → full pipeline (`task → ... → pr`) in total autonomy to opened PR |
 | `devflow.implement` | [`templates/devflow/skills/devflow-implement/SKILL.md`](templates/devflow/skills/devflow-implement/SKILL.md) | `plan.md` → code on `feat \| fix \| …/[NNN]_[name]` |
-| `devflow.beautify` | [`templates/devflow/skills/devflow-beautify/SKILL.md`](templates/devflow/skills/devflow-beautify/SKILL.md) | Implemented files → polished code |
+| beautify (optional step, no command) | [`templates/devflow/skills/devflow-beautify/SKILL.md`](templates/devflow/skills/devflow-beautify/SKILL.md) | Implemented files → polished code; offered by `devflow.implement` at exit, chained by `devflow.run` / `devflow.auto` per profile |
 | `devflow.test` | [`templates/devflow/skills/devflow-test/SKILL.md`](templates/devflow/skills/devflow-test/SKILL.md) | Feature → unit + integration tests |
 | `devflow.ship` | [`templates/devflow/skills/devflow-ship/SKILL.md`](templates/devflow/skills/devflow-ship/SKILL.md) | Feature → parallel review (code-reviewer + security-auditor from `standard` up) → gate before PR |
 | `devflow.pr` | [`templates/devflow/skills/devflow-pr/SKILL.md`](templates/devflow/skills/devflow-pr/SKILL.md) | Branch → PR to `main` |

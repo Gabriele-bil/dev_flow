@@ -19,4 +19,4 @@
 | Dumping full build/test output into response | Derive answer, quote decisive lines — `token-economy.md` |
 | grep→read chain when code-index MCP available | One semantic query first; trust result, no re-grep |
 | Skipping registry update for shared folder element | Anything in shared/ must be in `registry.md` by the end of Step 7 |
-| Fixing beautify/test issues during implement | Log in `## Deviations` (Step 7b); fix in `devflow.beautify` |
+| Fixing beautify/test issues during implement | Log in `## Deviations` (Step 7b); fix in the beautify step (Step 8 offer) |

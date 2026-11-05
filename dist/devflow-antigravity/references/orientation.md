@@ -4,7 +4,7 @@ Session-start routing: map project state to one entry point. Context, not a user
 
 ```text
 init ──────────────────────┐
-[discover] → setup → task ─┼→ plan → implement → beautify → test → ship → pr
+[discover] → setup → task ─┼→ plan → implement → [beautify] → test → ship → pr
        blueprint (3+ PRs) ─┘
 ```
 
@@ -29,7 +29,7 @@ task.md, no plan.md                      → devflow.plan
 plan Status:
   ready        → devflow.implement
   implementing → devflow.implement (resumes first [pending])
-  implemented  → devflow.beautify
+  implemented  → devflow.test (beautify: optional, offered by devflow.implement)
   beautified   → devflow.test
   tested       → devflow.ship
   shipped      → devflow.pr

@@ -33,7 +33,7 @@ Run-mode contract (marker, autonomy table `run` column, decision flags, discrepa
 
 - `task.md` / `plan.md` not yet approved — upstream gates are human; run `devflow.task` / `devflow.plan` first
 - First feature on unfamiliar stack or low-confidence plan — run steps interactively
-- User wants to review each beautify proposal — run `devflow.beautify` directly
+- User wants to review each beautify proposal — run `devflow.implement` interactively and accept its beautify offer
 - Interrupted run, blocked or corrupted state — `devflow.resume`
 - `plan.md` Status already past `--until` step — nothing to chain; `devflow.status`
 

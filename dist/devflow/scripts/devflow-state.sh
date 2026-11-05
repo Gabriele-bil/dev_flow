@@ -100,8 +100,7 @@ TASK_STATUSES="draft clarified done"  # clarified: legacy, read-only (devflow.cl
 next_step_for() {
   case "$1:$2" in
     plan:ready|plan:implementing) echo "devflow.implement" ;;
-    plan:implemented)  # quick profile skips beautify (implemented → tested is legal)
-      if grep -m1 '^\*\*Complexity:\*\*' "${3:-/dev/null}" 2>/dev/null | grep -q 'quick'; then echo "devflow.test"; else echo "devflow.beautify"; fi ;;
+    plan:implemented) echo "devflow.test" ;;  # beautify is an optional step offered by devflow.implement, not a command
     plan:beautified) echo "devflow.test" ;;
     plan:tested) echo "devflow.ship" ;;
     plan:shipped) echo "devflow.pr" ;;

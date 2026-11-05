@@ -27,7 +27,7 @@ you>  /devflow-plan
       Continue to implementation? -> devflow.implement
 ```
 
-Then `devflow.implement` → `devflow.beautify` → `devflow.test` (tests + per-AC verification) → `devflow.ship` (parallel agent fan-out) → `devflow.pr`. Interrupted or blocked? `devflow.resume`. Bug escaped? `devflow.backprop` fixes the spec, not just the code. Want the middle unattended? `devflow.run` chains implement → beautify → test with decision flags and stops before ship.
+Then `devflow.implement` (offers the optional beautify step at exit) → `devflow.test` (tests + per-AC verification) → `devflow.ship` (parallel agent fan-out) → `devflow.pr`. Interrupted or blocked? `devflow.resume`. Bug escaped? `devflow.backprop` fixes the spec, not just the code. Want the middle unattended? `devflow.run` chains implement → beautify → test with decision flags and stops before ship.
 
 Full setup:
 
@@ -92,8 +92,7 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 | `devflow.task` | Raw idea → structured task with HMW framing and verifiable subtasks |
 | `devflow.plan` | `task.md` → file-ordered implementation plan with traceability; optional consistency check (traceability, AC testability, terminology, constitution/ADR alignment) |
 | `devflow.blueprint` | Large idea → multi-PR blueprint with dependency graph + adversarial review |
-| `devflow.implement` | Execute `plan.md` step by step, vertical slice by slice |
-| `devflow.beautify` | Polish: readability, conventions, design tokens, layout, a11y basics (correctness/security → `devflow.ship`; skipped in `quick` profile) |
+| `devflow.implement` | Execute `plan.md` step by step, vertical slice by slice; at exit offers the optional beautify step (readability, conventions, design tokens, layout, a11y basics — not a slash command; default off in `quick` profile) |
 | `devflow.test` | Write and run unit + integration tests; bounded retry; goal-backward per-AC verification (`verification.md`) |
 | `devflow.ship` | Pre-merge gate: `code-reviewer` (+ `security-auditor` from `standard` up) in parallel → Ship Gate Report → route to PR |
 | `devflow.pr` | Commit, push branch, open PR to main |
