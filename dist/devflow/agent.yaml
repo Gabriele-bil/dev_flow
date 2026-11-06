@@ -1,8 +1,8 @@
 name: devflow
-version: 2.0.0
+version: 2.1.0
 description: >-
-  Spec-driven development pipeline: task → plan → implement → [beautify] →
-  test → ship → pr
+  Spec-driven development pipeline: task → plan → implement → [beautify] → test
+  → ship → pr
 pipeline:
   steps:
     - id: init
@@ -25,8 +25,8 @@ pipeline:
       skill: devflow-setup
       description: >-
         Generate or update AGENTS.md, REGISTRY.md, constitution.md, and
-        docs/product.md in the consumer project root from adapter templates
-        with a mandatory full questionnaire
+        docs/product.md in the consumer project root from adapter templates with
+        a mandatory full questionnaire
     - id: blueprint
       command: /devflow:blueprint
       skill: devflow-blueprint
@@ -60,8 +60,8 @@ pipeline:
       skill: devflow-beautify
       description: >-
         Optional step offered by devflow.implement at exit (not a slash
-        command): readability, conventions, design tokens, layout,
-        accessibility basics
+        command): readability, conventions, design tokens, layout, accessibility
+        basics
     - id: test
       command: /devflow:test
       skill: devflow-test
@@ -97,8 +97,8 @@ pipeline:
       skill: devflow-resume
       description: >-
         Resume an interrupted or blocked DevFlow session — read saved state,
-        cross-check plan.md markers, resync drifted state, unblock (user-confirmed),
-        re-enter the correct pipeline step
+        cross-check plan.md markers, resync drifted state, unblock
+        (user-confirmed), re-enter the correct pipeline step
     - command: /devflow:run
       skill: devflow-run
       description: >-
@@ -107,8 +107,8 @@ pipeline:
     - command: /devflow:auto
       skill: devflow-auto
       description: >-
-        Full-cycle autonomous delivery: chains task → plan → implement
-        → beautify → test → ship → pr in total autonomy from idea to opened pull
+        Full-cycle autonomous delivery: chains task → plan → implement →
+        beautify → test → ship → pr in total autonomy from idea to opened pull
         request
     - command: /devflow:backprop
       skill: devflow-backprop
@@ -148,8 +148,8 @@ agents:
     path: agents/step-runner.md
     description: >-
       Runs one pipeline step (one skill) in its own context for devflow.run /
-      devflow.auto (or one step group: task → plan, implement --fix → test)
-      and returns a RESULT line + short report
+      devflow.auto (or one step group: task → plan, implement --fix → test) and
+      returns a RESULT line + short report
     invoked_by: devflow.run, devflow.auto, devflow.ship
   - id: code-reviewer
     path: agents/code-reviewer.md
@@ -251,8 +251,8 @@ skills:
     - id: devflow-auto
       path: skills/devflow-auto/SKILL.md
       description: >-
-        Full-cycle autonomous delivery: chains task → plan → implement
-        → beautify → test → ship → pr in total autonomy from idea to opened pull
+        Full-cycle autonomous delivery: chains task → plan → implement →
+        beautify → test → ship → pr in total autonomy from idea to opened pull
         request
     - id: devflow-backprop
       path: skills/devflow-backprop/SKILL.md
@@ -730,13 +730,11 @@ hooks:
   - event: PreToolUse
     matcher: WebFetch
     script: hooks/pre-fetch-cache.sh
-    description: >-
-      Serve cached WebFetch responses when fresh
+    description: Serve cached WebFetch responses when fresh
   - event: PreToolUse
     matcher: Agent|Task
     script: hooks/pre-agent-fanout-cap.sh
-    description: >-
-      Cap concurrent subagent fan-out per turn
+    description: Cap concurrent subagent fan-out per turn
   - event: PreToolUse
     matcher: '*'
     script: hooks/observe.sh
@@ -784,8 +782,7 @@ hooks:
   - event: PostToolUse
     matcher: Write|Edit|MultiEdit
     script: hooks/post-edit-instinct-context.sh
-    description: >-
-      Inject matching domain instincts once per session when editing files
+    description: Inject matching domain instincts once per session when editing files
   - event: PostToolUse
     matcher: Write
     script: hooks/post-task-create.sh
@@ -796,17 +793,14 @@ hooks:
   - event: PostToolUse
     matcher: WebFetch
     script: hooks/post-fetch-cache.sh
-    description: >-
-      Cache WebFetch responses for reuse
+    description: Cache WebFetch responses for reuse
   - event: PreModelSwitch
     script: hooks/pre-model-switch.sh
-    description: >-
-      Guard against unsafe mid-session model switches
+    description: Guard against unsafe mid-session model switches
   - event: PostModelSwitch
     script: hooks/post-model-switch.sh
     async: true
-    description: >-
-      Log mid-session model switches
+    description: Log mid-session model switches
   - event: Stop
     script: hooks/stop-format-typecheck.sh
     description: >-
@@ -851,28 +845,30 @@ hooks:
     args: session-start
     async: true
     description: >-
-      Session start telemetry (source, model, plugin version, adapter) to .devflow-metrics/sessions.jsonl; sweeps stale tool-call marks
+      Session start telemetry (source, model, plugin version, adapter) to
+      .devflow-metrics/sessions.jsonl; sweeps stale tool-call marks
   - event: UserPromptSubmit
     script: hooks/metrics-collect.sh
     args: prompt
     async: true
     description: >-
-      Prompt size and slash command (never the text) to .devflow-metrics/prompts.jsonl; marks turn start and devflow command for stop-metrics
+      Prompt size and slash command (never the text) to
+      .devflow-metrics/prompts.jsonl; marks turn start and devflow command for
+      stop-metrics
   - event: PreCompact
     script: hooks/metrics-collect.sh
     args: pre-compact
     async: true
-    description: >-
-      Compaction trigger and context size to .devflow-metrics/sessions.jsonl
+    description: Compaction trigger and context size to .devflow-metrics/sessions.jsonl
   - event: SubagentStop
     script: hooks/metrics-collect.sh
     args: subagent-stop
     async: true
     description: >-
-      Subagent tokens, duration and estimated cost to .devflow-metrics/subagents.jsonl
+      Subagent tokens, duration and estimated cost to
+      .devflow-metrics/subagents.jsonl
   - event: SessionEnd
     script: hooks/metrics-collect.sh
     args: session-end
     async: true
-    description: >-
-      Session end reason to .devflow-metrics/sessions.jsonl
+    description: Session end reason to .devflow-metrics/sessions.jsonl
