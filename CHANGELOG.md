@@ -1,5 +1,37 @@
 # Changelog
 
+## [2.1.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v2.0.0...devflow-v2.1.0) (2026-11-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* /devflow.beautify is no longer a slash command on Claude Code.
+* /devflow.clarify, /devflow.analyze, /devflow.rollback and /devflow.recovery no longer exist; blocked plans route to devflow.resume.
+
+### Features
+
+* Make beautify an optional step offered by devflow.implement ([bd6beab](https://github.com/Gabriele-bil/dev_flow/commit/bd6beab81e28e01cee691ea46c99daed6ec68451))
+* **metrics:** Local telemetry folder for plugin usage, durations, tokens and context ([775ea5e](https://github.com/Gabriele-bil/dev_flow/commit/775ea5ed82a22e72e47811d8e79fcad328f1f8b9))
+* **metrics:** Local telemetry folder for plugin usage, durations, tokens and context ([610ade6](https://github.com/Gabriele-bil/dev_flow/commit/610ade6204fa60c10c8ad1dcbf744a33d97cd3d8))
+* Remove clarify, analyze, rollback, recovery commands; slim ship and hotfix ([4d2fd29](https://github.com/Gabriele-bil/dev_flow/commit/4d2fd290b223c82ef14b0e88e3d504e76d7ed925))
+* Slim command set, local telemetry folder, and auto pipeline token optimizations ([01fbbbd](https://github.com/Gabriele-bil/dev_flow/commit/01fbbbd9d82e4dc136210e4d1dcca772e4a37e26))
+
+
+### Bug Fixes
+
+* Update references from `registry.md` to `REGISTRY.md` across multiple templates and scripts ([a5272cc](https://github.com/Gabriele-bil/dev_flow/commit/a5272cc9c3fcec6ff13c02bb7bdeb1e4d510662a))
+
+
+### Performance Improvements
+
+* **auto:** Cut tokens and time in the unattended pipeline ([14c0d34](https://github.com/Gabriele-bil/dev_flow/commit/14c0d3433030dd6f95206d156cd921d9ee96c123))
+* **auto:** Cut tokens and time in the unattended pipeline ([c025c68](https://github.com/Gabriele-bil/dev_flow/commit/c025c68ba62d8ac7249e02f7e71a6bd275afcbea))
+
+
+### Tests
+
+* **hooks:** Silence shellcheck SC2034 on eval-read ROW in test-metrics-collect ([4330bf1](https://github.com/Gabriele-bil/dev_flow/commit/4330bf1208b5202dee0a0bb2594f9f187cda69d4))
+
 ## [2.0.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v1.19.0...devflow-v2.0.0) (2026-10-31)
 
 
