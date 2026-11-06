@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2034  # ROW is read inside single-quoted check() strings via eval
 # test-metrics-collect.sh — local telemetry folder (.devflow-metrics/):
 # metrics-collect.sh lifecycle rows, observe.sh tool rows, lib/emit.sh context
 # rows, gitignore entry, off switch. Real Claude Code / Antigravity payloads.
