@@ -5,7 +5,7 @@
 <!-- devflow-managed:end:stack -->
 
 <!-- devflow-managed:start:rules -->
-- Read `constitution.md` and `registry.md` before planning.
+- Read `constitution.md` and `REGISTRY.md` before planning.
 - Respect order: migrations -> domain -> data -> Riverpod -> UI -> i18n/codegen.
 - Use `slang` keys for user-visible copy; no hardcoded UI strings.
 - Cover compact/medium/expanded layouts with project breakpoints.

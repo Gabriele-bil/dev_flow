@@ -66,6 +66,6 @@ Validator names and field widgets change between `form_builder_validators` major
 | | |
 | --- | --- |
 | Trigger | `steps/implement.md` matrix row: `*/forms/*.dart`, `*_form.dart`, files using `FormBuilder` |
-| Reads | `constitution.md` (architecture conventions), `registry.md` (form patterns) |
+| Reads | `constitution.md` (architecture conventions), `REGISTRY.md` (form patterns) |
 | Invoked by | `devflow.implement` (form screens), `devflow.plan` (wizard or multi-field form planned) |
 | Related skills | `flutter-riverpod` (submit via notifier), `flutter-models` (payload mapping) |

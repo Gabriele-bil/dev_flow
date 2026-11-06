@@ -10,7 +10,7 @@ Per-axis checklist for `devflow.beautify` Step 3 (correctness, security and perf
 - Domain/data logic not in presentation components
 - **Preserve behavior:** simplifications must not change outputs, errors, side effects, or ordering. If unsure, treat as opinionated and propose first
 - **Chesterton's fence:** before removing or inlining code, understand why it exists (performance, platform constraint, history). If unclear, propose instead of deleting
-- Duplication: repeated blocks share a helper per `registry.md` patterns (optional extraction if it touches public API — propose first)
+- Duplication: repeated blocks share a helper per `REGISTRY.md` patterns (optional extraction if it touches public API — propose first)
 - Abstractions earn their complexity; avoid speculative generalization
 - **User-facing copy & docstrings:** clear, direct, active voice; zero AI-slop boosters (`seamless`, `robust`, `comprehensive`) or restating headings in opening sentences
 
@@ -18,7 +18,7 @@ Per-axis checklist for `devflow.beautify` Step 3 (correctness, security and perf
 
 - Imports are relative and point to the nearest barrel file
 - No feature imports another feature directly
-- Implemented patterns match `registry.md`
+- Implemented patterns match `REGISTRY.md`
 - File placement respects `constitution.md`
 - Dependencies flow in the right direction (no new circular patterns)
 

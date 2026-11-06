@@ -175,7 +175,7 @@ yq -i ".instincts = [.instincts[] | select(.id != \"<ID>\")]" .devflow-instincts
 
 #### Step 5 — Sync to REGISTRY.md (if --registry or confidence ≥ 0.85)
 
-If `REGISTRY.md` or `registry.md` exists and user provided `--registry` or confirmed:
+If `REGISTRY.md` exists and user provided `--registry` or confirmed:
 Append entry under `## Conventions & Patterns`:
 
 ```markdown

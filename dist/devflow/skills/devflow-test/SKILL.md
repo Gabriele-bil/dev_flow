@@ -56,7 +56,7 @@ Resolve adapter, adapter root, and app working directory per `${CLAUDE_PLUGIN_RO
 Read before writing tests:
 
 - `constitution.md` — test naming, file placement and layering rules the new tests must follow
-- `registry.md` — existing test helpers, fixtures and mocks to reuse instead of re-creating
+- `REGISTRY.md` — existing test helpers, fixtures and mocks to reuse instead of re-creating
 
 ### Step 2 - Scope
 
@@ -166,7 +166,7 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | --- | --- |
 | Reads | files from `devflow.implement` / `devflow.beautify` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
-| Reads | `constitution.md`, `registry.md`, `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`, `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core) + `steps/test.md` |
+| Reads | `constitution.md`, `REGISTRY.md`, `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`, `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core) + `steps/test.md` |
 | Reads | `${CLAUDE_PLUGIN_ROOT}/references/verification-levels.md` (Step 6b), `${CLAUDE_PLUGIN_ROOT}/references/escalation-ladder.md` (failure handling), `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` (handoff format, context pressure only), `${CLAUDE_PLUGIN_ROOT}/references/complexity-scoring.md` (depth profile), `${CLAUDE_PLUGIN_ROOT}/references/token-economy.md` (output discipline) |
 | Reads (conditional) | `.devflow-run.json` (existence — run-mode switch); `references/anti-patterns.md` (when unsure / retry) |
 | Reads (optional) | `${CLAUDE_PLUGIN_ROOT}/references/testing-patterns.md` — stack-agnostic patterns reference |

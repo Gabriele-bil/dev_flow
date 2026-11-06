@@ -54,7 +54,7 @@ Resolve adapter, adapter root, and app working directory per `@devflow/reference
 Read before writing tests:
 
 - `constitution.md` — test naming, file placement and layering rules the new tests must follow
-- `registry.md` — existing test helpers, fixtures and mocks to reuse instead of re-creating
+- `REGISTRY.md` — existing test helpers, fixtures and mocks to reuse instead of re-creating
 
 ### Step 2 - Scope
 
@@ -164,7 +164,7 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | --- | --- |
 | Reads | files from `devflow.implement` / `devflow.beautify` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
-| Reads | `constitution.md`, `registry.md`, `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/test.md` |
+| Reads | `constitution.md`, `REGISTRY.md`, `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/test.md` |
 | Reads | `@devflow/references/verification-levels.md` (Step 6b), `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (handoff format, context pressure only), `@devflow/references/complexity-scoring.md` (depth profile), `@devflow/references/token-economy.md` (output discipline) |
 | Reads (conditional) | `.devflow-run.json` (existence — run-mode switch); `references/anti-patterns.md` (when unsure / retry) |
 | Reads (optional) | `@devflow/references/testing-patterns.md` — stack-agnostic patterns reference |

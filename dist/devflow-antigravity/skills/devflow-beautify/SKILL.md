@@ -54,7 +54,7 @@ Resolve adapter, adapter root, and app working directory per `$HOME/.gemini/anti
 Read before starting:
 
 - `constitution.md`
-- `registry.md`
+- `REGISTRY.md`
 
 ### Step 2 - Scope
 
@@ -208,7 +208,7 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | --- | --- |
 | Reads | files from `devflow.implement` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
-| Reads | `constitution.md`, `registry.md` |
+| Reads | `constitution.md`, `REGISTRY.md` |
 | Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/references/escalation-ladder.md` (failure handling), `$HOME/.gemini/antigravity-cli/plugins/devflow/references/complexity-scoring.md` (depth profile) |
 | Reads (conditional) | `DESIGN.md` / `docs/design.md` — token source for UI consistency axis; `.devflow-run.json` (existence — run-mode switch, contract `$HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md`); `references/anti-patterns.md` (when unsure / retry) |
 | Writes | improvements to existing files only (no new files) |

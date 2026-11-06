@@ -24,9 +24,9 @@ pipeline:
       command: /devflow-setup
       skill: devflow-setup
       description: >-
-        Generate or update AGENTS.md, REGISTRY.md, and docs/product.md in the
-        consumer project root from adapter templates with a mandatory full
-        questionnaire
+        Generate or update AGENTS.md, REGISTRY.md, constitution.md, and
+        docs/product.md in the consumer project root from adapter templates
+        with a mandatory full questionnaire
     - id: blueprint
       command: /devflow-blueprint
       skill: devflow-blueprint
@@ -132,7 +132,6 @@ pipeline:
         Fast-track pipeline for critical bugfixes, targeted patches, or hotfixes
         — compact task+plan, failing regression test, fix, full suite +
         verification, PR (no beautify, no ship review)
-        directly to PR
     - command: /devflow-metrics
       skill: devflow-metrics
       description: >-
@@ -192,9 +191,9 @@ skills:
     - id: devflow-setup
       path: skills/devflow-setup/SKILL.md
       description: >-
-        Generates or updates AGENTS.md, REGISTRY.md, and docs/product.md in the
-        consumer project root from adapter templates using token-lean managed
-        sections and a mandatory questionnaire
+        Generates or updates AGENTS.md, REGISTRY.md, constitution.md, and
+        docs/product.md in the consumer project root from adapter templates
+        using token-lean managed sections and a mandatory questionnaire
     - id: devflow-task
       path: skills/devflow-task/SKILL.md
       description: >-
@@ -270,8 +269,10 @@ skills:
     - id: devflow-ship
       path: skills/devflow-ship/SKILL.md
       description: >-
-        Pre-merge fan-out gate — dispatches 1–5 review agents per complexity
-        profile, synthesizes a Ship Gate Report, routes to devflow.pr if clean
+        Pre-merge fan-out gate — dispatches code-reviewer (+ security-auditor
+        from standard up) in parallel, validates blocking findings via
+        finding-validator, synthesizes a Ship Gate Report, routes to devflow.pr
+        if clean
     - id: devflow-status
       path: skills/devflow-status/SKILL.md
       description: >-
@@ -296,7 +297,6 @@ skills:
         Fast-track pipeline for critical bugfixes, targeted patches, or hotfixes
         — compact task+plan, failing regression test, fix, full suite +
         verification, PR (no beautify, no ship review)
-        directly to PR
     - id: devflow-metrics
       path: skills/devflow-metrics/SKILL.md
       description: >-
@@ -710,6 +710,34 @@ hooks:
       Block modifications to linter/analyzer config files. Steers agent to fix
       code instead of weakening configs
   - event: PreToolUse
+    matcher: Write|Edit|MultiEdit
+    script: hooks/pre-scope-guard.sh
+    description: >-
+      Soft-warn when writing or editing a file not listed in the active plan.md
+      File List or Traceability table
+  - event: PreToolUse
+    matcher: Bash
+    script: hooks/pre-bash-destructive-guard.sh
+    description: >-
+      Block catastrophic rm -rf, hard-reset/clean/discard, force-push to
+      main/master, and commit --no-verify/--no-gpg-sign
+  - event: PreToolUse
+    matcher: Bash
+    script: hooks/pre-bash-stamp-guard.sh
+    description: >-
+      Run mode only: deny test/lint/analyze/format/e2e/build commands not
+      wrapped by verify-stamp.sh
+  - event: PreToolUse
+    matcher: WebFetch
+    script: hooks/pre-fetch-cache.sh
+    description: >-
+      Serve cached WebFetch responses when fresh
+  - event: PreToolUse
+    matcher: Agent|Task
+    script: hooks/pre-agent-fanout-cap.sh
+    description: >-
+      Cap concurrent subagent fan-out per turn
+  - event: PreToolUse
     matcher: '*'
     script: hooks/observe.sh
     args: pre
@@ -726,6 +754,14 @@ hooks:
       Log post-tool-call events to .devflow-observe.jsonl for pattern analysis;
       one row per tool call (duration, output size, skill/MCP/subagent) to
       .devflow-metrics/tools.jsonl
+  - event: PostToolUseFailure
+    matcher: '*'
+    script: hooks/observe.sh
+    args: post
+    async: true
+    description: >-
+      Log failed tool calls to .devflow-observe.jsonl and trigger retry-loop
+      detection
   - event: PostToolUse
     matcher: Bash
     script: hooks/post-bash-output-filter.sh
@@ -746,12 +782,31 @@ hooks:
       Accumulate modified file paths to .devflow-changed-files.tmp for batch
       format+typecheck at Stop time
   - event: PostToolUse
+    matcher: Write|Edit|MultiEdit
+    script: hooks/post-edit-instinct-context.sh
+    description: >-
+      Inject matching domain instincts once per session when editing files
+  - event: PostToolUse
     matcher: Write
     script: hooks/post-task-create.sh
     async: true
     description: >-
       After writing task.md under devflow/features/, update next_feature_number
       in .devflow-state.json to skip directory scan on next devflow.task
+  - event: PostToolUse
+    matcher: WebFetch
+    script: hooks/post-fetch-cache.sh
+    description: >-
+      Cache WebFetch responses for reuse
+  - event: PreModelSwitch
+    script: hooks/pre-model-switch.sh
+    description: >-
+      Guard against unsafe mid-session model switches
+  - event: PostModelSwitch
+    script: hooks/post-model-switch.sh
+    async: true
+    description: >-
+      Log mid-session model switches
   - event: Stop
     script: hooks/stop-format-typecheck.sh
     description: >-

@@ -57,6 +57,6 @@ Code (entity + mock, DTO, mapper, failure, `Result`): [`references/models-patter
 | | |
 | --- | --- |
 | Trigger | `steps/implement.md` matrix row: `*/domain/*.dart`, `*_entity.dart`, `*_model.dart`, `*_dto.dart`, `*_mapper.dart`, `*_failure.dart` |
-| Reads | `constitution.md` (layers, naming), `registry.md` (model patterns), `data-model.md` when present |
+| Reads | `constitution.md` (layers, naming), `REGISTRY.md` (model patterns), `data-model.md` when present |
 | Invoked by | `devflow.plan` (data layer design), `devflow.implement` (model files) |
 | Related skills | `flutter-riverpod` (`.skeleton` consumer), `flutter-supabase` (DTO ↔ Supabase JSON) |

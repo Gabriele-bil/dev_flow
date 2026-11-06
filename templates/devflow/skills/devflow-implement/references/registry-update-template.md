@@ -1,6 +1,6 @@
 # Registry update templates
 
-Used by `devflow.implement` Step 7 — after all files implemented, update `registry.md` for every element written to the shared folder or identified as reusable.
+Used by `devflow.implement` Step 7 — after all files implemented, update `REGISTRY.md` for every element written to the shared folder or identified as reusable.
 
 **Mandatory (write immediately, no confirmation needed):**
 
@@ -11,7 +11,7 @@ Used by `devflow.implement` Step 7 — after all files implemented, update `regi
 
 - New architectural patterns or conventions that are reusable but not yet in a shared path.
 
-For each mandatory entry, add a row to `registry.md` using the project's existing registry format:
+For each mandatory entry, add a row to `REGISTRY.md` using the project's existing registry format:
 
 ```text
 ✅ Registry updated: [component/widget/utility name]
@@ -25,7 +25,7 @@ For proposed entries, surface them first:
 🔍 New pattern found: [pattern name]
 [1-2 sentences describing what it solves and how it works.]
 
-Add to registry.md? [yes / no]
+Add to REGISTRY.md? [yes / no]
 ```
 
-> **Rule:** anything written to a shared folder that is missing from `registry.md` is invisible to future agents. Never leave a shared file unregistered.
+> **Rule:** anything written to a shared folder that is missing from `REGISTRY.md` is invisible to future agents. Never leave a shared file unregistered.

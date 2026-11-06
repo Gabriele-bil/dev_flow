@@ -25,7 +25,7 @@ setup() {
   git init -q -b main && git config user.email t@t && git config user.name t
   printf 'export const a = 1;\n' > a.ts; printf 'node_modules/\n' > .gitignore
   printf '# Constitution\n\n- Layering: ui → domain → data\n' > constitution.md
-  printf '| Name | Path |\n| UserCard | src/user-card.tsx |\n| Unrelated | src/other.ts |\n' > registry.md
+  printf '| Name | Path |\n| UserCard | src/user-card.tsx |\n| Unrelated | src/other.ts |\n' > REGISTRY.md
   git add -A && git commit -qm base
   git checkout -qb feat/001_cards
   mkdir -p devflow/features/001_cards src

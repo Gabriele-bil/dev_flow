@@ -32,7 +32,7 @@ Before reviewing:
 - `devflow/features/[NNN]_[feature-name]/task.md` — acceptance criteria and scope
 - `devflow/features/[NNN]_[feature-name]/plan.md` — architecture decisions and traceability
 - `constitution.md` — naming, layering, file conventions
-- `registry.md` — approved patterns
+- `REGISTRY.md` — approved patterns
 
 Read tests first — they reveal intent and coverage.
 
@@ -62,7 +62,7 @@ Read tests first — they reveal intent and coverage.
 
 ### 3. Architecture
 
-- Change follows patterns in `registry.md` or justifies a new one
+- Change follows patterns in `REGISTRY.md` or justifies a new one
 - Module boundaries maintained; no new circular dependencies
 - Dependencies flow correct direction per `constitution.md`
 - Abstraction level appropriate — not over-engineered, not too coupled

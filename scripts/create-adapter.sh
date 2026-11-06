@@ -258,7 +258,7 @@ Before push:
 - [ ] Integration tests passing
 - [ ] Build passing
 - [ ] \`$NAME-architecture\` constraints respected
-- [ ] \`registry.md\` updated if new patterns were introduced
+- [ ] \`REGISTRY.md\` updated if new patterns were introduced
 EOF
 
 # ── 8. templates/ ─────────────────────────────────────────────────────────────

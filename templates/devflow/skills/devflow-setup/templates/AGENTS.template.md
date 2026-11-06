@@ -5,7 +5,7 @@
 <!-- devflow-managed:end:stack -->
 
 <!-- devflow-managed:start:rules -->
-- Read `constitution.md` and `registry.md` before planning.
+- Read `constitution.md` and `REGISTRY.md` before planning.
 - Follow layer order: migrations -> domain -> data -> providers -> UI.
 - No hardcoded user strings; use i18n system.
 - Run `{{format-cmd}}` then `{{analyze-cmd}}` after edit batches.

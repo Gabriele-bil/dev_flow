@@ -83,7 +83,7 @@ fi
 # ── Project rules ─────────────────────────────────────────────────────────────
 first_existing() { local f; for f in "$@"; do [ -f "$f" ] && { echo "$f"; return; }; done; }
 CONSTITUTION=$(first_existing constitution.md devflow/constitution.md docs/constitution.md)
-REGISTRY=$(first_existing registry.md devflow/registry.md docs/registry.md)
+REGISTRY=$(first_existing REGISTRY.md devflow/REGISTRY.md docs/REGISTRY.md registry.md devflow/registry.md docs/registry.md)
 REGISTRY_HITS=""
 if [ -n "$REGISTRY" ] && [ -n "$NAMES" ]; then
   while IFS= read -r p; do

@@ -109,3 +109,4 @@ devflow/features/
 .devflow-tmp.*
 .devflow-metrics.jsonl.1
 .devflow-timings.jsonl.1
+.devflow-changed-files.tmp

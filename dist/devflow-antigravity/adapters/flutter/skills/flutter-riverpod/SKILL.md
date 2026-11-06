@@ -69,6 +69,6 @@ Notifier, keepAlive and test code: [`references/riverpod-patterns.md`](reference
 | | |
 | --- | --- |
 | Trigger | `steps/implement.md` matrix row: `*/providers/*.dart`, `*_provider.dart`, `*_notifier.dart`, widgets rendering `AsyncValue` |
-| Reads | `constitution.md` (Riverpod conventions), `registry.md` (provider patterns) |
+| Reads | `constitution.md` (Riverpod conventions), `REGISTRY.md` (provider patterns) |
 | Invoked by | `devflow.plan` (Riverpod Providers section), `devflow.implement` (providers + async UI) |
 | Related skills | `flutter-models` (`mock()`), `flutter-supabase` (repositories), `common-state-patterns` (scope choice) |

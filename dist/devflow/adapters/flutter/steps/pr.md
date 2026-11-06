@@ -19,5 +19,5 @@ flutter test test/ --reporter compact   # expect: All tests passed!
 - [ ] `flutter analyze` reports no issues
 - [ ] `dart format` applied
 - [ ] No hardcoded TODO or placeholder comments
-- [ ] `registry.md` updated if new patterns were introduced
+- [ ] `REGISTRY.md` updated if new patterns were introduced
 - [ ] Ephemeral UI screenshot attached for visual changes (bypassed if non-UI or headless)

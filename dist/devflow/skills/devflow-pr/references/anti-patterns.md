@@ -6,7 +6,7 @@
 | --- | --- |
 | Opening PR with failing tests | Fix or document failures with root cause first |
 | Ticking checklist without running commands | Every item must reflect actual command output |
-| Skipping `registry.md` update for new patterns | Undocumented patterns → inconsistency |
+| Skipping `REGISTRY.md` update for new patterns | Undocumented patterns → inconsistency |
 | `git add .` / `git add -A` | Stage expected paths only; review `git diff --cached --stat` |
 | Deleting images/files by wildcard to "clean up" | Delete only session files this pipeline created; leave the rest unstaged and report |
 | Committing screenshot files to repo working tree | Capture to `/tmp/` only; never stage |

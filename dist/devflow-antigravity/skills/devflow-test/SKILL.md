@@ -54,7 +54,7 @@ Resolve adapter, adapter root, and app working directory per `$HOME/.gemini/anti
 Read before writing tests:
 
 - `constitution.md` — test naming, file placement and layering rules the new tests must follow
-- `registry.md` — existing test helpers, fixtures and mocks to reuse instead of re-creating
+- `REGISTRY.md` — existing test helpers, fixtures and mocks to reuse instead of re-creating
 
 ### Step 2 - Scope
 
@@ -164,7 +164,7 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | --- | --- |
 | Reads | files from `devflow.implement` / `devflow.beautify` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
-| Reads | `constitution.md`, `registry.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/test.md` |
+| Reads | `constitution.md`, `REGISTRY.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/test.md` |
 | Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/references/verification-levels.md` (Step 6b), `$HOME/.gemini/antigravity-cli/plugins/devflow/references/escalation-ladder.md` (failure handling), `$HOME/.gemini/antigravity-cli/plugins/devflow/references/state-machine.md` (handoff format, context pressure only), `$HOME/.gemini/antigravity-cli/plugins/devflow/references/complexity-scoring.md` (depth profile), `$HOME/.gemini/antigravity-cli/plugins/devflow/references/token-economy.md` (output discipline) |
 | Reads (conditional) | `.devflow-run.json` (existence — run-mode switch); `references/anti-patterns.md` (when unsure / retry) |
 | Reads (optional) | `$HOME/.gemini/antigravity-cli/plugins/devflow/references/testing-patterns.md` — stack-agnostic patterns reference |

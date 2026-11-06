@@ -50,7 +50,7 @@ Read in order:
 | --- | --- |
 | **`docs/product.md`** (always) | Domain, actors, features, **implemented** vs **not implemented**, overlap checks |
 | **`constitution.md`** (as needed) | Stack, `lib/` layout, layering (UI → domain → data), engineering conventions |
-| **`registry.md`** (as needed) | Shared patterns: breakpoints, shell, navigation, reusable recipes |
+| **`REGISTRY.md`** (as needed) | Shared patterns: breakpoints, shell, navigation, reusable recipes |
 | **`docs/adr/`** (if present) | Architecture Decision Records — check active ADRs; bind task scope to accepted decisions |
 | **`DESIGN.md`** (if present) | Design system (or `docs/design.md`) — UI ideas inherit tokens |
 
@@ -190,7 +190,7 @@ Rows restating Step 8 checklist items live only in the catalog. Full catalog —
 
 | | |
 | --- | --- |
-| Reads | `devflow/config.md` (Apps table, monorepo only); `docs/product.md` (required); `constitution.md`, `registry.md` (as needed); `DESIGN.md` / `docs/design.md` (if present); `references/task-template.md`, `references/notify-template.md` |
+| Reads | `devflow/config.md` (Apps table, monorepo only); `docs/product.md` (required); `constitution.md`, `REGISTRY.md` (as needed); `DESIGN.md` / `docs/design.md` (if present); `references/task-template.md`, `references/notify-template.md` |
 | Reads (conditional) | `docs/adr/` (if present — active ADRs); `.devflow-run.json` (run-mode switch); `refinement-hints.md`, `references/invest-criteria.md`, `references/story-splitting.md`, `references/bdd-acceptance-criteria.md` (Step 5, on need); `references/interactive-interview.md` (Step 4, question fits no inline rule); `examples.md` (Step 8 checklist fails); `references/anti-patterns.md` (when unsure / retry) |
 | Writes | `devflow/features/[NNN]_[feature-name]/task.md`, `.devflow-state.json` (merge: feature, feature_path, branch, task_status, next_step) |
 | Side effects | Creates (from `origin/<default>`) and switches git branch `[feat/fix/chore/doc/ecc...]/[number-of-task-is-present]_[name]` |

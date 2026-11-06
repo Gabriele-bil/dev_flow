@@ -55,7 +55,7 @@ Read in order:
 | -------- | ------ |
 | `docs/product.md` | Domain, actors, implemented vs planned features |
 | `constitution.md` | Stack, layering rules, conventions |
-| `registry.md` | Shared patterns, existing modules |
+| `REGISTRY.md` | Shared patterns, existing modules |
 | `.devflow-state.json` (if present) | Current pipeline state, feature numbering |
 
 ### Step 2 — Decompose into steps
@@ -176,7 +176,7 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 
 | | |
 | --- | --- |
-| Reads | `docs/product.md`, `constitution.md`, `registry.md`, `.devflow-state.json` |
+| Reads | `docs/product.md`, `constitution.md`, `REGISTRY.md`, `.devflow-state.json` |
 | Reads (conditional) | `references/anti-patterns.md` (when unsure / retry) |
 | Spawns | Opus subagent (adversarial review, Step 6) |
 | Writes | `devflow/plans/[slug]-blueprint.md` |

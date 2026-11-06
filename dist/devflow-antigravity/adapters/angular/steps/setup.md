@@ -38,4 +38,4 @@ Baseline project: `ng new <name> --package-manager=pnpm --style=css` (Angular v2
 - `postcss` — required by `@tailwindcss/postcss` (`angular-theme`)
 - `@playwright/test` — E2E (`steps/test.md`, `angular-testing`)
 
-i18n library: none by default. Add one only when `constitution.md` requires i18n, and record the choice in `registry.md`.
+i18n library: none by default. Add one only when `constitution.md` requires i18n, and record the choice in `REGISTRY.md`.

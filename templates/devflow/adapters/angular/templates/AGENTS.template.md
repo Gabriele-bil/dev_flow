@@ -5,7 +5,7 @@
 <!-- devflow-managed:end:stack -->
 
 <!-- devflow-managed:start:rules -->
-- Read `constitution.md` and `registry.md` before planning.
+- Read `constitution.md` and `REGISTRY.md` before planning.
 - Respect boundaries: `core` (singleton infra), `pages` (feature domain), `shared` (cross-feature reuse). Flow: page → state → service → HTTP.
 - No HTTP in components: `HttpClient` and `httpResource()` live in `service.ts`.
 - State: NgRx Signal Store only (global + page). Do not use `@ngrx/store` (actions/reducers/effects/selectors).

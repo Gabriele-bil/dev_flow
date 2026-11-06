@@ -1,6 +1,6 @@
 # AGENTS.md — DevFlow plugin
 
-> **Scope:** agent guide for the DevFlow plugin itself (shipped in the plugin bundle). Consumer projects get their own `AGENTS.md` rendered by `devflow.setup` from `adapters/<adapter>/templates/AGENTS.template.md` — this file is never copied there. Plugin contributors: read `CONTRIBUTING.md` + root `CLAUDE.md`.
+> **Scope:** agent guide for the DevFlow plugin itself (shipped in the plugin bundle). Consumer projects get their own `AGENTS.md` rendered by `devflow.setup` from `adapters/<adapter>/templates/AGENTS.template.md` — this file is never copied there. Plugin contributors: read `CONTRIBUTING.md`.
 
 Read before invoking any devflow command.
 

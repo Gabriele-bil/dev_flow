@@ -46,4 +46,4 @@ Baseline project: `create-next-app` defaults (App Router, TypeScript, Tailwind 4
 - `ts-node`
 - `@playwright/test`
 
-i18n library: none by default. Add one only when `constitution.md` requires i18n, and record the choice in `registry.md`.
+i18n library: none by default. Add one only when `constitution.md` requires i18n, and record the choice in `REGISTRY.md`.

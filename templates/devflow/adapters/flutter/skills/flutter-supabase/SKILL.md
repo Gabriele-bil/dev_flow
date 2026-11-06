@@ -53,6 +53,6 @@ Provider, datasource and error-mapping code: [`references/supabase-patterns.md`]
 | | |
 | --- | --- |
 | Trigger | `steps/implement.md` matrix row: `*_datasource.dart`, `*/datasources/*.dart`, `*_repository_impl.dart`, files importing `supabase_flutter` |
-| Reads | `constitution.md` (data layer conventions), `registry.md` (datasource/repository patterns) |
+| Reads | `constitution.md` (data layer conventions), `REGISTRY.md` (datasource/repository patterns) |
 | Invoked by | `devflow.plan` (feature touches DB), `devflow.implement` (datasource + repository files) |
 | Related skills | `flutter-riverpod`, `flutter-models`, `flutter-supabase-migrations` |
