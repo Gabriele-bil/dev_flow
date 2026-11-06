@@ -10,7 +10,7 @@
 # Code). Cap 10k chars. Claude Code only: Antigravity has no output rewrite.
 # Not applicable / under threshold → exit 0 silently (original output kept).
 # Savings telemetry: each filtered command appends one JSONL line to
-# .devflow-filter-stats.jsonl (DEVFLOW_FILTER_STATS=<path> overrides, =off disables).
+# .devflow-metrics/filter-stats.jsonl (DEVFLOW_FILTER_STATS=<path> overrides, =off disables).
 # Read by devflow.status → "Filter savings" line.
 # Structured test-summary: for pytest/jest/vitest/flutter-test/go-test/cargo-test/
 # ng-test commands, best-effort parses the framework's own pass/fail summary line
@@ -167,17 +167,21 @@ RESULT="$FILTERED
 [devflow-filter] kept $KEPT of $TOTAL lines ($CHARS chars raw)"
 
 # ── Savings telemetry (one JSONL line per filtered command) ──────────────────
-STATS_FILE="${DEVFLOW_FILTER_STATS:-$DF_WORKSPACE/.devflow-filter-stats.jsonl}"
+STATS_FILE="${DEVFLOW_FILTER_STATS:-}"
 if [ "$STATS_FILE" != "off" ]; then
-  [ -z "${DEVFLOW_FILTER_STATS:-}" ] && df_gitignore ".devflow-filter-stats.jsonl" ".devflow-filter-stats.jsonl.1"
   CMD_HEAD=$(printf '%s' "$CMD" | tr '\n' ' ' | head -c 60)
   ENTRY=$(jq -cn --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || true)" \
-    --arg cmd "$CMD_HEAD" \
+    --arg session "$DF_SESSION" --arg cmd "$CMD_HEAD" \
     --argjson raw "$CHARS" --argjson kept "${#RESULT}" \
     --argjson raw_lines "$TOTAL" --argjson kept_lines "$KEPT" \
-    '{ts:$ts,cmd:$cmd,raw_chars:$raw,kept_chars:$kept,raw_lines:$raw_lines,kept_lines:$kept_lines}' 2>/dev/null) || true
-  df_rotate "$STATS_FILE"
-  [ -n "$ENTRY" ] && df_append "$STATS_FILE" "$ENTRY"
+    '{ts:$ts,session:$session,cmd:$cmd,raw_chars:$raw,kept_chars:$kept,raw_lines:$raw_lines,kept_lines:$kept_lines}
+     | with_entries(select(.value != ""))' 2>/dev/null) || true
+  if [ -n "$STATS_FILE" ]; then
+    df_rotate "$STATS_FILE"
+    [ -n "$ENTRY" ] && df_append "$STATS_FILE" "$ENTRY"
+  else
+    df_metric filter-stats "$ENTRY"
+  fi
 fi
 
 # Bash-shaped replacement: filtered text in stdout, interrupted carried over.

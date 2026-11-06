@@ -16,11 +16,11 @@ pnpm build
 
 - [ ] Lint passing
 - [ ] Tests passing (`test` stamp)
-- [ ] No open coverage gaps on modified files (Ship Gate report — test-engineer)
+- [ ] Every AC verified in `verification.md` (zero FAIL)
 - [ ] Build passing
 - [ ] `nextjs-architecture` constraints respected
 - [ ] Server/Client boundary documented for new components
 - [ ] `use client` scope minimal (no unnecessary promotion)
 - [ ] Web Interface Guidelines checked on modified UI files (no violations at Critical/Required severity)
-- [ ] `registry.md` updated if new patterns introduced
+- [ ] `REGISTRY.md` updated if new patterns introduced
 - [ ] Ephemeral UI screenshot attached for visual changes (bypassed if non-UI or headless)

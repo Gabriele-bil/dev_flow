@@ -103,8 +103,8 @@ rm -rf "$D"
 
 # T3: status → next_step mapping (per state-machine.md)
 echo "--- T3: status to next_step mapping ---"
-for pair in "ready:devflow.implement" "implemented:devflow.beautify" "beautified:devflow.test" \
-            "tested:devflow.ship" "shipped:devflow.pr" "blocked:devflow.recovery"; do
+for pair in "ready:devflow.implement" "implemented:devflow.test" "beautified:devflow.test" \
+            "tested:devflow.ship" "shipped:devflow.pr" "blocked:devflow.resume"; do
   status="${pair%%:*}"; expected="${pair##*:}"
   D=$(tmpdir)
   write_plan "$D" "$status"
@@ -174,10 +174,10 @@ run_hook "$D"
   || assert "legacy active_feature dropped in favour of feature" fail
 
 # T9: unknown plan status keeps the skills' next_step
-printf '{"next_step":"devflow.analyze"}' > "$D/.devflow-state.json"
+printf '{"next_step":"devflow.backprop"}' > "$D/.devflow-state.json"
 sed -i.bak 's/^\*\*Status:\*\*.*/**Status:** weird/' "$D/devflow/features/"*/plan.md
 run_hook "$D"
-[ "$(state_field "$D" '.next_step')" = "devflow.analyze" ] \
+[ "$(state_field "$D" '.next_step')" = "devflow.backprop" ] \
   && assert "unknown status keeps next_step" pass \
   || assert "unknown status keeps next_step (got '$(state_field "$D" '.next_step')')" fail
 rm -rf "$D"

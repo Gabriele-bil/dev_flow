@@ -5,7 +5,7 @@
 <!-- devflow-managed:end:stack -->
 
 <!-- devflow-managed:start:rules -->
-- Read `constitution.md` and `registry.md` before planning.
+- Read `constitution.md` and `REGISTRY.md` before planning.
 - Server Component default — no `'use client'` unless hooks/browser API/event handlers required.
 - State standard: Zustand for global client state. No server data in stores. URL state for filters/pagination.
 - Run quality commands after edit batches: `pnpm lint`, `pnpm test -- --passWithNoTests --watchAll=false`, `pnpm build`.

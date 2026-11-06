@@ -1,12 +1,12 @@
 # Pipeline State Machine
 
-Single source of truth for DevFlow statuses and transitions. Cited by `references/orientation.md`, `devflow-status`, `devflow-resume`, `devflow-recovery`, and `hooks/pre-compact.sh`. Do not invent statuses outside this file.
+Single source of truth for DevFlow statuses and transitions. Cited by `references/orientation.md`, `devflow-status`, `devflow-resume`, and `hooks/pre-compact.sh`. Do not invent statuses outside this file.
 
 ## Where state lives
 
 | Artifact | Field | Written by |
 | --- | --- | --- |
-| `task.md` | `**Status:**` | `devflow.task`, `devflow.clarify`, `devflow.pr` |
+| `task.md` | `**Status:**` | `devflow.task`, `devflow.pr` |
 | `plan.md` | `**Status:**` + `[done]`/`[pending]` markers | pipeline skills at step boundaries |
 | `docs/adr/ADR-NNN-[title].md` | `**Status:**` (Accepted/Proposed) | `devflow.discover` |
 | `.devflow-state.json` | derived cache — schema in **State file schema** below | `hooks/pre-compact.sh`, `hooks/post-task-create.sh`, skills via **Writing state** |
@@ -15,7 +15,7 @@ Single source of truth for DevFlow statuses and transitions. Cited by `reference
 | `.devflow-run.json` | autonomous-run marker (feature, from, until) | `devflow.run` Step 0 or `devflow.auto` Step 0 (`devflow-state.sh run arm`); deleted at every run exit |
 | `devflow/features/[NNN]_[name]/handoff.md` | context-pressure handoff (current slice, next action, open decisions, errors tried) | `devflow.implement` / `devflow.test` on pressure signal; consumed + deleted by `devflow.resume`; leftover deleted by `devflow.pr` |
 
-`plan.md` is authoritative; `.devflow-state.json` is a derived cache. On conflict → trust `plan.md`, resync via `devflow.recovery`.
+`plan.md` is authoritative; `.devflow-state.json` is a derived cache. On conflict → trust `plan.md`, resync via `devflow.resume` (`devflow-state.sh sync`).
 
 ## State file schema
 
@@ -27,7 +27,7 @@ Single source of truth for DevFlow statuses and transitions. Cited by `reference
   "feature_path": "devflow/features/003_user-profile",
   "app": "web",
   "branch": "feat/003_user-profile",
-  "task_status": "clarified",
+  "task_status": "draft",
   "plan_status": "implementing",
   "next_step": "devflow.implement",
   "progress": { "done": 4, "pending": 6, "total": 10 },
@@ -76,8 +76,8 @@ Script form (steps 1–3): `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/
 ## task.md statuses
 
 ```text
-draft → clarified → done
-draft → done          (clarify skipped)
+draft → done
+clarified → done      (legacy: features created before devflow.clarify was folded into devflow.task — read, never written)
 ```
 
 ## plan.md statuses
@@ -86,29 +86,40 @@ draft → done          (clarify skipped)
 | --- | --- | --- | --- |
 | `ready` | Plan approved, not started | `devflow.plan` Step 5 | `devflow.implement` |
 | `implementing` | Implement in progress (first pass or `--fix` re-entry) | `devflow.implement` entry (Step 4) / re-entry mode | `devflow.implement` (resume) |
-| `implemented` | All File List entries `[done]` | `devflow.implement` exit (Step 8) | `devflow.beautify` (`quick` profile: `devflow.test`) |
-| `beautified` | Multi-axis review applied | `devflow.beautify` exit (Step 6) | `devflow.test` |
+| `implemented` | All File List entries `[done]` | `devflow.implement` exit (Step 8) | `devflow.test` — beautify is an optional step offered at implement exit, not a command |
+| `beautified` | Beautify step applied | `devflow-beautify` exit (Step 6) | `devflow.test` |
 | `tested` | Tests pass + `verification.md` has no FAIL | `devflow.test` exit (Step 7) | `devflow.ship` |
 | `shipped` | Ship gate passed | `devflow.ship` Step 5 | `devflow.pr` |
 | `pr-opened` | PR open toward main | `devflow.pr` Step 6 | — (pipeline complete) |
-| `blocked` | Escalation ladder Level 5 | any skill per `references/escalation-ladder.md` | `devflow.recovery` |
+| `blocked` | Escalation ladder Level 5 | any skill per `references/escalation-ladder.md` | `devflow.resume` |
 
 ## Legal transitions
 
 ```text
 ready → implementing → implemented → beautified → tested → shipped → pr-opened
-hotfix fast-track and `quick` profile: ready → implementing → implemented → tested → shipped → pr-opened (beautify skipped)
+beautify declined, `quick` profile, hotfix fast-track: ready → implementing → implemented → tested → shipped → pr-opened
 any active status → blocked          (escalation ladder Level 5)
-blocked → <pre-block status> | ready  (devflow.recovery, user-confirmed plan.md reset)
+blocked → <reset status> | ready  (devflow.resume Step 2b, user-confirmed plan.md reset)
 implemented | beautified | tested | shipped → implementing   (devflow.implement --fix re-entry)
 tested → shipped requires verification.md with zero FAIL verdicts
 ```
 
 Backward transitions — always written to `plan.md`, never silent:
 
-- `implementing`/`implemented` → `ready`, `beautified` → `implemented` — `devflow.rollback`, user-confirmed
-- `implemented`+ → `implementing` — `devflow.implement --fix` re-entry. Callers: `devflow.ship` fix loop (user chose fix, or run-mode grader loop), `devflow.backprop` Step 5 (user-confirmed), `devflow.recovery` (user-confirmed). Re-entry then walks forward again: `implemented → beautified → tested` — no step skipped, `verification.md` regenerated
-- `blocked` → resume status — `devflow.recovery` Category G, user-confirmed
+- `implemented`+ → `implementing` — `devflow.implement --fix` re-entry. Callers: `devflow.ship` fix loop (user chose fix, or run-mode grader loop), `devflow.backprop` Step 5 (user-confirmed). Re-entry then walks forward again: `implemented → beautified → tested` (`devflow.ship` fix loop: `implemented → tested`, beautify skipped) — `verification.md` always regenerated
+- `blocked` → reset status — `devflow.resume` Step 2b, user-confirmed (table below)
+
+## Unblock reset table
+
+Used by `devflow.resume` Step 2b for `blocked`, an invalid status, or `implemented`+ with `[pending]` entries left:
+
+| Blocked during | Reset `plan.md` Status to | Resume step |
+| --- | --- | --- |
+| `devflow.implement` | `implementing` (`ready` when no `[done]` yet) | `devflow.implement` |
+| beautify step | `implemented` | `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-beautify/SKILL.md` (re-offered, user may decline → `devflow.test`) |
+| `devflow.test` | `beautified` (`implemented` when beautify was skipped) | `devflow.test` |
+| `devflow.ship` | `tested` | `devflow.ship` |
+| unknown | `[pending]` left → `implementing`; all `[done]` → `implemented` | per status table |
 
 ## Writing state
 
@@ -118,12 +129,12 @@ Skills never edit `**Status:**` lines or state JSON by hand — `scripts/devflow
 | --- | --- |
 | `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set plan <status> [F]` | `plan.md` `**Status:**` + cache (`plan_status`, `next_step`, `progress`, `branch`, `app`, `next_feature_number`). Refuses (exit 2) an illegal transition, and `tested`/`shipped` without `verification.md` or with Result FAIL |
 | `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set task <status> [F]` | same for `task.md` (`task_status`) |
-| `… set plan <status> [F] --force` | user-confirmed backward reset outside **Legal transitions** (`devflow.recovery`, re-plan) |
+| `… set plan <status> [F] --force` | user-confirmed backward reset outside **Legal transitions** (`devflow.resume` Step 2b, re-plan) |
 | `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" mark-done <path> [F]` | File List entry `[pending]` → `[done]`, progress refreshed |
-| `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" sync [F]` | rebuild the cache from `plan.md`/`task.md` (after writing a new `task.md`/`plan.md`, after recovery) |
+| `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" sync [F]` | rebuild the cache from `plan.md`/`task.md` (after writing a new `task.md`/`plan.md`; `devflow.resume` on drift) |
 | `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" status [F]` | one line: statuses, next step, progress |
 
-Merge, never overwrite: unknown keys preserved, legacy `active_feature` dropped. No `jq` → markdown still written, cache skipped. Corrupt cache → `devflow.recovery`. Full snapshot (file lists) still refreshed by `hooks/pre-compact.sh` at compaction.
+Merge, never overwrite: unknown keys preserved, legacy `active_feature` dropped. No `jq` → markdown still written, cache skipped. Corrupt cache → delete it, `sync` (`devflow.resume`). Full snapshot (file lists) still refreshed by `hooks/pre-compact.sh` at compaction.
 
 ## Checkpoint file (per feature)
 
@@ -145,7 +156,7 @@ Schema (6 fields max — no engine-oriented extras):
 Lifecycle:
 
 - Written by `devflow.implement` at each slice boundary (Step 4) and by `devflow.test` after each failed retry cycle
-- Read by `devflow.resume` (Step 1) and `devflow.recovery` (Step 3 diagnosis)
+- Read by `devflow.resume` (Step 1, Step 2b diagnosis)
 - Deleted by `devflow.pr` before staging (Step 2) — never committed
 - Atomic rewrite: write `.checkpoint.json.tmp` → `mv`
 
@@ -176,9 +187,9 @@ Shared by two orchestrators, distinguished by `from`/`until` vocabulary:
 Lifecycle:
 
 - Written by `devflow.run` Step 0 (after user confirmation) or `devflow.auto` Step 0 (immediately on execution) with `devflow-state.sh run arm --orchestrator <o> --from <x> --until <y> [--feature F]`; no other skill arms run mode. `run arm` refuses a stale marker (exit 2), adds the file to `.gitignore`
-- Deleted by the owning orchestrator (`devflow.run` or `devflow.auto`) on every exit path (complete, contract failure, block, handoff) — `devflow-state.sh run disarm`; `run feature <NNN_name>` sets `feature` after `devflow.auto`'s task step; `run status` prints it
+- Deleted by the owning orchestrator (`devflow.run` or `devflow.auto`) on every exit path (complete, contract failure, block, handoff) — `devflow-state.sh run disarm`; `run feature <NNN_name>` sets `feature` after `devflow.auto`'s task step (written by the `task → plan` step-runner); `run status` prints it
 - Never committed — the arming orchestrator appends it to `.gitignore` when present
-- Stale marker (found at session start, no run in progress) → `devflow.resume` asks: continue interactively (delete marker) or re-arm the orchestrator named in `from`/`until` (`devflow.run` or `devflow.auto`); corrupted → `devflow.recovery`
+- Stale marker (found at session start, no run in progress) → `devflow.resume` asks: continue interactively (delete marker) or re-arm the orchestrator named in `from`/`until` (`devflow.run` or `devflow.auto`); corrupted → `devflow-state.sh run disarm` (user-confirmed)
 
 Optional fields, read by `devflow-ship` Step 4b (autonomous grader loop):
 

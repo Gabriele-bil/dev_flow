@@ -95,17 +95,16 @@ need_feature() {
 
 # ── Status tables ─────────────────────────────────────────────────────────────
 PLAN_STATUSES="ready implementing implemented beautified tested shipped pr-opened blocked"
-TASK_STATUSES="draft clarified done"
+TASK_STATUSES="draft clarified done"  # clarified: legacy, read-only (devflow.clarify folded into devflow.task)
 
 next_step_for() {
   case "$1:$2" in
     plan:ready|plan:implementing) echo "devflow.implement" ;;
-    plan:implemented)  # quick profile skips beautify (implemented → tested is legal)
-      if grep -m1 '^\*\*Complexity:\*\*' "${3:-/dev/null}" 2>/dev/null | grep -q 'quick'; then echo "devflow.test"; else echo "devflow.beautify"; fi ;;
+    plan:implemented) echo "devflow.test" ;;  # beautify is an optional step offered by devflow.implement, not a command
     plan:beautified) echo "devflow.test" ;;
     plan:tested) echo "devflow.ship" ;;
     plan:shipped) echo "devflow.pr" ;;
-    plan:blocked) echo "devflow.recovery" ;;
+    plan:blocked) echo "devflow.resume" ;;
     task:draft|task:clarified) echo "devflow.plan" ;;
     *) echo "" ;;
   esac
@@ -125,7 +124,6 @@ legal() {
     ">ready"|"ready>implementing"|"implementing>implemented"|"implemented>beautified") return 0 ;;
     "implemented>tested"|"beautified>tested"|"tested>shipped"|"shipped>pr-opened") return 0 ;;
     "implemented>implementing"|"beautified>implementing"|"tested>implementing"|"shipped>implementing") return 0 ;;
-    "implementing>ready"|"implemented>ready"|"beautified>implemented") return 0 ;;
   esac
   return 1
 }
@@ -349,7 +347,7 @@ cmd_run() {
       done
       case "$orch" in devflow.run|devflow.auto) ;; *) die "run arm: --orchestrator devflow.run|devflow.auto" ;; esac
       [ -n "$from" ] && [ -n "$until" ] || die "run arm: --from and --until are required"
-      [ -e "$RUN_FILE" ] && die "stale $RUN_FILE found — ask the user: delete it (run disarm) or route devflow.recovery" 2
+      [ -e "$RUN_FILE" ] && die "stale $RUN_FILE found — ask the user: delete it (run disarm) or route devflow.resume" 2
       jq -n --arg o "$orch" --arg from "$from" --arg until "$until" --arg f "$feat" --arg at "$(now)" --argjson n "$iters" \
         '{active: true, feature: (if $f == "" then null else $f end), from: $from, until: $until, orchestrator: $o,
           started_at: $at, ship_grader_iterations: $n, ship_grader_iteration_count: 0}' > "$RUN_FILE"
@@ -372,7 +370,7 @@ cmd_run() {
     status)
       [ -f "$RUN_FILE" ] || { echo "run: inactive"; return 0; }
       jq -r '"run: \(.orchestrator) \(.from) → \(.until) · feature: \(.feature // "—") · grader \(.ship_grader_iteration_count // 0)/\(.ship_grader_iterations // 2)"' "$RUN_FILE" 2>/dev/null \
-        || die "$RUN_FILE is corrupt — route devflow.recovery" 2
+        || die "$RUN_FILE is corrupt — ask the user, then run disarm" 2
       ;;
     disarm)
       rm -f "$RUN_FILE"; echo "run disarmed"

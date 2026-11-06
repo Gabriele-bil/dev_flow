@@ -6,7 +6,7 @@
 | --- | --- |
 | Committing mid-implement ("save point") | Mark `[done]` in `plan.md`; commits in `devflow.pr` only |
 | Implementing files out of dependency order | Follow **File List** order; deps before dependents |
-| Creating shared components without checking registry | Read `registry.md` before writing any shared file |
+| Creating shared components without checking registry | Read `REGISTRY.md` before writing any shared file |
 | Loading full codebase "for context" | Load only `plan.md` files + one exemplar pattern per task |
 | Skipping codegen, localization, or loading/error states | Adapter rules apply from first line; hardcoded copy/colors fail beautify |
 | Deviating from plan without logging it | Report deviations in Step 7b summary |
@@ -18,5 +18,5 @@
 | Writing helper that stdlib/platform/installed dependency covers | Lazy ladder rungs 2–5: reuse > stdlib > platform > installed dep > new code |
 | Dumping full build/test output into response | Derive answer, quote decisive lines — `token-economy.md` |
 | grep→read chain when code-index MCP available | One semantic query first; trust result, no re-grep |
-| Skipping registry update for shared folder element | Anything in shared/ must be in `registry.md` by the end of Step 7 |
-| Fixing beautify/test issues during implement | Log in `## Deviations` (Step 7b); fix in `devflow.beautify` |
+| Skipping registry update for shared folder element | Anything in shared/ must be in `REGISTRY.md` by the end of Step 7 |
+| Fixing beautify/test issues during implement | Log in `## Deviations` (Step 7b); fix in the beautify step (Step 8 offer) |

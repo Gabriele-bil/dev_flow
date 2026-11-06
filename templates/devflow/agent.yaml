@@ -1,8 +1,8 @@
 name: devflow
 version: 2.0.0
 description: >-
-  Spec-driven development pipeline: task → [clarify] → plan → [analyze] →
-  implement → beautify → test → ship → pr
+  Spec-driven development pipeline: task → plan → implement → [beautify] →
+  test → ship → pr
 pipeline:
   steps:
     - id: init
@@ -24,9 +24,9 @@ pipeline:
       command: /devflow.setup
       skill: devflow-setup
       description: >-
-        Generate or update AGENTS.md, REGISTRY.md, and docs/product.md in the
-        consumer project root from adapter templates with a mandatory full
-        questionnaire
+        Generate or update AGENTS.md, REGISTRY.md, constitution.md, and
+        docs/product.md in the consumer project root from adapter templates
+        with a mandatory full questionnaire
     - id: blueprint
       command: /devflow.blueprint
       skill: devflow-blueprint
@@ -43,26 +43,12 @@ pipeline:
         and architecture context, optionally stress-testing scope, and
         generating a user story with HMW framing, scope boundaries, key
         assumptions, and verifiable subtasks
-    - id: clarify
-      command: /devflow.clarify
-      skill: devflow-clarify
-      description: >-
-        Optional step between task and plan: resolves [NEEDS CLARIFICATION: ...]
-        markers in task.md via incremental Q&A (8D scan, up to 5 questions) and
-        sets Status clarified
     - id: plan
       command: /devflow.plan
       skill: devflow-plan
       description: >-
         Transforms a structured DevFlow task into a detailed, file-oriented
         implementation plan for devflow.implement
-    - id: analyze
-      command: /devflow.analyze
-      skill: devflow-analyze
-      description: >-
-        Optional read-only consistency check between plan and implement: flags
-        traceability gaps, untestable acceptance criteria, terminology drift,
-        and constitution violations across task.md + plan.md + constitution.md
     - id: implement
       command: /devflow.implement
       skill: devflow-implement
@@ -71,12 +57,11 @@ pipeline:
         architecture conventions, MCP-assisted API validation, and verification
         steps
     - id: beautify
-      command: /devflow.beautify
       skill: devflow-beautify
       description: >-
-        Reviews and improves devflow.implement output across correctness,
-        readability, security, performance, architecture compliance, and UI
-        consistency
+        Optional step offered by devflow.implement at exit (not a slash
+        command): readability, conventions, design tokens, layout,
+        accessibility basics
     - id: test
       command: /devflow.test
       skill: devflow-test
@@ -94,11 +79,9 @@ pipeline:
     command: /devflow.ship
     skill: devflow-ship
     description: >-
-      Pre-merge gate before devflow.pr. Dispatches 1–5 review agents in parallel
-      per complexity profile (quick: code-reviewer; standard: +
-      security-auditor, test-engineer; thorough: + accessibility-auditor,
-      docs-reviewer), synthesizes reports, and routes to devflow.pr if no
-      blockers
+      Pre-merge gate before devflow.pr. Dispatches code-reviewer (quick) or
+      code-reviewer + security-auditor (standard, thorough) in parallel,
+      synthesizes one report, and routes to devflow.pr if no blockers
   utility:
     - command: /devflow.status
       skill: devflow-status
@@ -110,17 +93,12 @@ pipeline:
       description: >-
         Manage local and team instincts — log, search, list, check (Rigor
         check_cmd/ratchet), prune, boost, promote to team store and REGISTRY.md
-    - command: /devflow.recovery
-      skill: devflow-recovery
-      description: >-
-        Diagnose and recover a stuck or corrupted DevFlow pipeline — reads
-        state, observe log, and feature files to identify failure and propose a
-        targeted recovery
     - command: /devflow.resume
       skill: devflow-resume
       description: >-
-        Resume an interrupted DevFlow session — read saved state, cross-check
-        plan.md markers, confirm position, re-enter the correct pipeline step
+        Resume an interrupted or blocked DevFlow session — read saved state,
+        cross-check plan.md markers, resync drifted state, unblock (user-confirmed),
+        re-enter the correct pipeline step
     - command: /devflow.run
       skill: devflow-run
       description: >-
@@ -129,7 +107,7 @@ pipeline:
     - command: /devflow.auto
       skill: devflow-auto
       description: >-
-        Full-cycle autonomous delivery: chains task → plan → analyze → implement
+        Full-cycle autonomous delivery: chains task → plan → implement
         → beautify → test → ship → pr in total autonomy from idea to opened pull
         request
     - command: /devflow.backprop
@@ -148,17 +126,12 @@ pipeline:
       description: >-
         Diagnose environment readiness, MCP servers reachability, CLI
         toolchains, and pipeline state integrity
-    - command: /devflow.rollback
-      skill: devflow-rollback
-      description: >-
-        Roll back the active DevFlow step (implement or beautify) to its
-        pre-step checkpoint without corrupting pipeline state
     - command: /devflow.hotfix
       skill: devflow-hotfix
       description: >-
         Fast-track pipeline for critical bugfixes, targeted patches, or hotfixes
-        — compact task+plan, implement, targeted test, and quick ship gate
-        directly to PR
+        — compact task+plan, failing regression test, fix, full suite +
+        verification, PR (no beautify, no ship review)
     - command: /devflow.metrics
       skill: devflow-metrics
       description: >-
@@ -175,7 +148,8 @@ agents:
     path: agents/step-runner.md
     description: >-
       Runs one pipeline step (one skill) in its own context for devflow.run /
-      devflow.auto and returns a RESULT line + short report
+      devflow.auto (or one step group: task → plan, implement --fix → test)
+      and returns a RESULT line + short report
     invoked_by: devflow.run, devflow.auto, devflow.ship
   - id: code-reviewer
     path: agents/code-reviewer.md
@@ -184,32 +158,18 @@ agents:
       readability, architecture, security, performance, scope fidelity,
       simplicity. Use before merge or via devflow.ship fan-out
     invoked_by: devflow.ship
+  - id: finding-validator
+    path: agents/finding-validator.md
+    description: >-
+      Re-checks every Critical and Required devflow.ship finding against the
+      cited file and line; discards only what the code disproves
+    invoked_by: devflow.ship
   - id: security-auditor
     path: agents/security-auditor.md
     description: >-
       Security engineer focused on exploitable vulnerabilities, threat modeling,
       and secure coding. Use for security-focused review or via devflow.ship
       fan-out
-    invoked_by: devflow.ship
-  - id: test-engineer
-    path: agents/test-engineer.md
-    description: >-
-      QA engineer focused on test strategy, coverage gap analysis, and test
-      quality. Use for coverage review, test design, or via devflow.ship fan-out
-    invoked_by: devflow.ship
-  - id: accessibility-auditor
-    path: agents/accessibility-auditor.md
-    description: >-
-      Accessibility engineer focused on WCAG 2.1 AA compliance across
-      keyboard/focus, screen readers, visual contrast, touch targets, and forms.
-      Use for UI/component review or via devflow.ship fan-out
-    invoked_by: devflow.ship
-  - id: docs-reviewer
-    path: agents/docs-reviewer.md
-    description: >-
-      Documentation engineer focused on public API coverage, accuracy,
-      README/CHANGELOG sync, and plan traceability. Use for documentation drift
-      review or via devflow.ship fan-out
     invoked_by: devflow.ship
 skills:
   core:
@@ -231,9 +191,9 @@ skills:
     - id: devflow-setup
       path: skills/devflow-setup/SKILL.md
       description: >-
-        Generates or updates AGENTS.md, REGISTRY.md, and docs/product.md in the
-        consumer project root from adapter templates using token-lean managed
-        sections and a mandatory questionnaire
+        Generates or updates AGENTS.md, REGISTRY.md, constitution.md, and
+        docs/product.md in the consumer project root from adapter templates
+        using token-lean managed sections and a mandatory questionnaire
     - id: devflow-task
       path: skills/devflow-task/SKILL.md
       description: >-
@@ -276,12 +236,6 @@ skills:
         (.devflow-instincts.shared.yaml) instincts. Sub-commands: log, search,
         list, check (run Rigor check_cmd with optional ratchet_max), prune,
         boost, promote (team store + REGISTRY.md)
-    - id: devflow-recovery
-      path: skills/devflow-recovery/SKILL.md
-      description: >-
-        Diagnoses and recovers a stuck or corrupted DevFlow pipeline. Reads
-        state, observe log, and feature files to identify failure category and
-        propose a targeted recovery action
     - id: devflow-resume
       path: skills/devflow-resume/SKILL.md
       description: >-
@@ -297,7 +251,7 @@ skills:
     - id: devflow-auto
       path: skills/devflow-auto/SKILL.md
       description: >-
-        Full-cycle autonomous delivery: chains task → plan → analyze → implement
+        Full-cycle autonomous delivery: chains task → plan → implement
         → beautify → test → ship → pr in total autonomy from idea to opened pull
         request
     - id: devflow-backprop
@@ -312,23 +266,13 @@ skills:
         Transforms a large objective into a multi-PR blueprint with dependency
         graph, parallel-step detection, and adversarial review. For features
         requiring 3+ PRs, spanning sessions, or needing parallel workstreams
-    - id: devflow-clarify
-      path: skills/devflow-clarify/SKILL.md
-      description: >-
-        Resolves [NEEDS CLARIFICATION: ...] markers in task.md via incremental
-        Q&A — 8D scan, up to 5 questions, updates task.md, sets Status clarified
-    - id: devflow-analyze
-      path: skills/devflow-analyze/SKILL.md
-      description: >-
-        Read-only consistency check across task.md + plan.md + constitution.md —
-        flags traceability gaps, untestable acceptance criteria, terminology
-        drift, layer violations. Runs after devflow.plan, before
-        devflow.implement
     - id: devflow-ship
       path: skills/devflow-ship/SKILL.md
       description: >-
-        Pre-merge fan-out gate — dispatches 1–5 review agents per complexity
-        profile, synthesizes a Ship Gate Report, routes to devflow.pr if clean
+        Pre-merge fan-out gate — dispatches code-reviewer (+ security-auditor
+        from standard up) in parallel, validates blocking findings via
+        finding-validator, synthesizes a Ship Gate Report, routes to devflow.pr
+        if clean
     - id: devflow-status
       path: skills/devflow-status/SKILL.md
       description: >-
@@ -347,17 +291,12 @@ skills:
         Pre-flight diagnostic tool for DevFlow. Checks MCP server reachability,
         CLI toolchains, active adapter configuration, and pipeline state
         integrity. Supports --json and --fix
-    - id: devflow-rollback
-      path: skills/devflow-rollback/SKILL.md
-      description: >-
-        Roll back the active DevFlow step (implement or beautify) to its
-        pre-step checkpoint without corrupting pipeline state
     - id: devflow-hotfix
       path: skills/devflow-hotfix/SKILL.md
       description: >-
         Fast-track pipeline for critical bugfixes, targeted patches, or hotfixes
-        — compact task+plan, implement, targeted test, and quick ship gate
-        directly to PR
+        — compact task+plan, failing regression test, fix, full suite +
+        verification, PR (no beautify, no ship review)
     - id: devflow-metrics
       path: skills/devflow-metrics/SKILL.md
       description: >-
@@ -700,7 +639,7 @@ references:
       Pipeline state machine — canonical task.md/plan.md statuses, legal
       transitions, next-step mapping, state update snippet. State file schema,
       active feature resolution. Single source of truth for orientation, status,
-      resume, recovery, and hooks
+      resume, and hooks
   - id: escalation-ladder
     path: references/escalation-ladder.md
     description: >-
@@ -771,17 +710,58 @@ hooks:
       Block modifications to linter/analyzer config files. Steers agent to fix
       code instead of weakening configs
   - event: PreToolUse
+    matcher: Write|Edit|MultiEdit
+    script: hooks/pre-scope-guard.sh
+    description: >-
+      Soft-warn when writing or editing a file not listed in the active plan.md
+      File List or Traceability table
+  - event: PreToolUse
+    matcher: Bash
+    script: hooks/pre-bash-destructive-guard.sh
+    description: >-
+      Block catastrophic rm -rf, hard-reset/clean/discard, force-push to
+      main/master, and commit --no-verify/--no-gpg-sign
+  - event: PreToolUse
+    matcher: Bash
+    script: hooks/pre-bash-stamp-guard.sh
+    description: >-
+      Run mode only: deny test/lint/analyze/format/e2e/build commands not
+      wrapped by verify-stamp.sh
+  - event: PreToolUse
+    matcher: WebFetch
+    script: hooks/pre-fetch-cache.sh
+    description: >-
+      Serve cached WebFetch responses when fresh
+  - event: PreToolUse
+    matcher: Agent|Task
+    script: hooks/pre-agent-fanout-cap.sh
+    description: >-
+      Cap concurrent subagent fan-out per turn
+  - event: PreToolUse
     matcher: '*'
     script: hooks/observe.sh
     args: pre
     async: true
-    description: Log pre-tool-call events to .devflow-observe.jsonl for pattern analysis
+    description: >-
+      Log pre-tool-call events to .devflow-observe.jsonl for pattern analysis;
+      mark tool-call start for duration telemetry
   - event: PostToolUse
     matcher: '*'
     script: hooks/observe.sh
     args: post
     async: true
-    description: Log post-tool-call events to .devflow-observe.jsonl for pattern analysis
+    description: >-
+      Log post-tool-call events to .devflow-observe.jsonl for pattern analysis;
+      one row per tool call (duration, output size, skill/MCP/subagent) to
+      .devflow-metrics/tools.jsonl
+  - event: PostToolUseFailure
+    matcher: '*'
+    script: hooks/observe.sh
+    args: post
+    async: true
+    description: >-
+      Log failed tool calls to .devflow-observe.jsonl and trigger retry-loop
+      detection
   - event: PostToolUse
     matcher: Bash
     script: hooks/post-bash-output-filter.sh
@@ -802,12 +782,31 @@ hooks:
       Accumulate modified file paths to .devflow-changed-files.tmp for batch
       format+typecheck at Stop time
   - event: PostToolUse
+    matcher: Write|Edit|MultiEdit
+    script: hooks/post-edit-instinct-context.sh
+    description: >-
+      Inject matching domain instincts once per session when editing files
+  - event: PostToolUse
     matcher: Write
     script: hooks/post-task-create.sh
     async: true
     description: >-
       After writing task.md under devflow/features/, update next_feature_number
       in .devflow-state.json to skip directory scan on next devflow.task
+  - event: PostToolUse
+    matcher: WebFetch
+    script: hooks/post-fetch-cache.sh
+    description: >-
+      Cache WebFetch responses for reuse
+  - event: PreModelSwitch
+    script: hooks/pre-model-switch.sh
+    description: >-
+      Guard against unsafe mid-session model switches
+  - event: PostModelSwitch
+    script: hooks/post-model-switch.sh
+    async: true
+    description: >-
+      Log mid-session model switches
   - event: Stop
     script: hooks/stop-format-typecheck.sh
     description: >-
@@ -841,3 +840,39 @@ hooks:
     description: >-
       Inject past learnings from .devflow-learnings.jsonl into session context,
       filtered by active feature
+  - event: Stop
+    script: hooks/stop-metrics.sh
+    async: true
+    description: >-
+      Per-turn tokens, estimated cost, context window in use, tool mix, skills
+      and duration to .devflow-metrics/turns.jsonl and timings.jsonl
+  - event: SessionStart
+    script: hooks/metrics-collect.sh
+    args: session-start
+    async: true
+    description: >-
+      Session start telemetry (source, model, plugin version, adapter) to .devflow-metrics/sessions.jsonl; sweeps stale tool-call marks
+  - event: UserPromptSubmit
+    script: hooks/metrics-collect.sh
+    args: prompt
+    async: true
+    description: >-
+      Prompt size and slash command (never the text) to .devflow-metrics/prompts.jsonl; marks turn start and devflow command for stop-metrics
+  - event: PreCompact
+    script: hooks/metrics-collect.sh
+    args: pre-compact
+    async: true
+    description: >-
+      Compaction trigger and context size to .devflow-metrics/sessions.jsonl
+  - event: SubagentStop
+    script: hooks/metrics-collect.sh
+    args: subagent-stop
+    async: true
+    description: >-
+      Subagent tokens, duration and estimated cost to .devflow-metrics/subagents.jsonl
+  - event: SessionEnd
+    script: hooks/metrics-collect.sh
+    args: session-end
+    async: true
+    description: >-
+      Session end reason to .devflow-metrics/sessions.jsonl

@@ -1,6 +1,6 @@
 ---
 name: devflow-beautify
-description: "Polishes devflow.implement output: readability, conventions, design tokens, layout, accessibility basics — correctness and security stay with devflow.ship. Use when user runs devflow.beautify, polishes implementation output, or fourth pipeline step."
+description: "Optional polish step offered by devflow.implement at exit (and chained by devflow.run / devflow.auto per profile): readability, conventions, design tokens, layout, accessibility basics — correctness and security stay with devflow.ship. Not a slash command. Use when the user accepts the beautify offer at devflow.implement exit, or devflow.run / devflow.auto chain it."
 argument-hint: "[optional-plan-path]"
 disable-model-invocation: true
 ---
@@ -10,14 +10,13 @@ disable-model-invocation: true
 
 ## Quick Start
 
-Run `/devflow-beautify [optional plan path]`.
+Not a slash command — entered from `devflow.implement` Step 8 (user accepts the beautify offer) or chained by `devflow.run` / `devflow.auto`.
 
-- If an argument is passed, use it as the `plan.md` path
-- If no argument is passed, resolve feature with `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask)
+- Caller passes the `plan.md` path; none → resolve feature with `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask)
 
 ## Purpose
 
-Polish `devflow.implement` output: readability/simplification, project conventions, design-token consistency, responsive layout, accessibility basics. Correctness, security and performance are `devflow.ship`'s review — not repeated here. Fourth DevFlow step; skipped in the `quick` profile.
+Polish `devflow.implement` output: readability/simplification, project conventions, design-token consistency, responsive layout, accessibility basics. Correctness, security and performance are `devflow.ship`'s review — not repeated here. Optional step between implement and test; offered by `devflow.implement`, skipped by default in the `quick` profile.
 
 ## Core Principles
 
@@ -55,7 +54,7 @@ Resolve adapter, adapter root, and app working directory per `$HOME/.gemini/anti
 Read before starting:
 
 - `constitution.md`
-- `registry.md`
+- `REGISTRY.md`
 
 ### Step 2 - Scope
 
@@ -91,8 +90,6 @@ Axes: readability/simplification · conventions (naming, imports, layering per `
 Full per-axis checklist: `references/analysis-axes.md`.
 
 ### Step 4 - Apply changes
-
-Before applying edits: save git checkpoint tag (`git tag -f "devflow-checkpoint/$(git branch --show-current 2>/dev/null)/beautify" HEAD 2>/dev/null || true`).
 
 #### Severity labels
 
@@ -211,7 +208,7 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | --- | --- |
 | Reads | files from `devflow.implement` summary |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md` |
-| Reads | `constitution.md`, `registry.md` |
+| Reads | `constitution.md`, `REGISTRY.md` |
 | Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/references/escalation-ladder.md` (failure handling), `$HOME/.gemini/antigravity-cli/plugins/devflow/references/complexity-scoring.md` (depth profile) |
 | Reads (conditional) | `DESIGN.md` / `docs/design.md` — token source for UI consistency axis; `.devflow-run.json` (existence — run-mode switch, contract `$HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md`); `references/anti-patterns.md` (when unsure / retry) |
 | Writes | improvements to existing files only (no new files) |

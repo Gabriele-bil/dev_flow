@@ -3,9 +3,9 @@
 Session-start routing: map project state to one entry point. Context, not a user command — route, don't plan.
 
 ```text
-init ─────────────────────────────────┐
-[discover] → setup → task → [clarify] ┼→ plan → [analyze] → implement → beautify → test → ship → pr
-              blueprint (3+ PRs) ─────┘
+init ──────────────────────┐
+[discover] → setup → task ─┼→ plan → implement → [beautify] → test → ship → pr
+       blueprint (3+ PRs) ─┘
 ```
 
 Each step `devflow.<step>` is a skill the user runs as a slash command: `devflow.plan` is `/devflow-plan`, `devflow.ship` is `/devflow-ship` — suggest steps in that form.
@@ -19,18 +19,17 @@ No devflow/config.md?
   greenfield, empty repo → devflow.init
   existing code          → devflow.setup
 Stack / architecture undecided?          → devflow.discover
-.devflow-run.json, handoff.md, or plan Status implementing? → devflow.resume
-plan Status blocked, or state inconsistent? → devflow.recovery
+.devflow-run.json, handoff.md, plan Status implementing/blocked, or state inconsistent? → devflow.resume
 Urgent bug, root cause known, ≤3 files?  → devflow.hotfix
 Raw idea, no task.md:
   3+ PRs / multi-session                 → devflow.blueprint
   otherwise                              → devflow.task
-task.md has [NEEDS CLARIFICATION]        → devflow.clarify
+task.md has [NEEDS CLARIFICATION]        → devflow.task (resolve markers)
 task.md, no plan.md                      → devflow.plan
 plan Status:
-  ready        → devflow.analyze (recommended) → devflow.implement
+  ready        → devflow.implement
   implementing → devflow.implement (resumes first [pending])
-  implemented  → devflow.beautify
+  implemented  → devflow.test (beautify: optional, offered by devflow.implement)
   beautified   → devflow.test
   tested       → devflow.ship
   shipped      → devflow.pr

@@ -25,7 +25,7 @@ setup() {
   git init -q -b main && git config user.email t@t && git config user.name t
   printf 'export const a = 1;\n' > a.ts; printf 'node_modules/\n' > .gitignore
   printf '# Constitution\n\n- Layering: ui → domain → data\n' > constitution.md
-  printf '| Name | Path |\n| UserCard | src/user-card.tsx |\n| Unrelated | src/other.ts |\n' > registry.md
+  printf '| Name | Path |\n| UserCard | src/user-card.tsx |\n| Unrelated | src/other.ts |\n' > REGISTRY.md
   git add -A && git commit -qm base
   git checkout -qb feat/001_cards
   mkdir -p devflow/features/001_cards src
@@ -88,9 +88,9 @@ teardown
 
 setup
 for i in $(seq 1 400); do echo "line $i of a long generated file" ; done > src/big.ts
-bash "$RP" --max-diff-kb 2 --profile thorough --roster "code-reviewer docs-reviewer" >/dev/null 2>&1
+bash "$RP" --max-diff-kb 2 --profile thorough --roster "code-reviewer security-auditor" >/dev/null 2>&1
 has "diff cap announced" .devflow-review-packet.md "Cut at 2 KB"
-has "profile and roster flags" .devflow-review-packet.md "Depth profile: thorough · roster: code-reviewer docs-reviewer"
+has "profile and roster flags" .devflow-review-packet.md "Depth profile: thorough · roster: code-reviewer security-auditor"
 teardown
 
 setup

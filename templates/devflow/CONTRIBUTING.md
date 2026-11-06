@@ -17,7 +17,8 @@ Three mechanisms, three jobs. Don't blur them.
 | Mechanism | Use for | Control | Example |
 | --- | --- | --- | --- |
 | **Hook** | Must run every time, no exceptions — safety, formatting, config protection | Deterministic — shell script, exit code decides | `pre-bash-destructive-guard.sh` blocks `rm -rf /` unconditionally |
-| **Skill** | Needs judgment, context, multi-step reasoning | Probabilistic — Claude follows workflow guidance | `devflow-ship` weighs findings, asks user on Critical |
+| **Script** | Deterministic state/stamp/packet work invoked by skills across hosts | Deterministic — portable bash script (`scripts/*.sh`) | `devflow-state.sh`, `verify-stamp.sh`, `review-packet.sh` |
+| **Skill** | Needs judgment, context, multi-step reasoning | Probabilistic — agent follows workflow guidance | `devflow-ship` weighs findings, asks user on Critical |
 
 Rule of thumb: if skipping the check even once is unacceptable, it's a hook, not a skill instruction. Skills can be misread or rationalized around; hooks can't. Never put a hard safety rule only in skill prose — a determined agent (or a bad day) will talk itself past it. See Anthropic's "Steering Claude Code: Skills, Hooks, Rules, Subagents and More" for the underlying deterministic-vs-probabilistic framework.
 
@@ -70,7 +71,7 @@ Additional requirements:
 2. Rename to `adapters/<name>/`
 3. Rewrite `ADAPTER.md` (core: `**Verified against:**` line, Technology skills table, MCP, step-files index), add `deprecated-apis.txt`, and the `steps/*.md` files (per-step commands, plan sections, checklists — one file per pipeline step: setup, plan, implement, beautify, test, pr)
 4. Add technology skills under `adapters/<name>/skills/`
-5. Add setup templates under `adapters/<name>/templates/` (`AGENTS.template.md`, `REGISTRY.template.md`, `PRODUCT.template.md`)
+5. Add setup templates under `adapters/<name>/templates/` (`AGENTS.template.md`, `REGISTRY.template.md`, `CONSTITUTION.template.md`, `PRODUCT.template.md`)
 6. Document in root `README.md`
 
 Adapters stay single-stack and path-agnostic — never add monorepo-aware branching inside an adapter contract. Monorepo composition (which apps exist, which adapter each uses, which app a feature targets) lives entirely in `devflow/config.md`'s `## Apps` table, `task.md`/`plan.md`'s `**App:**` field, and `@devflow/references/adapter-resolution.md` — not in `ADAPTER.md`.
@@ -157,6 +158,9 @@ df_read_input || exit 0        # returns 1 without jq → fail open
 | `PreModelSwitch` | no | `{"decision":"block","reason":"..."}` — high-confidence, narrowly-scoped rules only (see `pre-model-switch.sh`); fail-open |
 | `PostModelSwitch` | no | Audit/log only — async |
 | `PreCompact` | no | Output never reaches the model — `df_notify` for the user; post-compaction context goes through `SessionStart` |
+| `UserPromptSubmit` | no | Telemetry only (`metrics-collect.sh prompt`) — async, never store the prompt text |
+| `SubagentStop` | no | Telemetry only — `agent_type`, `agent_transcript_path` |
+| `SessionEnd` | no | Telemetry only — `reason` |
 | `Stop` | yes | `df_notify` → `systemMessage` (the only visible channel). Never echo stdin back |
 
 Antigravity also has `PreInvocation` / `PostInvocation` (per model call). Payload fixtures for both hosts: `hooks/tests/fixtures/`.
@@ -171,6 +175,7 @@ Antigravity also has `PreInvocation` / `PostInvocation` (per model call). Payloa
 - Async hooks: `"async": true` in hooks.json (Claude Code does not enforce `timeout` on async hooks)
 - Optional tools (`yq`, `timeout`/`gtimeout`, `curl`): check with `command -v` and degrade silently; add them to `scripts/doctor.sh`
 - Runtime artefacts: `df_gitignore <entry...>`
+- Telemetry: `df_metric <name> <json-row>` appends to `.devflow-metrics/<name>.jsonl` (gitignored folder, rotation, `DEVFLOW_METRICS_DIR=off` included) — never a new root-level `.devflow-*.jsonl`. Sizes and names only, never prompt text, file content or tool output. Document new fields in `skills/devflow-metrics/references/telemetry-schema.md`
 
 **Naming convention:** `<event>-<purpose>.sh` — e.g. `pre-config-protect.sh`, `stop-format-typecheck.sh`
 

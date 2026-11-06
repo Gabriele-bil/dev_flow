@@ -6,6 +6,9 @@
       },
       {
         "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=SessionStart bash \"hooks/session-start-learnings.sh\""
+      },
+      {
+        "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=SessionStart bash \"hooks/metrics-collect.sh\" session-start"
       }
     ],
     "PreToolUse": [
@@ -30,6 +33,14 @@
         "hooks": [
           {
             "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=PreToolUse bash \"hooks/pre-bash-destructive-guard.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "command": "DEVFLOW_HOST=antigravity DEVFLOW_EVENT=PreToolUse bash \"hooks/pre-bash-stamp-guard.sh\""
           }
         ]
       },

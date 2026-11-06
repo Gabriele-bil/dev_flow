@@ -20,5 +20,5 @@ pnpm run build
 - [ ] Build passing
 - [ ] `angular-architecture` constraints respected
 - [ ] Relevant Angular skills applied for changed scope
-- [ ] `registry.md` updated if new patterns were introduced
+- [ ] `REGISTRY.md` updated if new patterns were introduced
 - [ ] Ephemeral UI screenshot attached for visual changes (bypassed if non-UI or headless)

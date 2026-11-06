@@ -8,7 +8,7 @@
       { "prompt": "Which devflow step should I run next for my feature?", "top_k": 3 }
     ],
     "negative": [
-      { "prompt": "The pipeline seems stuck or the state looks corrupted, fix it", "owner": "devflow-recovery" },
+      { "prompt": "The pipeline is blocked, unblock it and pick up where it stopped", "owner": "devflow-resume" },
       { "prompt": "Resume the work from where the last session stopped", "owner": "devflow-resume" }
     ]
   }

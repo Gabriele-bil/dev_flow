@@ -7,16 +7,14 @@ Where each pipeline step runs, and with which model and effort. One table — sk
 - **Main context runs on the session model.** A `model:` on a skill is a model switch for that turn: the next request re-reads the whole conversation with no cache hits, which on a long session costs more than a smaller model saves. Core skills set only `effort` — on Opus 5.5, Sonnet 5.5, Haiku 5.5 and Fable 5.1 an effort change keeps the cache.
 - **A different model means a subagent.** Subagents have their own context and cache, so their model never touches the main conversation's cache: ship's reviewers (`agents/*.md`) and the `step-runner` that `devflow.run` / `devflow.auto` dispatch per step.
 - **Aliases only** (`opus`, `sonnet`, `haiku`, `fable`), never full model IDs — they follow the current model generation and the provider. The Agent tool's per-call `model` takes the same aliases.
-- **Antigravity CLI:** the build strips `model`, `effort`, `maxTurns` and `experimental`; every step and agent runs on the session model. Per-step quality there comes from the skills and scripts, not from model choice.
+- **Antigravity CLI:** the build strips `model`, `effort`, `maxTurns` and `experimental`; every step and agent runs on the session model. Per-step quality there comes from the skills and scripts, not from model choice. Cost follows: `devflow.auto` there runs every step-runner and reviewer on the session model — pick a mid-tier session model for unattended runs; step groups, the stamp guard and finding validation are what cut its cost.
 
 ## Decision Table
 
 | Step | Interactive (main context) | `devflow.run` / `devflow.auto` | Effort |
 | --- | --- | --- | --- |
-| `devflow-task` | session model | step-runner, `sonnet` | medium |
-| `devflow-clarify` | session model | — (interactive only) | low |
-| `devflow-plan` | session model | step-runner, `sonnet` (`thorough`: `opus`) | high |
-| `devflow-analyze` | session model | step-runner, `sonnet` | low |
+| `devflow-task` | session model | step-runner, `sonnet` (`devflow.auto`: one runner with plan) | medium |
+| `devflow-plan` | session model | step-runner, `sonnet` (`thorough`: `opus`; `devflow.auto` `task → plan` group: `sonnet`, complexity not yet known) | high |
 | `devflow-implement` | session model | step-runner, `sonnet` (`thorough`: `opus`) | medium |
 | `devflow-beautify` | session model | step-runner, `sonnet` | medium |
 | `devflow-test` | session model | step-runner, `sonnet` | medium |
@@ -32,9 +30,7 @@ Skills not listed run on the session model with the effort in their frontmatter 
 | --- | --- | --- | --- |
 | `code-reviewer` | `sonnet` | high | per-call `model: opus` |
 | `security-auditor` | `sonnet` | high | per-call `model: opus` |
-| `test-engineer` | `sonnet` | medium | — |
-| `accessibility-auditor` | `sonnet` | medium | — |
-| `docs-reviewer` | `sonnet` | low | — |
+| `finding-validator` (Step 3b, blocking findings only) | `sonnet` | medium | `sonnet` |
 
 Never below `sonnet` for ship reviewers — `hooks/pre-model-switch.sh` blocks the switch.
 

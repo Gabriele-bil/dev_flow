@@ -200,7 +200,12 @@ When non-force mode cannot find valid managed markers in an existing file (`docs
 
 ### Step 7b - Gitignore (runtime artifacts)
 
-Ensure `.devflow-state.json` is listed in consumer `.gitignore`. If missing, append `# devflow runtime state` and `.devflow-state.json`. Skip if already present or if `.gitignore` does not exist (handled by `pre-compact`).
+Ensure consumer `.gitignore` lists both runtime entries, each as its own exact line:
+
+- `.devflow-state.json` — if missing, append `# devflow runtime state` + `.devflow-state.json`
+- `.devflow-metrics/` — local telemetry folder (usage, command durations, tokens, context; read by `devflow.metrics`), never versioned — if missing, append `# devflow local telemetry` + `.devflow-metrics/`
+
+Skip an entry already present. No `.gitignore` → create one with both entries when the project is a git repo; otherwise skip (hooks add `.devflow-metrics/` on first write once a `.gitignore` exists).
 
 ### Step 7c - Install adapter setup dependencies (required)
 
@@ -239,6 +244,6 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | --- | --- |
 | Reads | `@devflow/config.md`, `references/config-template.md`, `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core) + `steps/setup.md` (including `Setup dependencies`) — per declared app in monorepo mode, adapter + fallback templates |
 | Reads (conditional) | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-setup/references/setup-anti-patterns.md` (Anti-patterns catalog — when unsure / retry) |
-| Writes | `AGENTS.md`, `REGISTRY.md`, `docs/product.md` (consumer project root); `@devflow/config.md`; `.gitignore` (appends `.devflow-state.json` if missing) |
+| Writes | `AGENTS.md`, `REGISTRY.md`, `docs/product.md` (consumer project root); `@devflow/config.md`; `.gitignore` (appends `.devflow-state.json` and `.devflow-metrics/` if missing) |
 | Side effects | Installs adapter setup dependencies using project package manager or Flutter pub |
 | Next step | `devflow.task` |

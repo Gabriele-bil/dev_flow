@@ -38,7 +38,7 @@ Bootstrap greenfield software projects end-to-end: structured discovery intervie
 Before proceeding, verify:
 
 - [ ] Target directory is accessible and writable (current working directory or parent of `<project-slug>/`)
-- [ ] No active `.devflow-run.json` from a crashed autonomous session (if present, confirm cleanup or route `devflow.recovery`)
+- [ ] No active `.devflow-run.json` from a crashed autonomous session (if present, confirm cleanup or route `devflow.resume`)
 - [ ] If target directory already contains `constitution.md` or `devflow/features/`, ask user whether to run DevFlow-only roadmap/context initialization or stop and route to `devflow.setup` / `devflow.task`
 
 If any item fails → stop, report which check failed, do not write files.
@@ -75,7 +75,7 @@ Execute the 3-phase interview per `@devflow/skills/devflow-init/references/inter
 
 Execute directory initialization and optional technology scaffolding per `@devflow/skills/devflow-init/references/scaffolding-matrix.md`:
 
-1. **Workspace & Git init:** Create `<project-slug>/` (if subfolder mode), `cd` into root, run `git init -b main` (if `.git` absent), write `.gitignore` (stack ignores + `.devflow-state.json`, `.devflow-run.json`, `.devflow-verify.json`, `.devflow-verify/`, `.devflow-review-packet.md`, `.devflow-*.jsonl`, `.devflow-*.tmp`), and create `devflow/features/`, `devflow/plans/`, `docs/adr/`.
+1. **Workspace & Git init:** Create `<project-slug>/` (if subfolder mode), `cd` into root, run `git init -b main` (if `.git` absent), write `.gitignore` (stack ignores + `.devflow-state.json`, `.devflow-run.json`, `.devflow-verify.json`, `.devflow-verify/`, `.devflow-review-packet.md`, `.devflow-*.jsonl`, `.devflow-*.tmp`, `.devflow-metrics/` — local telemetry folder, never versioned), and create `devflow/features/`, `devflow/plans/`, `docs/adr/`.
 2. **If technology scaffolding is enabled, enforce the Always Up-to-Date rule:**
    - **Zero hardcoded stale versions:** Never write static templates with outdated package versions or legacy config schemas (e.g. no `.eslintrc.json`, no Angular NgModules, no Next.js Pages router).
    - **Live version & config resolution:** Query `context7` MCP (or stack MCPs: `dart`, `angular-cli`, `next-devtools`) and live registries (`npm view <pkg> version`, `flutter pub outdated`) to confirm current latest stable conventions before generating files.

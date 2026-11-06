@@ -24,7 +24,7 @@ Interactive architectural discovery for greenfield applications or complex featu
 - Architecture already decided and documented in `constitution.md` or existing ADR — go to `devflow.task` or `devflow.plan`
 - Feature is small or standard extension following established codebase patterns without architectural unknowns — go to `devflow.task`
 - Fixing a bug or regression in existing code — use `devflow.backprop` or `devflow.hotfix`
-- Task is written and needs clarification on user requirements, not architecture — use `devflow.clarify`
+- Task is written and needs clarification on user requirements, not architecture — use `devflow.task` (Step 4 clarification)
 
 ## Input contract
 
@@ -56,7 +56,7 @@ Analyze the problem across six core architectural axes defined in `${CLAUDE_PLUG
 5. **Security & Resilience:** Auth/authz, tenant isolation, failure modes, retries, fallback strategy.
 6. **Operations & DX:** Team familiarity, operational burden, local development ergonomics, observability.
 
-Read existing project context (`docs/product.md`, `constitution.md`, `registry.md`, adapter rules) and inspect code modules to identify established patterns and high-ambiguity axes.
+Read existing project context (`docs/product.md`, `constitution.md`, `REGISTRY.md`, adapter rules) and inspect code modules to identify established patterns and high-ambiguity axes.
 
 ### Step 3 — Interactive context-gathering Q&A loop
 
@@ -121,7 +121,7 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 
 | | |
 | --- | --- |
-| Reads | `docs/product.md`, `constitution.md`, `registry.md`, `devflow/config.md`, existing code modules |
+| Reads | `docs/product.md`, `constitution.md`, `REGISTRY.md`, `devflow/config.md`, existing code modules |
 | Reads (references) | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-discover/references/discovery-axes.md`, `${CLAUDE_PLUGIN_ROOT}/skills/devflow-discover/references/adr-template.md` |
 | Reads (conditional) | `references/anti-patterns.md` (when unsure / retry) |
 | Writes | `docs/adr/ADR-[NNN]-[title-slug].md`, `docs/adr/README.md` |

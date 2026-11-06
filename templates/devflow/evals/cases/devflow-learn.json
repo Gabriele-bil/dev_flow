@@ -7,7 +7,7 @@
       { "prompt": "Prune outdated instincts from devflow-instincts.yaml", "top_k": 3 }
     ],
     "negative": [
-      { "prompt": "Diagnose why the pipeline state is corrupted", "owner": "devflow-recovery" },
+      { "prompt": "The pipeline is blocked, unblock it and continue where it stopped", "owner": "devflow-resume" },
       { "prompt": "Split this large objective into a multi-PR blueprint", "owner": "devflow-blueprint" }
     ]
   }

@@ -84,7 +84,7 @@ rm -f devflow/features/[NNN]_[feature-name]/.checkpoint.json devflow/features/[N
 git status --porcelain --untracked-files=all
 ```
 
-Stage explicitly — never `git add .` / `git add -A`. Expected paths: `plan.md` File List, `devflow/features/[NNN]_[feature-name]/`, plus files the pipeline legitimately touched (`registry.md`, lockfile after a planned dependency change, codegen output of planned files). Stage expected paths only, review, then commit once:
+Stage explicitly — never `git add .` / `git add -A`. Expected paths: `plan.md` File List, `devflow/features/[NNN]_[feature-name]/`, plus files the pipeline legitimately touched (`REGISTRY.md`, lockfile after a planned dependency change, codegen output of planned files). Stage expected paths only, review, then commit once:
 
 ```bash
 git add -- <expected-path> [<expected-path> ...]
@@ -167,7 +167,7 @@ layers touched, key abstractions, notable patterns used.]
 ## Checklist
 [Bullets from the adapter PR step file + repo-wide items below. Every bullet ticked `- [x]` with its evidence: a Step 3 stamp line (lint, analyze, format, test, e2e, build), the Ship Gate report (architecture, conventions, docs, coverage gaps), or a file. Bullet not verifiable or not satisfied → do not open the PR (see When NOT to Use).]
 - [x] No TODO or placeholder comments in changed files — [evidence]
-- [x] `registry.md` updated for new patterns, or no new patterns — [evidence]
+- [x] `REGISTRY.md` updated for new patterns, or no new patterns — [evidence]
 
 Closes TASK-[NNN]
 ```

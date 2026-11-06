@@ -45,7 +45,7 @@ Pipeline skills declare no per-stack `allowed-tools` Bash allowlist — adapter 
 | `devflow-task` | creating a new feature (no file yet) | asks, or `--app` argument (monorepo only) |
 | `devflow-plan` | `task.md` at Input path, else `state-machine.md` → **Active feature resolution** | reads that `task.md`'s `**App:**`; copies into new `plan.md` header |
 | `devflow-implement`, `devflow-beautify`, `devflow-test`, `devflow-ship`, `devflow-pr`, `devflow-run` | `plan.md` at Input path, else `state-machine.md` → **Active feature resolution** | that `plan.md`'s own `**App:**` header field |
-| `devflow-recovery`, `devflow-resume` | `state-machine.md` → **Active feature resolution** | same `plan.md` header |
+| `devflow-resume` | `state-machine.md` → **Active feature resolution** | same `plan.md` header |
 | `devflow-status` | enumerates all features in `devflow/features/` | shows App per row, from each feature's `plan.md` header — no single resolution |
 | `references/orientation.md` (session start) | `state-machine.md` → **Active feature resolution** | active feature's app if known; else lists the Apps table |
 | `devflow-setup` | none — writes/owns the Apps table itself | N/A |

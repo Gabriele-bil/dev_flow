@@ -17,10 +17,10 @@ npm run build
 
 - [ ] Lint passing
 - [ ] Unit tests passing (`test` stamp)
-- [ ] No open coverage gaps on modified files (Ship Gate report — test-engineer)
+- [ ] Every AC verified in `verification.md` (zero FAIL)
 - [ ] E2E tests passing
 - [ ] Build passing
 - [ ] `nestjs-architecture` constraints respected (feature modules, constructor injection, no circular deps)
 - [ ] All new/changed endpoints documented with `@nestjs/swagger` decorators
 - [ ] All new input validated per `ADAPTER.md` → Project choices (DTO class or `@Body({ schema })`); guards applied to protected routes
-- [ ] `registry.md` updated if new patterns introduced
+- [ ] `REGISTRY.md` updated if new patterns introduced

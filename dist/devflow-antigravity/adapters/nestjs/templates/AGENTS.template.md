@@ -5,7 +5,7 @@
 <!-- devflow-managed:end:stack -->
 
 <!-- devflow-managed:start:rules -->
-- Read `constitution.md` and `registry.md` before planning.
+- Read `constitution.md` and `REGISTRY.md` before planning.
 - Feature-module organization — no technical-layer grouping (no bare `controllers/`, `services/` folders).
 - Constructor injection only — no `ModuleRef.get()` service-locator pattern.
 - ORM, validation style and test runner: as recorded in `constitution.md` → Key decisions. Never mix ORMs.

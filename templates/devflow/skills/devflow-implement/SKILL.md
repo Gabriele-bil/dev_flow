@@ -23,7 +23,7 @@ Implement all files in `plan.md` per architecture conventions. Third DevFlow ste
 ## Core Principles
 
 - **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
-- **reuse-first** — before writing any file, verify shared folder and `registry.md`; extend over duplicate, always
+- **reuse-first** — before writing any file, verify shared folder and `REGISTRY.md`; extend over duplicate, always
 
 ## When NOT to Use
 
@@ -51,13 +51,13 @@ If any item fails → stop, report which check failed, do not touch application 
 
 ## Re-entry mode (`--fix`)
 
-Targeted rework after the plan was already implemented. Callers: `devflow.ship` fix loop, `devflow.backprop` Step 5, `devflow.recovery`, user with explicit findings.
+Targeted rework after the plan was already implemented. Callers: `devflow.ship` fix loop, `devflow.backprop` Step 5, user with explicit findings.
 
 - Input: list of findings (`file:line` + description) or File List paths. Empty list → stop.
 - Entry: `bash "@devflow/scripts/devflow-state.sh" set plan implementing` (documented backward transition).
 - Scope: edit only files named by the findings (+ their direct callers when the fix changes a contract). Never touch other `[done]` markers; never re-implement untouched files; new file needed → add File List entry `[done]` + **Traceability** row + `## Deviations` entry.
 - Skip Step 3 branch creation (verify only) and Step 7 registry unless a shared element changed.
-- Run Steps 5–6 (codegen, format, analyze) on touched files; exit via Step 8 (`**Status:** implemented`). Next step stays `devflow.beautify` → `devflow.test` — re-entry never skips them.
+- Run Steps 5–6 (codegen, format, analyze) on touched files; exit via Step 8 (`**Status:** implemented`). Next step `devflow.test` (beautify offered per Step 8) — re-entry never skips test.
 
 ## Workflow
 
@@ -71,7 +71,7 @@ Always read before starting:
 
 - `devflow/features/[NNN]_[feature-name]/plan.md`
 - `constitution.md`
-- `registry.md`
+- `REGISTRY.md`
 
 Conditional: `DESIGN.md` (or `docs/design.md`) — when present and current batch touches **File List** entries tagged `[ui]` (set by `devflow.plan`): load as UI constraints alongside `constitution.md` (palette, typography, spacing tokens). Absent → skip, zero behavior change.
 
@@ -80,12 +80,12 @@ Conditional: `DESIGN.md` (or `docs/design.md`) — when present and current batc
 Plan's reuse decisions (Architecture decisions section) are authoritative. Before touching any file:
 
 - Honour every reuse/extend decision from the plan.
-- If the plan has **no** Architecture decisions entry about shared components but `registry.md` or the shared folder has a candidate covering ≥70% of the need → **stop and surface it** before implementing.
+- If the plan has **no** Architecture decisions entry about shared components but `REGISTRY.md` or the shared folder has a candidate covering ≥70% of the need → **stop and surface it** before implementing.
 - Never create a parallel implementation of an existing shared element.
 
 #### Context loading (implementation)
 
-Load only: plan (**File List** + decisions), `constitution.md`, `registry.md`, and one in-repo example per touched-file pattern. No whole feature folders unless plan cites them.
+Load only: plan (**File List** + decisions), `constitution.md`, `REGISTRY.md`, and one in-repo example per touched-file pattern. No whole feature folders unless plan cites them.
 
 **Exploration (pre-edit reading):** structural questions (who calls X, where is Y, blast radius) → index-first per `@devflow/references/token-economy.md`: one semantic query when code-index MCP available; trust returned source, no re-grep/re-read. grep/Read only for what index does not cover.
 
@@ -124,8 +124,8 @@ Implement all files from the plan in the exact order defined in the **File List*
 Each file must:
 
 - Follow architecture and naming conventions from `constitution.md`
-- Reuse existing patterns from `registry.md` where applicable
-- **Shared components first (non-negotiable):** honour Step 1 reuse decisions. Confirm shared folder and `registry.md` were checked before writing any widget, component, or service class; extend or parameterise instead of duplicating. Write new generic elements directly to the shared folder and propose a `registry.md` entry in Step 7.
+- Reuse existing patterns from `REGISTRY.md` where applicable
+- **Shared components first (non-negotiable):** honour Step 1 reuse decisions. Confirm shared folder and `REGISTRY.md` were checked before writing any widget, component, or service class; extend or parameterise instead of duplicating. Write new generic elements directly to the shared folder and propose a `REGISTRY.md` entry in Step 7.
 - Use relative imports pointing to the nearest barrel file (or the import style mandated by `constitution.md`)
 - Be complete; do not leave placeholder comments such as `// TODO` or `// implement this`
 - **Trace to plan (scope fidelity):** every file and function traces to a **File List** or **Traceability** entry — build only what the acceptance criteria require. Urge to add a "while I'm here" improvement → log it via `devflow.learn`; do not write it
@@ -140,7 +140,7 @@ After the contracts slice (`Slice 1`) is `[done]`, File List entries marked `[P]
 Best code = code never written. Before writing any code, stop at first rung that holds:
 
 1. Needs to exist at all? Speculative need → skip (YAGNI).
-2. Already in codebase? Reuse helper/util/type/pattern (`registry.md` + shared folder — Step 1 pre-check).
+2. Already in codebase? Reuse helper/util/type/pattern (`REGISTRY.md` + shared folder — Step 1 pre-check).
 3. Stdlib covers it? Use stdlib.
 4. Native platform feature covers it? CSS over JS, DB constraint over app code.
 5. Already-installed dependency solves it? Never add dependency for what few lines do.
@@ -156,7 +156,7 @@ Supporting rules:
 
 ### Checkpoint at slice boundaries
 
-After completing each vertical slice (or every 5 files on unsliced plans), record working context `[done]` markers cannot hold — read by `devflow.resume` / `devflow.recovery` after crash or compaction: `bash "@devflow/scripts/devflow-state.sh" checkpoint --step devflow.implement --slice "<slice>" [--decision "…"] [--constraint "…"] [--error "…"]` (flags repeatable; arrays are appended).
+After completing each vertical slice (or every 5 files on unsliced plans), record working context `[done]` markers cannot hold — read by `devflow.resume` after crash or compaction: `bash "@devflow/scripts/devflow-state.sh" checkpoint --step devflow.implement --slice "<slice>" [--decision "…"] [--constraint "…"] [--error "…"]` (flags repeatable; arrays are appended).
 
 ### Save point (for large plans)
 
@@ -183,7 +183,7 @@ Before Step 7, confirm every item in the **Pre-handoff checklist** section of th
 
 ### Step 7 - Registry update
 
-After all files implemented, update `registry.md` for every element written to shared folder or identified as reusable. Mandatory entries (shared components/helpers) written immediately; proposed entries (new patterns) only after user confirmation. Templates and rule: `references/registry-update-template.md`.
+After all files implemented, update `REGISTRY.md` for every element written to shared folder or identified as reusable. Mandatory entries (shared components/helpers) written immediately; proposed entries (new patterns) only after user confirmation. Templates and rule: `references/registry-update-template.md`.
 
 ### Step 7b - Write deviations to plan.md
 
@@ -201,13 +201,15 @@ Read by `devflow.beautify` and `devflow.pr`. Omit if fully aligned.
 
 `bash "@devflow/scripts/devflow-state.sh" set plan implemented`.
 
-Respond using template in `references/notify-template.md`. **Run mode** (`.devflow-run.json` present): emit the notify block but do not wait for user — control returns to the orchestrator (`devflow.run` or `devflow.auto`).
+Respond using template in `references/notify-template.md`, then offer the optional beautify step (not a slash command): `Run beautify (readability, conventions, design tokens, a11y basics) before test? (Recommended for standard/thorough)` — `quick` profile: default no. Yes → execute `@devflow/skills/devflow-beautify/SKILL.md` exactly (`implemented` → `beautified`). No → next `devflow.test` (`implemented → tested` is legal). `--fix` re-entry: offer only when the fix touched UI or conventions.
+
+**Run mode** (`.devflow-run.json` present): emit the notify block but do not wait for user — control returns to the orchestrator (`devflow.run` or `devflow.auto`).
 
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Fixing beautify/test issues during implement | Log in `## Deviations` (Step 7b); fix in `devflow.beautify` |
+| Fixing beautify/test issues during implement | Log in `## Deviations` (Step 7b); fix in the beautify step (Step 8 offer) |
 | Skipping codegen, localization, or loading/error states | Adapter rules apply from first line; hardcoded copy/colors fail beautify |
 
 Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
@@ -216,13 +218,13 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 
 | | |
 | --- | --- |
-| Reads | `devflow/features/[NNN]_[feature-name]/plan.md`, `constitution.md`, `registry.md`, `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/implement.md`, `references/registry-update-template.md`, `references/notify-template.md` |
+| Reads | `devflow/features/[NNN]_[feature-name]/plan.md`, `constitution.md`, `REGISTRY.md`, `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/implement.md`, `references/registry-update-template.md`, `references/notify-template.md` |
 | Reads | `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (handoff format, context pressure only), `@devflow/references/token-economy.md` (index-first + derive-don't-dump) |
 | Reads (conditional) | `DESIGN.md` / `docs/design.md` — UI constraints for `[ui]`-tagged batches; `.devflow-run.json` (existence — run-mode switch, contract `@devflow/references/run-mode.md`); `references/anti-patterns.md` (when unsure / retry) |
 | Writes | all files defined in `plan.md` |
 | Writes | `plan.md` — `[done]` markers, `**Status:** implementing → implemented`, `## Deviations`, `## Decision flags` (run mode) |
 | Writes (conditional) | `devflow/features/[NNN]_[feature-name]/handoff.md` — on context pressure (state-machine.md → Handoff file) |
 | Writes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json` — slice-boundary working context (state-machine.md → Checkpoint file) |
-| Writes | `registry.md` (mandatory for shared-folder elements; proposed for architectural patterns) |
-| Next step | `devflow.beautify` |
+| Writes | `REGISTRY.md` (mandatory for shared-folder elements; proposed for architectural patterns) |
+| Next step | optional beautify (Step 8 offer → `@devflow/skills/devflow-beautify/SKILL.md`), then `devflow.test` |
 | Related skills | Per active `ADAPTER.md` → **Technology skills** |

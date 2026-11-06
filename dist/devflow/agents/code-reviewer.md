@@ -32,7 +32,7 @@ Before reviewing:
 - `devflow/features/[NNN]_[feature-name]/task.md` — acceptance criteria and scope
 - `devflow/features/[NNN]_[feature-name]/plan.md` — architecture decisions and traceability
 - `constitution.md` — naming, layering, file conventions
-- `registry.md` — approved patterns
+- `REGISTRY.md` — approved patterns
 
 Read tests first — they reveal intent and coverage.
 
@@ -62,7 +62,7 @@ Read tests first — they reveal intent and coverage.
 
 ### 3. Architecture
 
-- Change follows patterns in `registry.md` or justifies a new one
+- Change follows patterns in `REGISTRY.md` or justifies a new one
 - Module boundaries maintained; no new circular dependencies
 - Dependencies flow correct direction per `constitution.md`
 - Abstraction level appropriate — not over-engineered, not too coupled
@@ -157,5 +157,5 @@ Use dev-flow taxonomy throughout the report:
 
 - **Invoke directly:** user asks for review of specific change or PR
 - **Invoke via:** `devflow.hotfix` Step 5 (alone — all seven axes)
-- **Invoke via:** `devflow.ship` fan-out per complexity profile — `quick`: `code-reviewer` alone; `standard`: + `security-auditor`, `test-engineer`; `thorough`: + `accessibility-auditor`, `docs-reviewer`
+- **Invoke via:** `devflow.ship` fan-out per complexity profile — `quick`: `code-reviewer` alone; `standard` / `thorough`: + `security-auditor`
 - **Do not invoke other personas.** Flag security/test concerns in your report; orchestration belongs to `devflow.ship`, not personas

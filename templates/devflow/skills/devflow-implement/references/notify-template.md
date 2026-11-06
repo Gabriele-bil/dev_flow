@@ -22,5 +22,6 @@ Used by `devflow.implement` Step 8 — respond with this format after implementa
 - format (per adapter): ✅ / ❌ (resolved after [N] attempts)
 - analyze/typecheck (per adapter): ✅ / ❌ (resolved after [N] attempts)
 
-Next: /devflow.beautify (`quick` profile: /devflow.test — beautify is skipped)
+Run beautify before test? (Recommended for standard/thorough · yes / no)
+Next: /devflow.test
 ```

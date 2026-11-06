@@ -1,6 +1,8 @@
 #!/bin/bash
 # devflow observe hook — continuous learning observer
-# Captures tool events to .devflow-observe.jsonl for pattern analysis.
+# Captures tool events to .devflow-observe.jsonl for pattern analysis, and one
+# telemetry row per tool call to .devflow-metrics/tools.jsonl (duration from the
+# pre→post pair keyed by tool_use_id, output size, skill/subagent/MCP used).
 # Usage:
 #   bash .../observe.sh pre   — PreToolUse  (before tool call, async)
 #   bash .../observe.sh post  — PostToolUse / PostToolUseFailure (async)
@@ -65,7 +67,7 @@ if [ "$EVENT" = "pre" ]; then
 
   NOW_EPOCH=$(date +%s 2>/dev/null || echo 0)
   INFERRED_CMD=""
-  if echo "$FILE_PATH" | grep -qE 'skills/devflow-(task|clarify|plan|analyze|implement|beautify|test|ship|pr|hotfix)/SKILL\.md'; then
+  if echo "$FILE_PATH" | grep -qE 'skills/devflow-(task|plan|implement|beautify|test|ship|pr|hotfix)/SKILL\.md'; then
     INFERRED_CMD=$(echo "$FILE_PATH" | sed -E 's|.*skills/devflow-([a-z]+)/SKILL\.md.*|\1|')
   elif echo "$FILE_PATH" | grep -qE 'devflow/features/[0-9]{3}_[^/]+/task\.md$' && [ "$KIND" != "read" ]; then
     INFERRED_CMD="task"
@@ -75,9 +77,20 @@ if [ "$EVENT" = "pre" ]; then
     INFERRED_CMD="test"
   fi
 
+  # Skill tool loading a devflow skill → exact command attribution
+  if [ -z "$INFERRED_CMD" ] && [ -n "$DF_SKILL" ]; then
+    case "$DF_SKILL" in *devflow*) INFERRED_CMD=$(printf '%s' "$DF_SKILL" | sed -E 's/^.*devflow[-.]//') ;; esac
+  fi
+
+  # Tool-call start, matched by observe.sh post through the call id
+  if [ -n "$DF_CALL_ID" ] && df_metrics_dir; then
+    mkdir -p "$DF_METRICS_DIR/.pending" 2>/dev/null \
+      && df_now_ms > "$DF_METRICS_DIR/.pending/$(printf '%s' "$DF_CALL_ID" | tr -cd 'A-Za-z0-9_.-')" 2>/dev/null || true
+  fi
+
   STEP_CMD=""
   case "$STEP" in
-    devflow.task|devflow.clarify|devflow.plan|devflow.analyze|devflow.implement|devflow.beautify|devflow.test|devflow.ship|devflow.pr|devflow.hotfix)
+    devflow.task|devflow.plan|devflow.implement|devflow.beautify|devflow.test|devflow.ship|devflow.pr|devflow.hotfix)
       STEP_CMD="${STEP#devflow.}" ;;
   esac
 
@@ -93,15 +106,17 @@ if [ "$EVENT" = "pre" ]; then
       --arg ts "$TS" --argjson epoch "$NOW_EPOCH" --arg inferred "$INFERRED_CMD" --arg stepcmd "$STEP_CMD"
   fi
 
-  # Don't pollute the churn log with read paths
-  [ "$KIND" = "read" ] && FILE_PATH=""
+  # Read paths go to their own key: the churn log (`file`) stays edit-only,
+  # while devflow.metrics counts re-reads of the same file per session
+  READ_PATH=""
+  if [ "$KIND" = "read" ]; then READ_PATH=$(df_rel_path "$FILE_PATH"); FILE_PATH=""; fi
 
   ENTRY=$(jq -cn \
     --arg ts "$TS" --arg event "$EVENT" --arg tool "$TOOL" --arg kind "$KIND" \
     --arg session "$SESSION" --arg step "$STEP" --arg feature "$FEATURE" \
-    --arg file "$FILE_PATH" --arg cmd "$CMD" \
+    --arg file "$FILE_PATH" --arg read "$READ_PATH" --arg cmd "$CMD" \
     '{ts: $ts, event: $event, tool: $tool, kind: $kind, session: $session,
-      step: $step, feature: $feature, file: $file, cmd: $cmd}
+      step: $step, feature: $feature, file: $file, read: $read, cmd: $cmd}
      | with_entries(select(.value != ""))' 2>/dev/null) || true
   [ -n "$ENTRY" ] && df_append "$LOG_FILE" "$ENTRY"
 
@@ -118,6 +133,35 @@ elif [ "$EVENT" = "post" ]; then
     '{ts: $ts, event: $event, tool: $tool, kind: $kind, session: $session, is_error: $is_error}
      | with_entries(select(.value != ""))' 2>/dev/null) || true
   [ -n "$ENTRY" ] && df_append "$LOG_FILE" "$ENTRY"
+
+  # Tool telemetry row (.devflow-metrics/tools.jsonl)
+  if df_metrics_dir; then
+    NOW_MS=$(df_now_ms)
+    DUR_MS=""
+    PENDING="$DF_METRICS_DIR/.pending/$(printf '%s' "$DF_CALL_ID" | tr -cd 'A-Za-z0-9_.-')"
+    if [ -n "$DF_CALL_ID" ] && [ -f "$PENDING" ]; then
+      START_MS=$(cat "$PENDING" 2>/dev/null) || START_MS=""
+      rm -f "$PENDING" 2>/dev/null || true
+      [[ "$START_MS" =~ ^[0-9]+$ ]] && [[ "$NOW_MS" =~ ^[0-9]+$ ]] && [ "$NOW_MS" -ge "$START_MS" ] \
+        && DUR_MS=$(( NOW_MS - START_MS ))
+    fi
+    MCP_SERVER=""
+    case "$TOOL" in mcp__*) MCP_SERVER=$(printf '%s' "$TOOL" | awk -F'__' '{print $2}') ;; esac
+    TOOL_ROW=$(jq -cn \
+      --arg ts "$TS" --arg session "$SESSION" --arg host "$DF_HOST" \
+      --arg tool "$TOOL" --arg kind "$KIND" --arg skill "$DF_SKILL" \
+      --arg subagent_type "$DF_SUBAGENT_TYPE" --arg mcp_server "$MCP_SERVER" \
+      --arg agent_type "$DF_AGENT_TYPE" --arg command "$(obs_get '.active_command // empty')" \
+      --arg step "$STEP" --arg feature "$FEATURE" --argjson is_error "$IS_ERROR" \
+      --arg duration_ms "$DUR_MS" --argjson output_chars "${DF_RESPONSE_CHARS:-0}" \
+      '{ts:$ts, session:$session, host:$host, tool:$tool, kind:$kind, skill:$skill,
+        subagent_type:$subagent_type, mcp_server:$mcp_server, agent_type:$agent_type,
+        command:$command, step:$step, feature:$feature, is_error:$is_error,
+        duration_ms:($duration_ms | tonumber? // null),
+        output_chars:$output_chars, output_tokens_est:(($output_chars / 4) | ceil)}
+       | with_entries(select(.value != "" and .value != null))' 2>/dev/null) || true
+    df_metric tools "$TOOL_ROW"
+  fi
 
   # Strategic-compact counter: cumulative tool calls per session (reset on new session)
   df_json_update "$OBS_STATE" '

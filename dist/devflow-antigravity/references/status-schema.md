@@ -88,12 +88,12 @@ PENDING_JSON=$(grep -E '^###.*\[pending\]' "$PLAN_FILE" 2>/dev/null | grep -oE '
 # Status → next_step (keep in sync with state-machine.md)
 case "$PLAN_STATUS" in
   ready|implementing) NEXT="devflow.implement" ;;
-  implemented)        NEXT="devflow.beautify"  ;;
+  implemented)        NEXT="devflow.test"      ;;
   beautified)         NEXT="devflow.test"      ;;
   tested)             NEXT="devflow.ship"      ;;
   shipped)            NEXT="devflow.pr"        ;;
   pr-opened)          NEXT="devflow.task"      ;;
-  blocked)            NEXT="devflow.recovery"  ;;
+  blocked)            NEXT="devflow.resume"    ;;
   *)                  NEXT="unknown"           ;;
 esac
 

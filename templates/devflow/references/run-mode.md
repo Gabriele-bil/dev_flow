@@ -9,7 +9,7 @@ Single source for unattended execution. Orchestrators: `devflow.run` (middle pip
 - Armed only by an orchestrator's Step 0 — never by a step skill, never mid-conversation.
 - `devflow.run`: armed after one explicit user confirmation.
 - `devflow.auto`: armed immediately; every input needing the user (idea text, monorepo `--app`, stale-marker cleanup) collected **before** arming.
-- Stale marker found before arming → ask user: delete, or route `devflow.recovery`.
+- Stale marker found before arming → ask user: delete (`run disarm`), or route `devflow.resume`.
 - Arm with `bash "@devflow/scripts/devflow-state.sh" run arm …` (refuses a stale marker, appends `.devflow-run.json` to `.gitignore`); disarm with `run disarm`.
 
 ## Autonomy policy
@@ -44,7 +44,7 @@ Precedence: repo precedent > `constitution.md` > adapter convention (`devflow.ta
 | Major — hard stop (both orchestrators) | Minor — flag + continue |
 | --- | --- |
 | Constitution Gate Critical/Required (`devflow-plan` Step 0b) | Ambiguity / unspecified behavior |
-| `devflow.analyze` Critical | `devflow.analyze` Required / Nit (`auto`: waiver flag) |
+| `devflow-plan` Step 5b consistency check Critical | Step 5b Required / Nit (`auto`: waiver flag) |
 | `escalation-ladder.md` Level 4 (decompose needs approval → Level 5) and Level 5 block | Beautify opinable proposal |
 | `devflow.ship` Critical | Ship Required at loop cap — `run`: surface report; `auto`: exceptions flag → PR body |
 | Step input contract fails | Idea vs codebase mismatch → `## Deviations` + flag |
@@ -52,7 +52,17 @@ Precedence: repo precedent > `constitution.md` > adapter convention (`devflow.ta
 
 ## Step dispatch
 
-While armed, the orchestrator runs each pipeline step in a `step-runner` subagent (`@devflow/agents/step-runner.md`), one per step: the step's skill body and tool output stay in that subagent, and `plan.md`, `.devflow-state.json`, the stamps and the reports carry everything to the next step. Same mechanism on both hosts.
+While armed, the orchestrator runs each pipeline step in a `step-runner` subagent (`@devflow/agents/step-runner.md`), one per step or step group: the skill bodies and tool output stay in that subagent, and `plan.md`, `.devflow-state.json`, the stamps and the reports carry everything to the next dispatch. Same mechanism on both hosts.
+
+**Step groups** — consecutive steps with no human gate between them share one step-runner, so constitution, registry, adapter files and explored code are read once:
+
+| Orchestrator | Dispatches |
+| --- | --- |
+| `devflow.auto` | `task → plan` · `implement` · (`beautify`, only with `--beautify`) · `test` |
+| `devflow.run` | `implement` · `beautify` · `test` (one each) |
+| `devflow.ship` Step 4b fix loop | `implement --fix → test --changed` |
+
+Group model = the highest of its steps' models in the Decision Table (`task → plan`: `sonnet` — complexity is unknown until plan writes it).
 
 | | Claude Code | Antigravity CLI |
 | --- | --- | --- |
@@ -60,14 +70,16 @@ While armed, the orchestrator runs each pipeline step in a `step-runner` subagen
 | Model | per-call `model` from `@devflow/references/model-selection.md` → Decision Table (run/auto column) | session model |
 | Workspace | shared (default) | `Workspace: 'inherit'` — a branched worktree would keep the step's edits out of the project |
 
-- **Prompt** — only: `Skill: <absolute path of skills/devflow-<step>/SKILL.md> · Feature: <NNN_name or "none yet"> · Arguments: <args or none> · Orchestrator: <devflow.run | devflow.auto>`. Wait for the subagent's final message before anything else.
-- **Result** — its `RESULT:` line. `ok` → confirm with `bash "@devflow/scripts/devflow-state.sh" status` that `plan.md` reached the step's exit status (otherwise treat as `stopped`); `stopped` / `failed` → stop the run and carry its `REPORT:` block into the final report.
+- **Prompt** — only: `Skills: <absolute path of skills/devflow-<step>/SKILL.md> [<args>] [→ <next path> [<args>]] · Feature: <NNN_name or "none yet"> · Orchestrator: <devflow.run | devflow.auto | devflow.ship fix loop>`. Wait for the subagent's final message before anything else.
+- **Result** — its `RESULT:` line. `ok` → confirm with `bash "@devflow/scripts/devflow-state.sh" status` that `plan.md` reached the last step's exit status (otherwise treat as `stopped`); `stopped` / `failed` → stop the run and carry its `REPORT:` block into the final report.
 - **Stay in the orchestrator's context**: `devflow.ship` (it dispatches the reviewer subagents, and subagents cannot dispatch subagents) and `devflow.pr`.
 - **No subagent support** on the host → run the step skills inline, in order, and write `Mode: single context` in the final report.
 
 ## Step behavior while armed
 
 - Notify blocks emitted, never waited on — control returns to the orchestrator.
+- Every check (format, lint, analyze, codegen, test, e2e, build) through `@devflow/scripts/verify-stamp.sh` — a raw check command is denied by `hooks/pre-bash-stamp-guard.sh`; subsets use `test:<scope>`.
+- Output written for a human reader (inventories, proposals, menus) goes to the feature files named by the skill, not the notify block.
 - Input contracts never forced; failure → orchestrator stops.
 - Context pressure → handoff per `state-machine.md` → **Handoff file**, stop.
 

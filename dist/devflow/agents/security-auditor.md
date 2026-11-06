@@ -130,5 +130,5 @@ Before auditing:
 ## Composition
 
 - **Invoke directly:** user wants security-focused pass on a change, PR, or component
-- **Invoke via:** `devflow.ship` fan-out per complexity profile — `quick`: `code-reviewer` alone; `standard`: + `security-auditor`, `test-engineer`; `thorough`: + `accessibility-auditor`, `docs-reviewer`
+- **Invoke via:** `devflow.ship` fan-out per complexity profile — `quick`: `code-reviewer` alone; `standard` / `thorough`: + `security-auditor`
 - **Do not invoke other personas.** If code-reviewer finding warrants deeper security pass, surface as recommendation — orchestration belongs to `devflow.ship`

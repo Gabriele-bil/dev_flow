@@ -1,6 +1,6 @@
 ---
 name: devflow-ship
-description: 'Pre-merge fan-out gate: dispatches 1–5 review agents (code-reviewer, security-auditor, test-engineer, +2) per complexity profile, routes devflow.pr if clean. Use when user runs devflow.ship, wants pre-merge gate, or asks "ready to ship?" — after devflow.test, before devflow.pr.'
+description: 'Pre-merge gate: dispatches code-reviewer (+ security-auditor from standard profile up) in parallel, synthesizes one Ship Gate Report, routes devflow.pr if clean. Use when user runs devflow.ship, wants pre-merge gate, or asks "ready to ship?" — after devflow.test, before devflow.pr.'
 argument-hint: "[optional notes for reviewers]"
 disable-model-invocation: true
 ---
@@ -12,7 +12,7 @@ disable-model-invocation: true
 
 ## Purpose
 
-Pre-merge fan-out gate. Dispatch specialist agents in parallel — count scaled by depth profile (`quick` = 1, `standard` = 3, `thorough` = 5) → synthesize reports → gate on findings → route to `devflow.pr`.
+Pre-merge gate. Dispatch 1–2 review agents in parallel per depth profile → one synthesized report → gate on findings → route to `devflow.pr`. Test coverage is already proven by `devflow.test` (`verification.md`) — ship reviews code, not coverage.
 
 ## Core Principles
 
@@ -20,77 +20,47 @@ Pre-merge fan-out gate. Dispatch specialist agents in parallel — count scaled 
 
 ## When NOT to Use
 
-- `devflow.test` is not complete or tests are still failing without explicit documentation
-- `devflow.beautify` has not been run
-- Active adapter analyze/typecheck has unresolved errors
-- `plan.md` or `task.md` are missing from `devflow/features/[NNN]_[feature-name]/`
+- `plan.md` Status ≠ `tested` — run `devflow.test` first
+- Hotfix — `devflow.hotfix` has no ship gate; it goes straight from verified tests to PR
 
----
+## Input contract
 
-## Step 0 - Input contract
+Stop and report the failed check if any item is unmet.
 
-Before dispatching, verify all of the following. Stop and report which check failed if any item is unmet.
-
-- [ ] `plan.md` **Status** == `tested` — proves beautify ran (legal transitions; only the hotfix fast-track and the `quick` profile skip it)
+- [ ] `task.md`, `plan.md` exist in `devflow/features/[NNN]_[feature-name]/`; `plan.md` **Status** == `tested`
 - [ ] Tests still valid: `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/verify-stamp.sh" check 'test*'` — stale or failing → code changed after `devflow.test`; stop, route `devflow.test`
-- [ ] `verification.md` exists at `devflow/features/[NNN]_[feature-name]/verification.md` with zero FAIL verdicts (goal-backward verification from `devflow.test` Step 6b)
+- [ ] `verification.md` present with zero FAIL verdicts
 - [ ] Analyze clean: `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/verify-stamp.sh" run analyze -- <adapter analyze cmd>` (fresh since `devflow.test` → skipped)
-- [ ] `plan.md` exists at `devflow/features/[NNN]_[feature-name]/plan.md`
-- [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md`
-- [ ] Depth profile resolved from `plan.md` `**Complexity:**` per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/complexity-scoring.md` (missing → `standard`)
-- [ ] **Rigor Ratchet Checks (conditional):** if `.devflow-instincts.shared.yaml` contains entries with `check_cmd`, start them (`devflow.learn check`) in the background and dispatch Step 1 without waiting; collect the result before Step 3. Any check exceeding its `ratchet_max` (or exiting non-zero when no ratchet is set) is recorded as a **Required** finding in Step 3.
+- [ ] Depth profile from `plan.md` `**Complexity:**` per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/complexity-scoring.md` (missing → `standard`)
+- [ ] **Rigor ratchet (conditional):** `.devflow-instincts.shared.yaml` has `check_cmd` entries → start `devflow.learn check` in background, collect in Step 2; check over `ratchet_max` (or non-zero exit without ratchet) = **Required** finding
 
----
+## Workflow
 
-## Step 1 - Fan-out (parallel)
+### Step 1 - Fan-out (parallel)
 
-Build the review packet once, then dispatch all profile-required agents **simultaneously**. Do not wait for one before dispatching the next.
+| Profile | Roster |
+| --- | --- |
+| `quick` | `code-reviewer` (all seven axes, security included) |
+| `standard` | `code-reviewer` · `security-auditor` |
+| `thorough` | `code-reviewer` · `security-auditor` — both with `model: opus` (Claude Code only; `$HOME/.gemini/antigravity-cli/plugins/devflow/references/model-selection.md`) |
+
+Build the packet once, then dispatch the roster **simultaneously**:
 
 ```bash
 bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/review-packet.sh" [NNN] --profile <profile> --roster "<agent names>"
 ```
 
-Keep the `tree <hash>` its summary line prints: Step 4b re-reviews start from it. It writes `.devflow-review-packet.md` — changed files and diff against the base branch (uncommitted and new files included, `devflow/` excluded), acceptance criteria, scope, architecture decisions, traceability, deviations, decision flags, verification stamps, `constitution.md` and the `registry.md` entries for the changed files.
+Keep the `tree <hash>` from its summary line — Step 4b re-reviews start from it. Each agent receives: path to `.devflow-review-packet.md` (read first — replaces own `git diff` and full reads of `task.md`/`plan.md`/`constitution.md`), adapter + app working directory (`$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md`), reviewer notes from `$ARGUMENTS`, the roster (`code-reviewer` skips its security axis when `security-auditor` is on it), and `$HOME/.gemini/antigravity-cli/plugins/devflow/references/token-economy.md` output rules.
 
-Each agent receives:
+Agents: `$HOME/.gemini/antigravity-cli/plugins/devflow/agents/code-reviewer.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/agents/security-auditor.md`. Read-only — a report claiming edits is invalid; discard, re-dispatch.
 
-- Path to `.devflow-review-packet.md` — read first; replaces each agent's own `git diff` and full reads of `task.md`/`plan.md`/`constitution.md`
-- Active adapter name and app working directory (resolved per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md`)
-- Optional reviewer notes from `$ARGUMENTS`
-- Dispatch roster (profile + agent names) — `code-reviewer` skips its security axis when `security-auditor` is on it
-- Exploration + output rules: `$HOME/.gemini/antigravity-cli/plugins/devflow/references/token-economy.md` (index-first when code-index MCP available; derive, don't dump)
+### Step 2 - Collect
 
-**Agents per depth profile:**
+Wait for every dispatched report and the ratchet result.
 
-| Profile | Agents |
-| --- | --- |
-| `quick` | `code-reviewer` |
-| `standard` | `code-reviewer` · `security-auditor` · `test-engineer` |
-| `thorough` | `standard` set + `accessibility-auditor` · `docs-reviewer` |
+### Step 3 - Synthesize
 
-Agent definitions (`thorough` profile: pass `model: opus` on the Agent calls for `code-reviewer` and `security-auditor` — Claude Code only; `$HOME/.gemini/antigravity-cli/plugins/devflow/references/model-selection.md`):
-
-1. `$HOME/.gemini/antigravity-cli/plugins/devflow/agents/code-reviewer.md` — seven-axis code review (security axis delegated to `security-auditor` when both dispatched)
-2. `$HOME/.gemini/antigravity-cli/plugins/devflow/agents/security-auditor.md` — security audit
-3. `$HOME/.gemini/antigravity-cli/plugins/devflow/agents/test-engineer.md` — coverage gap analysis
-4. `$HOME/.gemini/antigravity-cli/plugins/devflow/agents/accessibility-auditor.md` — WCAG 2.1 AA audit (thorough only)
-5. `$HOME/.gemini/antigravity-cli/plugins/devflow/agents/docs-reviewer.md` — doc coverage and drift (thorough only)
-
----
-
-## Step 2 - Collect reports
-
-Wait for **all dispatched** reports. Do not proceed until all complete. Agents are read-only (`disallowedTools` + Bash rule) — a report claiming it edited files is invalid; discard and re-dispatch.
-
----
-
-## Step 3 - Synthesize
-
-Merge findings across all dispatched reports. Deduplicate overlapping findings (same file:line from multiple reviewers → one merged entry, noting which reviewers flagged it).
-
-**Contradictions** — same file:line, opposite verdicts (one agent clears it, another flags it): keep the more severe verdict for gating, but surface the disagreement explicitly in **Reviewer Disagreements**. Never resolve a contradiction by silently dropping the dissenting verdict — the user decides, not the synthesis step.
-
-Produce a unified report:
+Merge, dedupe (same `file:line` → one entry, list reviewers). Contradiction (one clears, other flags) → keep more severe verdict for gating, list it under **Reviewer Disagreements** — never drop the dissent.
 
 ```markdown
 ## Ship Gate Report: [feature-name]
@@ -98,104 +68,77 @@ Produce a unified report:
 ### Verdict: APPROVE | REQUEST CHANGES
 
 ### Critical Blockers
-(findings marked Critical by any agent — must resolve before devflow.pr)
 - [agent] `[file:line]` — [description + fix]
 
 ### Required
-(findings with no prefix / Required severity — fix before merge)
 - [agent] `[file:line]` — [description + fix]
 
 ### Nit / Optional / FYI
 - [agent] `[file:line]` — [description]
 
-### Coverage Gaps
-- [from test-engineer: uncovered acceptance criteria or public surfaces]
+### Reviewer Disagreements
+(omit when none)
 
 ### Open Decision Flags
-(from plan.md ## Decision flags — autonomous decisions made under devflow.run; user reviews each before PR. Omit section when plan.md has no flags)
+(from plan.md ## Decision flags — omit when none)
 - F[N] — [decision]; alternatives: [...]; files: [...]
 
-### Done Well
-- [positive observations from all agents]
+### Discarded by validator
+(omit when none — Step 3b)
+- [agent] `[file:line]` — [finding] — discarded: [evidence]
 
 ---
-Profile: [quick | standard | thorough] · Reviewed by: [agents actually dispatched]
+Profile: [quick | standard | thorough] · Reviewed by: [agents dispatched]
 ```
 
----
+### Step 3b - Validate blocking findings
 
-## Step 4 - Gate decision
+Any **Critical** or **Required** in the report → dispatch `$HOME/.gemini/antigravity-cli/plugins/devflow/agents/finding-validator.md` once (Claude Code: Agent, `subagent_type: "devflow:finding-validator"`; Antigravity: `invoke_subagent`, subagent `finding-validator`) with the packet path and the numbered Critical + Required list. `DISCARDED` entries move to **Discarded by validator** with their evidence and stop gating; `CONFIRMED` stay. Re-compute the verdict. Nit/FYI never validated. Step 4b re-reviews validate their new blocking findings the same way.
 
-| Finding state | Action |
+### Step 4 - Gate decision
+
+| Findings | Action |
 | --- | --- |
-| Any **Critical** issue | Stop. Present report — run mode never overrides this. User asks to fix → Step 4b fix loop (interactive, no iteration cap) |
-| Any **Required** issue, no Critical | Interactive: present report, ask "Fix before PR or proceed with documented exceptions?" — fix → Step 4b; proceed → exceptions into `plan.md` `## Decision flags`, Step 5 · Run mode (`.devflow-run.json` present): Step 4b, bounded |
-| Only **Nit / Optional / FYI** | Proceed automatically to Step 5 |
-| No findings | Proceed automatically to Step 5 |
+| Any **Critical** | Stop, present report — run mode never overrides. User asks fix → Step 4b (no cap) |
+| **Required**, no Critical | Interactive: ask "Fix before PR or proceed with documented exceptions?" — fix → Step 4b; proceed → exceptions into `plan.md` `## Decision flags`, Step 5 · Run mode: Step 4b, bounded |
+| Only Nit/FYI, or none | Step 5 |
 
----
+### Step 4b - Fix loop
 
-## Step 4b - Fix loop
+Code edit after `devflow.test` invalidates `verification.md` — never patch inline and jump to Step 5.
 
-Every code edit after `devflow.test` invalidates `verification.md` — fixes always walk the full middle pipeline again. Never patch inline and jump to Step 5.
+Run mode only (Required-only verdicts; Critical never loops autonomously): `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" run bump` — exit 3 = cap reached → under `devflow.run`: present report, return control; under `devflow.auto`: remaining Required → `## Decision flags` as documented exceptions, Step 5.
 
-Run mode only — iteration budget (Required-only verdicts; Critical never enters an autonomous loop):
+Each iteration (run mode: steps 1–2 in **one** `step-runner` subagent — group `implement --fix` → `test --changed`, per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md` → **Step dispatch**; interactive: execute here):
 
-1. `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" run bump` — prints `grader iteration N/cap` and counts it; exit 3 = cap reached.
-2. Cap reached → stop looping. Under `devflow.run`: present report as-is, control returns to `devflow.run`. Under `devflow.auto` (`until: "pr"`): log remaining Required findings to `plan.md` `## Decision flags` as documented exceptions (go to PR body), proceed to Step 5.
+1. `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-implement/SKILL.md` `--fix <findings>` (confirmed findings only, `file:line` + description) — `tested` → `implementing` → `implemented`.
+2. `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-test/SKILL.md` `--changed <files the fix touched>` (`thorough`: no `--changed`) — `implemented` → `tested` only with zero FAIL. Fails → stop loop, present report + failure (`$HOME/.gemini/antigravity-cli/plugins/devflow/references/escalation-ladder.md`); never set `shipped`.
+3. Re-review the delta — packet built with `--since <previous tree>`, roster = `code-reviewer` + every agent whose confirmed findings this iteration fixed (`thorough`: full packet, same roster as Step 1) → Steps 2–4 (Step 3b on new blocking findings). Critical on any iteration → hard stop regardless of budget.
 
-Run mode: steps 1–3 each run in a `step-runner` subagent per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md` → **Step dispatch** (implement's arguments: `--fix` + the findings); interactive: execute the skills here.
+### Step 5 - Route to devflow.pr
 
-Each iteration (interactive and run mode), every status boundary written with `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set plan <status>`:
+Gate passed (Status `tested`, fresh `verification.md`, zero FAIL): `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set plan shipped`.
 
-1. `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-implement/SKILL.md` with `--fix <findings>` — re-entry mode, scoped to this report's findings (`file:line` + description); `tested` → `implementing` → `implemented`.
-2. `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-beautify/SKILL.md` on touched files (run mode: certain improvements only) → `beautified`.
-3. `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-test/SKILL.md` with `--changed <files the fix touched>` — the unit suite runs through the stamp as always; Step 6b re-verifies only ACs whose Traceability files are in that list and carries the other rows over (`thorough`: no `--changed`, full re-verification) → fresh `verification.md`; `tested` only with zero FAIL. Test step fails or verification FAIL → stop loop, present report + failure (escalation per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/escalation-ladder.md`); never set `shipped`.
-4. Re-run the fan-out from Step 1 at the **same depth profile** (same agents — never shrink on retry). `quick` / `standard`: build the packet with `--since <tree from the previous packet>`, so the agents review the fix diff with the previous report's findings as context; `thorough`: full packet, fully independent re-review.
-5. Route new report through Step 4. Critical on any iteration → immediate hard stop, independent of remaining budget.
-
----
-
-## Step 5 - Route to devflow.pr
-
-If gate passes (Status `tested`, `verification.md` written after last code edit, zero FAIL): `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set plan shipped`.
-
-**Run mode under devflow.run** (`.devflow-run.json` present with `until: "ship"` or `orchestrator: "devflow.run"`): do NOT execute `devflow-pr`. Present report, stop; PR stays human. Control returns to `devflow.run`.
-
-**Run mode under devflow.auto** (`.devflow-run.json` present with `until: "pr"` or `orchestrator: "devflow.auto"`): gate passed (or proceeded with documented exceptions). Execute `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-pr/SKILL.md` directly.
-
-Otherwise (interactive session):
-
-```text
-✅ Ship gate passed. Routing to devflow.pr.
-```
-
-Execute `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-pr/SKILL.md` exactly.
-
----
+- `.devflow-run.json` with `until: "ship"` / `orchestrator: "devflow.run"` → present report, stop; PR stays human.
+- `.devflow-run.json` with `until: "pr"` / `orchestrator: "devflow.auto"` → execute `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-pr/SKILL.md`.
+- Interactive → `✅ Ship gate passed. Routing to devflow.pr.` → execute `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-pr/SKILL.md` exactly.
 
 ## Anti-Patterns
 
 | Anti-Pattern | Fix |
 | --- | --- |
-| Downgrading profile at ship to shrink fan-out | Profile fixed at plan; change requires plan.md edit + user confirmation |
-| Downgrading severity in synthesis | Report as declared; escalate if disputed |
-| Re-running after fixing only some Critical issues | Fix all Critical; re-run full gate from Step 1 |
+| Downgrading profile or severity to pass the gate | Profile fixed at plan; severity reported as declared |
+| Fixing findings, then setting `shipped` on old `verification.md` | Every fix walks implement `--fix` → test |
 
 Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
-
----
 
 ## I/O Reference
 
 | | |
 | --- | --- |
-| Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `devflow/features/[NNN]_[feature-name]/verification.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md` |
-| Runs | `$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/review-packet.sh` (Step 1, every fan-out incl. Step 4b re-runs) → `.devflow-review-packet.md` |
-| Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/references/complexity-scoring.md` (depth profile → fan-out), `$HOME/.gemini/antigravity-cli/plugins/devflow/references/token-economy.md` (agent prompt rules) |
-| Reads (conditional) | `plan.md` `## Decision flags` (→ **Open Decision Flags** report section); `.devflow-run.json` (`until` field — stops before PR if `until: "ship"`, routes to `devflow.pr` if `until: "pr"`; `ship_grader_iterations`/`ship_grader_iteration_count` for Step 4b); `references/anti-patterns.md` (when unsure / retry) |
-| Writes | `plan.md` — `**Status:** shipped` on gate pass; Step 4b statuses via the chained skills; `.devflow-state.json` (merge) |
-| Writes (conditional) | `.devflow-run.json` `ship_grader_iteration_count` — Step 4b, run mode only (`devflow-state.sh run bump`) |
-| Dispatches | review agents per depth profile — `quick`: `code-reviewer`; `standard`: + `security-auditor`, `test-engineer`; `thorough`: + `accessibility-auditor`, `docs-reviewer` (parallel); Step 4b fix loop re-runs `devflow.implement --fix` → `devflow.beautify` → `devflow.test` before re-running the fan-out |
-| Routes to | `devflow-pr` skill on gate pass |
-| Replaces | Running `devflow.pr` directly when multi-perspective review is needed |
+| Reads | `task.md`, `plan.md` (`**Complexity:**`, `## Decision flags`), `verification.md` in `devflow/features/[NNN]_[feature-name]/`; `$HOME/.gemini/antigravity-cli/plugins/devflow/references/complexity-scoring.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/token-economy.md` |
+| Reads (conditional) | `.devflow-run.json` (`until`/`orchestrator`, grader budget); `references/anti-patterns.md` |
+| Runs | `$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/review-packet.sh` → `.devflow-review-packet.md` (every fan-out, incl. Step 4b) |
+| Dispatches | `code-reviewer` (+ `security-auditor` on `standard`/`thorough`), parallel; `finding-validator` on Critical/Required (Step 3b); Step 4b chains `devflow.implement --fix` → `devflow.test` (run mode: one step-runner) |
+| Writes | `plan.md` `**Status:** shipped` + `.devflow-state.json` via `devflow-state.sh`; `## Decision flags` (documented exceptions); `.devflow-run.json` grader count (run mode) |
+| Routes to | `devflow-pr` on gate pass |

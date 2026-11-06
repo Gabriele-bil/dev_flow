@@ -22,7 +22,7 @@ Turn structured task into detailed implementation plan. Read required docs, outp
 
 ## Planning discipline (read-only until `plan.md` is written)
 
-Until `plan.md` written and saved: no code/test/asset changes. Read `task.md`, `constitution.md`, `registry.md`, sources, MCP docs as needed.
+Until `plan.md` written and saved: no code/test/asset changes. Read `task.md`, `constitution.md`, `REGISTRY.md`, sources, MCP docs as needed.
 
 Deliverable: `plan.md` only.
 
@@ -40,7 +40,7 @@ Order **File list** bottom-up per `constitution.md` and the adapter plan step fi
 ## Core Principles
 
 - **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
-- **reuse-first** — always check `registry.md` and shared folders before planning new components; reuse or extend over duplicate
+- **reuse-first** — always check `REGISTRY.md` and shared folders before planning new components; reuse or extend over duplicate
 
 ## When NOT to Use
 
@@ -54,7 +54,7 @@ Before proceeding, verify:
 
 - [ ] `task.md` exists at `devflow/features/[NNN]_[feature-name]/task.md`
 - [ ] `task.md` has non-empty goal section (`## Goal & Value` or `## Summary`) and functional requirements (`## Use Cases & Scenarios` or `## Subtasks`)
-- [ ] `task.md` Status is `draft` (no `[NEEDS CLARIFICATION: ...]` markers) or `clarified` — if unresolved markers exist → stop, suggest `devflow.clarify`
+- [ ] `task.md` Status is `draft` (or legacy `clarified`) with no `[NEEDS CLARIFICATION: ...]` markers — markers left → stop, route back to `devflow.task` to resolve them
 
 If any item fails → stop, report which check failed, do not write `plan.md`.
 
@@ -95,7 +95,7 @@ Both severities stop unconditionally — **never bypassed, run mode or not**.
 Always read:
 
 - `constitution.md` (architecture rules, conventions, stack)
-- `registry.md` (existing patterns and shared utilities)
+- `REGISTRY.md` (existing patterns and shared utilities)
 - `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/common/skills/common-clean-code/SKILL.md` (clean code, SOLID rules)
 - `docs/adr/` (if present) — inspect referenced ADRs or `docs/adr/README.md` to ensure planned architecture respects accepted decisions
 
@@ -111,7 +111,7 @@ Follow the **MCP** section of the active `ADAPTER.md` (tooling order and when to
 
 Before planning any file:
 
-1. **Read `registry.md`** in full — note every shared component, widget, utility, and pattern relevant to this feature.
+1. **Read `REGISTRY.md`** in full — note every shared component, widget, utility, and pattern relevant to this feature.
 2. **Scan the project's shared folder** (e.g. `lib/shared/`, `src/shared/`, `components/shared/`) — list components that partially or fully cover any UI need in this feature.
 3. **Decide for each candidate:** reuse as-is / extend / parameterise / create new. Document the decision under **Architecture decisions** in `plan.md`.
 4. **Plan new shared components:** if this feature introduces a UI pattern generic enough for reuse elsewhere, list it under its shared path in the **File List** from the start — not as an afterthought.
@@ -194,6 +194,12 @@ Format rules:
 
 **Run mode** (`.devflow-run.json` present, contract `$HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md`): a genuine **Open questions** entry (plan-level ambiguity, not a constitution violation) does not escalate — default + `## Decision flags` entry per its **Decision flags**; keep Status `ready`. Constitution Gate Critical/Required violations above are the one exception — those stop regardless of mode.
 
+### Step 5b - Consistency check (optional)
+
+Read-only cross-check of `task.md` + `plan.md` + `constitution.md` + ADRs — passes, severity, report: `references/consistency-check.md`.
+- Interactive: ask `Run consistency check before implement? (Recommended for standard/thorough)`. Yes → run, report; Critical/Required → fix `plan.md` (or `task.md`), re-run failing passes. No → skip.
+- Run mode (`devflow.auto`): always run. Critical → stop (major discrepancy); Required → fix `plan.md` or waiver in `## Decision flags`.
+
 ### Step 6 - Notify user
 
 Respond with:
@@ -228,11 +234,11 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | | |
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md` |
-| Reads | `constitution.md`, `registry.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/common/skills/common-clean-code/SKILL.md` |
+| Reads | `constitution.md`, `REGISTRY.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/common/skills/common-clean-code/SKILL.md` |
 | Reads (adapter) | `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/plan.md`; technology skills per ADAPTER table |
 | Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/references/complexity-scoring.md` (Step 4d — score + profile) |
 | Reads | `$HOME/.gemini/antigravity-cli/plugins/devflow/references/token-economy.md` (Step 1 — index-first exploration) |
-| Reads (conditional) | `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-plan/references/plan-anti-patterns.md` (Anti-patterns catalog — when unsure / retry) |
+| Reads (conditional) | `$HOME/.gemini/antigravity-cli/plugins/devflow/skills/devflow-plan/references/plan-anti-patterns.md` (when unsure / retry); `references/consistency-check.md` (Step 5b) |
 | Runs | `$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh` (`resolve`, `sync`) |
 | Writes | `devflow/features/[NNN]_[feature-name]/plan.md`, `.devflow-state.json` (merge) |
 | Writes (conditional) | `plan.md` `## Decision flags` (run mode — resolved Open questions) |

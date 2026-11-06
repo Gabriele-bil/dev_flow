@@ -8,7 +8,7 @@
     ],
     "negative": [
       { "prompt": "Log this quirk as a project instinct", "owner": "devflow-learn" },
-      { "prompt": "Check the plan for traceability gaps before implementing", "owner": "devflow-analyze" }
+      { "prompt": "Write the task spec for a new feature idea", "owner": "devflow-task" }
     ]
   }
 }
