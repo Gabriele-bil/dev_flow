@@ -90,7 +90,7 @@ clarified → done      (legacy: features created before devflow.clarify was fol
 | `beautified` | Beautify step applied | `devflow-beautify` exit (Step 6) | `devflow.test` |
 | `tested` | Tests pass + `verification.md` has no FAIL | `devflow.test` exit (Step 7) | `devflow.ship` |
 | `shipped` | Ship gate passed | `devflow.ship` Step 5 | `devflow.pr` |
-| `pr-opened` | PR open toward main | `devflow.pr` Step 6 | — (pipeline complete) |
+| `pr-opened` | PR open toward main | `devflow.pr` Step 6 (committed & pushed) | — (pipeline complete) |
 | `blocked` | Escalation ladder Level 5 | any skill per `references/escalation-ladder.md` | `devflow.resume` |
 
 ## Legal transitions

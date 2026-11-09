@@ -16,3 +16,10 @@
 | PR body without task reference | Include `Closes TASK-NNN` |
 | Force-pushing an open PR | Creates follow-up commit instead |
 | Skipping `devflow.ship` | Ship gate prevents broken code reaching main |
+| Leaving `plan.md` and `task.md` uncommitted after status update | Follow up with commit and push so PR includes final status and worktree is clean |
+
+## Common Rationalizations
+
+| Thought | Reality |
+| --- | --- |
+| "PR is already opened so we don't commit status changes" | Pushing the status commit updates the open PR and ensures a clean working tree |

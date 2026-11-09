@@ -110,3 +110,6 @@ devflow/features/
 .devflow-metrics.jsonl.1
 .devflow-timings.jsonl.1
 .devflow-changed-files.tmp
+
+# devflow local telemetry
+.devflow-metrics/

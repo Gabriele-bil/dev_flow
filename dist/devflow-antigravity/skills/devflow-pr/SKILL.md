@@ -172,20 +172,36 @@ Closes TASK-[NNN]
 
 ---
 
-## Step 6 - Notify user
+## Step 6 - Finalize status, commit, push, and notify user
 
-After successful `gh pr create`: `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set plan pr-opened && bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set task done`.
+After successful `gh pr create`:
 
-```text
-✅ Pull request opened: [type]/[NNN]_[feature-name] -> $BASE_BRANCH
+1. Update terminal statuses:
+   ```bash
+   bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set plan pr-opened && bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set task done
+   ```
 
-Title: [PR title]
-Link: [PR URL returned by gh CLI]
-[UI preview: /tmp/devflow-ui-preview-[NNN]-[feature-name].png — drag into the PR to attach]   ← only if captured
-[Left unstaged: <paths>]                                                                      ← only if any
+2. Commit and push the status update so that the PR includes the final status and no modified files remain in the working tree:
+   ```bash
+   git add -- devflow/features/[NNN]_[feature-name]/plan.md devflow/features/[NNN]_[feature-name]/task.md
+   [ -f "devflow/board/board-data.js" ] && git add -- devflow/board/board-data.js devflow/board/board-data.json 2>/dev/null || true
+   git diff --cached --quiet || {
+     git commit -m "chore: update task and plan status to pr-opened"
+     git push origin [type]/[NNN]_[feature-name]
+   }
+   ```
 
-DevFlow pipeline complete for TASK-[NNN].
-```
+3. Announce completion:
+   ```text
+   ✅ Pull request opened: [type]/[NNN]_[feature-name] -> $BASE_BRANCH
+
+   Title: [PR title]
+   Link: [PR URL returned by gh CLI]
+   [UI preview: /tmp/devflow-ui-preview-[NNN]-[feature-name].png — drag into the PR to attach]   ← only if captured
+   [Left unstaged: <paths>]                                                                      ← only if any
+
+   DevFlow pipeline complete for TASK-[NNN].
+   ```
 
 ---
 
@@ -195,6 +211,7 @@ DevFlow pipeline complete for TASK-[NNN].
 | --- | --- |
 | Skipping `devflow.ship` | Ship gate prevents broken code reaching main |
 | Force-pushing an open PR | Creates follow-up commit instead |
+| Leaving `plan.md` and `task.md` uncommitted after status update | Follow up with commit and push so PR includes final status and worktree is clean |
 
 Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 
@@ -204,7 +221,7 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/task.md`, `devflow/features/[NNN]_[feature-name]/plan.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/adapter-resolution.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/pr.md` |
 | Reads (conditional) | `references/anti-patterns.md` (when unsure / retry) |
-| Runs | `git add -- <expected paths>` · `git commit` · `git push` · `gh pr create --body-file` |
+| Runs | `git add -- <expected paths>` · `git commit` · `git push` · `gh pr create --body-file` · status commit & push (`git add` / `git commit` / `git push`) |
 | Deletes | `devflow/features/[NNN]_[feature-name]/.checkpoint.json`, `devflow/features/[NNN]_[feature-name]/handoff.md`, PR body temp file |
 | Writes | `plan.md` `**Status:** pr-opened`, `task.md` `**Status:** done` |
 | Next step | - (end of pipeline) |
