@@ -8,9 +8,9 @@ description: DevFlow pipeline routing — which devflow skill to run next for a 
 Session-start routing: map project state to one entry point. Context, not a user command — route, don't plan.
 
 ```text
-init ──────────────────────┐
-[discover] → setup → task ─┼→ plan → implement → [beautify] → test → ship → pr
-       blueprint (3+ PRs) ─┘
+init ─────────────────────────────────────┐
+[discover] → setup → [brainstorm] → task ─┼→ plan → implement → [beautify] → test → ship → pr
+                      blueprint (3+ PRs) ─┘
 ```
 
 Each step `devflow.<step>` is a skill the user runs as a slash command: `devflow.plan` is `/devflow-plan`, `devflow.ship` is `/devflow-ship` — suggest steps in that form.
@@ -27,6 +27,7 @@ Stack / architecture undecided?          → devflow.discover
 .devflow-run.json, handoff.md, plan Status implementing/blocked, or state inconsistent? → devflow.resume
 Urgent bug, root cause known, ≤3 files?  → devflow.hotfix
 Raw idea, no task.md:
+  no concrete actor / problem yet        → devflow.brainstorm
   3+ PRs / multi-session                 → devflow.blueprint
   otherwise                              → devflow.task
 task.md has [NEEDS CLARIFICATION]        → devflow.task (resolve markers)

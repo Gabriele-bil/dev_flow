@@ -31,6 +31,7 @@ Cross-cutting entry points, outside the happy path:
 | Command | When |
 | --- | --- |
 | `devflow.init` | Greenfield project bootstrap — multi-phase interview, live stack scaffolding, DevFlow context + `ADR-001` + `project-blueprint.md` + ordered `001..NNN` `task.md` roadmap |
+| `devflow.brainstorm` | Idea still fuzzy (no concrete actor or problem) — frames it, generates distinct directions via `brainstormer`, writes a brief in `devflow/ideas/` for `devflow.task` |
 | `devflow.discover` | Architectural trade-offs unresolved — compares 2–3 viable options and writes a formal ADR in `docs/adr/` |
 | `devflow.run` / `devflow.auto` | Opt-in autonomy — `run` chains `implement → [beautify] → test` unattended; `auto` runs the full pipeline from raw idea to opened PR |
 | `devflow.hotfix` | Urgent bugfix — compact task+plan → failing regression test → fix → full suite + verification → PR |

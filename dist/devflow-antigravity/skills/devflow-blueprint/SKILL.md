@@ -32,7 +32,7 @@ Transform a large objective into a multi-PR blueprint. Output: dependency graph,
 
 - Objective fits a single PR or a single `devflow.plan` — use `devflow.task` + `devflow.plan` instead
 - A blueprint already exists for this objective with status `approved` and no scope has changed
-- Objective is still brainstorm-level with no concrete scope — clarify with the user first
+- Objective is still brainstorm-level with no concrete scope — run `devflow.brainstorm` first
 
 ## Input contract
 

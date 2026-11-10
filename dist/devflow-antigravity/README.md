@@ -88,6 +88,7 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 | --- | --- |
 | `devflow.init` | Bootstrap a greenfield project end-to-end: multi-phase interview → evergreen tech scaffolding (Nx, Angular, Next.js, Flutter, NestJS) → DevFlow context + `ADR-001` → `project-blueprint.md` + ordered `001..NNN` `task.md` roadmap |
 | `devflow.discover` | Explore architectural choices for app creation or complex features → comparative trade-offs + formal ADR |
+| `devflow.brainstorm` | Fuzzy idea → framed problem → distinct directions from `brainstormer` → chosen direction brief in `devflow/ideas/` for `devflow.task` |
 | `devflow.setup` | Generate `AGENTS.md`, `REGISTRY.md`, `constitution.md`, and `docs/product.md` from adapter templates |
 | `devflow.task` | Raw idea → structured task with HMW framing and verifiable subtasks; `task-reviewer` second read on larger or file-sourced tasks |
 | `devflow.plan` | `task.md` → file-ordered implementation plan with traceability; `plan-reviewer` lead review from `standard` up; optional consistency check (traceability, AC testability, terminology, constitution/ADR alignment) |

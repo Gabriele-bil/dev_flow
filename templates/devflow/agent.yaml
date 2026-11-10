@@ -27,6 +27,13 @@ pipeline:
         Generate or update AGENTS.md, REGISTRY.md, constitution.md, and
         docs/product.md in the consumer project root from adapter templates
         with a mandatory full questionnaire
+    - id: brainstorm
+      command: /devflow.brainstorm
+      skill: devflow-brainstorm
+      description: >-
+        Optional step before task for fuzzy ideas: frames the problem with the
+        user, generates distinct product directions via brainstormer, and
+        writes an idea brief in devflow/ideas/ for devflow.task
     - id: blueprint
       command: /devflow.blueprint
       skill: devflow-blueprint
@@ -164,6 +171,12 @@ agents:
       Re-checks every Critical and Required devflow.ship finding against the
       cited file and line; discards only what the code disproves
     invoked_by: devflow.ship
+  - id: brainstormer
+    path: agents/brainstormer.md
+    description: >-
+      Generates distinct product directions for a framed problem (value
+      mechanism, riskiest assumption, smallest test, size) in a clean context
+    invoked_by: devflow.brainstorm
   - id: task-reviewer
     path: agents/task-reviewer.md
     description: >-
@@ -202,6 +215,12 @@ skills:
         features, compares technical options, and records decisions in ADRs. Use
         when exploring architecture choices, evaluating trade-offs, or before
         devflow.setup or devflow.task
+    - id: devflow-brainstorm
+      path: skills/devflow-brainstorm/SKILL.md
+      description: >-
+        Turns a vague product idea or problem into a chosen direction: frames
+        the problem, generates distinct directions, converges with the user and
+        writes an idea brief for devflow.task
     - id: devflow-setup
       path: skills/devflow-setup/SKILL.md
       description: >-

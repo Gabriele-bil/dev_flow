@@ -19,6 +19,7 @@ Bracketed steps optional. Each step has a strict input contract; status lives in
 | No context files in consumer root | `devflow.setup` | No `devflow/config.md` |
 | Greenfield project, full roadmap | `devflow.init` | Empty repo |
 | Architectural choice / ADR | `devflow.discover` | Trade-offs unresolved |
+| Fuzzy idea, unclear what to build | `devflow.brainstorm` | No concrete actor or problem |
 | Large objective, multiple PRs | `devflow.blueprint` | Before task |
 | Raw feature idea | `devflow.task` | No `task.md` yet |
 | `task.md` ready | `devflow.plan` | task `draft`, no `[NEEDS CLARIFICATION]` markers (else back to `devflow.task`) |

@@ -32,10 +32,11 @@ Skills not listed run on the session model with the effort in their frontmatter 
 | `security-auditor` | `sonnet` | high | per-call `model: opus` |
 | `finding-validator` (Step 3b, blocking findings only) | `sonnet` | medium | `sonnet` |
 
-**Spec reviewers** (interactive only — a step-runner cannot dispatch them):
+**Spec agents** (interactive only — a step-runner cannot dispatch them):
 
 | Agent | Model | Effort | `thorough` profile |
 | --- | --- | --- | --- |
+| `brainstormer` (brainstorm Step 3) | `sonnet` | high | `sonnet` |
 | `task-reviewer` (task Step 5b, ≥ 3 use cases or file/ticket input) | `sonnet` | medium | `sonnet` |
 | `plan-reviewer` (plan Step 4f, `standard`+; blueprint Step 6) | `sonnet` | high | per-call `model: opus`; blueprint always `opus` |
 
