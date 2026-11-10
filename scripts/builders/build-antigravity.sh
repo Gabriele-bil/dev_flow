@@ -44,11 +44,12 @@ step "Generazione plugin.json"
 mkdir -p "$AGY_DIR/.antigravity-plugin"
 if ! jq -n \
   --arg name        "$NAME" \
+  --arg version     "$VERSION" \
   --arg description "$DESCRIPTION" \
   --arg author      "$AUTHOR" \
   --arg repository  "${REPOSITORY:-}" \
   --arg homepage    "${HOMEPAGE:-}" \
-  '{name: $name, description: $description, author: {name: $author}}
+  '{name: $name, version: $version, description: $description, author: {name: $author}}
    + (if $repository != "" then {repository: $repository} else {} end)
    + (if $homepage   != "" then {homepage:   $homepage}   else {} end)' \
   > "$AGY_DIR/.antigravity-plugin/plugin.json"; then
