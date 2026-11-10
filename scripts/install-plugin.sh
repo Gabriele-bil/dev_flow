@@ -183,52 +183,63 @@ validate_plugin() {
 # ── Install / Uninstall: Antigravity ─────────────────────────────────────────
 install_antigravity() {
   # dist/devflow-antigravity/ is the Antigravity build (root hooks.json,
-  # rules/). Global scope goes through agy itself, which stages
-  # plugins under ~/.gemini/antigravity-cli/plugins/<name>/.
-  local TARGET_DIR
+  # rules/). Global scope is discovered by agy under ~/.gemini/config/plugins/<name>/
+  # while internal staging scripts resolve ~/.gemini/antigravity-cli/plugins/<name>/.
+  local TARGET_DIRS=()
   if [ "$SCOPE" = "workspace" ]; then
-    TARGET_DIR="$WORKSPACE_DIR/.agents/plugins/devflow"
+    TARGET_DIRS=("$WORKSPACE_DIR/.agents/plugins/devflow")
   else
-    TARGET_DIR="$HOME/.gemini/antigravity-cli/plugins/devflow"
+    TARGET_DIRS=(
+      "$HOME/.gemini/config/plugins/devflow"
+      "$HOME/.gemini/antigravity-cli/plugins/devflow"
+    )
   fi
 
   [ -d "$AGY_DIST_DIR" ] || fail "Missing $AGY_DIST_DIR — run with --build first"
 
   if [ "$UNINSTALL" = true ]; then
-    step "Uninstalling DevFlow from Antigravity ($SCOPE: $TARGET_DIR)..."
+    step "Uninstalling DevFlow from Antigravity ($SCOPE)..."
     if [ "$SCOPE" != "workspace" ] && command -v agy >/dev/null 2>&1; then
       run_cmd agy plugin uninstall devflow || warn "agy plugin uninstall reported an error"
-    elif [ -d "$TARGET_DIR" ] || [ -L "$TARGET_DIR" ]; then
-      run_cmd rm -rf "$TARGET_DIR"
-      ok "DevFlow removed from $TARGET_DIR"
-    else
-      warn "DevFlow directory not found at $TARGET_DIR"
     fi
+    for t_dir in "${TARGET_DIRS[@]}"; do
+      if [ -d "$t_dir" ] || [ -L "$t_dir" ]; then
+        run_cmd rm -rf "$t_dir"
+        ok "DevFlow removed from $t_dir"
+      fi
+    done
     return 0
   fi
 
-  step "Installing DevFlow to Antigravity ($SCOPE: $TARGET_DIR)..."
+  step "Installing DevFlow to Antigravity ($SCOPE)..."
 
   if [ "$SCOPE" != "workspace" ] && [ "$MODE" = "copy" ] && command -v agy >/dev/null 2>&1; then
     run_cmd agy plugin install "$AGY_DIST_DIR"
+    # Also ensure internal staging path is linked/copied
+    run_cmd mkdir -p "$(dirname "$HOME/.gemini/antigravity-cli/plugins/devflow")"
+    run_cmd rm -rf "$HOME/.gemini/antigravity-cli/plugins/devflow"
+    run_cmd ln -sfn "$HOME/.gemini/config/plugins/devflow" "$HOME/.gemini/antigravity-cli/plugins/devflow"
     ok "DevFlow installed with agy plugin install"
     return 0
   fi
 
-  run_cmd mkdir -p "$(dirname "$TARGET_DIR")"
-  run_cmd rm -rf "$TARGET_DIR"
-  if [ "$MODE" = "link" ]; then
-    run_cmd ln -sfn "$AGY_DIST_DIR" "$TARGET_DIR"
-    ok "DevFlow linked: $TARGET_DIR → $AGY_DIST_DIR"
-  else
-    run_cmd cp -R "$AGY_DIST_DIR" "$TARGET_DIR"
-    ok "DevFlow copied to $TARGET_DIR"
-  fi
+  for t_dir in "${TARGET_DIRS[@]}"; do
+    run_cmd mkdir -p "$(dirname "$t_dir")"
+    run_cmd rm -rf "$t_dir"
+    if [ "$MODE" = "link" ]; then
+      run_cmd ln -sfn "$AGY_DIST_DIR" "$t_dir"
+      ok "DevFlow linked: $t_dir → $AGY_DIST_DIR"
+    else
+      run_cmd cp -R "$AGY_DIST_DIR" "$t_dir"
+      ok "DevFlow copied to $t_dir"
+    fi
+  done
 
+  local VALIDATION_TARGET="${TARGET_DIRS[0]}"
   if command -v agy >/dev/null 2>&1 && [ "$DRY_RUN" = false ]; then
     echo ""
     echo "  Running 'agy plugin validate' on installed target..."
-    agy plugin validate "$TARGET_DIR" || warn "agy validation reported notices (see above)"
+    agy plugin validate "$VALIDATION_TARGET" || warn "agy validation reported notices (see above)"
   fi
 }
 
