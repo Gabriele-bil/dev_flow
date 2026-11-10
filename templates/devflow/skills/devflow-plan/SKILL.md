@@ -172,14 +172,14 @@ Score feature per `@devflow/references/complexity-scoring.md`: 5 signals (files 
 
 ### Step 4e - Design system detection (conditional)
 
-**Trigger:** `DESIGN.md` (or `docs/design.md`) exists in consumer root AND feature has UI files.
+**Trigger:** feature has UI files AND (`DESIGN.md` (or `docs/design.md`) exists in consumer root OR impeccable design skill available per `@devflow/references/design-skill.md` → **Availability**).
 
 If triggered:
 
 1. Tag each UI **File List** entry `[ui]`.
-2. Note under **Architecture decisions:** `- **Design system:** DESIGN.md detected — [ui] entries constrained by its tokens (palette/typography/spacing)`.
+2. Note under **Architecture decisions:** `- **Design system:** [DESIGN.md tokens | impeccable | impeccable + DESIGN.md] — [ui] entries designed/constrained by it`.
 
-Read by `devflow.implement` (loads DESIGN.md for `[ui]` batches) and `devflow.beautify` (UI axis checks token compliance). Not triggered → no tags, zero behavior change.
+Read by `devflow.implement` (routes `[ui]` batches to impeccable, else loads DESIGN.md) and `devflow.beautify` (UI axis checks token compliance). Not triggered → no tags, zero behavior change.
 
 ### Step 5 - Write plan file
 
@@ -243,7 +243,7 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | Writes | `devflow/features/[NNN]_[feature-name]/plan.md`, `.devflow-state.json` (merge) |
 | Writes (conditional) | `plan.md` `## Decision flags` (run mode — resolved Open questions) |
 | Reads (conditional) | `docs/adr/` (if present — active ADRs referenced in `task.md`); `.devflow-run.json` (existence — run-mode switch, `@devflow/references/run-mode.md`) |
-| Reads (conditional) | `DESIGN.md` / `docs/design.md` (Step 4e — existence check + UI tagging) |
+| Reads (conditional) | `DESIGN.md` / `docs/design.md`, `@devflow/references/design-skill.md` (Step 4e — design source + UI tagging) |
 | Writes (optional) | `devflow/features/[NNN]_[feature-name]/data-model.md` (Step 4c — triggered when feature touches persistent entities) |
 | Next step | `devflow.implement` |
 | Related skills | Per active `ADAPTER.md` → **Technology skills** |

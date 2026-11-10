@@ -254,6 +254,28 @@ case "$DETECTED_ADAPTER" in
     ;;
 esac
 
+# Design skill (impeccable) — UI adapters only; absent → DESIGN.md-only fallback
+case "$DETECTED_ADAPTER" in
+  angular|nextjs|flutter)
+    IMPECCABLE_AT=""
+    for d in "$WORKSPACE_ROOT/.claude/skills/impeccable" "$HOME/.claude/skills/impeccable" \
+             "$WORKSPACE_ROOT/.agents/skills/impeccable" "$WORKSPACE_ROOT/.agent/skills/impeccable" \
+             "$HOME/.gemini/config/skills/impeccable"; do
+      [[ -f "$d/SKILL.md" ]] && { IMPECCABLE_AT="$d"; break; }
+    done
+    if [[ -z "$IMPECCABLE_AT" ]] && grep -q '"impeccable@' "$HOME/.claude/plugins/installed_plugins.json" 2>/dev/null; then
+      IMPECCABLE_AT="Claude Code plugin"
+    fi
+    if [[ -n "$IMPECCABLE_AT" ]]; then
+      CLI_RESULTS+=("impeccable|OK|$IMPECCABLE_AT")
+    else
+      CLI_RESULTS+=("impeccable|OPTIONAL|Missing — UI design falls back to DESIGN.md tokens")
+      WARNINGS=$((WARNINGS + 1))
+      REMEDIATIONS+=("Run devflow.setup (auto-installs impeccable for UI adapters) or install manually (/plugin marketplace add pbakaus/impeccable, then /plugin install impeccable@impeccable — or npx impeccable install) — enables design generation for [ui] files")
+    fi
+    ;;
+esac
+
 # ── Section 5: Pipeline & Repository Health ──────────────────────────────────
 PIPELINE_RESULTS=()
 

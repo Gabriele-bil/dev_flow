@@ -278,6 +278,19 @@ Use `code-review-graph` for blast-radius aware reviews with one setup:
 - `code-review-graph install` (auto-detects configured platforms, including Claude Code)
 - `code-review-graph build` (initial graph indexing per repository)
 
+### Recommended companion skill: impeccable (UI design)
+
+Angular, Next.js and Flutter projects: install [impeccable](https://github.com/pbakaus/impeccable) and DevFlow hands UI design to it — `devflow.setup` installs it automatically at project scope when the adapter has a UI (`npx impeccable install`, or the `claude plugin` CLI when Node is missing) and offers `/impeccable init` + `/impeccable document` (`PRODUCT.md`, `DESIGN.md`); `devflow.plan` tags UI files `[ui]`; `devflow.implement` invokes impeccable for those batches. Install failed or skipped → `[ui]` files follow `DESIGN.md` tokens only; `devflow.doctor` flags it.
+
+Manual install:
+
+```text
+/plugin marketplace add pbakaus/impeccable
+/plugin install impeccable@impeccable
+```
+
+Any host (Antigravity included): `npx impeccable install` from the project root. Contract: [`templates/devflow/references/design-skill.md`](templates/devflow/references/design-skill.md).
+
 ### Required MCP baseline
 
 | Adapter | MCP servers |

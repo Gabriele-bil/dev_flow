@@ -48,6 +48,7 @@ Run `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/doctor.sh"` and
 2. **CLI Toolchain Availability**:
    - Universal binaries: `git`, `gh`, `jq`.
    - Active adapter binaries: `flutter`/`dart`, `node`/`pnpm`/`npm`/`ng`/`nest`.
+   - Design skill (UI adapters only): `impeccable` — absent → `DEGRADED`, `[ui]` files fall back to `DESIGN.md` tokens (`$HOME/.gemini/antigravity-cli/plugins/devflow/references/design-skill.md`).
 3. **Pipeline & State Integrity**:
    - `config.md` validity and adapter resolution.
    - `.devflow-state.json` syntax and active feature synchronization.

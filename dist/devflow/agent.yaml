@@ -652,6 +652,13 @@ references:
       Goal-backward verification for devflow-test Step 6b — four levels
       (existence, substantive, wired, runtime) checked per acceptance criterion,
       with verification.md report template
+  - id: design-skill
+    path: references/design-skill.md
+    description: >-
+      Contract for handing UI design to the external impeccable skill:
+      availability check, impeccable-owned PRODUCT.md/DESIGN.md, routing in
+      devflow-setup (init/document offer), devflow-plan Step 4e ([ui] tags) and
+      devflow-implement ([ui] batches), run-mode limits. Absent → DESIGN.md-only
   - id: complexity-scoring
     path: references/complexity-scoring.md
     description: >-
