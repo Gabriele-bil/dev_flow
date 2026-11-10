@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.2.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v2.1.0...devflow-v2.2.0) (2026-11-10)
+
+
+### Features
+
+* **agents:** Add plan-reviewer engineering-lead gate for plan and blueprint ([474ea8c](https://github.com/Gabriele-bil/dev_flow/commit/474ea8cd61e6053f923968bcf9bad04d71d6bc02))
+* **agents:** Add task-reviewer product-manager gate for devflow.task ([6194f4c](https://github.com/Gabriele-bil/dev_flow/commit/6194f4c4293b7d595e7d98e789b9726a30045555))
+* **board:** Redesign project board UI and UX with impeccable standards ([24af13d](https://github.com/Gabriele-bil/dev_flow/commit/24af13d4981e6c7dfa58e83a20419e015ab4535e))
+* Brainstorm skill, task/plan review gates, board redesign, and impeccable UI routing ([aefd737](https://github.com/Gabriele-bil/dev_flow/commit/aefd7376f46f873a14cbe2c6b5367ac510e372a4))
+* **brainstorm:** Add devflow.brainstorm skill and brainstormer agent ([21ca6c7](https://github.com/Gabriele-bil/dev_flow/commit/21ca6c7610c4969583bd7514923e16a172174f22))
+* **design:** Route UI design to the impeccable skill ([f55f59b](https://github.com/Gabriele-bil/dev_flow/commit/f55f59b7c1b21da155fc88e7bc1929172c66c885))
+* Enhance devflow process with status updates and clean working tree requirements ([b018f29](https://github.com/Gabriele-bil/dev_flow/commit/b018f29bdea065ae60d77e10682912252af1a40a))
+
+
+### Bug Fixes
+
+* **installer:** Sync global config and staging paths for Antigravity ([3ba894b](https://github.com/Gabriele-bil/dev_flow/commit/3ba894bfaa80be70bcc80ab5e3a73616d35f601a))
+
 ## [2.1.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v2.0.0...devflow-v2.1.0) (2026-11-06)
 
 
