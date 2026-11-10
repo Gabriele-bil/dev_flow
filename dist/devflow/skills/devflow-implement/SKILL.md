@@ -75,7 +75,10 @@ Always read before starting:
 - `constitution.md`
 - `REGISTRY.md`
 
-Conditional: `DESIGN.md` (or `docs/design.md`) — when present and current batch touches **File List** entries tagged `[ui]` (set by `devflow.plan`): load as UI constraints alongside `constitution.md` (palette, typography, spacing tokens). Absent → skip, zero behavior change.
+Conditional — current batch touches **File List** entries tagged `[ui]` (set by `devflow.plan`):
+
+- impeccable design skill available → invoke it per `${CLAUDE_PLUGIN_ROOT}/references/design-skill.md` → **Implement brief** (run mode → its **Run mode** section) before writing those files; impeccable reads `DESIGN.md` itself
+- Not available → `DESIGN.md` (or `docs/design.md`) present: load as UI constraints alongside `constitution.md` (palette, typography, spacing tokens). Absent → skip, zero behavior change
 
 #### Reuse pre-check (mandatory before Step 4)
 
@@ -222,7 +225,7 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | --- | --- |
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md`, `constitution.md`, `REGISTRY.md`, `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`, `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core) + `steps/implement.md`, `references/registry-update-template.md`, `references/notify-template.md` |
 | Reads | `${CLAUDE_PLUGIN_ROOT}/references/escalation-ladder.md` (failure handling), `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` (handoff format, context pressure only), `${CLAUDE_PLUGIN_ROOT}/references/token-economy.md` (index-first + derive-don't-dump) |
-| Reads (conditional) | `DESIGN.md` / `docs/design.md` — UI constraints for `[ui]`-tagged batches; `.devflow-run.json` (existence — run-mode switch, contract `${CLAUDE_PLUGIN_ROOT}/references/run-mode.md`); `references/anti-patterns.md` (when unsure / retry) |
+| Reads (conditional) | `${CLAUDE_PLUGIN_ROOT}/references/design-skill.md` + skill `impeccable` (when available) or `DESIGN.md` / `docs/design.md` — UI design for `[ui]`-tagged batches; `.devflow-run.json` (existence — run-mode switch, contract `${CLAUDE_PLUGIN_ROOT}/references/run-mode.md`); `references/anti-patterns.md` (when unsure / retry) |
 | Writes | all files defined in `plan.md` |
 | Writes | `plan.md` — `[done]` markers, `**Status:** implementing → implemented`, `## Deviations`, `## Decision flags` (run mode) |
 | Writes (conditional) | `devflow/features/[NNN]_[feature-name]/handoff.md` — on context pressure (state-machine.md → Handoff file) |

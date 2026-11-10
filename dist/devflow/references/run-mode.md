@@ -23,7 +23,7 @@ Single source for unattended execution. Orchestrators: `devflow.run` (middle pip
 | Switch/create feature branch per `devflow-task` / `devflow-implement` | ✅ | ✅ |
 | Beautify **certain** improvements (opinable → flag, never applied) | ✅ | ✅ |
 | Ship fan-out + Required-only fix loop (`devflow-ship` Step 4b, bounded) | `--until ship` | ✅ |
-| `git commit` / `push` / open PR — only via `devflow-pr` | ❌ | ✅ |
+| `git commit` / `push` / open PR — only via `devflow-pr` (incl. terminal status commit/push) | ❌ | ✅ |
 | Edit `devflow/config.md`, CI/tooling configs | ❌ | ❌ |
 | Install deps not in plan; delete files outside plan scope | ❌ | ❌ |
 

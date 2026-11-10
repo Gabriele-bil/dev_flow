@@ -1,0 +1,14 @@
+{
+  "skill_name": "devflow-brainstorm",
+  "trigger": {
+    "positive": [
+      { "prompt": "I have a fuzzy idea for our users but I'm not sure what to build, let's brainstorm", "top_k": 3 },
+      { "prompt": "Help me explore different product directions for this user problem", "top_k": 3 },
+      { "prompt": "Brainstorm options before we commit to a feature", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "Compare database and framework options and record an ADR", "owner": "devflow-discover" },
+      { "prompt": "Write a user story with acceptance criteria for this feature", "owner": "devflow-task" }
+    ]
+  }
+}

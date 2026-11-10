@@ -49,6 +49,7 @@ Run `bash "${CLAUDE_PLUGIN_ROOT}/scripts/doctor.sh"` and capture its structured 
 2. **CLI Toolchain Availability**:
    - Universal binaries: `git`, `gh`, `jq`.
    - Active adapter binaries: `flutter`/`dart`, `node`/`pnpm`/`npm`/`ng`/`nest`.
+   - Design skill (UI adapters only): `impeccable` — absent → `DEGRADED`, `[ui]` files fall back to `DESIGN.md` tokens (`${CLAUDE_PLUGIN_ROOT}/references/design-skill.md`).
 3. **Pipeline & State Integrity**:
    - `config.md` validity and adapter resolution.
    - `.devflow-state.json` syntax and active feature synchronization.

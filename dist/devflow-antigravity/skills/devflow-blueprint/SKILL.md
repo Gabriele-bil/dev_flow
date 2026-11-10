@@ -25,14 +25,14 @@ Transform a large objective into a multi-PR blueprint. Output: dependency graph,
 - **Ethos** — spec-first · traceability · vertical slices · token-lean (caveman-compress); pipeline-wide, defined in the plugin's `ETHOS.md`
 - **self-contained briefs** — every step contains enough context for a fresh agent with zero prior-session knowledge
 - **explicit dependencies** — steps list their blockers; no implicit ordering
-- **adversarial gate** — Opus subagent critiques the draft before it is finalised
+- **adversarial gate** — `plan-reviewer` (Opus) critiques the draft before it is finalised
 - **parallel-first** — steps with no shared file or output dependencies are flagged as parallelizable
 
 ## When NOT to Use
 
 - Objective fits a single PR or a single `devflow.plan` — use `devflow.task` + `devflow.plan` instead
 - A blueprint already exists for this objective with status `approved` and no scope has changed
-- Objective is still brainstorm-level with no concrete scope — clarify with the user first
+- Objective is still brainstorm-level with no concrete scope — run `devflow.brainstorm` first
 
 ## Input contract
 
@@ -113,26 +113,9 @@ The brief must be self-contained: a new agent handed only this section and the p
 
 ### Step 6 — Adversarial review gate
 
-Before writing the final file, spawn an Opus subagent with the **full draft blueprint** and this prompt:
+Before writing the final file, dispatch `$HOME/.gemini/antigravity-cli/plugins/devflow/agents/plan-reviewer.md` (Claude Code: Agent, `subagent_type: "devflow:plan-reviewer"`, `model: opus`; Antigravity: `invoke_subagent`, subagent `plan-reviewer`) with mode `blueprint` and the **full draft blueprint** inline. It critiques dependencies, parallelization, brief completeness, scope, sequencing and naming, and returns `PLAN REVIEW: LGTM | ISSUES` with critical / major / minor issues.
 
-```text
-You are a senior architect reviewing a multi-PR blueprint.
-Your job: find problems BEFORE implementation begins.
-
-Critique the blueprint on these axes and respond with a structured list of issues (severity: critical / major / minor):
-
-1. Missing dependencies — steps that implicitly require another step's output but don't list it as a blocker
-2. Wrong parallelization — steps marked parallel-safe that actually share files or contracts
-3. Incomplete context briefs — briefs where a fresh agent would need to ask follow-up questions
-4. Scope inflation — steps that are larger than one reviewable PR
-5. Sequencing risk — steps ordered so that a late-stage failure invalidates prior work
-6. Naming clarity — step titles that don't clearly describe the increment
-
-For each issue: cite the step ID, describe the problem, suggest the fix.
-Respond with "LGTM" only if you find no issues of severity critical or major.
-```
-
-Collect the subagent's response. Then:
+Then:
 
 - **LGTM** → proceed to Step 7
 - **Critical / major issues found** → fix them (update steps, dependencies, briefs) and re-run adversarial review
@@ -176,7 +159,7 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | --- | --- |
 | Reads | `docs/product.md`, `constitution.md`, `REGISTRY.md`, `.devflow-state.json` |
 | Reads (conditional) | `references/anti-patterns.md` (when unsure / retry) |
-| Spawns | Opus subagent (adversarial review, Step 6) |
+| Dispatches | `plan-reviewer`, mode `blueprint`, `model: opus` (adversarial review, Step 6) |
 | Writes | `devflow/plans/[slug]-blueprint.md` |
 | Next step | `devflow.plan` per step, in dependency order |
 | Related skills | `devflow-plan` (per-step planning), `devflow-task` (single-feature scoping) |

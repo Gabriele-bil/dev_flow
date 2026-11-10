@@ -52,9 +52,11 @@ Every step: full skill workflow, run-mode clauses active, status boundaries writ
 
 1. `devflow-task` (arguments: the idea text, `--app`) → `devflow-plan` — **one** step-runner (group `task → plan`, feature `none yet`; the runner sets `run feature` after task). Plan Step 5b consistency check always runs: Critical → stop; Required → plan fix or waiver flag. Feature for the next dispatch = the `feature:` field of its `RESULT:` line.
 2. Middle pipeline — `devflow-run` Step 1 chain rules, `--from implement --until ship`: implement → (beautify, only with `--beautify`) → test (incl. Step 6b) dispatched, then `@devflow/skills/devflow-ship/SKILL.md` here.
-3. Ship gate passes (or loop cap reached with exceptions flagged) → `devflow-ship` Step 5 executes `@devflow/skills/devflow-pr/SKILL.md`; PR body carries `## Autonomous Decisions & Discrepancies` from `## Decision flags`, `## Deviations`, `task.md` `## Assumptions & Risks`.
+3. Ship gate passes (or loop cap reached with exceptions flagged) → `devflow-ship` Step 5 executes `@devflow/skills/devflow-pr/SKILL.md`; PR body carries `## Autonomous Decisions & Discrepancies` from `## Decision flags`, `## Deviations`, `task.md` `## Assumptions & Risks`. In `devflow-pr` Step 6, after PR creation and setting terminal statuses (`plan` `pr-opened`, `task` `done`), a follow-up commit and push (`chore: update task and plan status to pr-opened`) is performed so the PR includes the final status.
 
-### Step 2 - Disarm + report
+### Step 2 - Ensure clean tree, disarm + report
+
+Verify clean working tree: if any status or pipeline files (`plan.md`, `task.md`, `devflow/features/[NNN]_[feature-name]/`) were modified and remain uncommitted, stage them, commit (`chore: update task and plan status to pr-opened`), and push to the feature branch so that the PR contains the final statuses and zero modified files remain at the end of `devflow.auto`.
 
 Disarm on every exit path: `bash "@devflow/scripts/devflow-state.sh" run disarm`. Then `bash "@devflow/scripts/devflow-state.sh" report` (computed Feature, Files, Checks, Verification, Flags lines — paste as printed; skip when no `task.md` was written). Report:
 
@@ -73,6 +75,7 @@ Steps:         task · plan · implement · [beautify] · test · ship · pr  [�
 | --- | --- |
 | Asking the user mid-chain | Collect idea/app/stale-marker decisions before Step 0 |
 | Silent defaults | Every autonomous choice → `## Decision flags` → PR body |
+| Leaving modified `plan.md` or `task.md` at end of run | Commit and push status updates to the feature branch so worktree is clean |
 
 Full catalog — read when unsure, or before retrying after a failed contract: `references/anti-patterns.md`.
 

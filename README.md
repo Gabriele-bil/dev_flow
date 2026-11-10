@@ -31,6 +31,7 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 | -------- | -------- | ---------------- |
 | `devflow.init` | [`templates/devflow/skills/devflow-init/SKILL.md`](templates/devflow/skills/devflow-init/SKILL.md) | Project brief + interview → greenfield repo + live tech scaffold (Nx, Angular, Next.js, Flutter, NestJS) + `AGENTS.md` + `REGISTRY.md` + `constitution.md` + `ADR-001` + `project-blueprint.md` + ordered `001..NNN` `task.md` files |
 | `devflow.setup` | [`templates/devflow/skills/devflow-setup/SKILL.md`](templates/devflow/skills/devflow-setup/SKILL.md) | Consumer repo context + adapter templates → root `AGENTS.md` + `REGISTRY.md` |
+| `devflow.brainstorm` | [`templates/devflow/skills/devflow-brainstorm/SKILL.md`](templates/devflow/skills/devflow-brainstorm/SKILL.md) | Fuzzy idea → framed problem + distinct directions → `devflow/ideas/[slug].md` brief |
 | `devflow.task` | [`templates/devflow/skills/devflow-task/SKILL.md`](templates/devflow/skills/devflow-task/SKILL.md) | Idea → `devflow/features/[NNN]_[name]/task.md` |
 | `devflow.plan` | [`templates/devflow/skills/devflow-plan/SKILL.md`](templates/devflow/skills/devflow-plan/SKILL.md) | `task.md` → `plan.md` |
 | `devflow.discover` | [`templates/devflow/skills/devflow-discover/SKILL.md`](templates/devflow/skills/devflow-discover/SKILL.md) | Architecture question → compared options + ADR in `docs/adr/` |
@@ -96,6 +97,7 @@ dev_flow/
 │       │   ├── devflow-beautify/        # optional step, no slash command
 │       │   ├── devflow-blueprint/
 │       │   ├── devflow-board/
+│       │   ├── devflow-brainstorm/
 │       │   ├── devflow-discover/
 │       │   ├── devflow-doctor/
 │       │   ├── devflow-hotfix/
@@ -121,8 +123,11 @@ dev_flow/
 │       │   ├── nestjs/              # nestjs-architecture, -error-handling, -security, -performance, -database, -api-design, -testing, -microservices
 │       │   └── common/              # common-clean-code, -web-interface-guidelines, -caveman, -state-patterns
 │       ├── agents/
+│       │   ├── brainstormer.md
 │       │   ├── code-reviewer.md
 │       │   ├── finding-validator.md
+│       │   ├── plan-reviewer.md
+│       │   ├── task-reviewer.md
 │       │   ├── security-auditor.md
 │       │   └── step-runner.md
 │       ├── references/
@@ -278,6 +283,19 @@ Use `code-review-graph` for blast-radius aware reviews with one setup:
 - `code-review-graph install` (auto-detects configured platforms, including Claude Code)
 - `code-review-graph build` (initial graph indexing per repository)
 
+### Recommended companion skill: impeccable (UI design)
+
+Angular, Next.js and Flutter projects: install [impeccable](https://github.com/pbakaus/impeccable) and DevFlow hands UI design to it — `devflow.setup` installs it automatically at project scope when the adapter has a UI (`npx impeccable install`, or the `claude plugin` CLI when Node is missing) and offers `/impeccable init` + `/impeccable document` (`PRODUCT.md`, `DESIGN.md`); `devflow.plan` tags UI files `[ui]`; `devflow.implement` invokes impeccable for those batches. Install failed or skipped → `[ui]` files follow `DESIGN.md` tokens only; `devflow.doctor` flags it.
+
+Manual install:
+
+```text
+/plugin marketplace add pbakaus/impeccable
+/plugin install impeccable@impeccable
+```
+
+Any host (Antigravity included): `npx impeccable install` from the project root. Contract: [`templates/devflow/references/design-skill.md`](templates/devflow/references/design-skill.md).
+
 ### Required MCP baseline
 
 | Adapter | MCP servers |
@@ -291,12 +309,15 @@ Use `code-review-graph` for blast-radius aware reviews with one setup:
 
 ## Agents
 
-Specialized agents live in [`templates/devflow/agents/`](templates/devflow/agents/): the reviewers are dispatched by `devflow.ship`, the step runner by `devflow.run` / `devflow.auto`:
+Specialized agents live in [`templates/devflow/agents/`](templates/devflow/agents/): the code reviewers are dispatched by `devflow.ship`, the brainstormer by `devflow.brainstorm`, the task reviewer by `devflow.task`, the plan reviewer by `devflow.plan` / `devflow.blueprint`, the step runner by `devflow.run` / `devflow.auto`:
 
 | Agent | File | Role |
 | ------- | ------ | ------ |
 | Step Runner | [`agents/step-runner.md`](templates/devflow/agents/step-runner.md) | Runs one pipeline step — or a step group (`task → plan` in `devflow.auto`, `implement --fix → test` in the ship fix loop) — in its own context for `devflow.run` / `devflow.auto` (Claude Code: per-step model); returns a `RESULT:` line |
 | Finding Validator | [`agents/finding-validator.md`](templates/devflow/agents/finding-validator.md) | Re-checks each Critical/Required ship finding against the cited `file:line`; discards only what the code disproves, so a false positive never starts a fix loop |
+| Brainstormer | [`agents/brainstormer.md`](templates/devflow/agents/brainstormer.md) | Generates distinct product directions for a framed problem — value mechanism, riskiest assumption, smallest test, size — in a clean context |
+| Task Reviewer | [`agents/task-reviewer.md`](templates/devflow/agents/task-reviewer.md) | Product-manager second read of a draft `task.md` (≥ 3 use cases or file/ticket input): source fidelity, product overlap, INVEST, BDD criteria, async states, scope boundaries |
+| Plan Reviewer | [`agents/plan-reviewer.md`](templates/devflow/agents/plan-reviewer.md) | Engineering-lead critique of a draft `plan.md` (`standard`/`thorough`) or blueprint before it is written: codebase fit, reuse, contracts-first slicing, dependencies, risks, over-engineering |
 | Code Reviewer | [`agents/code-reviewer.md`](templates/devflow/agents/code-reviewer.md) | 7-axis code review: correctness, readability, architecture, security, performance, scope fidelity, simplicity |
 | Security Auditor | [`agents/security-auditor.md`](templates/devflow/agents/security-auditor.md) | Exploitable vulnerabilities, threat modeling, secure coding |
 

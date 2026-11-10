@@ -60,7 +60,7 @@ Transitions: `ready → implementing → implemented → tested → shipped → 
 
 ### Step 4 - PR
 
-Execute `${CLAUDE_PLUGIN_ROOT}/skills/devflow-pr/SKILL.md` exactly — base-branch detection, artifact cleanup, commit, push, PR body, `pr-opened` + task `done`. Never hand-roll `gh pr create`.
+Execute `${CLAUDE_PLUGIN_ROOT}/skills/devflow-pr/SKILL.md` exactly — base-branch detection, artifact cleanup, commit, push, PR body, `pr-opened` + task `done`, follow-up status commit and push. Never hand-roll `gh pr create`.
 
 ## Anti-Patterns
 

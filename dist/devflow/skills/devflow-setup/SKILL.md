@@ -211,6 +211,8 @@ Skip an entry already present. No `.gitignore` → create one with both entries 
 
 After successful file writes, install dependencies declared in the active adapter `Setup dependencies` section. Single-app: install from the consumer project root. Monorepo: install once per declared app, from that app's own directory (its own `package.json`/`pubspec.yaml` lives there, not at repo root). Full rules: `references/dependency-install.md`.
 
+**Design context (Step 7d):** UI adapter (`angular`, `nextjs`, `flutter` — any declared app in monorepo) → follow `${CLAUDE_PLUGIN_ROOT}/references/design-skill.md` → **Routing by step** (`devflow.setup` row): impeccable not available → install it automatically at project scope (**Install** — npx or plugin CLI, no question); then `PRODUCT.md` / `DESIGN.md` missing → offer `/impeccable init` + `/impeccable document`. Never write `PRODUCT.md` / `DESIGN.md` from DevFlow templates. Run mode or `nestjs`-only → skip.
+
 ### Step 8 - Notify user
 
 Respond using the template in `references/notify-template.md`. If `--mcp` in `$ARGUMENTS`: emit ready-to-copy client MCP config JSON (Antigravity `mcp_config.json` or Claude Code `.mcp.json`) and offer to write it.
@@ -245,5 +247,5 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | Reads | `@devflow/config.md`, `references/config-template.md`, `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core) + `steps/setup.md` (including `Setup dependencies`) — per declared app in monorepo mode, adapter + fallback templates |
 | Reads (conditional) | `${CLAUDE_PLUGIN_ROOT}/skills/devflow-setup/references/setup-anti-patterns.md` (Anti-patterns catalog — when unsure / retry) |
 | Writes | `AGENTS.md`, `REGISTRY.md`, `docs/product.md` (consumer project root); `@devflow/config.md`; `.gitignore` (appends `.devflow-state.json` and `.devflow-metrics/` if missing) |
-| Side effects | Installs adapter setup dependencies using project package manager or Flutter pub |
+| Side effects | Installs adapter setup dependencies using project package manager or Flutter pub; UI adapters: installs impeccable (project scope), runs its `init` / `document` → `PRODUCT.md`, `DESIGN.md` (Step 7d) |
 | Next step | `devflow.task` |

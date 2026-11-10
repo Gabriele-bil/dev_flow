@@ -145,24 +145,7 @@ Verify **File list** order per Dependency ordering. **Contracts First:** migrati
 If triggered:
 
 1. Extract technology-agnostic entity definitions from `task.md`, architecture analysis, and any DB or schema notes accumulated in earlier steps.
-2. Write `devflow/features/[NNN]_[feature-name]/data-model.md` using this format:
-
-```markdown
-# Data Model - [Feature Name]
-
-**Feature:** PLAN-[NNN]
-**Date:** [YYYY-MM-DD]
-
-| Entity | Fields | Relationships | Lifecycle states | Validation rules |
-|--------|--------|---------------|------------------|------------------|
-| [EntityName] | [field: type, ...] | [belongs to / has many / ...] | [created / active / archived / ...] | [required, max-length N, format, ...] |
-```
-
-Rules:
-
-- No class names, annotations, or framework types — technology-agnostic only.
-- One row per domain concept; split conflated concepts.
-- Adapter skills derive stack-specific types from this file.
+2. Write `devflow/features/[NNN]_[feature-name]/data-model.md` per `references/data-model-template.md` (format + rules: technology-agnostic, one row per domain concept).
 
 If not triggered: skip.
 
@@ -172,14 +155,22 @@ Score feature per `@devflow/references/complexity-scoring.md`: 5 signals (files 
 
 ### Step 4e - Design system detection (conditional)
 
-**Trigger:** `DESIGN.md` (or `docs/design.md`) exists in consumer root AND feature has UI files.
+**Trigger:** feature has UI files AND (`DESIGN.md` (or `docs/design.md`) exists in consumer root OR impeccable design skill available per `@devflow/references/design-skill.md` → **Availability**).
 
 If triggered:
 
 1. Tag each UI **File List** entry `[ui]`.
-2. Note under **Architecture decisions:** `- **Design system:** DESIGN.md detected — [ui] entries constrained by its tokens (palette/typography/spacing)`.
+2. Note under **Architecture decisions:** `- **Design system:** [DESIGN.md tokens | impeccable | impeccable + DESIGN.md] — [ui] entries designed/constrained by it`.
 
-Read by `devflow.implement` (loads DESIGN.md for `[ui]` batches) and `devflow.beautify` (UI axis checks token compliance). Not triggered → no tags, zero behavior change.
+Read by `devflow.implement` (routes `[ui]` batches to impeccable, else loads DESIGN.md) and `devflow.beautify` (UI axis checks token compliance). Not triggered → no tags, zero behavior change.
+
+### Step 4f - Lead review (conditional)
+
+**Trigger:** Step 4d profile `standard` or `thorough`, not run mode. `quick` → skip. Run mode (`.devflow-run.json` present) → skip: plan runs inside a step-runner, which cannot dispatch subagents; Step 5b covers it.
+
+1. Dispatch `@devflow/agents/plan-reviewer.md` once (Claude Code: Agent, `subagent_type: "devflow:plan-reviewer"`, `model: opus` on `thorough`; Antigravity: `invoke_subagent`, subagent `plan-reviewer`) with: mode `plan`, full draft `plan.md` inline, `task.md` path, Complexity profile.
+2. `LGTM` → Step 5. Critical / major → fix draft, re-dispatch. Minor → fix inline, no re-dispatch.
+3. Max two rounds. Critical or major left after round two → record each under **Open questions**, ask user before Step 5.
 
 ### Step 5 - Write plan file
 
@@ -238,12 +229,13 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | Reads (adapter) | `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/plan.md`; technology skills per ADAPTER table |
 | Reads | `@devflow/references/complexity-scoring.md` (Step 4d — score + profile) |
 | Reads | `@devflow/references/token-economy.md` (Step 1 — index-first exploration) |
-| Reads (conditional) | `@devflow/skills/devflow-plan/references/plan-anti-patterns.md` (when unsure / retry); `references/consistency-check.md` (Step 5b) |
+| Reads (conditional) | `@devflow/skills/devflow-plan/references/plan-anti-patterns.md` (when unsure / retry); `references/data-model-template.md` (Step 4c); `references/consistency-check.md` (Step 5b) |
 | Runs | `@devflow/scripts/devflow-state.sh` (`resolve`, `sync`) |
 | Writes | `devflow/features/[NNN]_[feature-name]/plan.md`, `.devflow-state.json` (merge) |
 | Writes (conditional) | `plan.md` `## Decision flags` (run mode — resolved Open questions) |
 | Reads (conditional) | `docs/adr/` (if present — active ADRs referenced in `task.md`); `.devflow-run.json` (existence — run-mode switch, `@devflow/references/run-mode.md`) |
-| Reads (conditional) | `DESIGN.md` / `docs/design.md` (Step 4e — existence check + UI tagging) |
+| Reads (conditional) | `DESIGN.md` / `docs/design.md`, `@devflow/references/design-skill.md` (Step 4e — design source + UI tagging) |
 | Writes (optional) | `devflow/features/[NNN]_[feature-name]/data-model.md` (Step 4c — triggered when feature touches persistent entities) |
+| Dispatches (conditional) | `plan-reviewer` (Step 4f — `standard`/`thorough`, interactive only) |
 | Next step | `devflow.implement` |
 | Related skills | Per active `ADAPTER.md` → **Technology skills** |
