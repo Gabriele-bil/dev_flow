@@ -90,7 +90,7 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 | `devflow.discover` | Explore architectural choices for app creation or complex features → comparative trade-offs + formal ADR |
 | `devflow.setup` | Generate `AGENTS.md`, `REGISTRY.md`, `constitution.md`, and `docs/product.md` from adapter templates |
 | `devflow.task` | Raw idea → structured task with HMW framing and verifiable subtasks |
-| `devflow.plan` | `task.md` → file-ordered implementation plan with traceability; optional consistency check (traceability, AC testability, terminology, constitution/ADR alignment) |
+| `devflow.plan` | `task.md` → file-ordered implementation plan with traceability; `plan-reviewer` lead review from `standard` up; optional consistency check (traceability, AC testability, terminology, constitution/ADR alignment) |
 | `devflow.blueprint` | Large idea → multi-PR blueprint with dependency graph + adversarial review |
 | `devflow.implement` | Execute `plan.md` step by step, vertical slice by slice; at exit offers the optional beautify step (readability, conventions, design tokens, layout, a11y basics — not a slash command; default off in `quick` profile) |
 | `devflow.test` | Write and run unit + integration tests; bounded retry; goal-backward per-AC verification (`verification.md`) |

@@ -32,6 +32,12 @@ Skills not listed run on the session model with the effort in their frontmatter 
 | `security-auditor` | `sonnet` | high | per-call `model: opus` |
 | `finding-validator` (Step 3b, blocking findings only) | `sonnet` | medium | `sonnet` |
 
+**Spec reviewers** (interactive only — a step-runner cannot dispatch them):
+
+| Agent | Model | Effort | `thorough` profile |
+| --- | --- | --- | --- |
+| `plan-reviewer` (plan Step 4f, `standard`+; blueprint Step 6) | `sonnet` | high | per-call `model: opus`; blueprint always `opus` |
+
 Never below `sonnet` for ship reviewers — `hooks/pre-model-switch.sh` blocks the switch.
 
 ## Subtask & Slice Routing Tiers (`[route: light | mid | strong]`)

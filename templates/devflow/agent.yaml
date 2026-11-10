@@ -164,6 +164,13 @@ agents:
       Re-checks every Critical and Required devflow.ship finding against the
       cited file and line; discards only what the code disproves
     invoked_by: devflow.ship
+  - id: plan-reviewer
+    path: agents/plan-reviewer.md
+    description: >-
+      Engineering-lead critique of a draft plan.md (standard/thorough) or
+      blueprint: codebase fit, reuse, contracts-first slicing, dependencies,
+      risks, over-engineering; returns severity-ranked issues
+    invoked_by: devflow.plan, devflow.blueprint
   - id: security-auditor
     path: agents/security-auditor.md
     description: >-

@@ -123,6 +123,7 @@ dev_flow/
 │       ├── agents/
 │       │   ├── code-reviewer.md
 │       │   ├── finding-validator.md
+│       │   ├── plan-reviewer.md
 │       │   ├── security-auditor.md
 │       │   └── step-runner.md
 │       ├── references/
@@ -304,12 +305,13 @@ Any host (Antigravity included): `npx impeccable install` from the project root.
 
 ## Agents
 
-Specialized agents live in [`templates/devflow/agents/`](templates/devflow/agents/): the reviewers are dispatched by `devflow.ship`, the step runner by `devflow.run` / `devflow.auto`:
+Specialized agents live in [`templates/devflow/agents/`](templates/devflow/agents/): the code reviewers are dispatched by `devflow.ship`, the plan reviewer by `devflow.plan` / `devflow.blueprint`, the step runner by `devflow.run` / `devflow.auto`:
 
 | Agent | File | Role |
 | ------- | ------ | ------ |
 | Step Runner | [`agents/step-runner.md`](templates/devflow/agents/step-runner.md) | Runs one pipeline step — or a step group (`task → plan` in `devflow.auto`, `implement --fix → test` in the ship fix loop) — in its own context for `devflow.run` / `devflow.auto` (Claude Code: per-step model); returns a `RESULT:` line |
 | Finding Validator | [`agents/finding-validator.md`](templates/devflow/agents/finding-validator.md) | Re-checks each Critical/Required ship finding against the cited `file:line`; discards only what the code disproves, so a false positive never starts a fix loop |
+| Plan Reviewer | [`agents/plan-reviewer.md`](templates/devflow/agents/plan-reviewer.md) | Engineering-lead critique of a draft `plan.md` (`standard`/`thorough`) or blueprint before it is written: codebase fit, reuse, contracts-first slicing, dependencies, risks, over-engineering |
 | Code Reviewer | [`agents/code-reviewer.md`](templates/devflow/agents/code-reviewer.md) | 7-axis code review: correctness, readability, architecture, security, performance, scope fidelity, simplicity |
 | Security Auditor | [`agents/security-auditor.md`](templates/devflow/agents/security-auditor.md) | Exploitable vulnerabilities, threat modeling, secure coding |
 
