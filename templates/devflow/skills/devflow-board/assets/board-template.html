@@ -6,65 +6,83 @@
   <title>DevFlow Project Board — Read-Only Pipeline & Telemetry</title>
   <style>
     :root, [data-theme="dark"] {
-      --bg-base: #0b0f17;
+      --bg-base: #0b0f19;
       --bg-surface: #111827;
-      --bg-elevated: #1e293b;
-      --bg-card: #161f30;
-      --bg-card-hover: #1e2a40;
-      --bg-glass: rgba(17, 24, 39, 0.88);
-      --border: #26334d;
-      --border-subtle: #1e293b;
+      --bg-elevated: #1a2336;
+      --bg-card: #151e30;
+      --bg-card-hover: #1c2840;
+      --bg-glass: rgba(17, 24, 39, 0.92);
+      --border: #26354f;
+      --border-subtle: #1e2a40;
       --text-primary: #f8fafc;
-      --text-secondary: #94a3b8;
-      --text-muted: #64748b;
-      --accent: #6366f1;
-      --accent-soft: rgba(99, 102, 241, 0.16);
-      --accent-border: rgba(99, 102, 241, 0.45);
-      --success: #10b981;
-      --success-soft: rgba(16, 185, 129, 0.15);
-      --warning: #f59e0b;
-      --warning-soft: rgba(245, 158, 11, 0.16);
-      --danger: #ef4444;
-      --danger-soft: rgba(239, 68, 68, 0.16);
+      --text-secondary: #9cb3d1;
+      --text-muted: #788fae;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --accent-soft: rgba(56, 189, 248, 0.14);
+      --accent-border: rgba(56, 189, 248, 0.38);
+      --accent-fg: #0369a1;
+      --success: #4ade80;
+      --success-soft: rgba(74, 222, 128, 0.14);
+      --success-border: rgba(74, 222, 128, 0.38);
+      --warning: #facc15;
+      --warning-soft: rgba(250, 204, 21, 0.14);
+      --warning-border: rgba(250, 204, 21, 0.38);
+      --danger: #f87171;
+      --danger-soft: rgba(248, 113, 113, 0.14);
+      --danger-border: rgba(248, 113, 113, 0.38);
       --info: #38bdf8;
-      --info-soft: rgba(56, 189, 248, 0.15);
-      --critical: #ec4899;
-      --critical-soft: rgba(236, 72, 153, 0.16);
-      --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
-      --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55);
-      --code-bg: #090d14;
-      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
-      --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      --info-soft: rgba(56, 189, 248, 0.14);
+      --info-border: rgba(56, 189, 248, 0.38);
+      --critical: #f472b6;
+      --critical-soft: rgba(244, 114, 182, 0.14);
+      --critical-border: rgba(244, 114, 182, 0.38);
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.45);
+      --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.65);
+      --code-bg: #080c14;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+      --focus-ring: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--accent);
     }
 
     [data-theme="light"] {
-      --bg-base: #f1f5f9;
+      --bg-base: #f4f6f9;
       --bg-surface: #ffffff;
       --bg-elevated: #f8fafc;
       --bg-card: #ffffff;
       --bg-card-hover: #f8fafc;
-      --bg-glass: rgba(255, 255, 255, 0.92);
+      --bg-glass: rgba(255, 255, 255, 0.94);
       --border: #cbd5e1;
       --border-subtle: #e2e8f0;
       --text-primary: #0f172a;
-      --text-secondary: #475569;
+      --text-secondary: #334155;
       --text-muted: #64748b;
-      --accent: #4f46e5;
-      --accent-soft: rgba(79, 70, 229, 0.1);
-      --accent-border: rgba(79, 70, 229, 0.35);
-      --success: #059669;
-      --success-soft: rgba(5, 150, 105, 0.12);
-      --warning: #d97706;
-      --warning-soft: rgba(217, 119, 6, 0.12);
-      --danger: #dc2626;
-      --danger-soft: rgba(220, 38, 38, 0.12);
+      --accent: #0284c7;
+      --accent-hover: #0369a1;
+      --accent-soft: rgba(2, 132, 199, 0.12);
+      --accent-border: rgba(2, 132, 199, 0.35);
+      --accent-fg: #0369a1;
+      --success: #15803d;
+      --success-soft: rgba(21, 128, 61, 0.12);
+      --success-border: rgba(21, 128, 61, 0.35);
+      --warning: #a16207;
+      --warning-soft: rgba(161, 98, 7, 0.12);
+      --warning-border: rgba(161, 98, 7, 0.35);
+      --danger: #b91c1c;
+      --danger-soft: rgba(185, 28, 28, 0.12);
+      --danger-border: rgba(185, 28, 28, 0.35);
       --info: #0284c7;
       --info-soft: rgba(2, 132, 199, 0.12);
-      --critical: #db2777;
-      --critical-soft: rgba(219, 39, 119, 0.12);
+      --info-border: rgba(2, 132, 199, 0.35);
+      --critical: #be185d;
+      --critical-soft: rgba(190, 24, 93, 0.12);
+      --critical-border: rgba(190, 24, 93, 0.35);
       --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
-      --shadow-lg: 0 14px 34px rgba(15, 23, 42, 0.16);
-      --code-bg: #f1f5f9;
+      --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.1);
+      --shadow-lg: 0 14px 34px rgba(15, 23, 42, 0.15);
+      --code-bg: #f8fafc;
+      --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px #0284c7;
     }
 
     * {
@@ -73,16 +91,71 @@
       padding: 0;
     }
 
+    ::selection {
+      background: var(--accent-soft);
+      color: var(--text-primary);
+    }
+
+    /* Custom thin scrollbar */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 999px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
     body {
       font-family: var(--font-sans);
       background: var(--bg-base);
       color: var(--text-primary);
       line-height: 1.5;
+      font-size: 14px;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       overflow-x: hidden;
       user-select: text;
+    }
+
+    /* Accessibility focus styling */
+    :focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+
+    /* Global Icons */
+    .icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .icon svg {
+      width: 1em;
+      height: 1em;
+      stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     /* Header & Project Summary */
@@ -91,7 +164,8 @@
       top: 0;
       z-index: 30;
       background: var(--bg-glass);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
       padding: 0.85rem 1.5rem;
     }
@@ -100,14 +174,14 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 1rem;
+      gap: 1.25rem;
       flex-wrap: wrap;
     }
 
     .brand-group {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.85rem;
       flex-wrap: wrap;
     }
 
@@ -115,93 +189,169 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 2.15rem;
-      height: 2.15rem;
+      width: 2.25rem;
+      height: 2.25rem;
       border-radius: 0.55rem;
-      background: linear-gradient(135deg, var(--accent), #38bdf8);
-      color: #ffffff;
+      background: var(--bg-elevated);
+      color: var(--accent);
+      border: 1px solid var(--accent-border);
       font-weight: 800;
       font-size: 0.95rem;
       letter-spacing: -0.03em;
       box-shadow: var(--shadow-sm);
     }
 
+    .brand-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .brand-title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      flex-wrap: wrap;
+    }
+
     .project-title {
       font-size: 1.15rem;
       font-weight: 700;
       letter-spacing: -0.02em;
+      color: var(--text-primary);
     }
 
     .readonly-pill {
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      font-size: 0.72rem;
+      font-size: 12px;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.02em;
       padding: 0.2rem 0.55rem;
       border-radius: 999px;
-      background: var(--accent-soft);
-      color: var(--accent);
-      border: 1px solid var(--accent-border);
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
     }
 
     .meta-pill {
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      font-size: 0.78rem;
+      font-size: 12px;
       font-family: var(--font-mono);
-      padding: 0.2rem 0.6rem;
+      padding: 0.2rem 0.55rem;
       border-radius: 0.4rem;
       background: var(--bg-elevated);
       color: var(--text-secondary);
       border: 1px solid var(--border);
+      font-variant-numeric: tabular-nums;
     }
 
     .meta-pill.active-feat {
       background: var(--info-soft);
       color: var(--info);
-      border-color: rgba(56, 189, 248, 0.35);
+      border-color: var(--info-border);
+      font-weight: 600;
+    }
+
+    .active-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--info);
+      display: inline-block;
     }
 
     .header-controls {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.55rem;
       flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .search-icon-inside {
+      position: absolute;
+      left: 0.65rem;
+      color: var(--text-muted);
+      pointer-events: none;
     }
 
     .search-input {
       background: var(--bg-elevated);
       border: 1px solid var(--border);
       color: var(--text-primary);
-      padding: 0.42rem 0.75rem;
-      border-radius: 0.45rem;
-      font-size: 0.82rem;
-      width: 210px;
+      padding: 0.45rem 2rem 0.45rem 2rem;
+      border-radius: 0.5rem;
+      font-size: 13px;
+      width: 220px;
       outline: none;
-      transition: border-color 0.15s;
+      transition: border-color 0.15s, width 0.2s, box-shadow 0.15s;
     }
 
     .search-input:focus {
       border-color: var(--accent);
+      width: 270px;
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    .search-clear-btn {
+      position: absolute;
+      right: 0.5rem;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 0.15rem;
+      border-radius: 50%;
+    }
+
+    .search-clear-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .search-clear-btn.visible {
+      display: inline-flex;
+    }
+
+    .search-shortcut-hint {
+      position: absolute;
+      right: 0.55rem;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      background: var(--bg-surface);
+      color: var(--text-muted);
+      padding: 0.05rem 0.35rem;
+      border-radius: 0.25rem;
+      border: 1px solid var(--border);
+      pointer-events: none;
     }
 
     .btn, .select-ctrl {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.45rem;
       background: var(--bg-elevated);
       color: var(--text-primary);
       border: 1px solid var(--border);
-      padding: 0.42rem 0.75rem;
-      border-radius: 0.45rem;
-      font-size: 0.8rem;
+      padding: 0.45rem 0.8rem;
+      border-radius: 0.5rem;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+      min-height: 32px;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      user-select: none;
     }
 
     .btn:hover:not(:disabled), .select-ctrl:hover {
@@ -210,27 +360,35 @@
     }
 
     .btn:disabled {
-      opacity: 0.55;
+      opacity: 0.6;
       cursor: not-allowed;
     }
 
     .btn-primary {
       background: var(--accent);
-      color: #ffffff;
+      color: #0b0f19;
       border-color: var(--accent);
+      font-weight: 700;
+    }
+
+    [data-theme="light"] .btn-primary {
+      color: #ffffff;
+      background: var(--accent);
     }
 
     .btn-primary:hover:not(:disabled) {
-      background: #4f46e5;
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+      color: #ffffff;
     }
 
     /* Summary KPI Strip */
     .summary-strip {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 0.75rem;
-      margin-top: 0.8rem;
-      padding-top: 0.75rem;
+      margin-top: 0.85rem;
+      padding-top: 0.85rem;
       border-top: 1px solid var(--border-subtle);
     }
 
@@ -239,36 +397,69 @@
       flex-direction: column;
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
-      border-radius: 0.5rem;
-      padding: 0.55rem 0.8rem;
+      border-radius: 0.55rem;
+      padding: 0.65rem 0.9rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
     }
 
     .kpi-label {
-      font-size: 0.7rem;
+      font-size: 12px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
       color: var(--text-muted);
       font-weight: 600;
     }
 
+    .kpi-icon {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
     .kpi-value {
-      font-size: 1.05rem;
+      font-size: 1.25rem;
       font-weight: 700;
       color: var(--text-primary);
-      margin-top: 0.15rem;
+      margin-top: 0.25rem;
       display: flex;
       align-items: baseline;
-      gap: 0.4rem;
+      gap: 0.45rem;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.015em;
     }
 
     .kpi-sub {
-      font-size: 0.74rem;
+      font-size: 12px;
       font-weight: 500;
       color: var(--text-secondary);
       font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
     }
 
-    /* Navigation Tabs */
+    .kpi-mini-bar {
+      margin-top: 0.45rem;
+      width: 100%;
+      height: 4px;
+      background: var(--bg-elevated);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .kpi-mini-bar-fill {
+      height: 100%;
+      background: var(--success);
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+
+    /* Navigation Tabs & Views Bar */
     .view-bar {
       display: flex;
       align-items: center;
@@ -282,32 +473,49 @@
 
     .view-tabs {
       display: flex;
-      gap: 0.4rem;
+      align-items: center;
+      gap: 0.35rem;
+      background: var(--bg-elevated);
+      padding: 0.25rem;
+      border-radius: 0.55rem;
+      border: 1px solid var(--border);
     }
 
     .tab-btn {
       background: transparent;
       color: var(--text-secondary);
       border: 1px solid transparent;
-      padding: 0.42rem 0.9rem;
+      padding: 0.4rem 0.85rem;
       border-radius: 0.45rem;
-      font-size: 0.83rem;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 0.45rem;
+      transition: color 0.15s, background 0.15s, border-color 0.15s;
     }
 
     .tab-btn:hover {
       color: var(--text-primary);
-      background: var(--bg-elevated);
+      background: var(--bg-card-hover);
     }
 
     .tab-btn.active {
-      background: var(--accent-soft);
-      color: var(--accent);
-      border-color: var(--accent-border);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border-color: var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tab-kbd {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      background: var(--bg-elevated);
+      padding: 0.05rem 0.3rem;
+      border-radius: 0.25rem;
+      border: 1px solid var(--border-subtle);
     }
 
     .global-docs-bar {
@@ -317,16 +525,72 @@
       flex-wrap: wrap;
     }
 
+    /* Filter Chips Bar (Quick Filters) */
+    .filters-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.6rem 1.5rem;
+      background: var(--bg-base);
+      border-bottom: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+    }
+
+    .filter-chip-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-right: 0.25rem;
+    }
+
+    .filter-chip {
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .filter-chip:hover {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border-color: var(--accent);
+    }
+
+    .filter-chip.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: var(--accent-border);
+    }
+
+    .filter-chip-count {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 0.05rem 0.35rem;
+      border-radius: 999px;
+      background: var(--bg-elevated);
+      color: inherit;
+    }
+
     /* Status / Error Banner */
     .status-banner {
       display: none;
       align-items: center;
       justify-content: space-between;
-      padding: 0.6rem 1.5rem;
+      padding: 0.65rem 1.5rem;
       background: var(--warning-soft);
       color: var(--warning);
-      border-bottom: 1px solid var(--warning);
-      font-size: 0.82rem;
+      border-bottom: 1px solid var(--warning-border);
+      font-size: 13px;
     }
 
     .status-banner.visible {
@@ -351,126 +615,141 @@
     /* Kanban Columns */
     .kanban-grid {
       display: grid;
-      grid-template-columns: repeat(5, minmax(280px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(5, minmax(290px, 1fr));
+      gap: 1.1rem;
       align-items: start;
-      min-width: 1420px;
+      min-width: 1460px;
     }
 
     .kanban-col {
       background: var(--bg-surface);
       border: 1px solid var(--border);
-      border-radius: 0.7rem;
+      border-radius: 0.75rem;
       display: flex;
       flex-direction: column;
-      max-height: calc(100vh - 235px);
+      max-height: calc(100vh - 250px);
+      box-shadow: var(--shadow-sm);
     }
 
     .col-header {
-      padding: 0.75rem 0.95rem;
+      padding: 0.85rem 1rem;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 13.5px;
+      background: var(--bg-surface);
+      border-top-left-radius: 0.75rem;
+      border-top-right-radius: 0.75rem;
     }
 
     .col-header-left {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.55rem;
     }
 
     .col-dot {
-      width: 0.55rem;
-      height: 0.55rem;
+      width: 0.6rem;
+      height: 0.6rem;
       border-radius: 50%;
     }
 
-    .col-draft_clarified .col-dot { background: #94a3b8; }
-    .col-planned_ready .col-dot { background: #38bdf8; }
-    .col-in_progress .col-dot { background: #f59e0b; }
-    .col-implemented_verified .col-dot { background: #a855f7; }
-    .col-pr_opened_done .col-dot { background: #10b981; }
+    .col-draft_clarified .col-dot { background: var(--text-muted); }
+    .col-planned_ready .col-dot { background: var(--info); }
+    .col-in_progress .col-dot { background: var(--warning); }
+    .col-implemented_verified .col-dot { background: var(--critical); }
+    .col-pr_opened_done .col-dot { background: var(--success); }
 
-    .col-count {
+    .col-count-badge {
       font-family: var(--font-mono);
-      font-size: 0.75rem;
-      padding: 0.1rem 0.5rem;
+      font-size: 12px;
+      padding: 0.15rem 0.55rem;
       border-radius: 999px;
       background: var(--bg-elevated);
       color: var(--text-secondary);
       border: 1px solid var(--border);
+      font-variant-numeric: tabular-nums;
     }
 
     .col-body {
-      padding: 0.75rem;
+      padding: 0.85rem;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 0.85rem;
     }
 
     .col-empty {
-      padding: 1.5rem 0.75rem;
+      padding: 2.2rem 1rem;
       text-align: center;
-      font-size: 0.78rem;
+      font-size: 13px;
       color: var(--text-muted);
       border: 1px dashed var(--border);
-      border-radius: 0.5rem;
+      border-radius: 0.6rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.45rem;
+      background: var(--bg-base);
     }
 
     /* Task Card (Strictly Read-Only, Clickable to Inspect) */
     .task-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 0.6rem;
-      padding: 0.85rem;
+      border-radius: 0.65rem;
+      padding: 0.95rem;
       box-shadow: var(--shadow-sm);
       cursor: pointer;
-      transition: transform 0.12s, border-color 0.15s, background 0.15s;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
       display: flex;
       flex-direction: column;
-      gap: 0.55rem;
+      gap: 0.65rem;
       position: relative;
     }
 
     .task-card:hover {
       border-color: var(--accent);
       background: var(--bg-card-hover);
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
     }
 
     .task-card.is-active-feature {
-      border-left: 3px solid var(--info);
+      box-shadow: 0 0 0 1px var(--info-border), var(--shadow-sm);
     }
 
     .task-card.is-blocked {
-      border-left: 3px solid var(--danger);
+      box-shadow: 0 0 0 1px var(--danger-border), var(--shadow-sm);
     }
 
     .task-card.is-critical {
-      box-shadow: 0 0 0 1px rgba(236, 72, 153, 0.35);
+      box-shadow: 0 0 0 1px var(--critical-border), var(--shadow-sm);
     }
 
     .card-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 0.4rem;
+      gap: 0.5rem;
       flex-wrap: wrap;
     }
 
     .task-id-badge {
       font-family: var(--font-mono);
-      font-size: 0.74rem;
+      font-size: 12px;
       font-weight: 700;
-      padding: 0.15rem 0.45rem;
-      border-radius: 0.35rem;
-      background: var(--accent-soft);
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.4rem;
+      background: var(--bg-elevated);
       color: var(--accent);
       border: 1px solid var(--accent-border);
+      font-variant-numeric: tabular-nums;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
     }
 
     .badge-row {
@@ -481,39 +760,48 @@
     }
 
     .badge {
-      font-size: 0.68rem;
+      font-size: 12px;
       font-weight: 600;
-      padding: 0.12rem 0.42rem;
-      border-radius: 0.3rem;
+      padding: 0.18rem 0.5rem;
+      border-radius: 0.35rem;
       font-family: var(--font-mono);
       border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-variant-numeric: tabular-nums;
     }
 
-    .badge-status-done { background: var(--success-soft); color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
-    .badge-status-wip { background: var(--warning-soft); color: var(--warning); border-color: rgba(245, 158, 11, 0.3); }
-    .badge-status-ready { background: var(--info-soft); color: var(--info); border-color: rgba(56, 189, 248, 0.3); }
+    .badge-status-done { background: var(--success-soft); color: var(--success); border-color: var(--success-border); }
+    .badge-status-wip { background: var(--warning-soft); color: var(--warning); border-color: var(--warning-border); }
+    .badge-status-ready { background: var(--info-soft); color: var(--info); border-color: var(--info-border); }
     .badge-status-draft { background: var(--bg-elevated); color: var(--text-secondary); border-color: var(--border); }
-    .badge-blocked { background: var(--danger-soft); color: var(--danger); border-color: rgba(239, 68, 68, 0.35); }
-    .badge-unblocked { background: var(--success-soft); color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
-    .badge-critical { background: var(--critical-soft); color: var(--critical); border-color: rgba(236, 72, 153, 0.35); }
+    .badge-blocked { background: var(--danger-soft); color: var(--danger); border-color: var(--danger-border); }
+    .badge-unblocked { background: var(--success-soft); color: var(--success); border-color: var(--success-border); }
+    .badge-critical { background: var(--critical-soft); color: var(--critical); border-color: var(--critical-border); }
+    .badge-active { background: var(--info-soft); color: var(--info); border-color: var(--info-border); font-weight: 700; }
 
     .card-title {
-      font-size: 0.9rem;
-      font-weight: 700;
+      font-size: 14.5px;
+      font-weight: 650;
       color: var(--text-primary);
-      line-height: 1.35;
+      line-height: 1.4;
+      letter-spacing: -0.01em;
     }
 
     .card-meta-paths {
       display: flex;
       flex-direction: column;
-      gap: 0.2rem;
+      gap: 0.25rem;
       font-family: var(--font-mono);
-      font-size: 0.71rem;
+      font-size: 12px;
       color: var(--text-secondary);
     }
 
-    .card-meta-paths span {
+    .card-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -523,20 +811,25 @@
     .slice-progress {
       display: flex;
       flex-direction: column;
-      gap: 0.25rem;
+      gap: 0.3rem;
+      background: var(--bg-base);
+      padding: 0.45rem 0.65rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border-subtle);
     }
 
     .slice-progress-top {
       display: flex;
       justify-content: space-between;
-      font-size: 0.72rem;
+      font-size: 12px;
       color: var(--text-secondary);
       font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
     }
 
     .progress-track {
       width: 100%;
-      height: 0.38rem;
+      height: 5px;
       background: var(--bg-elevated);
       border-radius: 999px;
       overflow: hidden;
@@ -544,7 +837,7 @@
 
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--success));
+      background: var(--success);
       border-radius: 999px;
       transition: width 0.25s ease;
     }
@@ -552,42 +845,64 @@
     .relations-box {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.3rem;
-      padding-top: 0.35rem;
+      gap: 0.35rem;
+      padding-top: 0.4rem;
       border-top: 1px solid var(--border-subtle);
     }
 
     .card-timings {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0.35rem;
-      padding-top: 0.45rem;
-      border-top: 1px solid var(--border-subtle);
-      font-size: 0.7rem;
+      gap: 0.45rem;
+      padding: 0.55rem 0.65rem;
+      background: var(--bg-base);
+      border-radius: 0.5rem;
+      border: 1px solid var(--border-subtle);
+      font-size: 12px;
       color: var(--text-secondary);
       font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .card-timing-item {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .card-timing-item strong {
+      color: var(--text-primary);
     }
 
     .card-actions {
       display: flex;
-      gap: 0.35rem;
-      margin-top: 0.2rem;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin-top: 0.15rem;
     }
 
     .mini-btn {
-      font-size: 0.7rem;
-      padding: 0.2rem 0.5rem;
-      border-radius: 0.32rem;
+      font-size: 12px;
+      padding: 0.25rem 0.55rem;
+      border-radius: 0.35rem;
       background: var(--bg-elevated);
       color: var(--text-secondary);
       border: 1px solid var(--border);
       cursor: pointer;
       font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
     }
 
     .mini-btn:hover {
       color: var(--text-primary);
       border-color: var(--accent);
+      background: var(--bg-card-hover);
     }
 
     /* Relations / Dependency DAG View */
@@ -595,10 +910,11 @@
       background: var(--bg-surface);
       border: 1px solid var(--border);
       border-radius: 0.75rem;
-      padding: 1.25rem;
+      padding: 1.35rem;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 1.15rem;
+      box-shadow: var(--shadow-sm);
     }
 
     .dag-legend {
@@ -606,24 +922,24 @@
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 0.75rem;
-      padding-bottom: 0.85rem;
+      gap: 1rem;
+      padding-bottom: 1rem;
       border-bottom: 1px solid var(--border);
     }
 
     .legend-items {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 1.1rem;
       flex-wrap: wrap;
-      font-size: 0.78rem;
+      font-size: 13px;
       color: var(--text-secondary);
     }
 
     .legend-item {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.45rem;
     }
 
     .legend-swatch {
@@ -632,36 +948,60 @@
       border-radius: 0.2rem;
     }
 
+    .dag-critical-path-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.6rem 0.95rem;
+      background: var(--critical-soft);
+      border: 1px solid var(--critical-border);
+      border-radius: 0.5rem;
+      color: var(--critical);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
     .dag-canvas-wrap {
       width: 100%;
       overflow: auto;
       min-height: 420px;
       background: var(--bg-base);
       border: 1px solid var(--border-subtle);
-      border-radius: 0.6rem;
-      padding: 1rem;
+      border-radius: 0.65rem;
+      padding: 1.25rem;
       position: relative;
     }
 
     .dag-matrix-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.82rem;
+      font-size: 13px;
       margin-top: 0.5rem;
     }
 
     .dag-matrix-table th, .dag-matrix-table td {
-      padding: 0.65rem 0.85rem;
+      padding: 0.75rem 0.95rem;
       text-align: left;
       border-bottom: 1px solid var(--border);
+      vertical-align: middle;
     }
 
     .dag-matrix-table th {
       color: var(--text-muted);
-      font-size: 0.72rem;
+      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       background: var(--bg-elevated);
+      font-weight: 700;
+    }
+
+    .dag-matrix-table tbody tr {
+      transition: background 0.12s;
+    }
+
+    .dag-matrix-table tbody tr:hover {
+      background: var(--bg-card-hover);
     }
 
     /* Timeline & Telemetry Global Table */
@@ -669,16 +1009,37 @@
       background: var(--bg-surface);
       border: 1px solid var(--border);
       border-radius: 0.75rem;
-      padding: 1.25rem;
+      padding: 1.35rem;
       overflow-x: auto;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .cmd-breakdown-bar {
+      display: flex;
+      height: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: var(--bg-elevated);
+      gap: 1px;
+      margin-top: 0.35rem;
+    }
+
+    .cmd-breakdown-seg {
+      height: 100%;
+      transition: opacity 0.15s;
+    }
+
+    .cmd-breakdown-seg:hover {
+      opacity: 0.8;
     }
 
     /* Slide-Over Drawer for Task Detail, Timeline & Markdown Viewer */
     .drawer-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(3px);
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
       z-index: 50;
       display: none;
     }
@@ -692,7 +1053,7 @@
       top: 0;
       right: 0;
       bottom: 0;
-      width: min(920px, 94vw);
+      width: min(940px, 94vw);
       background: var(--bg-surface);
       border-left: 1px solid var(--border);
       box-shadow: var(--shadow-lg);
@@ -708,19 +1069,44 @@
     }
 
     .drawer-header {
-      padding: 1rem 1.35rem;
+      padding: 1.1rem 1.5rem;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 1rem;
+      gap: 1.25rem;
       background: var(--bg-elevated);
+    }
+
+    .drawer-title-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .drawer-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.015em;
+      line-height: 1.35;
+    }
+
+    .drawer-subtitle {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      flex-wrap: wrap;
     }
 
     .drawer-tabs {
       display: flex;
-      gap: 0.35rem;
-      padding: 0.6rem 1.35rem;
+      gap: 0.4rem;
+      padding: 0.65rem 1.5rem;
       border-bottom: 1px solid var(--border);
       background: var(--bg-surface);
       overflow-x: auto;
@@ -728,7 +1114,7 @@
 
     .drawer-body {
       flex: 1;
-      padding: 1.35rem;
+      padding: 1.5rem;
       overflow-y: auto;
     }
 
@@ -736,18 +1122,19 @@
     .timeline-list {
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
-      margin-top: 0.85rem;
+      gap: 0.85rem;
+      margin-top: 1rem;
     }
 
     .timeline-row {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 0.55rem;
-      padding: 0.85rem 1rem;
+      border-radius: 0.6rem;
+      padding: 0.95rem 1.1rem;
       display: flex;
       flex-direction: column;
-      gap: 0.45rem;
+      gap: 0.55rem;
+      box-shadow: var(--shadow-sm);
     }
 
     .timeline-row-top {
@@ -761,9 +1148,9 @@
     .cmd-pill {
       font-family: var(--font-mono);
       font-weight: 700;
-      font-size: 0.8rem;
-      padding: 0.2rem 0.55rem;
-      border-radius: 0.35rem;
+      font-size: 13px;
+      padding: 0.25rem 0.6rem;
+      border-radius: 0.4rem;
       background: var(--accent-soft);
       color: var(--accent);
       border: 1px solid var(--accent-border);
@@ -771,80 +1158,141 @@
 
     /* Integrated Markdown Viewer Styles */
     .md-viewer {
-      font-size: 0.9rem;
+      font-size: 14px;
       color: var(--text-primary);
-      line-height: 1.65;
+      line-height: 1.7;
+      max-width: 80ch;
     }
 
     .md-frontmatter-strip {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.45rem;
-      margin-bottom: 1.15rem;
-      padding: 0.75rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.65rem;
+      margin-bottom: 1.35rem;
+      padding: 0.95rem;
       background: var(--bg-elevated);
       border: 1px solid var(--border);
-      border-radius: 0.5rem;
+      border-radius: 0.65rem;
+    }
+
+    .md-frontmatter-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      font-size: 12px;
+      font-family: var(--font-mono);
+    }
+
+    .md-frontmatter-key {
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .md-frontmatter-val {
+      color: var(--text-primary);
+      font-weight: 600;
     }
 
     .md-viewer h1, .md-viewer h2, .md-viewer h3, .md-viewer h4 {
-      margin-top: 1.3rem;
-      margin-bottom: 0.55rem;
+      margin-top: 1.45rem;
+      margin-bottom: 0.6rem;
       font-weight: 700;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.015em;
+      color: var(--text-primary);
     }
 
-    .md-viewer h1 { font-size: 1.35rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
-    .md-viewer h2 { font-size: 1.12rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.3rem; }
-    .md-viewer h3 { font-size: 0.98rem; color: var(--info); }
+    .md-viewer h1 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    .md-viewer h2 { font-size: 1.18rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.4rem; }
+    .md-viewer h3 { font-size: 1.02rem; color: var(--accent); }
 
     .md-viewer p, .md-viewer ul, .md-viewer ol {
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.85rem;
     }
 
     .md-viewer ul, .md-viewer ol {
-      padding-left: 1.35rem;
+      padding-left: 1.4rem;
     }
 
     .md-viewer li {
-      margin-bottom: 0.3rem;
+      margin-bottom: 0.35rem;
     }
 
     .md-viewer code {
       font-family: var(--font-mono);
-      font-size: 0.82em;
+      font-size: 13px;
       background: var(--code-bg);
-      padding: 0.15rem 0.38rem;
-      border-radius: 0.3rem;
+      padding: 0.15rem 0.4rem;
+      border-radius: 0.35rem;
       border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+
+    .code-block-wrap {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.6rem;
+      margin-bottom: 1.1rem;
+      overflow: hidden;
+    }
+
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.45rem 0.85rem;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .code-copy-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 12px;
+      padding: 0.15rem 0.55rem;
+      border-radius: 0.3rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .code-copy-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--accent);
+      background: var(--bg-card-hover);
     }
 
     .md-viewer pre {
       background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: 0.5rem;
-      padding: 0.85rem 1rem;
+      padding: 0.95rem 1.1rem;
       overflow-x: auto;
-      margin-bottom: 0.9rem;
+      margin: 0;
     }
 
     .md-viewer pre code {
       background: none;
       border: none;
       padding: 0;
-      font-size: 0.8rem;
+      font-size: 13px;
+      line-height: 1.6;
     }
 
     .md-viewer table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 1rem;
-      font-size: 0.82rem;
+      margin-bottom: 1.15rem;
+      font-size: 13px;
     }
 
     .md-viewer th, .md-viewer td {
       border: 1px solid var(--border);
-      padding: 0.5rem 0.7rem;
+      padding: 0.6rem 0.85rem;
       text-align: left;
       vertical-align: top;
     }
@@ -852,40 +1300,95 @@
     .md-viewer th {
       background: var(--bg-elevated);
       font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .md-viewer tbody tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.02);
     }
 
     .md-viewer hr {
       border: none;
       border-top: 1px solid var(--border);
-      margin: 1.1rem 0;
+      margin: 1.35rem 0;
     }
 
     .gherkin-kw {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
       font-family: var(--font-mono);
-      font-size: 0.75rem;
+      font-size: 12px;
       font-weight: 700;
-      padding: 0.05rem 0.38rem;
-      border-radius: 0.25rem;
-      margin: 0 0.15rem;
+      padding: 0.1rem 0.45rem;
+      border-radius: 0.3rem;
+      margin: 0 0.2rem;
+      letter-spacing: 0.02em;
     }
 
-    .gherkin-given { background: var(--info-soft); color: var(--info); }
-    .gherkin-when  { background: var(--warning-soft); color: var(--warning); }
-    .gherkin-then  { background: var(--success-soft); color: var(--success); }
-    .gherkin-and   { background: var(--accent-soft); color: var(--accent); }
+    .gherkin-given { background: var(--info-soft); color: var(--info); border: 1px solid var(--info-border); }
+    .gherkin-when  { background: var(--warning-soft); color: var(--warning); border: 1px solid var(--warning-border); }
+    .gherkin-then  { background: var(--success-soft); color: var(--success); border: 1px solid var(--success-border); }
+    .gherkin-and   { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-border); }
 
-    .md-checkbox {
-      pointer-events: none;
-      accent-color: var(--success);
-      margin-right: 0.45rem;
-      transform: translateY(1px);
+    .checklist-item {
+      display: flex;
+      align-items: baseline;
+      gap: 0.55rem;
+      margin-bottom: 0.45rem;
+    }
+
+    .checklist-box {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 0.25rem;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      flex-shrink: 0;
+      transform: translateY(2px);
+    }
+
+    .checklist-box.checked {
+      background: var(--success-soft);
+      border-color: var(--success-border);
+      color: var(--success);
+    }
+
+    /* Toast Notification */
+    .toast-notice {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      padding: 0.65rem 1.1rem;
+      border-radius: 0.55rem;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 100;
+      display: none;
+      align-items: center;
+      gap: 0.55rem;
+      animation: toastIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast-notice.visible {
+      display: inline-flex;
+    }
+
+    @keyframes toastIn {
+      from { transform: translateY(12px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
     .spinner {
       display: inline-block;
-      width: 0.85rem;
-      height: 0.85rem;
+      width: 0.95rem;
+      height: 0.95rem;
       border: 2px solid currentColor;
       border-right-color: transparent;
       border-radius: 50%;
@@ -903,65 +1406,129 @@
     <div class="header-top">
       <div class="brand-group">
         <div class="brand-logo" aria-hidden="true">DF</div>
-        <div>
-          <div style="display:flex;align-items:center;gap:0.55rem;flex-wrap:wrap;">
+        <div class="brand-info">
+          <div class="brand-title-row">
             <h1 class="project-title" id="hdr-project-name">DevFlow Project</h1>
-            <span class="readonly-pill" title="Strictly static & read-only: no state mutation or file modifications allowed from browser">🔒 Read-Only Board</span>
-            <span class="meta-pill" id="hdr-branch" title="Current Git Branch">⎇ main</span>
-            <span class="meta-pill active-feat" id="hdr-active-feature" title="Active Feature in .devflow-state.json">⚡ active: —</span>
+            <span class="readonly-pill" title="Deterministic static read-only project board">
+              <span class="icon" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              Read-Only Board
+            </span>
+            <span class="meta-pill" id="hdr-branch" title="Current Git Branch">
+              <span class="icon" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+              </span>
+              main
+            </span>
+            <span class="meta-pill active-feat" id="hdr-active-feature" title="Active Feature in .devflow-state.json">
+              <span class="active-dot" aria-hidden="true"></span>
+              active: —
+            </span>
           </div>
         </div>
       </div>
 
       <div class="header-controls">
-        <input type="search" id="search-input" class="search-input" placeholder="Filter tasks, IDs, branches..." aria-label="Filter tasks" />
+        <div class="search-wrap">
+          <span class="search-icon-inside icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </span>
+          <input type="search" id="search-input" class="search-input" placeholder="Search tasks, IDs, branches..." aria-label="Filter tasks" />
+          <button type="button" id="search-clear-btn" class="search-clear-btn" aria-label="Clear search">
+            <span class="icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+          </button>
+          <span class="search-shortcut-hint" id="search-shortcut-hint">/</span>
+        </div>
+
         <select id="poll-select" class="select-ctrl" aria-label="Auto-refresh interval" title="Auto-sync polling interval">
-          <option value="0">Auto-Sync: Manual</option>
+          <option value="0">Auto-Sync: Off</option>
           <option value="5000" selected>Auto-Sync: 5s</option>
           <option value="15000">Auto-Sync: 15s</option>
           <option value="30000">Auto-Sync: 30s</option>
         </select>
-        <button type="button" id="refresh-btn" class="btn btn-primary" title="Reload board-data.js and Markdown artifacts">
-          <span id="refresh-icon">↻</span>
+
+        <button type="button" id="refresh-btn" class="btn btn-primary" title="Reload board-data.js and Markdown artifacts (Shortcut: r)">
+          <span id="refresh-icon" class="icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          </span>
           <span id="refresh-label">Refresh</span>
         </button>
-        <button type="button" id="theme-btn" class="btn" aria-label="Toggle Dark or Light Theme" title="Toggle Dark / Light Theme">☀/☾</button>
+
+        <button type="button" id="theme-btn" class="btn" aria-label="Toggle Dark or Light Theme" title="Toggle Theme (Shortcut: t)">
+          <span id="theme-icon" class="icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </span>
+        </button>
       </div>
     </div>
 
+    <!-- Summary KPI Strip -->
     <div class="summary-strip">
       <div class="kpi-box">
-        <span class="kpi-label">Total Tasks</span>
+        <div class="kpi-label-row">
+          <span class="kpi-label">Total Tasks</span>
+          <span class="icon kpi-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="11" y="3" width="5" height="11" rx="1"/><rect x="19" y="3" width="5" height="15" rx="1"/></svg>
+          </span>
+        </div>
         <div class="kpi-value">
           <span id="kpi-total-tasks">0</span>
-          <span class="kpi-sub" id="kpi-tasks-sub">0 done · 0 in progress</span>
+          <span class="kpi-sub" id="kpi-tasks-sub">0 done · 0 active</span>
         </div>
       </div>
+
       <div class="kpi-box">
-        <span class="kpi-label">Completion</span>
+        <div class="kpi-label-row">
+          <span class="kpi-label">Project Completion</span>
+          <span class="icon kpi-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+        </div>
         <div class="kpi-value">
           <span id="kpi-completion-pct">0%</span>
           <span class="kpi-sub" id="kpi-blocked-sub">0 blocked</span>
         </div>
+        <div class="kpi-mini-bar">
+          <div id="kpi-completion-bar" class="kpi-mini-bar-fill" style="width:0%;"></div>
+        </div>
       </div>
+
       <div class="kpi-box">
-        <span class="kpi-label">Total Dev Time</span>
+        <div class="kpi-label-row">
+          <span class="kpi-label">Active Dev Time</span>
+          <span class="icon kpi-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </span>
+        </div>
         <div class="kpi-value">
           <span id="kpi-dev-time">0s</span>
           <span class="kpi-sub" id="kpi-lead-sub">lead: 0s</span>
         </div>
       </div>
+
       <div class="kpi-box">
-        <span class="kpi-label">Telemetry & Cost (Est.)</span>
+        <div class="kpi-label-row">
+          <span class="kpi-label">Telemetry & Cost</span>
+          <span class="icon kpi-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </span>
+        </div>
         <div class="kpi-value">
           <span id="kpi-cost">$0.00</span>
           <span class="kpi-sub" id="kpi-tokens">0 tok</span>
         </div>
       </div>
+
       <div class="kpi-box">
-        <span class="kpi-label">Last Synced</span>
+        <div class="kpi-label-row">
+          <span class="kpi-label">Last Synced</span>
+          <span class="icon kpi-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 10"/></svg>
+          </span>
+        </div>
         <div class="kpi-value">
-          <span id="kpi-updated-at" style="font-size:0.88rem;font-family:var(--font-mono);">—</span>
+          <span id="kpi-updated-at" style="font-size:0.95rem;font-family:var(--font-mono);">—</span>
         </div>
       </div>
     </div>
@@ -976,12 +1543,51 @@
   <!-- View Switcher & Global Docs Bar -->
   <nav class="view-bar" aria-label="Board Views">
     <div class="view-tabs" role="tablist">
-      <button type="button" class="tab-btn active" data-view="kanban" role="tab" aria-selected="true">📋 Kanban Pipeline</button>
-      <button type="button" class="tab-btn" data-view="dag" role="tab" aria-selected="false">🕸️ Relations & Dependency DAG</button>
-      <button type="button" class="tab-btn" data-view="timings" role="tab" aria-selected="false">⏱️ Command Timings & Telemetry</button>
+      <button type="button" class="tab-btn active" data-view="kanban" role="tab" aria-selected="true" title="Kanban Pipeline (1)">
+        <span class="icon" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="11" y="3" width="5" height="11" rx="1"/><rect x="19" y="3" width="5" height="15" rx="1"/></svg>
+        </span>
+        Kanban Pipeline
+        <span class="tab-kbd">1</span>
+      </button>
+      <button type="button" class="tab-btn" data-view="dag" role="tab" aria-selected="false" title="Relations & Dependency DAG (2)">
+        <span class="icon" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="5" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><circle cx="19" cy="6" r="3"/><path d="M7.5 7.5L10 16"/><path d="M16.5 7.5L14 16"/></svg>
+        </span>
+        Relations & DAG
+        <span class="tab-kbd">2</span>
+      </button>
+      <button type="button" class="tab-btn" data-view="timings" role="tab" aria-selected="false" title="Command Timings & Telemetry (3)">
+        <span class="icon" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </span>
+        Command Timings
+        <span class="tab-kbd">3</span>
+      </button>
     </div>
+
     <div class="global-docs-bar" id="global-docs-bar"></div>
   </nav>
+
+  <!-- Quick Filter Chips Bar -->
+  <div class="filters-bar" id="filters-bar">
+    <span class="filter-chip-label">Filter:</span>
+    <button type="button" class="filter-chip active" data-filter="all">
+      All Tasks <span class="filter-chip-count" id="chip-count-all">0</span>
+    </button>
+    <button type="button" class="filter-chip" data-filter="active">
+      Active Only <span class="filter-chip-count" id="chip-count-active">0</span>
+    </button>
+    <button type="button" class="filter-chip" data-filter="blocked">
+      Blocked <span class="filter-chip-count" id="chip-count-blocked">0</span>
+    </button>
+    <button type="button" class="filter-chip" data-filter="ready">
+      Ready <span class="filter-chip-count" id="chip-count-ready">0</span>
+    </button>
+    <button type="button" class="filter-chip" data-filter="done">
+      Completed <span class="filter-chip-count" id="chip-count-done">0</span>
+    </button>
+  </div>
 
   <!-- Main Workspace -->
   <main class="board-main">
@@ -995,30 +1601,32 @@
       <div class="dag-container">
         <div class="dag-legend">
           <div>
-            <h2 style="font-size:1rem;font-weight:700;">Inter-Task Dependency Graph (DAG) & Critical Path</h2>
-            <p style="font-size:0.78rem;color:var(--text-secondary);">Derived from <code>**Blockers:**</code> and <code>**Unlocks:**</code> in <code>task.md</code> and <code>devflow/plans/project-blueprint.md</code>. Click any node to inspect.</p>
+            <h2 style="font-size:1.1rem;font-weight:700;">Inter-Task Dependency Graph (DAG) & Critical Path</h2>
+            <p style="font-size:13px;color:var(--text-secondary);margin-top:0.25rem;">Derived from <code>**Blockers:**</code> and <code>**Unlocks:**</code> in task specs and blueprint. Click any node to inspect.</p>
           </div>
           <div class="legend-items">
-            <span class="legend-item"><span class="legend-swatch" style="background:#10b981;"></span> Completed / Done</span>
-            <span class="legend-item"><span class="legend-swatch" style="background:#38bdf8;"></span> Ready to Develop</span>
-            <span class="legend-item"><span class="legend-swatch" style="background:#f59e0b;"></span> In Progress</span>
-            <span class="legend-item"><span class="legend-swatch" style="background:#ef4444;"></span> Blocked</span>
-            <span class="legend-item"><span class="legend-swatch" style="background:#ec4899;"></span> Critical Path</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:var(--success);"></span> Completed</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:var(--info);"></span> Ready</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:var(--warning);"></span> In Progress</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:var(--danger);"></span> Blocked</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:var(--critical);"></span> Critical Path</span>
           </div>
         </div>
-        <div id="dag-critical-banner" style="font-size:0.8rem;font-family:var(--font-mono);color:var(--critical);"></div>
+
+        <div id="dag-critical-banner" class="dag-critical-path-bar" style="display:none;"></div>
         <div id="dag-canvas-wrap" class="dag-canvas-wrap"></div>
+
         <div style="overflow-x:auto;">
           <table class="dag-matrix-table" id="dag-matrix-table">
             <thead>
               <tr>
                 <th>Task ID</th>
-                <th>Title & Folder</th>
+                <th>Title & Slug</th>
                 <th>State</th>
                 <th>Blockers (Prerequisites)</th>
                 <th>Unlocks (Downstream)</th>
-                <th>Critical Path</th>
-                <th>Lead Time / Dev Time</th>
+                <th>DAG Position</th>
+                <th>Lead / Dev Time</th>
               </tr>
             </thead>
             <tbody id="dag-matrix-body"></tbody>
@@ -1030,19 +1638,21 @@
     <!-- 3. Command Timings & Telemetry Overview -->
     <section id="view-timings" class="view-panel" aria-label="Command Timings Overview">
       <div class="telemetry-table-wrap">
-        <h2 style="font-size:1rem;font-weight:700;margin-bottom:0.35rem;">Per-Task & Per-Command Development Timings</h2>
-        <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">Chronological command durations (<code>task</code>, <code>clarify</code>, <code>plan</code>, <code>analyze</code>, <code>implement</code>, <code>beautify</code>, <code>test</code>, <code>ship</code>, <code>pr</code>, <code>hotfix</code>), total accumulated time, and task lead time.</p>
+        <div style="margin-bottom:1.1rem;">
+          <h2 style="font-size:1.1rem;font-weight:700;">Per-Task & Per-Command Development Timings</h2>
+          <p style="font-size:13px;color:var(--text-secondary);margin-top:0.25rem;">Chronological command durations, step-by-step breakdown bar, total development time, and task lead time.</p>
+        </div>
         <table class="dag-matrix-table">
           <thead>
             <tr>
               <th>Task</th>
               <th>Status</th>
               <th>First Started</th>
-              <th>Last Command Ended</th>
+              <th>Last Ended</th>
               <th>Active Dev Time</th>
-              <th>Lead Time (Task → Done)</th>
-              <th>Commands Executed</th>
-              <th>Est. Tokens / Cost</th>
+              <th>Lead Time</th>
+              <th>Command Sequence & Durations</th>
+              <th>Est. Tokens & Cost</th>
             </tr>
           </thead>
           <tbody id="timings-overview-body"></tbody>
@@ -1053,18 +1663,31 @@
 
   <!-- Slide-over Drawer for Task Detail, Command Timeline & Integrated Markdown Viewer -->
   <div id="drawer-backdrop" class="drawer-backdrop"></div>
-  <aside id="drawer-panel" class="drawer-panel" aria-label="Task & Document Inspector">
+  <aside id="drawer-panel" class="drawer-panel" aria-label="Task & Document Inspector" role="dialog" aria-modal="true">
     <div class="drawer-header">
-      <div>
+      <div class="drawer-title-area">
         <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;" id="drawer-badges"></div>
-        <h2 id="drawer-title" style="font-size:1.1rem;font-weight:700;margin-top:0.3rem;">Task Details</h2>
-        <div id="drawer-subtitle" style="font-size:0.76rem;font-family:var(--font-mono);color:var(--text-secondary);margin-top:0.15rem;"></div>
+        <h2 id="drawer-title" class="drawer-title">Task Details</h2>
+        <div id="drawer-subtitle" class="drawer-subtitle"></div>
       </div>
-      <button type="button" id="drawer-close-btn" class="btn" aria-label="Close Inspector">✕ Close</button>
+      <button type="button" id="drawer-close-btn" class="btn" aria-label="Close Inspector (Esc)" title="Close (Esc)">
+        <span class="icon" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </span>
+        Close
+      </button>
     </div>
     <div id="drawer-tabs" class="drawer-tabs" role="tablist"></div>
     <div id="drawer-body" class="drawer-body"></div>
   </aside>
+
+  <!-- Toast notification -->
+  <div id="toast-notice" class="toast-notice" role="alert" aria-live="assertive">
+    <span class="icon" aria-hidden="true">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+    </span>
+    <span id="toast-text">Copied to clipboard</span>
+  </div>
 
   <!-- Load initial data manifest (works on both file:// and http://) -->
   <script src="board-data.js"></script>
@@ -1076,6 +1699,7 @@
         data: window.__DEVFLOW_BOARD_DATA__ || null,
         activeView: "kanban",
         searchQuery: "",
+        activeFilter: "all", // "all" | "active" | "blocked" | "ready" | "done"
         isRefreshing: false,
         pollTimer: null,
         pollIntervalMs: 5000,
@@ -1084,6 +1708,60 @@
         selectedAdrId: null,
         activeDrawerTab: "timeline" // "timeline" | "task_md" | "plan_md" | "verification_md"
       };
+
+      // Vector Icon Registry
+      const ICONS = {
+        kanban: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="11" y="3" width="5" height="11" rx="1"/><rect x="19" y="3" width="5" height="15" rx="1"/></svg>',
+        dag: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="5" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><circle cx="19" cy="6" r="3"/><path d="M7.5 7.5L10 16"/><path d="M16.5 7.5L14 16"/></svg>',
+        clock: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+        branch: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>',
+        zap: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+        lock: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+        unlock: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>',
+        flame: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
+        file: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+        check: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>',
+        folder: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',
+        copy: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+        blueprint: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>',
+        adr: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+        sun: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
+        moon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+        link: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'
+      };
+
+      function renderIcon(name) {
+        return '<span class="icon" aria-hidden="true">' + (ICONS[name] || "") + '</span>';
+      }
+
+      function showToast(msg) {
+        const t = document.getElementById("toast-notice");
+        const txt = document.getElementById("toast-text");
+        txt.textContent = msg;
+        t.classList.add("visible");
+        clearTimeout(t._timer);
+        t._timer = setTimeout(function () {
+          t.classList.remove("visible");
+        }, 2200);
+      }
+
+      function copyTextToClipboard(text, label) {
+        if (!navigator.clipboard) {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+          showToast(label ? label + " copied!" : "Copied!");
+          return;
+        }
+        navigator.clipboard.writeText(text).then(function () {
+          showToast(label ? label + " copied!" : "Copied!");
+        }).catch(function () {
+          showToast("Failed to copy");
+        });
+      }
 
       function escapeHtml(str) {
         if (str === null || str === undefined) return "";
@@ -1123,10 +1801,10 @@
       }
 
       // Safe, zero-dependency Markdown renderer supporting Frontmatter headers,
-      // Headings, Tables, Code blocks, Gherkin Given/When/Then, and Read-Only Checklists
+      // Headings, Tables, Code blocks with copy button, Gherkin Given/When/Then, and Read-Only Checklists
       function renderMarkdown(rawMd) {
         if (!rawMd || !String(rawMd).trim()) {
-          return '<div class="col-empty">Document is empty or not yet generated for this task.</div>';
+          return '<div class="col-empty">' + renderIcon("file") + '<span>Document is empty or not yet generated for this task.</span></div>';
         }
 
         const lines = String(rawMd).replace(/\r\n/g, "\n").split("\n");
@@ -1158,7 +1836,7 @@
         if (metaBadges.length > 0) {
           html += '<div class="md-frontmatter-strip">';
           for (const b of metaBadges) {
-            html += '<span class="meta-pill"><strong>' + escapeHtml(b.key) + ':</strong> ' + escapeHtml(b.val) + '</span>';
+            html += '<div class="md-frontmatter-item"><span class="md-frontmatter-key">' + escapeHtml(b.key) + '</span><span class="md-frontmatter-val">' + escapeHtml(b.val) + '</span></div>';
           }
           html += '</div>';
         }
@@ -1213,16 +1891,16 @@
           // Bold & italic
           s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
           s = s.replace(/\*([^*]+)\*/g, "<em>$1</em>");
-          // Links (keep label & safe href)
-          s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<span class="badge badge-status-ready" title="$2">$1</span>');
-          // Gherkin keywords (GIVEN / WHEN / THEN / AND)
+          // Links
+          s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<span class="badge badge-status-ready" title="$2">' + renderIcon("link") + ' $1</span>');
+          // Gherkin keywords
           s = s.replace(/\b(GIVEN|Given)\b/g, '<span class="gherkin-kw gherkin-given">$1</span>');
           s = s.replace(/\b(WHEN|When)\b/g, '<span class="gherkin-kw gherkin-when">$1</span>');
           s = s.replace(/\b(THEN|Then)\b/g, '<span class="gherkin-kw gherkin-then">$1</span>');
           s = s.replace(/\b(AND|And)\b/g, '<span class="gherkin-kw gherkin-and">$1</span>');
           // [done] / [pending] markers
-          s = s.replace(/\[done\]/gi, '<span class="badge badge-status-done">[done]</span>');
-          s = s.replace(/\[pending\]/gi, '<span class="badge badge-status-wip">[pending]</span>');
+          s = s.replace(/\[done\]/gi, '<span class="badge badge-status-done">' + renderIcon("check") + ' done</span>');
+          s = s.replace(/\[pending\]/gi, '<span class="badge badge-status-wip">' + renderIcon("clock") + ' pending</span>');
           return s;
         }
 
@@ -1238,7 +1916,8 @@
               codeLang = trimmed.slice(3).trim();
               codeBuffer = [];
             } else {
-              html += '<pre><code data-lang="' + escapeHtml(codeLang) + '">' + escapeHtml(codeBuffer.join("\n")) + "</code></pre>";
+              const fullCode = codeBuffer.join("\n");
+              html += '<div class="code-block-wrap"><div class="code-block-header"><span>' + escapeHtml(codeLang || "code") + '</span><button type="button" class="code-copy-btn" data-code="' + escapeHtml(fullCode) + '">' + renderIcon("copy") + ' Copy</button></div><pre><code data-lang="' + escapeHtml(codeLang) + '">' + escapeHtml(fullCode) + "</code></pre></div>";
               inCodeBlock = false;
               codeLang = "";
               codeBuffer = [];
@@ -1284,14 +1963,12 @@
           // Checklists (- [x] or - [ ])
           const chkMatch = trimmed.match(/^[-*]\s+\[([ xX~])\]\s+(.*)$/);
           if (chkMatch) {
-            if (!inList || listTag !== "ul") {
-              flushList();
-              inList = true;
-              listTag = "ul";
-              html += '<ul style="list-style:none;padding-left:0.3rem;">';
-            }
-            const checked = chkMatch[1].toLowerCase() === "x" ? "checked" : "";
-            html += '<li><input type="checkbox" class="md-checkbox" disabled ' + checked + " />" + formatInline(chkMatch[2]) + "</li>";
+            flushList();
+            const isDone = chkMatch[1].toLowerCase() === "x";
+            html += '<div class="checklist-item">';
+            html += '<span class="checklist-box ' + (isDone ? "checked" : "") + '">' + (isDone ? renderIcon("check") : "") + '</span>';
+            html += '<span>' + formatInline(chkMatch[2]) + '</span>';
+            html += '</div>';
             continue;
           }
 
@@ -1328,7 +2005,7 @@
         flushList();
         flushTable();
         if (inCodeBlock) {
-          html += "<pre><code>" + escapeHtml(codeBuffer.join("\n")) + "</code></pre>";
+          html += '<pre><code>' + escapeHtml(codeBuffer.join("\n")) + "</code></pre>";
         }
         html += "</div>";
         return html;
@@ -1336,8 +2013,24 @@
 
       function filterTasks(tasks) {
         const q = state.searchQuery.trim().toLowerCase();
-        if (!q) return tasks;
+        const f = state.activeFilter;
+        const activeFeat = (state.data && state.data.project && state.data.project.active_feature) || "";
+
         return tasks.filter((t) => {
+          // Status chip filter
+          if (f === "active") {
+            const isActive = activeFeat && (t.slug === activeFeat || t.id === activeFeat);
+            if (!isActive && t.column !== "in_progress") return false;
+          } else if (f === "blocked") {
+            if (!t.is_blocked) return false;
+          } else if (f === "ready") {
+            if (t.column !== "planned_ready" && t.task_status !== "clarified") return false;
+          } else if (f === "done") {
+            if (t.column !== "pr_opened_done" && t.task_status !== "done") return false;
+          }
+
+          // Search query filter
+          if (!q) return true;
           return (
             (t.id && t.id.toLowerCase().includes(q)) ||
             (t.title && t.title.toLowerCase().includes(q)) ||
@@ -1349,36 +2042,80 @@
         });
       }
 
+      function updateFilterCounts(tasks) {
+        const total = tasks.length;
+        const activeFeat = (state.data && state.data.project && state.data.project.active_feature) || "";
+        let activeCount = 0;
+        let blockedCount = 0;
+        let readyCount = 0;
+        let doneCount = 0;
+
+        for (const t of tasks) {
+          if ((activeFeat && (t.slug === activeFeat || t.id === activeFeat)) || t.column === "in_progress") {
+            activeCount++;
+          }
+          if (t.is_blocked) {
+            blockedCount++;
+          }
+          if (t.column === "planned_ready" || t.task_status === "clarified") {
+            readyCount++;
+          }
+          if (t.column === "pr_opened_done" || t.task_status === "done") {
+            doneCount++;
+          }
+        }
+
+        document.getElementById("chip-count-all").textContent = String(total);
+        document.getElementById("chip-count-active").textContent = String(activeCount);
+        document.getElementById("chip-count-blocked").textContent = String(blockedCount);
+        document.getElementById("chip-count-ready").textContent = String(readyCount);
+        document.getElementById("chip-count-done").textContent = String(doneCount);
+      }
+
       function renderHeader(data) {
         const p = data.project || {};
         document.getElementById("hdr-project-name").textContent = p.name || "DevFlow Project";
-        document.getElementById("hdr-branch").textContent = "⎇ " + (p.branch || "main");
-        document.getElementById("hdr-active-feature").textContent =
-          "⚡ active: " + (p.active_feature || "none") + (p.next_step && p.next_step !== "-" ? " → " + p.next_step : "");
+        document.getElementById("hdr-branch").innerHTML = renderIcon("branch") + " " + escapeHtml(p.branch || "main");
 
-        document.getElementById("kpi-total-tasks").textContent = String(p.total_tasks || 0);
+        const actFeat = p.active_feature || "none";
+        document.getElementById("hdr-active-feature").innerHTML =
+          '<span class="active-dot" aria-hidden="true"></span> active: ' +
+          escapeHtml(actFeat) +
+          (p.next_step && p.next_step !== "-" && p.next_step !== "none" ? " → " + escapeHtml(p.next_step) : "");
+
+        const totalTasks = p.total_tasks || 0;
+        const compPct = p.completion_pct || 0;
+
+        document.getElementById("kpi-total-tasks").textContent = String(totalTasks);
         document.getElementById("kpi-tasks-sub").textContent =
           (p.completed_tasks || 0) + " done · " + (p.in_progress_tasks || 0) + " active";
-        document.getElementById("kpi-completion-pct").textContent = (p.completion_pct || 0) + "%";
+
+        document.getElementById("kpi-completion-pct").textContent = compPct + "%";
         document.getElementById("kpi-blocked-sub").textContent = (p.blocked_tasks || 0) + " blocked";
+        document.getElementById("kpi-completion-bar").style.width = Math.min(100, Math.max(0, compPct)) + "%";
+
         document.getElementById("kpi-dev-time").textContent = formatDuration(p.total_development_sec || 0);
         document.getElementById("kpi-lead-sub").textContent = "lead: " + formatDuration(p.total_lead_time_sec || 0);
+
         document.getElementById("kpi-cost").textContent = "$" + Number(p.total_cost_usd || 0).toFixed(2);
         document.getElementById("kpi-tokens").textContent = formatTokens(p.total_tokens || 0) + " tok";
+
         document.getElementById("kpi-updated-at").textContent = formatTimestamp(data.generated_at);
 
         // Render global document buttons (Blueprint + ADRs)
         const docsBar = document.getElementById("global-docs-bar");
         let docsHtml = "";
         if (data.documents && data.documents.blueprint && data.documents.blueprint.content) {
-          docsHtml += '<button type="button" class="mini-btn" data-open-blueprint="true">🗺️ Project Blueprint</button>';
+          docsHtml += '<button type="button" class="mini-btn" data-open-blueprint="true">' + renderIcon("blueprint") + ' Blueprint</button>';
         }
         if (data.documents && Array.isArray(data.documents.adrs)) {
           for (const adr of data.documents.adrs) {
             docsHtml +=
               '<button type="button" class="mini-btn" data-open-adr="' +
               escapeHtml(adr.id) +
-              '">📐 ' +
+              '">' +
+              renderIcon("adr") +
+              " " +
               escapeHtml(adr.id) +
               "</button>";
           }
@@ -1395,7 +2132,11 @@
           { id: "implemented_verified", label: "Implemented / Verified" },
           { id: "pr_opened_done", label: "PR Opened / Done" }
         ];
-        const tasks = filterTasks(data.tasks || []);
+
+        const allTasks = data.tasks || [];
+        updateFilterCounts(allTasks);
+
+        const tasks = filterTasks(allTasks);
         const activeFeat = (data.project && data.project.active_feature) || "";
 
         let html = "";
@@ -1404,12 +2145,12 @@
           html += '<div class="kanban-col col-' + escapeHtml(col.id) + '">';
           html += '<div class="col-header">';
           html += '<div class="col-header-left"><span class="col-dot"></span><span>' + escapeHtml(col.label) + "</span></div>";
-          html += '<span class="col-count">' + colTasks.length + "</span>";
+          html += '<span class="col-count-badge">' + colTasks.length + "</span>";
           html += "</div>";
           html += '<div class="col-body">';
 
           if (colTasks.length === 0) {
-            html += '<div class="col-empty">No tasks in ' + escapeHtml(col.label) + "</div>";
+            html += '<div class="col-empty">' + renderIcon("folder") + '<span>No tasks in ' + escapeHtml(col.label) + '</span></div>';
           } else {
             for (const t of colTasks) {
               const isActive = activeFeat && (t.slug === activeFeat || t.id === activeFeat);
@@ -1428,6 +2169,7 @@
                   : t.task_status === "clarified"
                   ? "badge-status-ready"
                   : "badge-status-draft";
+
               const planBadgeCls =
                 t.plan_status === "pr-opened" || t.plan_status === "shipped"
                   ? "badge-status-done"
@@ -1441,30 +2183,35 @@
               const slicesTotal = (t.slices && t.slices.total) || 0;
               const slicesPct = (t.slices && t.slices.pct) || 0;
 
-              html += '<article class="' + cardClasses + '" data-task-id="' + escapeHtml(t.id) + '">';
+              html += '<article class="' + cardClasses + '" data-task-id="' + escapeHtml(t.id) + '" tabindex="0" role="button" aria-label="Inspect task ' + escapeHtml(t.id) + '">';
               html += '<div class="card-top">';
               html += '<span class="task-id-badge">' + escapeHtml(t.id) + "</span>";
               html += '<div class="badge-row">';
-              html += '<span class="badge ' + taskBadgeCls + '" title="task.md Status">task: ' + escapeHtml(t.task_status) + "</span>";
+
+              if (isActive) {
+                html += '<span class="badge badge-active" title="Active feature being developed">' + renderIcon("zap") + ' Active</span>';
+              }
+
+              html += '<span class="badge ' + taskBadgeCls + '" title="task.md Status">' + escapeHtml(t.task_status) + "</span>";
               if (t.plan_status && t.plan_status !== "none") {
-                html += '<span class="badge ' + planBadgeCls + '" title="plan.md Status">plan: ' + escapeHtml(t.plan_status) + "</span>";
+                html += '<span class="badge ' + planBadgeCls + '" title="plan.md Status">' + escapeHtml(t.plan_status) + "</span>";
               }
               if (t.complexity && t.complexity !== "none") {
-                html += '<span class="badge badge-status-draft" title="Complexity Score">⚙️ ' + escapeHtml(t.complexity) + "</span>";
+                html += '<span class="badge badge-status-draft" title="Complexity Score">' + escapeHtml(t.complexity) + "</span>";
               }
               html += "</div></div>";
 
               html += '<h3 class="card-title">' + escapeHtml(t.title) + "</h3>";
 
               html += '<div class="card-meta-paths">';
-              html += '<span title="Feature Directory">📁 devflow/features/' + escapeHtml(t.slug) + "</span>";
-              html += '<span title="Feature Branch">⎇ ' + escapeHtml(t.branch) + "</span>";
+              html += '<div class="card-meta-row" title="Feature Directory">' + renderIcon("folder") + ' <span>devflow/features/' + escapeHtml(t.slug) + "</span></div>";
+              html += '<div class="card-meta-row" title="Feature Branch">' + renderIcon("branch") + ' <span>' + escapeHtml(t.branch) + "</span></div>";
               html += "</div>";
 
               // Vertical slices progress
               html += '<div class="slice-progress">';
               html += '<div class="slice-progress-top">';
-              html += "<span>Vertical Slices [x]</span>";
+              html += "<span>Vertical Slices</span>";
               html +=
                 "<span>" +
                 (slicesTotal > 0 ? slicesDone + "/" + slicesTotal + " (" + slicesPct + "%)" : t.column === "pr_opened_done" ? "Complete" : "Not planned") +
@@ -1478,7 +2225,7 @@
               if (Array.isArray(t.blocker_details) && t.blocker_details.length > 0) {
                 for (const b of t.blocker_details) {
                   const bCls = b.resolved ? "badge-unblocked" : "badge-blocked";
-                  const bIcon = b.resolved ? "🔓" : "🔒";
+                  const bIcon = b.resolved ? renderIcon("unlock") : renderIcon("lock");
                   html +=
                     '<span class="badge ' +
                     bCls +
@@ -1487,51 +2234,49 @@
                     (b.resolved ? " (Resolved)" : " (Blocking)") +
                     '">' +
                     bIcon +
-                    " Blocker: " +
+                    " " +
                     escapeHtml(b.id) +
                     "</span>";
                 }
               } else {
-                html += '<span class="badge badge-unblocked" title="No blocking dependencies">✓ Unblocked</span>';
+                html += '<span class="badge badge-unblocked" title="No blocking dependencies">' + renderIcon("check") + ' Unblocked</span>';
               }
 
               if (Array.isArray(t.unlocks) && t.unlocks.length > 0) {
                 for (const u of t.unlocks) {
-                  html += '<span class="badge badge-status-ready" title="Unlocks downstream task">↳ Unlocks: ' + escapeHtml(u) + "</span>";
+                  html += '<span class="badge badge-status-ready" title="Unlocks downstream task">↳ ' + escapeHtml(u) + "</span>";
                 }
               }
 
               if (Array.isArray(t.adrs) && t.adrs.length > 0) {
                 for (const a of t.adrs) {
-                  html += '<span class="badge badge-status-draft" title="Linked ADR">📐 ' + escapeHtml(a.replace(/^docs\/adr\//, "")) + "</span>";
+                  html += '<span class="badge badge-status-draft" title="Linked ADR">' + renderIcon("adr") + ' ' + escapeHtml(a.replace(/^docs\/adr\//, "")) + "</span>";
                 }
               }
 
               if (t.on_critical_path) {
-                html += '<span class="badge badge-critical" title="On DAG Critical Path">🔥 Critical Path</span>';
+                html += '<span class="badge badge-critical" title="On DAG Critical Path">' + renderIcon("flame") + ' Critical Path</span>';
               }
               html += "</div>";
 
               // Development time summary
               const tm = t.timings || {};
               html += '<div class="card-timings">';
-              html += '<div title="Total development duration">⏱️ Dev: <strong>' + formatDuration(tm.total_duration_sec || 0) + "</strong></div>";
-              html += '<div title="Lead time (task creation to done)">🏁 Lead: <strong>' + formatDuration(tm.lead_time_sec || 0) + "</strong></div>";
-              html += '<div title="First command started">▶ ' + escapeHtml((tm.first_started_at || "—").slice(0, 16).replace("T", " ")) + "</div>";
-              html += '<div title="Last command ended">⏹ ' + escapeHtml((tm.last_ended_at || "—").slice(0, 16).replace("T", " ")) + "</div>";
+              html += '<div class="card-timing-item" title="Active development duration">' + renderIcon("clock") + ' Dev: <strong>' + formatDuration(tm.total_duration_sec || 0) + "</strong></div>";
+              html += '<div class="card-timing-item" title="Task lead time (creation to PR/Done)">🏁 Lead: <strong>' + formatDuration(tm.lead_time_sec || 0) + "</strong></div>";
               html += "</div>";
 
               // Quick Document Tabs
               html += '<div class="card-actions">';
-              html += '<button type="button" class="mini-btn" data-task-id="' + escapeHtml(t.id) + '" data-tab="timeline">⏱️ Timeline (' + ((tm.commands && tm.commands.length) || 0) + ")</button>";
+              html += '<button type="button" class="mini-btn" data-task-id="' + escapeHtml(t.id) + '" data-tab="timeline">' + renderIcon("clock") + ' Timeline (' + ((tm.commands && tm.commands.length) || 0) + ")</button>";
               if (t.files && t.files.task_path) {
-                html += '<button type="button" class="mini-btn" data-task-id="' + escapeHtml(t.id) + '" data-tab="task_md">📄 task.md</button>';
+                html += '<button type="button" class="mini-btn" data-task-id="' + escapeHtml(t.id) + '" data-tab="task_md">' + renderIcon("file") + ' task.md</button>';
               }
               if (t.files && t.files.plan_path) {
-                html += '<button type="button" class="mini-btn" data-task-id="' + escapeHtml(t.id) + '" data-tab="plan_md">📐 plan.md</button>';
+                html += '<button type="button" class="mini-btn" data-task-id="' + escapeHtml(t.id) + '" data-tab="plan_md">' + renderIcon("file") + ' plan.md</button>';
               }
               if (t.files && t.files.verification_path) {
-                html += '<button type="button" class="mini-btn" data-task-id="' + escapeHtml(t.id) + '" data-tab="verification_md">✅ verification.md</button>';
+                html += '<button type="button" class="mini-btn" data-task-id="' + escapeHtml(t.id) + '" data-tab="verification_md">' + renderIcon("check") + ' verification.md</button>';
               }
               html += "</div>";
               html += "</article>";
@@ -1550,14 +2295,15 @@
         const matrixBody = document.getElementById("dag-matrix-body");
 
         if (dag.critical_path && dag.critical_path.length > 0) {
-          critBanner.textContent = "🔥 Critical Path: " + dag.critical_path.join("  →  ");
+          critBanner.style.display = "flex";
+          critBanner.innerHTML = renderIcon("flame") + " <span>Critical Path: " + escapeHtml(dag.critical_path.join("  →  ")) + "</span>";
         } else {
-          critBanner.textContent = "🔥 Critical Path: (no tasks)";
+          critBanner.style.display = "none";
         }
 
         if (tasks.length === 0) {
-          canvasWrap.innerHTML = '<div class="col-empty">No tasks found in <code>devflow/features/</code> to build the dependency graph.</div>';
-          matrixBody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);">No tasks recorded yet.</td></tr>';
+          canvasWrap.innerHTML = '<div class="col-empty">' + renderIcon("dag") + '<span>No tasks found in <code>devflow/features/</code> to build the dependency graph.</span></div>';
+          matrixBody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:2rem;">No tasks recorded yet.</td></tr>';
           return;
         }
 
@@ -1571,24 +2317,24 @@
           levelsMap[lvl].push(t);
         }
 
-        const nodeW = 230;
-        const nodeH = 86;
-        const colGap = 110;
-        const rowGap = 28;
+        const nodeW = 240;
+        const nodeH = 92;
+        const colGap = 120;
+        const rowGap = 32;
         let maxRows = 1;
         for (const k of Object.keys(levelsMap)) {
           if (levelsMap[k].length > maxRows) maxRows = levelsMap[k].length;
         }
 
-        const svgW = Math.max(760, (maxLevel + 1) * (nodeW + colGap) + 60);
-        const svgH = Math.max(300, maxRows * (nodeH + rowGap) + 60);
+        const svgW = Math.max(820, (maxLevel + 1) * (nodeW + colGap) + 60);
+        const svgH = Math.max(340, maxRows * (nodeH + rowGap) + 60);
 
         const coords = {};
         for (let lvl = 0; lvl <= maxLevel; lvl++) {
           const colNodes = levelsMap[lvl] || [];
           colNodes.forEach((t, idx) => {
-            const x = 30 + lvl * (nodeW + colGap);
-            const y = 30 + idx * (nodeH + rowGap);
+            const x = 36 + lvl * (nodeW + colGap);
+            const y = 36 + idx * (nodeH + rowGap);
             coords[t.id] = { x, y, task: t };
           });
         }
@@ -1605,9 +2351,9 @@
           '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Task Dependency Graph">';
         svg +=
           '<defs>' +
-          '<marker id="arrow-ok" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981"/></marker>' +
-          '<marker id="arrow-block" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#ef4444"/></marker>' +
-          '<marker id="arrow-crit" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#ec4899"/></marker>' +
+          '<marker id="arrow-ok" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#4ade80"/></marker>' +
+          '<marker id="arrow-block" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#f87171"/></marker>' +
+          '<marker id="arrow-crit" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#f472b6"/></marker>' +
           "</defs>";
 
         // Draw edges
@@ -1619,12 +2365,12 @@
           const y1 = fromNode.y + nodeH / 2;
           const x2 = toNode.x;
           const y2 = toNode.y + nodeH / 2;
-          const dx = Math.max(40, Math.abs(x2 - x1) * 0.5);
+          const dx = Math.max(45, Math.abs(x2 - x1) * 0.5);
           const onCrit =
             (dag.critical_path || []).includes(edge.from) && (dag.critical_path || []).includes(edge.to);
-          const stroke = onCrit ? "#ec4899" : edge.resolved ? "#10b981" : "#ef4444";
+          const stroke = onCrit ? "#f472b6" : edge.resolved ? "#4ade80" : "#f87171";
           const marker = onCrit ? "url(#arrow-crit)" : edge.resolved ? "url(#arrow-ok)" : "url(#arrow-block)";
-          const dash = edge.resolved ? "" : 'stroke-dasharray="5,4"';
+          const dash = edge.resolved ? "" : 'stroke-dasharray="6,4"';
           svg +=
             '<path d="M ' +
             x1 +
@@ -1659,17 +2405,18 @@
           let borderCol = "#38bdf8";
           let statusLabel = "READY";
           if (t.dag_state === "completed") {
-            borderCol = "#10b981";
+            borderCol = "#4ade80";
             statusLabel = "COMPLETED";
           } else if (t.dag_state === "blocked") {
-            borderCol = "#ef4444";
+            borderCol = "#f87171";
             statusLabel = "BLOCKED";
           } else if (t.dag_state === "active") {
-            borderCol = "#f59e0b";
+            borderCol = "#facc15";
             statusLabel = "IN PROGRESS";
           }
-          const strokeCol = t.on_critical_path ? "#ec4899" : borderCol;
+          const strokeCol = t.on_critical_path ? "#f472b6" : borderCol;
           const shortTitle = t.title.length > 26 ? t.title.slice(0, 25) + "…" : t.title;
+
           svg +=
             '<g class="dag-node" role="button" tabindex="0" aria-label="Inspect ' +
             escapeHtml(t.id + " " + t.title) +
@@ -1691,26 +2438,26 @@
             (t.on_critical_path ? "2.5" : "1.8") +
             '" />';
           svg +=
-            '<text x="12" y="24" fill="var(--text-primary)" font-family="monospace" font-size="12" font-weight="bold">' +
+            '<text x="14" y="24" fill="var(--text-primary)" font-family="monospace" font-size="12" font-weight="bold">' +
             escapeHtml(t.id) +
-            (t.on_critical_path ? " 🔥" : "") +
+            (t.on_critical_path ? " [CRIT]" : "") +
             "</text>";
           svg +=
             '<text x="' +
-            (nodeW - 12) +
+            (nodeW - 14) +
             '" y="24" text-anchor="end" fill="' +
             borderCol +
-            '" font-family="monospace" font-size="10" font-weight="bold">' +
+            '" font-family="monospace" font-size="12" font-weight="bold">' +
             statusLabel +
             "</text>";
           svg +=
-            '<text x="12" y="46" fill="var(--text-primary)" font-family="sans-serif" font-size="12" font-weight="600">' +
+            '<text x="14" y="48" fill="var(--text-primary)" font-family="sans-serif" font-size="13" font-weight="600">' +
             escapeHtml(shortTitle) +
             "</text>";
           svg +=
-            '<text x="12" y="68" fill="var(--text-secondary)" font-family="monospace" font-size="10">⏱️ ' +
+            '<text x="14" y="72" fill="var(--text-secondary)" font-family="monospace" font-size="12">Dev: ' +
             formatDuration((t.timings && t.timings.total_duration_sec) || 0) +
-            " · slices: " +
+            " · Slices: " +
             ((t.slices && t.slices.done) || 0) +
             "/" +
             ((t.slices && t.slices.total) || 0) +
@@ -1723,14 +2470,16 @@
 
         // Render Matrix Table
         let rowsHtml = "";
-        for (const t of tasks) {
+        const filteredTasks = filterTasks(tasks);
+
+        for (const t of filteredTasks) {
           const stateBadge =
             t.dag_state === "completed"
-              ? '<span class="badge badge-status-done">Completed</span>'
+              ? '<span class="badge badge-status-done">' + renderIcon("check") + ' Completed</span>'
               : t.dag_state === "blocked"
-              ? '<span class="badge badge-blocked">🔒 Blocked</span>'
+              ? '<span class="badge badge-blocked">' + renderIcon("lock") + ' Blocked</span>'
               : t.dag_state === "active"
-              ? '<span class="badge badge-status-wip">⚡ In Progress</span>'
+              ? '<span class="badge badge-status-wip">' + renderIcon("zap") + ' In Progress</span>'
               : '<span class="badge badge-status-ready">Ready</span>';
 
           const blockersHtml =
@@ -1741,7 +2490,7 @@
                       '<span class="badge ' +
                       (b.resolved ? "badge-unblocked" : "badge-blocked") +
                       '">' +
-                      (b.resolved ? "🔓 " : "🔒 ") +
+                      (b.resolved ? renderIcon("unlock") + " " : renderIcon("lock") + " ") +
                       escapeHtml(b.id) +
                       "</span>"
                   )
@@ -1750,7 +2499,7 @@
 
           const unlocksHtml =
             Array.isArray(t.unlocks) && t.unlocks.length > 0
-              ? t.unlocks.map((u) => '<span class="badge badge-status-ready">' + escapeHtml(u) + "</span>").join(" ")
+              ? t.unlocks.map((u) => '<span class="badge badge-status-ready">↳ ' + escapeHtml(u) + "</span>").join(" ")
               : '<span style="color:var(--text-muted);">none</span>';
 
           rowsHtml += '<tr style="cursor:pointer;" data-task-id="' + escapeHtml(t.id) + '">';
@@ -1758,7 +2507,7 @@
           rowsHtml +=
             "<td><strong>" +
             escapeHtml(t.title) +
-            '</strong><div style="font-size:0.72rem;font-family:var(--font-mono);color:var(--text-muted);">' +
+            '</strong><div style="font-size:12px;font-family:var(--font-mono);color:var(--text-muted);margin-top:0.15rem;">' +
             escapeHtml(t.slug) +
             "</div></td>";
           rowsHtml += "<td>" + stateBadge + "</td>";
@@ -1767,11 +2516,11 @@
           rowsHtml +=
             "<td>" +
             (t.on_critical_path
-              ? '<span class="badge badge-critical">🔥 Critical (L' + (t.dag_level || 0) + ")</span>"
+              ? '<span class="badge badge-critical">' + renderIcon("flame") + ' Critical (L' + (t.dag_level || 0) + ")</span>"
               : '<span class="badge badge-status-draft">Level ' + (t.dag_level || 0) + "</span>") +
             "</td>";
           rowsHtml +=
-            '<td style="font-family:var(--font-mono);font-size:0.76rem;">' +
+            '<td style="font-family:var(--font-mono);font-size:12px;font-variant-numeric:tabular-nums;">' +
             formatDuration((t.timings && t.timings.lead_time_sec) || 0) +
             " / " +
             formatDuration((t.timings && t.timings.total_duration_sec) || 0) +
@@ -1784,14 +2533,45 @@
       function renderTimingsOverview(data) {
         const tbody = document.getElementById("timings-overview-body");
         const tasks = filterTasks(data.tasks || []);
+
         if (tasks.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);">No tasks available.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:2.5rem;">No tasks match filter or recorded yet.</td></tr>';
           return;
         }
+
         let html = "";
         for (const t of tasks) {
           const tm = t.timings || {};
           const cmds = tm.commands || [];
+          const totalDur = Math.max(1, Number(tm.total_duration_sec) || 0);
+
+          // Build mini-breakdown bar of steps
+          let barHtml = '<div class="cmd-breakdown-bar">';
+          if (cmds.length === 0) {
+            barHtml += '<div style="width:100%;height:100%;background:var(--bg-elevated);"></div>';
+          } else {
+            const stepColors = {
+              task: "#38bdf8",
+              clarify: "#0284c7",
+              plan: "#818cf8",
+              analyze: "#a78bfa",
+              implement: "#f59e0b",
+              beautify: "#ec4899",
+              test: "#10b981",
+              ship: "#4ade80",
+              pr: "#059669",
+              hotfix: "#ef4444"
+            };
+
+            for (const c of cmds) {
+              const dur = Number(c.duration_sec) || 0;
+              const pct = Math.max(2, Math.round((dur / totalDur) * 100));
+              const col = stepColors[c.command] || "#94a3b8";
+              barHtml += '<div class="cmd-breakdown-seg" style="width:' + pct + '%;background:' + col + ';" title="' + escapeHtml(c.command) + ' (' + formatDuration(dur) + ')"></div>';
+            }
+          }
+          barHtml += "</div>";
+
           const cmdBadges = cmds
             .map(
               (c) =>
@@ -1811,17 +2591,17 @@
           html +=
             '<td><span class="task-id-badge">' +
             escapeHtml(t.id) +
-            '</span> <strong style="margin-left:0.35rem;">' +
+            '</span> <strong style="margin-left:0.4rem;">' +
             escapeHtml(t.title) +
             "</strong></td>";
           html += '<td><span class="badge badge-status-draft">' + escapeHtml(t.task_status + " / " + t.plan_status) + "</span></td>";
-          html += '<td style="font-family:var(--font-mono);font-size:0.75rem;">' + formatTimestamp(tm.first_started_at) + "</td>";
-          html += '<td style="font-family:var(--font-mono);font-size:0.75rem;">' + formatTimestamp(tm.last_ended_at) + "</td>";
-          html += '<td style="font-family:var(--font-mono);font-weight:700;">' + formatDuration(tm.total_duration_sec || 0) + "</td>";
-          html += '<td style="font-family:var(--font-mono);">' + formatDuration(tm.lead_time_sec || 0) + "</td>";
-          html += "<td>" + (cmdBadges || '<span style="color:var(--text-muted);">—</span>') + "</td>";
+          html += '<td style="font-family:var(--font-mono);font-size:12px;font-variant-numeric:tabular-nums;">' + formatTimestamp(tm.first_started_at) + "</td>";
+          html += '<td style="font-family:var(--font-mono);font-size:12px;font-variant-numeric:tabular-nums;">' + formatTimestamp(tm.last_ended_at) + "</td>";
+          html += '<td style="font-family:var(--font-mono);font-weight:700;font-variant-numeric:tabular-nums;">' + formatDuration(tm.total_duration_sec || 0) + "</td>";
+          html += '<td style="font-family:var(--font-mono);font-variant-numeric:tabular-nums;">' + formatDuration(tm.lead_time_sec || 0) + "</td>";
+          html += "<td><div>" + (cmdBadges || '<span style="color:var(--text-muted);">—</span>') + "</div>" + barHtml + "</td>";
           html +=
-            '<td style="font-family:var(--font-mono);font-size:0.75rem;">' +
+            '<td style="font-family:var(--font-mono);font-size:12px;font-variant-numeric:tabular-nums;">' +
             formatTokens(tm.total_tokens || 0) +
             " tok · $" +
             Number(tm.estimated_cost_usd || 0).toFixed(4) +
@@ -1875,10 +2655,10 @@
 
         if (state.drawerMode === "blueprint") {
           const bp = state.data.documents.blueprint;
-          badgesEl.innerHTML = '<span class="task-id-badge">GLOBAL BLUEPRINT</span>';
-          titleEl.textContent = "Project Blueprint & Dependency Architecture";
-          subEl.textContent = bp.path || "devflow/plans/project-blueprint.md";
-          tabsEl.innerHTML = '<button type="button" class="tab-btn active">🗺️ project-blueprint.md</button>';
+          badgesEl.innerHTML = '<span class="task-id-badge">' + renderIcon("blueprint") + ' GLOBAL BLUEPRINT</span>';
+          titleEl.textContent = "Project Blueprint & Architecture";
+          subEl.innerHTML = '<span>' + renderIcon("file") + ' ' + escapeHtml(bp.path || "devflow/plans/project-blueprint.md") + '</span>';
+          tabsEl.innerHTML = '<button type="button" class="tab-btn active">' + renderIcon("file") + ' project-blueprint.md</button>';
           bodyEl.innerHTML = renderMarkdown(bp.content);
           return;
         }
@@ -1888,10 +2668,10 @@
           const adr = adrs.find((a) => a.id === state.selectedAdrId) || adrs[0];
           if (!adr) return;
           badgesEl.innerHTML =
-            '<span class="task-id-badge">ADR</span><span class="badge badge-status-done">' + escapeHtml(adr.status) + "</span>";
+            '<span class="task-id-badge">' + renderIcon("adr") + ' ADR</span><span class="badge badge-status-done">' + escapeHtml(adr.status) + "</span>";
           titleEl.textContent = adr.title;
-          subEl.textContent = adr.path;
-          tabsEl.innerHTML = '<button type="button" class="tab-btn active">📐 ' + escapeHtml(adr.id) + ".md</button>";
+          subEl.innerHTML = '<span>' + renderIcon("file") + ' ' + escapeHtml(adr.path) + '</span>';
+          tabsEl.innerHTML = '<button type="button" class="tab-btn active">' + renderIcon("file") + ' ' + escapeHtml(adr.id) + ".md</button>";
           bodyEl.innerHTML = renderMarkdown(adr.content);
           return;
         }
@@ -1909,15 +2689,20 @@
           '</span><span class="badge badge-status-wip">plan: ' +
           escapeHtml(t.plan_status) +
           "</span>" +
-          (t.is_blocked ? '<span class="badge badge-blocked">🔒 Blocked</span>' : '<span class="badge badge-unblocked">✓ Unblocked</span>');
+          (t.is_blocked ? '<span class="badge badge-blocked">' + renderIcon("lock") + ' Blocked</span>' : '<span class="badge badge-unblocked">' + renderIcon("check") + ' Unblocked</span>');
+
         titleEl.textContent = t.title;
-        subEl.textContent = "📁 devflow/features/" + t.slug + "  ·  ⎇ " + t.branch;
+
+        subEl.innerHTML =
+          '<span>' + renderIcon("folder") + ' devflow/features/' + escapeHtml(t.slug) + '</span>' +
+          '<span>' + renderIcon("branch") + ' ' + escapeHtml(t.branch) + '</span>' +
+          '<button type="button" class="mini-btn" id="drawer-copy-branch-btn" data-branch="' + escapeHtml(t.branch) + '">' + renderIcon("copy") + ' Copy Branch</button>';
 
         const tabs = [
-          { id: "timeline", label: "⏱️ Command Timeline & Metrics", enabled: true },
-          { id: "task_md", label: "📄 task.md", enabled: Boolean(t.files && t.files.task_path) },
-          { id: "plan_md", label: "📐 plan.md", enabled: Boolean(t.files && t.files.plan_path) },
-          { id: "verification_md", label: "✅ verification.md", enabled: Boolean(t.files && t.files.verification_path) }
+          { id: "timeline", label: renderIcon("clock") + " Timeline & Metrics", enabled: true },
+          { id: "task_md", label: renderIcon("file") + " task.md", enabled: Boolean(t.files && t.files.task_path) },
+          { id: "plan_md", label: renderIcon("file") + " plan.md", enabled: Boolean(t.files && t.files.plan_path) },
+          { id: "verification_md", label: renderIcon("check") + " verification.md", enabled: Boolean(t.files && t.files.verification_path) }
         ];
 
         tabsEl.innerHTML = tabs
@@ -1950,7 +2735,7 @@
           const cmds = tm.commands || [];
           const maxDur = Math.max(1, ...cmds.map((c) => Number(c.duration_sec) || 0));
 
-          let tlHtml = '<div class="summary-strip" style="margin-top:0;padding-top:0;border-top:none;margin-bottom:1.1rem;">';
+          let tlHtml = '<div class="summary-strip" style="margin-top:0;padding-top:0;border-top:none;margin-bottom:1.25rem;">';
           tlHtml +=
             '<div class="kpi-box"><span class="kpi-label">Active Dev Time</span><div class="kpi-value">' +
             formatDuration(tm.total_duration_sec || 0) +
@@ -1960,18 +2745,18 @@
             formatDuration(tm.lead_time_sec || 0) +
             "</div></div>";
           tlHtml +=
-            '<div class="kpi-box"><span class="kpi-label">First Command Start</span><div class="kpi-value" style="font-size:0.8rem;font-family:var(--font-mono);">' +
+            '<div class="kpi-box"><span class="kpi-label">First Started</span><div class="kpi-value" style="font-size:0.85rem;font-family:var(--font-mono);">' +
             formatTimestamp(tm.first_started_at) +
             "</div></div>";
           tlHtml +=
-            '<div class="kpi-box"><span class="kpi-label">Last Command End</span><div class="kpi-value" style="font-size:0.8rem;font-family:var(--font-mono);">' +
+            '<div class="kpi-box"><span class="kpi-label">Last Ended</span><div class="kpi-value" style="font-size:0.85rem;font-family:var(--font-mono);">' +
             formatTimestamp(tm.last_ended_at) +
             "</div></div>";
           tlHtml += "</div>";
 
-          tlHtml += '<h3 style="font-size:0.95rem;font-weight:700;">Executed DevFlow Commands Breakdown</h3>';
+          tlHtml += '<h3 style="font-size:1.05rem;font-weight:700;margin-bottom:0.75rem;">Executed DevFlow Commands Breakdown</h3>';
           if (cmds.length === 0) {
-            tlHtml += '<div class="col-empty" style="margin-top:0.75rem;">No command execution timings recorded yet for this task.</div>';
+            tlHtml += '<div class="col-empty">' + renderIcon("clock") + '<span>No command execution timings recorded yet for this task.</span></div>';
           } else {
             tlHtml += '<div class="timeline-list">';
             for (const c of cmds) {
@@ -1980,8 +2765,8 @@
               tlHtml += '<div class="timeline-row">';
               tlHtml += '<div class="timeline-row-top">';
               tlHtml += '<span class="cmd-pill">/devflow.' + escapeHtml(c.command) + "</span>";
-              tlHtml += '<div style="display:flex;gap:0.6rem;align-items:center;font-family:var(--font-mono);font-size:0.78rem;">';
-              tlHtml += "<span>⏱️ <strong>" + formatDuration(dur) + "</strong> (" + dur + "s)</span>";
+              tlHtml += '<div style="display:flex;gap:0.6rem;align-items:center;font-family:var(--font-mono);font-size:12px;font-variant-numeric:tabular-nums;">';
+              tlHtml += "<span>" + renderIcon("clock") + " <strong>" + formatDuration(dur) + "</strong> (" + dur + "s)</span>";
               if (c.total_tokens > 0) {
                 tlHtml += '<span class="badge badge-status-draft">' + formatTokens(c.total_tokens) + " tok</span>";
               }
@@ -1990,9 +2775,9 @@
               }
               tlHtml += "</div></div>";
               tlHtml +=
-                '<div style="font-family:var(--font-mono);font-size:0.74rem;color:var(--text-secondary);">started_at: ' +
+                '<div style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary);font-variant-numeric:tabular-nums;">started: ' +
                 formatTimestamp(c.started_at) +
-                "  →  ended_at: " +
+                "  →  ended: " +
                 formatTimestamp(c.ended_at) +
                 "</div>";
               tlHtml += '<div class="progress-track"><div class="progress-fill" style="width:' + barPct + '%;"></div></div>';
@@ -2004,7 +2789,7 @@
         }
       }
 
-      // Optional live fetch of raw .md files when served via local HTTP server
+      // Live fetch of raw .md files when served via local HTTP server
       function tryLiveMarkdownFetch(relPath, targetEl) {
         if (!relPath || !window.location.protocol.startsWith("http")) return;
         fetch("../../" + relPath + "?t=" + Date.now(), { cache: "no-store" })
@@ -2040,7 +2825,7 @@
           icon.innerHTML = '<span class="spinner"></span>';
           label.textContent = "Syncing...";
         } else {
-          icon.textContent = "↻";
+          icon.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>';
           label.textContent = "Refresh";
         }
       }
@@ -2101,7 +2886,7 @@
           setRefreshingUI(false);
         };
         s.onerror = function () {
-          showStatusBanner("⚠️ Could not reload board-data.js. Run `devflow.board --sync` and retry.");
+          showStatusBanner("Could not reload board-data.js. Run devflow.board --sync and retry.");
           setRefreshingUI(false);
         };
         document.body.appendChild(s);
@@ -2123,12 +2908,42 @@
         }
       }
 
+      function toggleTheme() {
+        const root = document.documentElement;
+        const current = root.getAttribute("data-theme") || "dark";
+        const next = current === "light" ? "dark" : "light";
+        root.setAttribute("data-theme", next);
+        const iconSpan = document.getElementById("theme-icon");
+        iconSpan.innerHTML = next === "light" ? ICONS.moon : ICONS.sun;
+      }
+
       // Event Listeners
       document.getElementById("refresh-btn").addEventListener("click", refreshBoardData);
       document.getElementById("status-retry-btn").addEventListener("click", refreshBoardData);
+      document.getElementById("theme-btn").addEventListener("click", toggleTheme);
 
-      document.getElementById("search-input").addEventListener("input", function (e) {
+      const searchInput = document.getElementById("search-input");
+      const searchClearBtn = document.getElementById("search-clear-btn");
+      const searchShortcutHint = document.getElementById("search-shortcut-hint");
+
+      searchInput.addEventListener("input", function (e) {
         state.searchQuery = e.target.value || "";
+        if (state.searchQuery) {
+          searchClearBtn.classList.add("visible");
+          searchShortcutHint.style.display = "none";
+        } else {
+          searchClearBtn.classList.remove("visible");
+          searchShortcutHint.style.display = "block";
+        }
+        renderAll();
+      });
+
+      searchClearBtn.addEventListener("click", function () {
+        searchInput.value = "";
+        state.searchQuery = "";
+        searchClearBtn.classList.remove("visible");
+        searchShortcutHint.style.display = "block";
+        searchInput.focus();
         renderAll();
       });
 
@@ -2136,12 +2951,19 @@
         setupPolling(Number(e.target.value) || 0);
       });
 
-      document.getElementById("theme-btn").addEventListener("click", function () {
-        const root = document.documentElement;
-        const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
-        root.setAttribute("data-theme", next);
+      // Quick Filter Chips
+      document.getElementById("filters-bar").addEventListener("click", function (e) {
+        const chip = e.target.closest("[data-filter]");
+        if (!chip) return;
+        const filter = chip.getAttribute("data-filter");
+        state.activeFilter = filter;
+        document.querySelectorAll(".filter-chip").forEach((c) => {
+          c.classList.toggle("active", c.getAttribute("data-filter") === filter);
+        });
+        renderAll();
       });
 
+      // View Switcher Tabs
       document.querySelector(".view-tabs").addEventListener("click", function (e) {
         const btn = e.target.closest("[data-view]");
         if (!btn) return;
@@ -2157,23 +2979,53 @@
         });
       });
 
+      function switchView(viewName) {
+        state.activeView = viewName;
+        document.querySelectorAll(".view-tabs .tab-btn").forEach((b) => {
+          const active = b.getAttribute("data-view") === viewName;
+          b.classList.toggle("active", active);
+          b.setAttribute("aria-selected", String(active));
+        });
+        document.querySelectorAll(".view-panel").forEach((p) => {
+          p.classList.toggle("active", p.id === "view-" + viewName);
+        });
+      }
+
+      // Global delegation click handler
       document.addEventListener("click", function (e) {
+        const copyCodeBtn = e.target.closest(".code-copy-btn");
+        if (copyCodeBtn) {
+          const code = copyCodeBtn.getAttribute("data-code");
+          copyTextToClipboard(code, "Code");
+          return;
+        }
+
+        const copyBranchBtn = e.target.closest("#drawer-copy-branch-btn");
+        if (copyBranchBtn) {
+          const br = copyBranchBtn.getAttribute("data-branch");
+          copyTextToClipboard("git checkout " + br, "Git branch checkout command");
+          return;
+        }
+
         const bpBtn = e.target.closest("[data-open-blueprint]");
         if (bpBtn) {
           openBlueprintDrawer();
           return;
         }
+
         const adrBtn = e.target.closest("[data-open-adr]");
         if (adrBtn) {
           openAdrDrawer(adrBtn.getAttribute("data-open-adr"));
           return;
         }
+
         const drawerTabBtn = e.target.closest("[data-drawer-tab]");
         if (drawerTabBtn && !drawerTabBtn.disabled) {
           state.activeDrawerTab = drawerTabBtn.getAttribute("data-drawer-tab");
           renderDrawerContent();
           return;
         }
+
         const taskTrigger = e.target.closest("[data-task-id]");
         if (taskTrigger) {
           const tid = taskTrigger.getAttribute("data-task-id");
@@ -2184,11 +3036,57 @@
 
       document.getElementById("drawer-close-btn").addEventListener("click", closeDrawer);
       document.getElementById("drawer-backdrop").addEventListener("click", closeDrawer);
+
+      // Keyboard shortcuts
       document.addEventListener("keydown", function (e) {
+        if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "SELECT" || e.target.tagName === "TEXTAREA")) {
+          if (e.key === "Escape") {
+            e.target.blur();
+          }
+          return;
+        }
+
         if (e.key === "Escape") {
           closeDrawer();
           return;
         }
+
+        if (e.key === "/") {
+          e.preventDefault();
+          searchInput.focus();
+          return;
+        }
+
+        if (e.key === "1") {
+          e.preventDefault();
+          switchView("kanban");
+          return;
+        }
+
+        if (e.key === "2") {
+          e.preventDefault();
+          switchView("dag");
+          return;
+        }
+
+        if (e.key === "3") {
+          e.preventDefault();
+          switchView("timings");
+          return;
+        }
+
+        if (e.key === "t" || e.key === "T") {
+          e.preventDefault();
+          toggleTheme();
+          return;
+        }
+
+        if (e.key === "r" || e.key === "R") {
+          e.preventDefault();
+          refreshBoardData();
+          return;
+        }
+
         if (e.key === "Enter" || e.key === " ") {
           const trigger = e.target && e.target.closest ? e.target.closest("[data-task-id]") : null;
           if (trigger && trigger.tagName !== "BUTTON") {
@@ -2202,7 +3100,7 @@
       if (state.data) {
         renderAll();
       } else {
-        showStatusBanner("⚠️ No board data loaded yet. Run `/devflow.board` to generate `devflow/board/board-data.js`.");
+        showStatusBanner("No board data loaded yet. Run /devflow.board to generate devflow/board/board-data.js.");
       }
       setupPolling(state.pollIntervalMs);
     })();
