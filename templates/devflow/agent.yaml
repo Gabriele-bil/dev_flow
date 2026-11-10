@@ -1,5 +1,5 @@
 name: devflow
-version: 2.1.0
+version: 2.2.0
 description: >-
   Spec-driven development pipeline: task → plan → implement → [beautify] → test
   → ship → pr
@@ -32,8 +32,8 @@ pipeline:
       skill: devflow-brainstorm
       description: >-
         Optional step before task for fuzzy ideas: frames the problem with the
-        user, generates distinct product directions via brainstormer, and
-        writes an idea brief in devflow/ideas/ for devflow.task
+        user, generates distinct product directions via brainstormer, and writes
+        an idea brief in devflow/ideas/ for devflow.task
     - id: blueprint
       command: /devflow.blueprint
       skill: devflow-blueprint
@@ -180,9 +180,9 @@ agents:
   - id: task-reviewer
     path: agents/task-reviewer.md
     description: >-
-      Product-manager second read of a draft task.md: source fidelity,
-      product overlap, INVEST, BDD acceptance criteria, async states, scope
-      boundaries; returns concrete fixes
+      Product-manager second read of a draft task.md: source fidelity, product
+      overlap, INVEST, BDD acceptance criteria, async states, scope boundaries;
+      returns concrete fixes
     invoked_by: devflow.task
   - id: plan-reviewer
     path: agents/plan-reviewer.md
