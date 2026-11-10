@@ -36,6 +36,7 @@ Skills not listed run on the session model with the effort in their frontmatter 
 
 | Agent | Model | Effort | `thorough` profile |
 | --- | --- | --- | --- |
+| `task-reviewer` (task Step 5b, ≥ 3 use cases or file/ticket input) | `sonnet` | medium | `sonnet` |
 | `plan-reviewer` (plan Step 4f, `standard`+; blueprint Step 6) | `sonnet` | high | per-call `model: opus`; blueprint always `opus` |
 
 Never below `sonnet` for ship reviewers — `hooks/pre-model-switch.sh` blocks the switch.

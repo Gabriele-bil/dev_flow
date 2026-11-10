@@ -95,6 +95,13 @@ Load only on need — default path reads none:
 | AC with > 1 `When`, click-mechanics or technical leaks | `references/bdd-acceptance-criteria.md` |
 | Long/ambiguous source (attached file, ticket) or blind spot needs probing | `refinement-hints.md` (full Socratic pass §0–§5) |
 
+### Step 5b - PM review (conditional)
+
+**Trigger:** draft has ≥ 3 use cases, or input came from an attached file or ticket — and not run mode. Otherwise skip. Run mode (`.devflow-run.json` present) → skip: task runs inside a step-runner, which cannot dispatch subagents.
+
+1. Dispatch `@devflow/agents/task-reviewer.md` once (Claude Code: Agent, `subagent_type: "devflow:task-reviewer"`; Antigravity: `invoke_subagent`, subagent `task-reviewer`) with: raw input (idea text inline, or source file path), full draft inline, resolved app (monorepo).
+2. `LGTM` → Step 6. Each `required` → fix draft, or ask user when the fix changes scope or behavior (Step 4 rules). `nit` → apply when cheap. No re-dispatch.
+
 ### Step 6 - Resolve feature name & branch automatically (NEVER ask user)
 
 1. **Incremental number (`NNN`):**
@@ -190,6 +197,7 @@ Rows restating Step 8 checklist items live only in the catalog. Full catalog —
 | --- | --- |
 | Reads | `devflow/config.md` (Apps table, monorepo only); `docs/product.md` (required); `constitution.md`, `REGISTRY.md` (as needed); `DESIGN.md` / `docs/design.md` (if present); `references/task-template.md`, `references/notify-template.md` |
 | Reads (conditional) | `docs/adr/` (if present — active ADRs); `.devflow-run.json` (run-mode switch); `refinement-hints.md`, `references/invest-criteria.md`, `references/story-splitting.md`, `references/bdd-acceptance-criteria.md` (Step 5, on need); `references/interactive-interview.md` (Step 4, question fits no inline rule); `examples.md` (Step 8 checklist fails); `references/anti-patterns.md` (when unsure / retry) |
+| Dispatches (conditional) | `task-reviewer` (Step 5b — ≥ 3 use cases or file/ticket input, interactive only) |
 | Writes | `devflow/features/[NNN]_[feature-name]/task.md`, `.devflow-state.json` (merge: feature, feature_path, branch, task_status, next_step) |
 | Side effects | Creates (from `origin/<default>`) and switches git branch `[feat/fix/chore/doc/ecc...]/[number-of-task-is-present]_[name]` |
 | Next step | `devflow.plan` → `plan.md` (full template in `devflow/skills/devflow-plan/SKILL.md`) |

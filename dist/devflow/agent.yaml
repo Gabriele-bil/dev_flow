@@ -164,6 +164,13 @@ agents:
       Re-checks every Critical and Required devflow.ship finding against the
       cited file and line; discards only what the code disproves
     invoked_by: devflow.ship
+  - id: task-reviewer
+    path: agents/task-reviewer.md
+    description: >-
+      Product-manager second read of a draft task.md: source fidelity,
+      product overlap, INVEST, BDD acceptance criteria, async states, scope
+      boundaries; returns concrete fixes
+    invoked_by: devflow.task
   - id: plan-reviewer
     path: agents/plan-reviewer.md
     description: >-
