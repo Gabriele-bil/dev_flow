@@ -78,15 +78,16 @@ Resolve `{{mcp-baseline}}` per project according to actual dependencies and ques
 
 1. **Universal baseline** (always included):
    - `` `context7` ``, `` `sequential-thinking` ``
-   - Code index MCP (`` `serena` `` / LSP) if available in project
+   - `` `code-review-graph` `` (code graph MCP, installed per README setup)
 2. **Stack core**:
    - `flutter` → add `` `dart` ``
    - `angular` → add `` `angular-cli` `` (`@angular/cli mcp`) and `` `playwright` `` (`@playwright/mcp`)
    - `nextjs` → add `` `next-devtools` `` (`next-devtools-mcp`) and `` `playwright` `` (`@playwright/mcp`)
-   - `nestjs` → add `` `openapi` `` (`openapi-mcp`)
+   - `nestjs` → add `` `openapi` `` (`@ivotoby/openapi-mcp-server`, dynamic mode)
 3. **Conditional infrastructure (ONLY add if detected or explicitly answered; omit otherwise)**:
    - `supabase`: Add `` `supabase` `` **ONLY** if project uses Supabase (detected in manifest dependencies `supabase_flutter`/`@supabase/*` or chosen in questionnaire). **Omit if app does not use Supabase.**
    - `postgres`: Add `` `postgres` `` (read-only) **ONLY** if project connects directly to PostgreSQL (detected via `pg`, `postgres`, TypeORM/Prisma postgres driver, or chosen in questionnaire). **Omit if app does not use Postgres.**
+   - `shadcn`: Add `` `shadcn` `` **ONLY** on `nextjs` apps with `components.json`. **Omit otherwise.**
    - `sentry`: Add `` `sentry` `` **ONLY** if project uses Sentry for monitoring (detected via `@sentry/*` or `sentry_flutter`). **Omit if app does not use Sentry.**
 
 Collect at least 3 features. Ask: "List your key features (name, status, notes). Add as many as needed." Add one table row per feature. `devflow.task` will maintain this table as features progress.

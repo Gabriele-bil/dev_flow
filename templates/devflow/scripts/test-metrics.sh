@@ -144,7 +144,7 @@ cat > .devflow-metrics/tools.jsonl <<'JSONL'
 {"ts":"2026-05-01T10:00:00Z","tool":"Read","kind":"read","is_error":false,"duration_ms":100,"output_tokens_est":500}
 {"ts":"2026-05-01T10:00:01Z","tool":"Read","kind":"read","is_error":true,"duration_ms":300,"output_tokens_est":0}
 {"ts":"2026-05-01T10:00:02Z","tool":"Skill","kind":"other","skill":"devflow:devflow-plan","is_error":false}
-{"ts":"2026-05-01T10:00:03Z","tool":"mcp__serena__find_symbol","kind":"other","mcp_server":"serena","is_error":false}
+{"ts":"2026-05-01T10:00:03Z","tool":"mcp__context7__resolve-library-id","kind":"other","mcp_server":"context7","is_error":false}
 JSONL
 cat > .devflow-metrics/context.jsonl <<'JSONL'
 {"ts":"2026-05-01T10:00:00Z","hook":"session-start","est_tokens":150}
@@ -175,7 +175,7 @@ assert_equals "context: top injector" "$(echo "$JSON_OUT" | jq -r '.context.inje
 assert_equals "tools: Read error pct" "$(echo "$JSON_OUT" | jq -r '.tools.by_tool[] | select(.tool=="Read") | .error_pct')" "50"
 assert_equals "tools: Read avg ms" "$(echo "$JSON_OUT" | jq -r '.tools.by_tool[] | select(.tool=="Read") | .avg_ms')" "200"
 assert_equals "tools: skill counted" "$(echo "$JSON_OUT" | jq -r '.tools.skills[0].name')" "devflow:devflow-plan"
-assert_equals "tools: mcp server counted" "$(echo "$JSON_OUT" | jq -r '.tools.mcp_servers[0].name')" "serena"
+assert_equals "tools: mcp server counted" "$(echo "$JSON_OUT" | jq -r '.tools.mcp_servers[0].name')" "context7"
 assert_equals "usage: slash command pct" "$(echo "$JSON_OUT" | jq -r '.usage.slash_command_pct')" "50"
 assert_equals "usage: plugin version" "$(echo "$JSON_OUT" | jq -r '.usage.plugin_versions[0].name')" "2.0.0"
 SINCE_JSON=$(bash "$METRICS_SH" --json --since 2026-05-02)

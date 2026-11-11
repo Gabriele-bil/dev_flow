@@ -50,6 +50,7 @@ if [[ -n "${ANTIGRAVITY_CONVERSATION_ID:-}" || -n "${ANTIGRAVITY_APP_DIR:-}" || 
   DETECTED_CLIENT="Antigravity"
 fi
 [[ -f "$HOME/.gemini/config/mcp_config.json" ]] && MCP_CONFIG_PATHS+=("$HOME/.gemini/config/mcp_config.json")
+[[ -f "$HOME/.gemini/antigravity/mcp_config.json" ]] && MCP_CONFIG_PATHS+=("$HOME/.gemini/antigravity/mcp_config.json")
 [[ -f "$WORKSPACE_ROOT/.agents/mcp_config.json" ]] && MCP_CONFIG_PATHS+=("$WORKSPACE_ROOT/.agents/mcp_config.json")
 
 # Check Claude Code (CLAUDECODE=1 inside a session wins over file heuristics)
@@ -103,7 +104,8 @@ fi
 CONFIGURED_MCPS=()
 for CFG in "${MCP_CONFIG_PATHS[@]}"; do
   if [[ -f "$CFG" ]] && command -v jq >/dev/null 2>&1; then
-    SERVERS=$(jq -r '(.mcpServers // {}) | keys[]' "$CFG" 2>/dev/null || true)
+    # ~/.claude.json keeps `claude mcp add` (local scope) entries under .projects[<path>]
+    SERVERS=$(jq -r --arg ws "$WORKSPACE_ROOT" '((.mcpServers // {}) + (.projects[$ws].mcpServers // {})) | keys[]' "$CFG" 2>/dev/null || true)
     while IFS= read -r s; do
       [[ -n "$s" ]] && CONFIGURED_MCPS+=("$s")
     done <<< "$SERVERS"
@@ -152,7 +154,7 @@ record_mcp() {
 
 record_mcp "context7" "baseline" "Live library/API documentation"
 record_mcp "sequential-thinking" "baseline" "Multi-step reasoning & refactoring"
-record_mcp "serena" "baseline" "AST / semantic code index (or other LSP index)"
+record_mcp "code-review-graph" "baseline" "Code graph: index-first exploration & blast radius (setup: references/mcp-catalog.md)"
 
 case "$DETECTED_ADAPTER" in
   flutter)
@@ -178,6 +180,10 @@ fi
 
 if grep -qiE 'pg|postgres|typeorm' "$WORKSPACE_ROOT/package.json" 2>/dev/null; then
   record_mcp "postgres" "conditional" "Detected PostgreSQL / TypeORM in project"
+fi
+
+if [[ "$DETECTED_ADAPTER" == "nextjs" && -f "$WORKSPACE_ROOT/components.json" ]]; then
+  record_mcp "shadcn" "conditional" "Detected shadcn/ui (components.json)"
 fi
 
 if grep -qiE 'sentry' "$WORKSPACE_ROOT/package.json" 2>/dev/null || grep -qiE 'sentry' "$WORKSPACE_ROOT/pubspec.yaml" 2>/dev/null; then
@@ -253,6 +259,21 @@ case "$DETECTED_ADAPTER" in
     check_cli "node" "false" "-v"
     ;;
 esac
+
+# code-review-graph: CLI present + graph built (MCP entry checked in Section 3)
+if command -v code-review-graph >/dev/null 2>&1; then
+  if [[ -f "$WORKSPACE_ROOT/.code-review-graph/graph.db" ]]; then
+    CLI_RESULTS+=("code-review-graph|OK|graph built")
+  else
+    CLI_RESULTS+=("code-review-graph|OPTIONAL|Graph not built — index-first exploration disabled")
+    WARNINGS=$((WARNINGS + 1))
+    REMEDIATIONS+=("Build the code graph: code-review-graph build")
+  fi
+else
+  CLI_RESULTS+=("code-review-graph|OPTIONAL|Missing — index-first exploration disabled")
+  WARNINGS=$((WARNINGS + 1))
+  REMEDIATIONS+=("Install code-review-graph (pipx install code-review-graph, then install --platform claude-code|antigravity --no-skills --no-instructions -y) — see references/mcp-catalog.md")
+fi
 
 # Design skill (impeccable) — UI adapters only; absent → DESIGN.md-only fallback
 case "$DETECTED_ADAPTER" in

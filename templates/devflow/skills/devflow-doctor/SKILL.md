@@ -41,11 +41,11 @@ Inspect `$ARGUMENTS`:
 Run `bash "@devflow/scripts/doctor.sh"` and capture its structured report across the 4 core inspection axes:
 
 1. **MCP Baseline Verification**:
-   - Universal baseline: `context7`, `sequential-thinking`, code index (`serena` / LSP).
+   - Universal baseline: `context7`, `sequential-thinking`, `code-review-graph` (code graph).
    - Stack-specific core: `dart` (Flutter), `angular-cli` + `playwright` (Angular), `next-devtools` + `playwright` (Next.js), `openapi` (NestJS).
-   - Conditional infrastructure: `supabase`, `postgres`, `sentry` (checked against project dependencies).
+   - Conditional infrastructure: `supabase`, `postgres`, `sentry`, `shadcn` (Next.js + `components.json`) (checked against project dependencies).
 2. **CLI Toolchain Availability**:
-   - Universal binaries: `git`, `gh`, `jq`.
+   - Universal binaries: `git`, `gh`, `jq`; `code-review-graph` CLI + built graph (`.code-review-graph/graph.db`).
    - Active adapter binaries: `flutter`/`dart`, `node`/`pnpm`/`npm`/`ng`/`nest`.
    - Design skill (UI adapters only): `impeccable` — absent → `DEGRADED`, `[ui]` files fall back to `DESIGN.md` tokens (`@devflow/references/design-skill.md`).
 3. **Pipeline & State Integrity**:

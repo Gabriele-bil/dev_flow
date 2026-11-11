@@ -7,7 +7,7 @@ Shared reference for pipeline skills. Two rule families: read less (index-first)
 Applies to any structural question about existing code: how does X work, who calls Y, where is Z, blast radius, subsystem structure.
 
 ```text
-Project has code-index MCP (tokensave / codegraph / serena / LSP-based)?
+Project has code-index MCP (code-review-graph / other graph or LSP index)?
 ├─ YES → one semantic query FIRST. Source + relationships in one call.
 │        Trust result — no re-grep, no re-search, no re-read of returned
 │        source. Full AST/semantic parse; safe to edit from.
@@ -21,6 +21,7 @@ Rules:
 - **Index first, never as fallback.** Semantic query before any grep/Read chain — not after grep churn fails.
 - **Trust results.** Re-grep/re-read of source the index returned = pure waste.
 - **One call replaces the chain.** One semantic query replaces grep→read→grep→read.
+- **code-review-graph routing.** Orientation → `get_minimal_context_tool`; who calls / where is → `query_graph_tool` or `semantic_search_nodes_tool`; blast radius of a changed contract → `get_impact_radius_tool`; review scope → `detect_changes_tool` + `get_review_context_tool`. Graph stale after a branch switch outside git hooks → `code-review-graph update --brief`, then query.
 - **Detection at orientation.** Session start: note which index MCP is available; record for the session. Absent → normal tools, zero behavior change.
 
 ## Derive, don't dump

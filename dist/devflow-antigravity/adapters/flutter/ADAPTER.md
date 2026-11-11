@@ -20,17 +20,17 @@ Feature-level index (`devflow-plan`). Per-file triggers: `steps/implement.md` �
 | Theme tokens, colors, typography, component themes | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/flutter/skills/flutter-theme/SKILL.md` |
 | Constraints, breakpoints, scrollables, spacing | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/flutter/skills/flutter-layout/SKILL.md` |
 | `flutter_form_builder` forms, validation, wizards | `$HOME/.gemini/antigravity-cli/plugins/devflow/adapters/flutter/skills/flutter-form/SKILL.md` |
-| PR review, blast radius, architecture risk checks | `@code-review-graph/skills/code-review-graph/SKILL.md` |
 
 ## MCP (when available)
 
 - Required baseline for this adapter:
   - `context7`
   - `sequential-thinking` (MCP server: <https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking>)
-  - `dart` (required on Flutter projects)
+  - `code-review-graph` (code graph MCP — setup in `$HOME/.gemini/antigravity-cli/plugins/devflow/references/mcp-catalog.md`; index-first exploration, blast radius)
+  - `dart` (`dart mcp-server`, official, Dart SDK ≥ 3.9 — required on Flutter projects)
 - Conditional (only when used in project):
-  - `supabase` (Supabase MCP) — schema, RLS, tables (add ONLY if project uses Supabase as backend/DB; omit otherwise)
-  - `sentry` (`mcp.sentry.dev` / `getsentry/sentry-mcp`) — error triage and stack traces (add ONLY if project uses Sentry)
+  - `supabase` (`https://mcp.supabase.com/mcp?read_only=true`) — schema, RLS, tables (add ONLY if project uses Supabase as backend/DB; omit otherwise)
+  - `sentry` (`https://mcp.sentry.dev/mcp` / `getsentry/sentry-mcp`) — error triage and stack traces (add ONLY if project uses Sentry)
 - **Dart MCP** — package APIs, Flutter/Dart signatures (use in plan, implement, beautify).
 - **Context7** — third-party docs when Dart MCP is insufficient.
 - **Supabase MCP** — schema, RLS, tables when the feature touches the database (active only on Supabase-backed apps).

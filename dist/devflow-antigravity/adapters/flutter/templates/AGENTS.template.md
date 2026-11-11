@@ -24,5 +24,5 @@ When you touch → read skill (full matrix: adapter `steps/implement.md`):
 - `pages/`, `screens/`, `widgets/` → `flutter-theme` + `flutter-layout`
 - forms (`FormBuilder`) → `flutter-form`
 - Supabase datasource / repository impl → `flutter-supabase`; `supabase/migrations/*.sql` → `flutter-supabase-migrations`
-- PR review / blast radius → `code-review-graph`
+- PR review / blast radius → `code-review-graph` MCP (`get_impact_radius_tool`, `get_review_context_tool`)
 <!-- devflow-managed:end:skills -->

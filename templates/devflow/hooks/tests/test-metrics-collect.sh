@@ -63,11 +63,11 @@ ROW=$(last "$d" tools)
 check "T3a: tool row has duration_ms" '[ "$(jq -r ".duration_ms | type" <<<"$ROW")" = "number" ]'
 check "T3b: output size measured" '[ "$(jq -r ".output_chars" <<<"$ROW")" -gt 40 ]'
 check "T3c: pending start mark consumed" '[ -z "$(ls -A "$d/.devflow-metrics/.pending" 2>/dev/null)" ]'
-jq -cn --arg ws "$d" '{session_id:"s1", cwd:$ws, hook_event_name:"PostToolUseFailure", tool_name:"mcp__serena__find_symbol", tool_input:{}, tool_use_id:"toolu_9", error:"boom"}' \
+jq -cn --arg ws "$d" '{session_id:"s1", cwd:$ws, hook_event_name:"PostToolUseFailure", tool_name:"mcp__context7__resolve-library-id", tool_input:{}, tool_use_id:"toolu_9", error:"boom"}' \
   | run "$d" observe.sh post
 ROW=$(last "$d" tools)
 check "T3d: failed MCP call → mcp_server + is_error" \
-  '[ "$(jq -r ".mcp_server + \"|\" + (.is_error | tostring)" <<<"$ROW")" = "serena|true" ]'
+  '[ "$(jq -r ".mcp_server + \"|\" + (.is_error | tostring)" <<<"$ROW")" = "context7|true" ]'
 rm -rf "$d"
 
 # ── T4: Skill tool attributes the devflow command ───────────────────────────

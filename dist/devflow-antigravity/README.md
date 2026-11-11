@@ -34,14 +34,17 @@ Full setup:
 1. **Active stack** — edit [`config.md`](config.md); set **Adapter** to `flutter`, `angular`, `nextjs`, or `nestjs`.
 2. **Run setup once** — execute `devflow.setup` to generate root `AGENTS.md` and `REGISTRY.md` for the consumer project.
 3. **Run the pipeline** — each step is a skill: `/devflow:<step>` on Claude Code (e.g. `/devflow-task`), `/devflow-<step>` on Antigravity CLI.
-4. **Enable code-review-graph** — install and configure once for all detected hosts:
-   - `pipx install code-review-graph` (or `pip install code-review-graph`)
-   - `code-review-graph install`
+4. **Enable code-review-graph** — one graph per repo, one MCP entry per client (Claude Code and/or Antigravity):
+   - `pipx install code-review-graph`
+   - `code-review-graph install --platform claude-code --no-skills --no-instructions -y`
+   - `code-review-graph install --platform antigravity --no-skills --no-instructions -y`
    - `code-review-graph build`
+   - Flags, tool budget (`CRG_TOOLS`) and freshness: [`references/mcp-catalog.md`](references/mcp-catalog.md#code-review-graph-setup-claude-code--antigravity)
 5. **Ensure required MCP baseline**:
    - `context7`
    - `sequential-thinking` ([server reference](https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking))
-   - `dart` for Flutter adapters/projects
+   - `code-review-graph` (registered by step 4)
+   - `dart` (`dart mcp-server`) for Flutter adapters/projects
 
 Architecture and design rationale: [`docs/architecture.md`](../../docs/architecture.md) · honest comparison with Forge, spec-kit, and vanilla agents: [`docs/comparison.md`](../../docs/comparison.md).
 
@@ -68,7 +71,7 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 - Default behavior: update only `devflow-managed` blocks and preserve user content outside those blocks
 - Force rewrite: pass `--force` to overwrite full file contents
 - Template resolution: adapter `templates/` first, then `skills/devflow-setup/templates/` fallback
-- Generated `AGENTS.md` includes `code-review-graph` skill reference for graph-aware reviews.
+- Generated `AGENTS.md` lists `code-review-graph` in the MCP baseline; graph-aware exploration/review routing lives in `references/token-economy.md`.
 
 ## Claude Code
 

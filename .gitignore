@@ -103,7 +103,6 @@ devflow/board/
 devflow/features/
 
 # Per-developer tool config
-.serena/
 .devflow-observe-state.json
 .devflow-*.lock
 .devflow-tmp.*

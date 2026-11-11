@@ -32,14 +32,16 @@ Index only. Triggers (file path / content → skill) live in one place: `steps/i
 - Required baseline for this adapter:
   - `context7`
   - `sequential-thinking` (MCP server: <https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking>)
+  - `code-review-graph` (code graph MCP — setup in `$HOME/.gemini/antigravity-cli/plugins/devflow/references/mcp-catalog.md`; index-first exploration, blast radius)
 - Native to Next.js:
   - Next.js DevTools MCP — `next-devtools-mcp` (connects to Next.js 16+ dev server `/_next/mcp`)
 - Testing & verification:
   - Playwright MCP server — `@playwright/mcp` (semantic accessibility snapshots + runtime E2E verification)
 - Conditional (only when used in project):
+  - `shadcn` (`npx shadcn@latest mcp`) — registry search and component install (add ONLY if app has `components.json`)
   - `postgres` (`@microsoft/postgres-mcp` or `mcp-postgres-server`, read-only) — schema introspection (add ONLY if project connects directly to Postgres; omit otherwise)
-  - `supabase` (Supabase MCP) — schema, RLS, tables (add ONLY if project uses Supabase as backend/DB; omit otherwise)
-  - `sentry` (`mcp.sentry.dev` / `getsentry/sentry-mcp`) — error triage and stack traces (add ONLY if project uses Sentry)
+  - `supabase` (`https://mcp.supabase.com/mcp?read_only=true`) — schema, RLS, tables (add ONLY if project uses Supabase as backend/DB; omit otherwise)
+  - `sentry` (`https://mcp.sentry.dev/mcp` / `getsentry/sentry-mcp`) — error triage and stack traces (add ONLY if project uses Sentry)
 - **Context7**: Next.js, React, Zustand, shadcn/ui, React Hook Form, Zod docs and version deltas.
 - **Sequential Thinking**: break complex refactors and multi-step Server Action flows into small, testable steps.
 - **Next.js DevTools MCP**: live diagnostics — `get_errors`, `get_routes`, `get_project_metadata`, `get_logs`, `get_server_action_by_id`.
