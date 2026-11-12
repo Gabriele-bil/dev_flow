@@ -50,7 +50,7 @@ Each step produces an artifact that feeds the next. Do not skip steps.
 | `devflow.backprop` | [`templates/devflow/skills/devflow-backprop/SKILL.md`](templates/devflow/skills/devflow-backprop/SKILL.md) | Escaped bug → spec gap classified, AC tightened, regression test |
 | `devflow.worktree` | [`templates/devflow/skills/devflow-worktree/SKILL.md`](templates/devflow/skills/devflow-worktree/SKILL.md) | Feature → isolated git worktree with port offset for parallel work |
 | `devflow.learn` | [`templates/devflow/skills/devflow-learn/SKILL.md`](templates/devflow/skills/devflow-learn/SKILL.md) | — → manage instincts (local vs shared team gotchas, promote to REGISTRY.md) |
-| `devflow.metrics` | [`templates/devflow/skills/devflow-metrics/SKILL.md`](templates/devflow/skills/devflow-metrics/SKILL.md) | — → telemetry dashboard (bash filter savings, cost est., pass@1, step duration) |
+| `devflow.metrics` | [`templates/devflow/skills/devflow-metrics/SKILL.md`](templates/devflow/skills/devflow-metrics/SKILL.md) | — → telemetry dashboard (tokens/cost, step duration, pass@1, error categories, feature funnel) |
 | `devflow.board` | [`templates/devflow/skills/devflow-board/SKILL.md`](templates/devflow/skills/devflow-board/SKILL.md) | — → static, read-only, auto-updating HTML project board (`devflow/board/index.html`) with Kanban, Dependency DAG, Markdown viewer, and command timings |
 
 Skills are the only entry point (2.0.0): there are no command wrappers. Each step `devflow.<step>` is invoked as:

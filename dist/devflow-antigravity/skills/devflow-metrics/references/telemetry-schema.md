@@ -26,6 +26,8 @@ Privacy: no prompt text, file content or tool output is stored — only sizes, n
 | `subagents.jsonl` | `metrics-collect.sh subagent-stop` (SubagentStop) | finished subagent |
 | `filter-stats.jsonl` | `post-bash-output-filter.sh` | filtered shell output |
 | `model-switch.jsonl` | `post-model-switch.sh` | model switch |
+| `features.jsonl` | `post-task-create.sh`, `devflow-state.sh` | feature lifecycle (start, complete, diff & LOC stats) |
+| `feedback.jsonl` | `devflow-state.sh feedback` (devflow.pr) | workflow feedback note |
 | `.pending/` | `observe.sh pre` | in-flight tool call start (ms), removed by `post`; stale marks swept at session start |
 
 Common fields: `ts` (UTC ISO-8601), `session`, `host` (`claude` / `antigravity`), `step` (`.devflow-state.json` `next_step`), `feature`, `command` (devflow command the turn belongs to: from the typed `/devflow.<step>`, the Skill tool loading `devflow-<step>`, or the artefact being written).
@@ -38,7 +40,15 @@ Duration source, first available: UserPromptSubmit mark → first tool call of t
 
 ### tools.jsonl
 
-`tool`, `kind` (`shell`, `write`, `edit`, `read`, `fetch`, `subagent`, `other`), `duration_ms` (pre→post, matched by `tool_use_id`; Antigravity: `conversationId-stepIdx`), `is_error`, `output_chars` / `output_tokens_est` (tool output returned to the model, before the bash filter), `skill`, `subagent_type`, `mcp_server`, `agent_type` (set when a subagent made the call).
+`tool`, `kind` (`shell`, `write`, `edit`, `read`, `fetch`, `subagent`, `other`), `duration_ms` (pre→post, matched by `tool_use_id`; Antigravity: `conversationId-stepIdx`), `is_error`, `output_chars` / `output_tokens_est` (tool output returned to the model, before the bash filter), `skill`, `subagent_type`, `mcp_server`, `agent_type` (set when a subagent made the call). When `is_error` is true: `exit_code` (if available), `error_category` (`command_not_found`, `timeout`, `syntax_error`, `type_error`, `permission_denied`, `not_found`, `test_failure`, `shell_error`, `tool_error`), `error_msg` (sanitized, truncated to 120 chars).
+
+### features.jsonl
+
+`feature`, `event` (`start`, `complete`, `status_change`), `status` (`started`, `pr-opened`, `done`, `blocked`), `branch`, `planned_files`, `touched_files`, `loc_added`, `loc_deleted`, `loc_test_added`.
+
+### feedback.jsonl
+
+`feature`, `feedback` (user experience rating or note logged via `devflow-state.sh feedback`).
 
 ### context.jsonl
 

@@ -193,6 +193,17 @@ assert_equals "run disarm: marker removed" "$([ -e .devflow-run.json ] && echo p
 assert_equals "run status: inactive" "$(st run status)" "run: inactive"
 teardown
 
+# ── lifecycle metrics & feedback ─────────────────────────────────────────────
+setup
+feature 001_funnel draft implementing
+st set plan implemented 001_funnel >/dev/null
+assert_equals "lifecycle: features.jsonl written" "$([ -f .devflow-metrics/features.jsonl ] && echo yes || echo no)" "yes"
+assert_equals "lifecycle: event status_change recorded" "$(jq -r .event .devflow-metrics/features.jsonl | head -1)" "status_change"
+st feedback 001_funnel "Smooth run!" >/dev/null
+assert_equals "feedback: feedback.jsonl written" "$([ -f .devflow-metrics/feedback.jsonl ] && echo yes || echo no)" "yes"
+assert_equals "feedback: note recorded" "$(jq -r .feedback .devflow-metrics/feedback.jsonl | head -1)" "Smooth run!"
+teardown
+
 echo ""
 echo "devflow-state: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]

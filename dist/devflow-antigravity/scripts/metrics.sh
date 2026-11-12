@@ -97,6 +97,8 @@ read_log "$METRICS_DIR/context.jsonl" > "$ROWS/context.json"
 read_log "$METRICS_DIR/sessions.jsonl" > "$ROWS/sessions.json"
 read_log "$METRICS_DIR/prompts.jsonl" feature > "$ROWS/prompts.json"
 read_log "$METRICS_DIR/subagents.jsonl" feature > "$ROWS/subagents.json"
+read_log "$METRICS_DIR/features.jsonl" feature > "$ROWS/features.json"
+read_log "$METRICS_DIR/feedback.jsonl" feature > "$ROWS/feedback.json"
 
 
 # ── 1. Filter Savings Telemetry (filter-stats.jsonl) ─────────────────────────
@@ -221,6 +223,10 @@ TOOLS_JSON=$(jq -n --slurpfile tools "$ROWS/tools.json" --slurpfile subs "$ROWS/
   {
     total_calls: ($tools | length),
     failed_calls: ($tools | map(select(.is_error == true)) | length),
+    error_categories: ($tools | map(select(.is_error == true and (.error_category // "") != ""))
+      | group_by(.error_category)
+      | map({category: .[0].error_category, count: length})
+      | sort_by(.count) | reverse),
     output_tokens_est: ($tools | map(.output_tokens_est // 0) | add // 0),
     by_tool: ($tools | group_by(.tool // "unknown")
       | map(([ .[] | .duration_ms // empty ]) as $d
@@ -319,7 +325,30 @@ QUALITY_JSON=$(
     }'
 )
 
-# ── 8. Unified Payload ────────────────────────────────────────────────────────
+# ── 8. Feature Lifecycle & Funnel (.devflow-metrics/features.jsonl) ───────────
+FEATURES_JSON=$(jq -n --slurpfile feats "$ROWS/features.json" --slurpfile feed "$ROWS/feedback.json" '
+  ($feats[0]) as $f | ($feed[0]) as $fb |
+  ($f | map(select(.event == "start")) | map(.feature // empty) | unique | length) as $started |
+  ($f | map(select(.event == "complete")) | map(.feature // empty) | unique | length) as $completed |
+  ([ $f[] | .planned_files // empty ]) as $planned |
+  ([ $f[] | .touched_files // empty ]) as $touched |
+  ([ $f[] | .loc_added // empty ]) as $added |
+  ([ $f[] | .loc_deleted // empty ]) as $deleted |
+  ([ $f[] | .loc_test_added // empty ]) as $test_added |
+  {
+    features_started: $started,
+    features_completed: $completed,
+    completion_rate_pct: (if $started > 0 then ((($completed * 1000 / $started) | round) / 10) else 0 end),
+    avg_planned_files: (if ($planned | length) > 0 then (($planned | add) / ($planned | length) | floor) else 0 end),
+    avg_touched_files: (if ($touched | length) > 0 then (($touched | add) / ($touched | length) | floor) else 0 end),
+    total_loc_added: ($added | add // 0),
+    total_loc_deleted: ($deleted | add // 0),
+    total_loc_test_added: ($test_added | add // 0),
+    feedback_count: ($fb | length),
+    recent_feedback: ($fb | reverse | .[0:5])
+  }')
+
+# ── 9. Unified Payload ────────────────────────────────────────────────────────
 PAYLOAD=$(
   jq -n \
     --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
@@ -333,6 +362,7 @@ PAYLOAD=$(
     --argjson tools "$TOOLS_JSON" \
     --argjson usage "$USAGE_JSON" \
     --argjson quality "$QUALITY_JSON" \
+    --argjson features "$FEATURES_JSON" \
     '{
       ts: $ts,
       filter: (if $feature != "" then $feature else null end),
@@ -344,7 +374,8 @@ PAYLOAD=$(
       context: $context,
       tools: $tools,
       usage: $usage,
-      quality: $quality
+      quality: $quality,
+      features: $features
     }'
 )
 
@@ -431,6 +462,10 @@ if [ "$(q '.tools.total_calls')" -gt 0 ] || [ "$(q '.tools.subagents.runs')" -gt
     "$(q '.tools.total_calls')" "$(q '.tools.failed_calls')" "$(q '.tools.output_tokens_est')"
   q '.tools.by_tool[:10][] | "    • " + .tool + ": " + (.calls | tostring) + " calls, " + (.error_pct | tostring) + "% err"
      + (if .avg_ms != null then ", avg " + (.avg_ms | tostring) + "ms" else "" end) + ", ~" + (.output_tokens_est | tostring) + " tok out"'
+  if [ "$(q '.tools.error_categories | length')" -gt 0 ]; then
+    echo "  Tool error categories:"
+    q '.tools.error_categories[] | "    • " + .category + ": " + (.count | tostring) + " errors"'
+  fi
   if [ "$(q '.tools.skills | length')" -gt 0 ]; then
     echo "  Skills loaded:"
     q '.tools.skills[] | "    • " + .name + ": " + (.calls | tostring)'
@@ -477,6 +512,34 @@ if [ "$TOOL_CALLS" -gt 0 ] || [ "$RETRY_COUNT" -gt 0 ]; then
   fi
 fi
 
+FEAT_STARTED=$(q '.features.features_started // 0')
+FEAT_COMPLETED=$(q '.features.features_completed // 0')
+if [ "$FEAT_STARTED" -gt 0 ] || [ "$FEAT_COMPLETED" -gt 0 ]; then
+  HAS_ANY=1
+  echo ""
+  echo "🚀 Feature Lifecycle & Funnel"
+  echo "────────────────────────────────────────────────────────────────────────"
+  printf '  Features Started:    %s · Completed: %s (%s%% completion rate)\n' \
+    "$FEAT_STARTED" "$FEAT_COMPLETED" "$(q '.features.completion_rate_pct')"
+  if [ "$(q '.features.avg_planned_files')" -gt 0 ] || [ "$(q '.features.avg_touched_files')" -gt 0 ]; then
+    printf '  Files per Feature:   planned avg %s · touched avg %s\n' \
+      "$(q '.features.avg_planned_files')" "$(q '.features.avg_touched_files')"
+  fi
+  if [ "$(q '.features.total_loc_added')" -gt 0 ] || [ "$(q '.features.total_loc_deleted')" -gt 0 ]; then
+    printf '  Code Delta:          +%s / -%s LOC (test code: +%s LOC)\n' \
+      "$(q '.features.total_loc_added')" "$(q '.features.total_loc_deleted')" "$(q '.features.total_loc_test_added')"
+  fi
+fi
+
+FEEDBACK_COUNT=$(q '.features.feedback_count // 0')
+if [ "$FEEDBACK_COUNT" -gt 0 ]; then
+  HAS_ANY=1
+  echo ""
+  echo "💬 Workflow Feedback ($FEEDBACK_COUNT notes)"
+  echo "────────────────────────────────────────────────────────────────────────"
+  q '.features.recent_feedback[] | "    • " + (.feature // "general") + ": " + .feedback'
+fi
+
 if [ "$HAS_ANY" -eq 0 ]; then
   echo ""
   echo "ℹ️  No telemetry recorded yet in this workspace."
@@ -486,6 +549,7 @@ if [ "$HAS_ANY" -eq 0 ]; then
   echo "  • metrics-collect.sh         (sessions.jsonl, prompts.jsonl, subagents.jsonl)"
   echo "  • post-bash-output-filter.sh (filter-stats.jsonl)"
   echo "  • lib/emit.sh                (context.jsonl)"
+  echo "  • devflow-state.sh           (features.jsonl, feedback.jsonl)"
 fi
 
 echo "========================================================================"

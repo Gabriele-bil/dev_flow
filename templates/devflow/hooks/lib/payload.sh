@@ -28,6 +28,7 @@ df_read_input() {
   DF_EVENT="" DF_TOOL_RAW="" DF_TOOL="" DF_FILE="" DF_CMD="" DF_URL=""
   DF_IS_ERROR="" DF_SESSION="" DF_TRANSCRIPT="" DF_WORKSPACE=""
   DF_CALL_ID="" DF_AGENT_TYPE="" DF_SKILL="" DF_SUBAGENT_TYPE="" DF_RESPONSE_CHARS=0
+  DF_ERROR_RAW="" DF_EXIT_CODE=""
   local cwd_in="" event_in="" agy_shape=""
 
   command -v jq >/dev/null 2>&1 || return 1
@@ -38,6 +39,8 @@ df_read_input() {
       ((.tool_input // .toolInput // .toolCall.args // .args // .tool_use.input // {}) | obj) as $i
       | (.tool_response | obj) as $resp
       | ($resp.is_error // $resp.isError // .tool_result.is_error) as $err
+      | ((.error // (if (.tool_response | type) == "string" and ($err == true or (.hook_event_name // "") == "PostToolUseFailure") then .tool_response else null end) // $resp.error // $resp.stderr // .tool_result.error // "") | if type == "string" then . else tostring end) as $raw_err
+      | ($resp.exit_code // $resp.exitCode // ($raw_err | capture("exit (?:code|status) (?<c>[0-9]+)"; "i")? | .c | tonumber?) // null) as $ec
       | @sh "event_in=\(.hook_event_name // .hookEventName // "")",
         @sh "agy_shape=\(if (has("conversationId") or has("workspacePaths")) then "1" else "" end)",
         @sh "DF_TOOL_RAW=\(.tool_name // .toolName // .toolCall.name // .tool.name // .tool_use.name // "")",
@@ -45,6 +48,8 @@ df_read_input() {
         @sh "DF_CMD=\($i.command // $i.CommandLine // $i.Command // "")",
         @sh "DF_URL=\($i.url // $i.Url // "")",
         @sh "DF_IS_ERROR=\(if $err != null then ($err | tostring) elif (.hook_event_name // "") == "PostToolUseFailure" then "true" elif (.error | type) == "string" and has("toolCall") then (.error != "" | tostring) else "" end)",
+        @sh "DF_ERROR_RAW=\($raw_err)",
+        @sh "DF_EXIT_CODE=\($ec // "")",
         @sh "DF_SESSION=\(.session_id // .conversationId // "")",
         @sh "DF_TRANSCRIPT=\(.transcript_path // .transcriptPath // "")",
         @sh "cwd_in=\(.cwd // ((.workspacePaths // [])[0]) // "")",

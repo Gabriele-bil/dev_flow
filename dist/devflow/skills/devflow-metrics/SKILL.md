@@ -19,7 +19,9 @@ Aggregate and visualize the local telemetry folder `.devflow-metrics/` (gitignor
 - **Cost telemetry**: tokens (input, output, cache write/read, thinking) and estimated cost per feature, step, model.
 - **Commands**: per devflow command — turns, avg/p50/p90 duration, tokens and context per turn, tool calls, compactions, subagent cost.
 - **Context & memory**: context window in use per turn (avg/peak), prompt-cache reads, compactions (auto vs manual, context size at compaction), tokens injected by each devflow hook (orientation, instincts).
-- **Tools**: calls, error %, avg duration, output tokens fed back per tool; skills loaded, MCP servers, subagent runs.
+- **Tools**: calls, error %, error categories, exit codes, avg duration, output tokens fed back per tool; skills loaded, MCP servers, subagent runs.
+- **Feature lifecycle & funnel**: features started vs completed, completion rate, planned vs touched files, code delta (LOC added/deleted, test LOC).
+- **Workflow feedback**: user experience notes recorded at feature completion.
 - **Usage**: sessions by source/host/plugin version/model/adapter, prompts, share of slash commands, devflow commands typed.
 - **Quality & stability**: first-pass tool invocation success (`pass@1`), retry loop counts, re-reads of the same file, checks run outside `verify-stamp.sh`, and tool calls per pipeline step, from `observe.sh`.
 
@@ -73,6 +75,8 @@ When presenting or inspecting dashboard numbers:
 6. **Injected by hooks**: tokens devflow adds to every session before any work; growth here is a fixed cost on every turn.
 7. **Tool output tokens / error %**: tools that flood context or fail often point at missing filters or unclear skill instructions.
 8. **Command p90 duration**: long tails on one command show where the pipeline stalls.
+9. **Feature Completion Rate %**: values <70% indicate pipeline drop-off or friction before ship/PR.
+10. **Plan vs Touched Ratio**: large discrepancy between planned and touched files highlights scope creep or blind spots in planning.
 
 ## Anti-Patterns
 

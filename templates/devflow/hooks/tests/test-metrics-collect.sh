@@ -68,6 +68,10 @@ jq -cn --arg ws "$d" '{session_id:"s1", cwd:$ws, hook_event_name:"PostToolUseFai
 ROW=$(last "$d" tools)
 check "T3d: failed MCP call → mcp_server + is_error" \
   '[ "$(jq -r ".mcp_server + \"|\" + (.is_error | tostring)" <<<"$ROW")" = "context7|true" ]'
+fixture "$d" claude/post-failure.json | run "$d" observe.sh post
+ROW=$(last "$d" tools)
+check "T3e: error diagnostics extracted (exit_code, category, msg)" \
+  '[ "$(jq -r "[.is_error, .exit_code, .error_category, .error_msg] | join(\"|\")" <<<"$ROW")" = "true|1|test_failure|Exit code 1" ]'
 rm -rf "$d"
 
 # ── T4: Skill tool attributes the devflow command ───────────────────────────

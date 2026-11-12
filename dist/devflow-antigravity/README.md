@@ -109,7 +109,7 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 | `devflow.backprop` | Backpropagate escaped bug into spec — classify gap, tighten AC, add regression test |
 | `devflow.worktree` | Create / list / remove isolated git worktrees for parallel features, with dev-server port offset and overlap detection |
 | `devflow.learn` | Manage instincts — log / search / list / prune / boost / promote to team store |
-| `devflow.metrics` | Local telemetry dashboard (`.devflow-metrics/`, gitignored) — tokens, cost, command durations, context window and compactions, hook-injected context, tool/skill/subagent usage, pass@1 |
+| `devflow.metrics` | Local telemetry dashboard (`.devflow-metrics/`, gitignored) — tokens, cost, command durations, context window and compactions, hook-injected context, tool/skill/subagent usage, error categories, feature funnel & code delta, pass@1 |
 | `devflow.board` | Static, read-only, auto-updating HTML project board (`devflow/board/index.html`) — Kanban pipeline, dependency DAG critical path, Markdown viewer, and command timings |
 
 ## Hooks
@@ -127,11 +127,11 @@ Hook registrations (`hooks/hooks.json`) activate automatically — no user invoc
 | PreToolUse | `pre-fetch-cache.sh` | Serves cached `WebFetch` responses when fresh |
 | PreToolUse | `pre-agent-fanout-cap.sh` | Caps concurrent subagent fan-out per turn |
 | PreToolUse | `observe.sh pre` | Logs tool calls to `.devflow-observe.jsonl`; marks tool-call start for timing |
-| PostToolUse / PostToolUseFailure | `observe.sh post` | Logs tool results to `.devflow-observe.jsonl`; one telemetry row per call (duration, output size, skill/MCP/subagent) to `.devflow-metrics/tools.jsonl` |
+| PostToolUse / PostToolUseFailure | `observe.sh post` | Logs tool results to `.devflow-observe.jsonl`; one telemetry row per call (duration, output size, skill/MCP/subagent, exit code, error category) to `.devflow-metrics/tools.jsonl` |
 | PostToolUse | `post-bash-output-filter.sh` | Compresses verbose adapter command output (flutter/dart/pnpm/ng/git diff) past 2k chars: head + error/warning lines + tail |
 | PostToolUse | `post-edit-accumulate.sh` | Tracks modified files for batch format check |
 | PostToolUse | `post-edit-instinct-context.sh` | Injects matching domain instincts once per session when editing files |
-| PostToolUse | `post-task-create.sh` | Updates `next_feature_number` in `.devflow-state.json` after `task.md` writes |
+| PostToolUse | `post-task-create.sh` | Updates `next_feature_number` in `.devflow-state.json` and records feature start telemetry after `task.md` writes |
 | PostToolUse | `post-fetch-cache.sh` | Caches `WebFetch` responses for reuse |
 | PreModelSwitch / PostModelSwitch | `pre-model-switch.sh` · `post-model-switch.sh` | Guards and logs mid-session model switches (Claude Code) |
 | PreCompact | `pre-compact.sh` | Snapshots `plan.md` progress to `.devflow-state.json` |

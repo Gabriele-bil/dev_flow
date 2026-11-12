@@ -85,6 +85,23 @@ if [ "$TIMINGS_FILE" != "off" ] && [ -n "$FEATURE_SLUG" ]; then
   fi
 fi
 
+# Record feature lifecycle start event in .devflow-metrics/features.jsonl
+if df_metrics_dir && [ -n "$FEATURE_SLUG" ]; then
+  BRANCH=""
+  if [ -f "$FILE_PATH" ]; then
+    BRANCH=$(grep -m1 '^\*\*Branch:\*\*' "$FILE_PATH" 2>/dev/null | sed 's/^\*\*Branch:\*\*[[:space:]]*//; s/[[:space:]]*$//' | tr -d '\r') || true
+  fi
+  FEAT_ENTRY=$(jq -cn \
+    --arg ts "$TS" \
+    --arg feat "$FEATURE_SLUG" \
+    --arg event "start" \
+    --arg status "started" \
+    --arg branch "$BRANCH" \
+    '{ts: $ts, feature: $feat, event: $event, status: $status, branch: $branch}
+     | with_entries(select(.value != "" and .value != null))' 2>/dev/null) || true
+  [ -n "$FEAT_ENTRY" ] && df_metric features "$FEAT_ENTRY"
+fi
+
 # Auto-sync DevFlow Board if already initialized in workspace
 if [ -f "$WORKSPACE_ROOT/devflow/board/index.html" ]; then
   BOARD_SH="$SCRIPT_DIR/../scripts/board.sh"

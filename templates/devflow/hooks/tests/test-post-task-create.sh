@@ -81,6 +81,19 @@ got=$(jq -r '.next_feature_number // empty' "$D/.devflow-state.json" 2>/dev/null
   || assert "099 rolls to 100 (got '$got')" fail
 rm -rf "$D"
 
+# T5: features.jsonl start event
+echo "--- T5: feature start telemetry ---"
+D=$(tmpdir)
+mkdir -p "$D/devflow/features/012_checkout"
+printf '# Task\n\n**Status:** draft\n**Branch:** feat/012_checkout\n' > "$D/devflow/features/012_checkout/task.md"
+run_hook "$D" "$D/devflow/features/012_checkout/task.md"
+event=$(jq -r '.event // empty' "$D/.devflow-metrics/features.jsonl" 2>/dev/null | head -1)
+feat=$(jq -r '.feature // empty' "$D/.devflow-metrics/features.jsonl" 2>/dev/null | head -1)
+[ "$event" = "start" ] && [ "$feat" = "012_checkout" ] \
+  && assert "features.jsonl records start event" pass \
+  || assert "features.jsonl records start event (event='$event', feat='$feat')" fail
+rm -rf "$D"
+
 echo ""
 echo "Results: $PASS passed, $FAIL failed"
 if [ ${#ERRORS[@]} -gt 0 ]; then

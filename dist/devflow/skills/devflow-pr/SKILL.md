@@ -205,6 +205,16 @@ After successful `gh pr create`:
    DevFlow pipeline complete for TASK-[NNN].
    ```
 
+4. Optional workflow feedback prompt (interactive mode only — skip under `.devflow-run.json`):
+   Ask the user:
+   ```text
+   Did this feature workflow go smoothly? (yes / no / notes)
+   ```
+   If the user replies with feedback, record it:
+   ```bash
+   bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" feedback [NNN]_[feature-name] "<feedback text>"
+   ```
+
 ---
 
 ## Anti-Patterns

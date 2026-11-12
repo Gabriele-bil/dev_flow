@@ -147,6 +147,30 @@ elif [ "$EVENT" = "post" ]; then
     fi
     MCP_SERVER=""
     case "$TOOL" in mcp__*) MCP_SERVER=$(printf '%s' "$TOOL" | awk -F'__' '{print $2}') ;; esac
+    ERR_CAT=""
+    ERR_MSG=""
+    EXIT_CODE="${DF_EXIT_CODE:-}"
+    if [ "$IS_ERROR" = "true" ]; then
+      ERR_MSG=$(printf '%s' "${DF_ERROR_RAW:-}" | tr '\r\n' '  ' | sed -E 's/[[:space:]]+/ /g' | cut -c1-120)
+      case "$ERR_MSG" in
+        *"command not found"*|*"not recognized as an internal or external command"*) ERR_CAT="command_not_found" ;;
+        *"timed out"*|*"timeout"*|*"ETIMEDOUT"*) ERR_CAT="timeout" ;;
+        *"SyntaxError"*|*"syntax error"*) ERR_CAT="syntax_error" ;;
+        *"TypeError"*|*"type error"*) ERR_CAT="type_error" ;;
+        *"Permission denied"*|*"EACCES"*) ERR_CAT="permission_denied" ;;
+        *"No such file"*|*"ENOENT"*|*"not found"*) ERR_CAT="not_found" ;;
+      esac
+      if [ -z "$ERR_CAT" ]; then
+        if [ "$KIND" = "shell" ]; then
+          case "$DF_CMD" in
+            *test*|*vitest*|*jest*|*pytest*|*playwright*|*flutter\ test*|*dart\ test*) ERR_CAT="test_failure" ;;
+            *) [ -n "$EXIT_CODE" ] && ERR_CAT="shell_error" || ERR_CAT="shell_failure" ;;
+          esac
+        else
+          ERR_CAT="tool_error"
+        fi
+      fi
+    fi
     TOOL_ROW=$(jq -cn \
       --arg ts "$TS" --arg session "$SESSION" --arg host "$DF_HOST" \
       --arg tool "$TOOL" --arg kind "$KIND" --arg skill "$DF_SKILL" \
@@ -154,11 +178,15 @@ elif [ "$EVENT" = "post" ]; then
       --arg agent_type "$DF_AGENT_TYPE" --arg command "$(obs_get '.active_command // empty')" \
       --arg step "$STEP" --arg feature "$FEATURE" --argjson is_error "$IS_ERROR" \
       --arg duration_ms "$DUR_MS" --argjson output_chars "${DF_RESPONSE_CHARS:-0}" \
+      --arg exit_code "$EXIT_CODE" --arg error_category "$ERR_CAT" --arg error_msg "$ERR_MSG" \
       '{ts:$ts, session:$session, host:$host, tool:$tool, kind:$kind, skill:$skill,
         subagent_type:$subagent_type, mcp_server:$mcp_server, agent_type:$agent_type,
         command:$command, step:$step, feature:$feature, is_error:$is_error,
         duration_ms:($duration_ms | tonumber? // null),
-        output_chars:$output_chars, output_tokens_est:(($output_chars / 4) | ceil)}
+        output_chars:$output_chars, output_tokens_est:(($output_chars / 4) | ceil),
+        exit_code:($exit_code | tonumber? // null),
+        error_category:$error_category,
+        error_msg:$error_msg}
        | with_entries(select(.value != "" and .value != null))' 2>/dev/null) || true
     df_metric tools "$TOOL_ROW"
   fi
