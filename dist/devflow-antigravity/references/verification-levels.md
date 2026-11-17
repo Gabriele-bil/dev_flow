@@ -86,6 +86,11 @@ Write to `devflow/features/[NNN]_[feature-name]/verification.md`:
 ## Failures
 (only if any FAIL)
 - **AC [#]** failed **L[N]**: [evidence — file:line, stub signal, unpinned clause, console error, missing registration] → [fix pointer]
+
+## Manual QA Steps
+(include when feature touches UI or has any PARTIAL `L4: N/A` verdict; omit for backend/library features with full automated L4 coverage)
+1. **Preconditions:** [required state, user role, or seed data]
+2. **AC-[#] ([Scenario Title]):** [step-by-step action to perform] → **Expected:** [observable UI/system outcome]
 ```
 
 ## Gate rule
