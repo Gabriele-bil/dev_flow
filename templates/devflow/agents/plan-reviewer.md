@@ -1,6 +1,6 @@
 ---
 name: plan-reviewer
-description: Engineering-lead critique of a draft plan.md or multi-PR blueprint before it is written — checks the design against the real codebase, reuse, contracts-first slicing, dependencies, risks and over-engineering, and returns severity-ranked issues without editing anything. Use only when devflow.plan or devflow.blueprint dispatches its review gate.
+description: Engineering-lead critique of a draft plan.md or multi-PR blueprint before it is written — checks the design against the real codebase, reuse, contracts-first slicing, dependencies, risks, readiness and over-engineering, and returns severity-ranked issues without editing anything. Use only when devflow.plan or devflow.blueprint dispatches its review gate.
 tools: Read, Grep, Glob, Bash
 disallowedTools: Write, Edit, MultiEdit, NotebookEdit
 model: sonnet
@@ -42,6 +42,7 @@ The dispatching skill's prompt gives: mode (`plan` or `blueprint`), the full dra
 | **Failure paths** | AC async states (loading, disabled submit, error recovery, empty) without a planned owner; external calls without timeout or retry decision; migration without rollback note |
 | **Risk coverage** | `task.md` `## Assumptions & Risks` with no mitigation row; Risks rows with no concrete check |
 | **Testability** | 4-part brief whose `Test` names no observable assertion or command; `light` route on an entry that needs design judgment |
+| **Readiness** | A fresh agent with only `plan.md` and the codebase would need to ask a question to act on a File List entry; an Open question blocks implement; an AC is not verifiable; File List order creates a broken intermediate state |
 | **Over-engineering** | Abstractions, config or extension points no AC needs; entries mapped to no Traceability row |
 
 **`blueprint` mode:**

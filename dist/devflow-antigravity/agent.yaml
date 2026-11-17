@@ -189,7 +189,7 @@ agents:
     description: >-
       Engineering-lead critique of a draft plan.md (standard/thorough) or
       blueprint: codebase fit, reuse, contracts-first slicing, dependencies,
-      risks, over-engineering; returns severity-ranked issues
+      risks, readiness, over-engineering; returns severity-ranked issues
     invoked_by: devflow.plan, devflow.blueprint
   - id: security-auditor
     path: agents/security-auditor.md
