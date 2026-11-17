@@ -9,7 +9,7 @@ Replaces per-skill "retry 3× then stop" clauses. Bounded at every level — no 
 | --- | --- | --- |
 | **1 — Bounded retry** | Command or test fails | Max **3 attempts**. Each attempt must change something material (fix, mock setup, root cause) — never rerun unchanged |
 | **2 — Debug mode** | 3 failed attempts | Stop patching. Read **full** error output. Form ONE explicit hypothesis. Design minimal probe (log line, isolated run, single-file test). Max **2 hypotheses** |
-| **3 — Re-approach** | 2 failed hypotheses | Reread `task.md` + `plan.md`. Question the plan step itself — wrong file order, missing dependency, flawed decision. Propose plan deviation; log in `plan.md` → `## Deviations` |
+| **3 — Re-approach** | 2 failed hypotheses | Reread `task.md` + `plan.md`. Question the plan step — wrong file order, missing dependency, flawed local decision. For a deviation **confined to the current entry**, log in `plan.md` → `## Deviations` the moment settled |
 | **4 — Decompose** | Re-approach fails | Split current slice into smaller sub-steps in `plan.md` **File List** (user approves). Retry smallest step first. **Run mode:** no approval channel — skip to Level 5 (re-planning is a human decision) |
 | **5 — Block** | Identical error text across 2 consecutive rounds, or Level 4 exhausted | Set `plan.md` `**Status:** blocked`. Emit stuck-report (below). Hand to user. Never falsify progress |
 
@@ -19,6 +19,8 @@ Replaces per-skill "retry 3× then stop" clauses. Bounded at every level — no 
 - Attempt counter resets per distinct failure, not per session. Same error after "fix" = same failure, counter continues.
 - "Identical error text" = same error class + message; line numbers may differ.
 - Level 3 deviations require user visibility: state old approach → new approach → reason.
+- **Shape-changing workaround (immediate stop):** a workaround that adds files/areas not in the File List, changes a contract later slices or ACs rely on, delivers other than the entry's 4-part brief, or abandons the prescribed approach bypasses Levels 1–3 — **stop immediately** (whatever the attempt count) and jump to Level 4 (interactive: user approves a plan change) or Level 5 (run mode: block — re-planning is a human decision).
+- **Keep/discard edit accounting:** at Level 5, report every file edited so far with a `keep` or `discard` verdict; mark any `## Deviations` line from a failed approach `[discarded]` so `devflow.resume` does not treat it as outranking the plan. Never revert edits on your own.
 
 ## Stuck-report format (Level 5)
 
@@ -30,6 +32,7 @@ Attempts:   [N] retries, [N] hypotheses tested
 Tried:      [bullet per approach + why it failed]
 Suspicion:  [best current theory, marked as unverified]
 Plan state: [done]/[pending] counts; deviations logged: [yes/no]
+Edits:      [each touched file → keep | discard (reason); never reverted automatically]
 
 Options:
   1. [most promising manual intervention]

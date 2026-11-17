@@ -133,6 +133,7 @@ Each file must:
 - Use relative imports pointing to the nearest barrel file (or the import style mandated by `constitution.md`)
 - Be complete; do not leave placeholder comments such as `// TODO` or `// implement this`
 - **Trace to plan (scope fidelity):** every file and function traces to a **File List** or **Traceability** entry — build only what the acceptance criteria require. Urge to add a "while I'm here" improvement → log it via `devflow.learn`; do not write it
+- **Log deviations at settle time:** the moment a confined deviation from `plan.md` is settled, append `- \`[file]\`: [planned] → [actual] — [reason]` to `plan.md` `## Deviations` immediately (create heading on first entry); on resume, a logged deviation outranks the plan text it deviates from. Any **shape-changing** workaround (adds unplanned files/areas, alters a contract later slices/ACs rely on, delivers other than the 4-part brief, or abandons the prescribed approach) → stop immediately and escalate per `@devflow/references/escalation-ladder.md` Level 4/5
 - Satisfy **all implementation rules** in the adapter implement step file (responsive UI, localization, state architecture, accessibility, layout, contracts, data boundaries — load the referenced technology skills from the adapter table when touching those areas)
 
 #### Parallel leaf files (`[P]`)
@@ -189,17 +190,11 @@ Before Step 7, confirm every item in the **Pre-handoff checklist** section of th
 
 After all files implemented, update `REGISTRY.md` for every element written to shared folder or identified as reusable. Mandatory entries (shared components/helpers) written immediately; proposed entries (new patterns) only after user confirmation. Templates and rule: `references/registry-update-template.md`.
 
-### Step 7b - Write deviations to plan.md
+### Step 7b - Reconcile deviations in plan.md
 
-If any file differs from `plan.md` (structure, dependency, behavior), append to `plan.md` (single heading for all skills — create on first entry):
+Confined deviations are appended to `plan.md` `## Deviations` in Step 4 the moment they are settled. Run a final pass here: confirm every diverged file has its `- \`[file path]\`: [planned behavior] → [actual behavior] — [reason]` line, and mark any deviation from a later-abandoned attempt `[discarded]` (or remove it).
 
-```markdown
-## Deviations
-
-- `[file path]`: [planned behavior] → [actual behavior] — [reason]
-```
-
-Read by `devflow.beautify` and `devflow.pr`. Omit if fully aligned.
+Read by `devflow.beautify`, `devflow.resume`, and `devflow.pr`. Omit if fully aligned.
 
 ### Step 8 - Notify user
 
