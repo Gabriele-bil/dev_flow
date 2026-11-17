@@ -35,14 +35,14 @@ The dispatching skill's prompt gives: mode (`plan` or `blueprint`), the full dra
 
 | Axis | Look for |
 | --- | --- |
-| **Codebase fit** | Plan modifies files or symbols that do not exist; creates what exists; misses callers in the blast radius of a changed contract |
+| **Codebase fit** | Plan modifies files or symbols that do not exist; creates what exists; misses callers in the blast radius of a changed contract; deletion leaves orphaned last-users or drops surviving-behavior tests; rename/move misses hits in docs/CI/configs/agent files |
 | **Reuse** | New component where `REGISTRY.md` or a shared folder covers ≥70% of the need; duplicated logic across File List entries |
 | **Contracts & slicing** | Shared types, schemas, migrations not in the first blocking slice; layer-shaped slices (all models, then all UI); a slice that leaves the app unrunnable |
 | **Dependencies** | Entry consuming another entry's output with no `deps:` ordering; `[P]` entries sharing a file or contract |
-| **Failure paths** | AC async states (loading, disabled submit, error recovery, empty) without a planned owner; external calls without timeout or retry decision; migration without rollback note |
+| **Failure paths** | AC async states (loading, disabled submit, error recovery, empty) without a planned owner; external calls without timeout or retry decision; migration without rollback note; staged live-state change (migration/backfill/swap) without stop-point walk (abort, timeout, re-run); separately deployed change without backward compatibility or release order |
 | **Risk coverage** | `task.md` `## Assumptions & Risks` with no mitigation row; Risks rows with no concrete check |
 | **Testability** | 4-part brief whose `Test` names no observable assertion or command; `light` route on an entry that needs design judgment |
-| **Readiness** | A fresh agent with only `plan.md` and the codebase would need to ask a question to act on a File List entry; an Open question blocks implement; an AC is not verifiable; File List order creates a broken intermediate state |
+| **Readiness** | A fresh agent with only `plan.md` and the codebase would need to ask a question to act on a File List entry; an Open question blocks implement; an AC is not verifiable; File List order creates a broken intermediate state; File List entry `001` is discovery work |
 | **Over-engineering** | Abstractions, config or extension points no AC needs; entries mapped to no Traceability row |
 
 **`blueprint` mode:**

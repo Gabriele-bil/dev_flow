@@ -133,12 +133,15 @@ Analyze:
 - Edge cases, error states, and required DB/external-system edits
 - Architectural trade-offs: state the concrete mechanism and strongest real limitation/trade-off for each decision (never empty boosters like `scalable` or `seamless`); when multiple viable designs exist, trigger `AskUserQuestion` checkpoint and recommend an external grilling skill (e.g. `/grill-me`, if installed) for deep review
 - ADR alignment: verify architecture complies with decisions in `docs/adr/`; record in Architecture decisions
+- **Prior art & cascades:** prior art models shape, not content (check copied settings line-by-line; docs/ADRs outrank prior art); trace deleted symbols' last-users transitively (keep tests for surviving behavior); on renames/moves, grep docs, `AGENTS.md`/`CLAUDE.md`, CI, build scripts, and config across all case/separator variants and list every hit
+- **Live-state & release compatibility:** for staged migrations/backfills/swaps, walk every stop point (step, abort, timeout, re-run) and residual state; for separately deployed parts (BE/FE, callers, schema/code), prefer backward-compatible additions with old defaults or state release order in **Architecture decisions**
+- **Overlapping work:** read-only check of open PRs (`gh pr list --search "<path>"` when `gh` available) and active branches touching planned paths; note overlaps in the entry (`references/plan-anti-patterns.md` → **Planning Guardrails**)
 
 ### Step 4b - Dependency pass & Contracts First
 
-Verify **File list** order per Dependency ordering. **Contracts First:** migrations and shared contracts (types, schemas, state interfaces shared by ≥2 slices or `[P]` files) MUST sit in the first blocking slice (`deps: none`) before consumers; shared components before consumers. Never copy contracts across parallel slices. Never plan or cite `task.md` rows marked `[wont]` or `[retired]`.
+Verify **File list** order per Dependency ordering. **Contracts First:** migrations and shared contracts (types, schemas, state interfaces shared by ≥2 slices or `[P]` files) MUST sit in the first blocking slice (`deps: none`) before consumers; shared components before consumers. Never copy contracts across parallel slices. Never plan or cite `task.md` rows marked `[wont]` or `[retired]`. **Entry `001` is never discovery work** (for `fix/` features, `001` is the fail-first regression test).
 
-**Scope fidelity & 4-Part Brief:** every **File List** entry must map to ≥1 **Traceability** row (no gold-plating, one concern per entry) and include the 4-part brief (`Change`, `Contract`, `Test`, `Out of scope`) per `references/plan-template.md`. Optionally tag slices/entries with `[route: light|mid|strong]` per `${CLAUDE_PLUGIN_ROOT}/references/model-selection.md` (`light` requires a complete 4-part brief and exact test target).
+**Scope fidelity & 4-Part Brief:** every **File List** entry must map to ≥1 **Traceability** row (no gold-plating, one concern per entry) and include the 4-part brief (`Change`, `Contract`, `Test`, `Out of scope`) per `references/plan-template.md`. Optionally tag slices/entries with `[route: light|mid|strong]` per `${CLAUDE_PLUGIN_ROOT}/references/model-selection.md` (`light` requires a complete 4-part brief and exact test target). Run or resolve-check cheap read-only `Test` commands (~1–2 min, no shared writes) while planning and rescope pre-existing failures (`references/plan-anti-patterns.md`).
 
 ### Step 4c - Data model extraction
 
