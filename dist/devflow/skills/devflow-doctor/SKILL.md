@@ -1,7 +1,7 @@
 ---
 name: doctor
-description: "Pre-flight diagnostic tool for DevFlow. Checks MCP server reachability, CLI toolchains, active adapter configuration, and pipeline state integrity. Supports --json and --fix. Use when user runs devflow.doctor, asks to diagnose the environment, check MCP servers, or troubleshoot pipeline prerequisites."
-argument-hint: "[--json] [--fix]"
+description: "Pre-flight diagnostic tool for DevFlow. Checks MCP server reachability, CLI toolchains, active adapter configuration, pipeline state integrity, and optional startup token context budget. Supports --json, --fix, and --context. Use when user runs devflow.doctor, asks to diagnose the environment, check MCP servers, audit startup context, or troubleshoot pipeline prerequisites."
+argument-hint: "[--json] [--fix] [--context]"
 disable-model-invocation: true
 ---
 
@@ -35,8 +35,9 @@ Validate that the consumer environment satisfies all DevFlow operational prerequ
 
 Inspect `$ARGUMENTS`:
 
-- If `--json` is present: run `bash "${CLAUDE_PLUGIN_ROOT}/scripts/doctor.sh" --json` directly and emit only the raw JSON payload with its exit code. Stop here.
+- If `--json` is present: run `bash "${CLAUDE_PLUGIN_ROOT}/scripts/doctor.sh" --json` (include `--context` if passed) directly and emit only the raw JSON payload with its exit code. Stop here.
 - If `--fix` is present: pass `--fix` to the diagnostic script to automatically repair safe runtime files (e.g. `.gitignore`, resetting corrupted `.devflow-state.json`).
+- If `--context` is present: pass `--context` to `doctor.sh` to audit estimated startup token cost per source (`CLAUDE.md`/`AGENTS.md`, `constitution.md`, `REGISTRY.md`, `docs/product.md`, skill descriptions, instincts, MCP schemas) and propose reversible trims (complements `devflow.metrics`, which tracks runtime hook-injected context).
 
 ### Step 2 - Execute Environment Diagnostics
 
@@ -55,6 +56,9 @@ Run `bash "${CLAUDE_PLUGIN_ROOT}/scripts/doctor.sh"` and capture its structured 
    - `.devflow-state.json` syntax and active feature synchronization.
    - Git working tree status (clean vs dirty) and active branch.
    - Project instincts count in `.devflow-instincts.yaml`.
+4. **Startup Context Audit (`--context` only)**:
+   - Estimated startup tokens (`bytes / 4`) for governing docs (`CLAUDE.md`/`AGENTS.md` >2000 token threshold, `REGISTRY.md` >3000 threshold, `constitution.md`, `docs/product.md`), core + adapter skill descriptions, recorded instincts (>25 threshold), and configured MCP server schema overhead.
+   - Reversible trim suggestions for any source exceeding budget.
 
 ### Step 3 - Present Diagnostic Dashboard
 

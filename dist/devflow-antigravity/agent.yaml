@@ -324,8 +324,9 @@ skills:
       path: skills/devflow-doctor/SKILL.md
       description: >-
         Pre-flight diagnostic tool for DevFlow. Checks MCP server reachability,
-        CLI toolchains, active adapter configuration, and pipeline state
-        integrity. Supports --json and --fix
+        CLI toolchains, active adapter configuration, pipeline state integrity,
+        and optional startup token context budget. Supports --json, --fix, and
+        --context
     - id: devflow-hotfix
       path: skills/devflow-hotfix/SKILL.md
       description: >-
