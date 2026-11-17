@@ -57,6 +57,8 @@ state the vertical-slice execution order here.]
 | [UC-N title from task.md] | [AC-N: GIVEN ... WHEN ... THEN ... from task.md] | [file path(s)] |
 | ... | ... | ... |
 
+**"None left" acceptance criteria (removals, renames, sweeps):** When an AC asserts absence of a removed flag, renamed symbol/API, or deprecated term, its **Acceptance criteria** cell must include: (1) exact whole-word search command covering every case/separator variant (`camelCase`, `snake_case`, `kebab-case`, `SCREAMING_SNAKE`), (2) allow-list of legitimate hits (changelogs, migrations, historical ADRs), and (3) non-empty hits found on default branch today (seen failing at plan time; 0 hits today → widen search; still 0 → record that nothing remains to remove).
+
 
 ---
 
