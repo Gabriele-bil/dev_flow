@@ -1,5 +1,35 @@
 # Changelog
 
+## [2.3.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v2.2.0...devflow-v2.3.0) (2026-11-17)
+
+
+### Features
+
+* **build:** Include version in plugin.json generation ([d77a3b3](https://github.com/Gabriele-bil/dev_flow/commit/d77a3b3bb5185e8ddfc0a8cc82a92835b23170d4))
+* **code-reviewer:** Add contract omissions lens and pattern-mirroring check ([3e5622e](https://github.com/Gabriele-bil/dev_flow/commit/3e5622e6f6e03e3cadacb3dba817d4e0970cb571))
+* **doctor:** Add --context startup token audit and trim recommendations ([b7a9486](https://github.com/Gabriele-bil/dev_flow/commit/b7a948699eae0f84c4ee2e1f98cd50d2a6c346a6))
+* **implement,ladder:** Log deviations at settle time and stop on shape-changing workarounds ([ac0217a](https://github.com/Gabriele-bil/dev_flow/commit/ac0217a6888778454a4f484b0c9736d800843cd5))
+* **learn:** Add discoverability diagnosis before logging duplicate instincts ([2e4bbc4](https://github.com/Gabriele-bil/dev_flow/commit/2e4bbc4f9d05b50d43ae0cf4cf714beb19fde2d8))
+* **mcp:** Replace serena with code-review-graph, add openapi and shadcn MCPs ([51892c9](https://github.com/Gabriele-bil/dev_flow/commit/51892c9400aa57ff722ef757fcd566ab8f15bd7a))
+* **metrics:** Enhance telemetry with feature lifecycle and feedback tracking ([e7e9dff](https://github.com/Gabriele-bil/dev_flow/commit/e7e9dff8860ec6a1b665041c40cf966ea73088a4))
+* **plan,implement,resume:** Pin verified commit in plan.md and add drift check ([4c00ace](https://github.com/Gabriele-bil/dev_flow/commit/4c00acef9626dbab6c4b803265e7e6cea256aa24))
+* **plan,test:** Require exact search and baseline hits for none-left ACs ([7f129a1](https://github.com/Gabriele-bil/dev_flow/commit/7f129a176a04d9374b81eb0701b8439346a56b48))
+* **plan:** Add planning guardrails for prescribed checks, cascades, sweeps, and live state ([6e7e140](https://github.com/Gabriele-bil/dev_flow/commit/6e7e14069adf53b010d44720924b8b002396b1af))
+* **plan:** Add Readiness review axis and self-containment grep pass ([1411935](https://github.com/Gabriele-bil/dev_flow/commit/141193551c9b90ed81248f1d5b240c50073970fd))
+* Planning & review guardrails, slice implementation mode, context audit, and code-review-graph MCP ([76e9a91](https://github.com/Gabriele-bil/dev_flow/commit/76e9a91766d7fe5dcecd4aa8b03d191be5fe0427))
+* **pr:** Make PR body reviewer-oriented and respect repository PR templates ([d930af3](https://github.com/Gabriele-bil/dev_flow/commit/d930af3047c9fe08528c9d062fe03f819d90531c))
+* **task,plan,agents:** Add finding-validator challenge pass on task and plan reviews ([6290e55](https://github.com/Gabriele-bil/dev_flow/commit/6290e5532ed2f6c874993b98a94b7ee6943102e3))
+* **task,plan,implement,hotfix:** Require fail-first regression test and reproduction for fixes ([891477c](https://github.com/Gabriele-bil/dev_flow/commit/891477c09d916277084195113b7ea7f9b2cf7d91))
+* **task,plan,implement:** Add --slice implement mode, Try-it slice cue, and requirement source tags ([fd62b30](https://github.com/Gabriele-bil/dev_flow/commit/fd62b30025ca45990e2978fe2744053d737b287d))
+* **task,plan,implement:** Recommend fresh-context handoff in phase notifications ([7e55d18](https://github.com/Gabriele-bil/dev_flow/commit/7e55d18f4fc653b052906988c301bb5cb3352d3d))
+* **test:** Add manual QA steps section to verification.md for UI and partial ACs ([e61519e](https://github.com/Gabriele-bil/dev_flow/commit/e61519ebad43969b54a08ae92e95b9bd4ceb22f7))
+
+
+### Bug Fixes
+
+* **hooks:** Remove redundant case patterns in observe.sh for shellcheck ([a930d75](https://github.com/Gabriele-bil/dev_flow/commit/a930d75a5104f0cfc31bc2808543c439a289463e))
+* **plan,task:** Clarify optional external /grill-me skill reference ([e7a5d34](https://github.com/Gabriele-bil/dev_flow/commit/e7a5d34f520cfae1d66fae66c9e5bf7fbfa31e6e))
+
 ## [2.2.0](https://github.com/Gabriele-bil/dev_flow/compare/devflow-v2.1.0...devflow-v2.2.0) (2026-11-10)
 
 
