@@ -6,6 +6,7 @@
 # Usage (from the project root; [F] = feature: NNN, NNN_name or a path inside it):
 #   devflow-state.sh resolve [F]          active feature NNN_name (exit 1 → ask the user)
 #   devflow-state.sh status [F]           one line: statuses, next step, progress
+#   devflow-state.sh drift [F]            planned files modified in git since **Verified at:** sha
 #   devflow-state.sh report [F]           report lines for run/auto: files, checks,
 #                                         verification, decision flags — computed, not recalled
 #   devflow-state.sh set plan|task <status> [F] [--force]
@@ -358,6 +359,33 @@ count_items() {
   awk -v h="## $2" '$0 == h || index($0, h " ") == 1 { on = 1; next } on && /^## / { exit } on && /^- / { n++ } END { print n + 0 }' "$1" 2>/dev/null
 }
 
+cmd_drift() {
+  need_feature "$1"
+  local plan="$FDIR/plan.md" raw sha paths changed p
+  [ -f "$plan" ] || die "$plan not found"
+  raw=$(_field "$plan" "Verified at")
+  sha=$(printf '%s' "$raw" | awk '{print $1}')
+  if [ -z "$sha" ] || ! git rev-parse --verify --quiet "$sha^{commit}" >/dev/null 2>&1; then
+    echo "drift: no pinned commit in $plan"
+    return 0
+  fi
+  paths=()
+  while IFS= read -r p; do
+    [ -n "$p" ] && paths+=("$p")
+  done < <(grep -E '^###[[:space:]]+.*`[^`]+`' "$plan" 2>/dev/null | sed -E 's/^###[^`]*`([^`]+)`.*/\1/')
+  if [ ${#paths[@]} -eq 0 ]; then
+    echo "drift: clean ($sha..HEAD)"
+    return 0
+  fi
+  changed=$(git diff --name-only "$sha"..HEAD -- "${paths[@]}" 2>/dev/null || true)
+  if [ -z "$changed" ]; then
+    echo "drift: clean ($sha..HEAD)"
+  else
+    printf 'drift: %d planned file(s) changed since %s: %s\n' \
+      "$(printf '%s\n' "$changed" | grep -c .)" "$sha" "$(printf '%s' "$changed" | paste -sd, -)"
+  fi
+}
+
 cmd_report() {
   need_feature "$1"
   local plan="$FDIR/plan.md" ver="$FDIR/verification.md" stamps total ok
@@ -462,6 +490,7 @@ cmd_run() {
 case "$1" in
   resolve) resolve_feature "$2" && echo || exit 1 ;;
   status) need_feature "$2"; status_line ;;
+  drift) cmd_drift "$2" ;;
   report) cmd_report "$2" ;;
   base) base_branch ;;
   branch) cmd_branch "$2" ;;

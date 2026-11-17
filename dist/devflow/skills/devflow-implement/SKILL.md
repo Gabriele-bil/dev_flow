@@ -44,6 +44,7 @@ Before proceeding, verify:
 - [ ] `plan.md` **Status** ∈ `ready` | `implementing` (`implementing` = resume at first `[pending]` entry) — or any of `implemented` | `beautified` | `tested` | `shipped` **with** `--fix` (re-entry mode)
 - [ ] `plan.md` has a non-empty `## File List` section (at least one `###` file entry)
 - [ ] `plan.md` has a non-empty `## Traceability` table (every `task.md` subtask mapped to a file)
+- [ ] Drift check (`bash "${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh" drift`): if planned files changed since `**Verified at:**`, re-verify only those entries (symbol present, contract unchanged) before editing — contradiction routes back to `devflow.plan` (interactive) or adds a `## Decision flags` entry / blocks (run mode per `${CLAUDE_PLUGIN_ROOT}/references/run-mode.md`)
 
 If any item fails → stop, report which check failed, do not touch application code.
 
@@ -226,6 +227,7 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md`, `constitution.md`, `REGISTRY.md`, `${CLAUDE_PLUGIN_ROOT}/references/adapter-resolution.md`, `${CLAUDE_PLUGIN_ROOT}/adapters/<adapter>/ADAPTER.md` (core) + `steps/implement.md`, `references/registry-update-template.md`, `references/notify-template.md` |
 | Reads | `${CLAUDE_PLUGIN_ROOT}/references/escalation-ladder.md` (failure handling), `${CLAUDE_PLUGIN_ROOT}/references/state-machine.md` (handoff format, context pressure only), `${CLAUDE_PLUGIN_ROOT}/references/token-economy.md` (index-first + derive-don't-dump) |
 | Reads (conditional) | `${CLAUDE_PLUGIN_ROOT}/references/design-skill.md` + skill `impeccable` (when available) or `DESIGN.md` / `docs/design.md` — UI design for `[ui]`-tagged batches; `.devflow-run.json` (existence — run-mode switch, contract `${CLAUDE_PLUGIN_ROOT}/references/run-mode.md`); `references/anti-patterns.md` (when unsure / retry) |
+| Runs | `${CLAUDE_PLUGIN_ROOT}/scripts/devflow-state.sh` (`resolve`, `drift`, `set`, `mark-done`, `checkpoint`, `branch`), `${CLAUDE_PLUGIN_ROOT}/scripts/verify-stamp.sh` |
 | Writes | all files defined in `plan.md` |
 | Writes | `plan.md` — `[done]` markers, `**Status:** implementing → implemented`, `## Deviations`, `## Decision flags` (run mode) |
 | Writes (conditional) | `devflow/features/[NNN]_[feature-name]/handoff.md` — on context pressure (state-machine.md → Handoff file) |

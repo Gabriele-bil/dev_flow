@@ -176,7 +176,7 @@ Read by `devflow.implement` (routes `[ui]` batches to impeccable, else loads DES
 
 Create `devflow/features/[NNN]_[feature-name]/plan.md` using the template in `references/plan-template.md`. After write (`**Status:** ready`): `bash "@devflow/scripts/devflow-state.sh" sync [NNN]` refreshes the state cache. Sections in order: Overview, Architecture decisions, Risks and mitigations, Open questions, Traceability, File List, Implementation checkpoints, Adapter-specific sections, Edge Cases & Error Handling, Pre-implement checklist.
 
-Header: copy `**App:**` from `task.md` verbatim when present; omit the line entirely when absent (single-app repos) — never invent it.
+Header: copy `**App:**` from `task.md` verbatim when present (omit entire line in single-app repos — never invent); write `**Verified at:** <short-sha> (<YYYY-MM-DD>)[, dirty tree]` from `git rev-parse --short HEAD` (append `, dirty tree` when `git status --porcelain` is non-empty outside `devflow/`).
 
 Format rules:
 

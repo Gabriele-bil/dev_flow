@@ -68,6 +68,7 @@ Trust order: `plan.md` > `.devflow-state.json` (state file is derived cache — 
 | Status vs state file | state file `plan_status` ≠ plan.md Status, or state file missing/corrupt | trust `plan.md`; `bash "@devflow/scripts/devflow-state.sh" sync [F]` (corrupt → `rm .devflow-state.json` first); note drift in Step 3 |
 | `tested` status | `verification.md` missing or Result FAIL | downgrade resume position to `devflow.test` |
 | Feature in state file | `devflow/features/<feature>/` absent | `sync` on the resolved feature; note in Step 3 |
+| Codebase drift | `bash "@devflow/scripts/devflow-state.sh" drift [F]` lists planned files changed since `**Verified at:**` | note affected entries in Step 3; re-verify symbols/contracts on re-entry (contradiction → propose `devflow.plan`) |
 
 ### Step 2b — Unblock / reset (user-confirmed)
 
@@ -90,7 +91,7 @@ Progress:    [done]/[total] files done
 First pending: [file path, if mid-implement]
 Checkpoint:  [slice + last decision + last error tried, if .checkpoint.json present]
 Handoff:     [next action from handoff.md, if present]
-[Drift note, if state file was resynced] · [Unblocked: blocked → <status>, if Step 2b ran]
+[Drift note, if state file was resynced] · [Drift: <planned files changed since Verified at>, if any] · [Unblocked: blocked → <status>, if Step 2b ran]
 [Stale run marker found — resume interactively (delete .devflow-run.json) or re-arm devflow.run / devflow.auto?, if present]
 
 Continue with [next_step]? (yes / no / different step)

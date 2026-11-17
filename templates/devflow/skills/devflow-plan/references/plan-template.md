@@ -10,6 +10,7 @@ Used by `devflow.plan` Step 5 — write `devflow/features/[NNN]_[feature-name]/p
 **App:** [name] <!-- omit entire line in single-app repos (no ## Apps table in devflow/config.md) -->
 **ADRs:** [docs/adr/ADR-NNN-...md or "none"] <!-- copied from task.md or resolved during planning -->
 **Date:** [YYYY-MM-DD]
+**Verified at:** [short-sha] ([YYYY-MM-DD])[, dirty tree] <!-- from git rev-parse --short HEAD at Step 5 -->
 **Status:** ready
 **Complexity:** [N] ([quick | standard | thorough])
 
