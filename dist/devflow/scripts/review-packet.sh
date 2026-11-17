@@ -4,6 +4,9 @@
 # base branch), acceptance criteria, plan excerpts, verification stamps and the
 # project rules. Every agent reads the packet instead of re-running git diff
 # and re-reading task.md, plan.md and constitution.md. Identical on both hosts.
+# Fresh-eyes isolation rule: packet includes spec artefacts (task.md, plan.md,
+# constitution.md, stamps, diff) only — never pass authoring-session reasoning,
+# chat transcripts, or scratch files.
 #
 # Usage (from the project root):
 #   review-packet.sh [feature] [--base BRANCH] [--profile P] [--roster "a b c"] [--max-diff-kb N] [--since TREE]
