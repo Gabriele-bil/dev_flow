@@ -1,5 +1,5 @@
 name: devflow
-version: 2.2.0
+version: 2.3.0
 description: >-
   Spec-driven development pipeline: task → plan → implement → [beautify] → test
   → ship → pr
@@ -170,8 +170,8 @@ agents:
     description: >-
       Re-checks blocking review findings from devflow.ship, devflow.plan, or
       devflow.task against the cited file, line, or source document; discards
-      unsupported findings and classifies confirmed plan/task findings as
-      proven or suspected
+      unsupported findings and classifies confirmed plan/task findings as proven
+      or suspected
     invoked_by: devflow.ship, devflow.plan, devflow.task
   - id: brainstormer
     path: agents/brainstormer.md
