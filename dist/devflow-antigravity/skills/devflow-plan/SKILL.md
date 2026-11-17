@@ -169,8 +169,8 @@ Read by `devflow.implement` (routes `[ui]` batches to impeccable, else loads DES
 **Trigger:** Step 4d profile `standard` or `thorough`, not run mode. `quick` → skip. Run mode (`.devflow-run.json` present) → skip: plan runs inside a step-runner, which cannot dispatch subagents; Step 5b covers it.
 
 1. Dispatch `$HOME/.gemini/antigravity-cli/plugins/devflow/agents/plan-reviewer.md` once (Claude Code: Agent, `subagent_type: "devflow:plan-reviewer"`, `model: opus` on `thorough`; Antigravity: `invoke_subagent`, subagent `plan-reviewer`) with: mode `plan`, full draft `plan.md` inline, `task.md` path, Complexity profile.
-2. `LGTM` → Step 5. Critical / major → fix draft, re-dispatch. Minor → fix inline, no re-dispatch.
-3. Max two rounds. Critical or major left after round two → record each under **Open questions**, ask user before Step 5.
+2. `LGTM` → Step 5. Any `critical` / `major` → challenge pass: dispatch `$HOME/.gemini/antigravity-cli/plugins/devflow/agents/finding-validator.md` (mode `plan`, draft + numbered `critical`/`major` list). `DISCARDED` → drop and list in Step 6 notify with reason. `CONFIRMED (proven)` → fix draft (never override a documented deliberate decision on opinion alone). `CONFIRMED (suspected)` → ask user (`ask_question`). `minor` → fix inline, no re-dispatch.
+3. Max two rounds. If draft changed for a confirmed finding, re-dispatch `plan-reviewer` with the new draft only (never earlier findings; a re-raised finding matching a discarded one keeps its outcome unless it cites new evidence). Critical/major left after round two → record under **Open questions**, ask user before Step 5.
 
 ### Step 5 - Write plan file
 
@@ -236,6 +236,6 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | Reads (conditional) | `docs/adr/` (if present — active ADRs referenced in `task.md`); `.devflow-run.json` (existence — run-mode switch, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md`) |
 | Reads (conditional) | `DESIGN.md` / `docs/design.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/design-skill.md` (Step 4e — design source + UI tagging) |
 | Writes (optional) | `devflow/features/[NNN]_[feature-name]/data-model.md` (Step 4c — triggered when feature touches persistent entities) |
-| Dispatches (conditional) | `plan-reviewer` (Step 4f — `standard`/`thorough`, interactive only) |
+| Dispatches (conditional) | `plan-reviewer`, `finding-validator` (Step 4f — `standard`/`thorough`, interactive only) |
 | Next step | `devflow.implement` |
 | Related skills | Per active `ADAPTER.md` → **Technology skills** |

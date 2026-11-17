@@ -168,9 +168,11 @@ agents:
   - id: finding-validator
     path: agents/finding-validator.md
     description: >-
-      Re-checks every Critical and Required devflow.ship finding against the
-      cited file and line; discards only what the code disproves
-    invoked_by: devflow.ship
+      Re-checks blocking review findings from devflow.ship, devflow.plan, or
+      devflow.task against the cited file, line, or source document; discards
+      unsupported findings and classifies confirmed plan/task findings as
+      proven or suspected
+    invoked_by: devflow.ship, devflow.plan, devflow.task
   - id: brainstormer
     path: agents/brainstormer.md
     description: >-

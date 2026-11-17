@@ -30,7 +30,7 @@ The dispatching skill's prompt gives: the raw input inline (user's idea text, or
 ## Workflow
 
 1. Read `docs/product.md` (feature status, actors, domain terms). Accepted ADRs in `docs/adr/` only when the draft cites them.
-2. Review the axes in order. One issue per defect; cite the section, `UC-N` or `AC-N`.
+2. Review the axes in order. One issue per defect; cite the section, `UC-N` or `AC-N`. Every `required` issue MUST include a blind-verifiable citation: verbatim quote from raw input, `docs/product.md` (`path:line` + quote), cited ADR, or draft `task.md` line.
 
 | Axis | Look for |
 | --- | --- |
@@ -51,7 +51,7 @@ Final message, nothing before or after:
 
 ```text
 TASK REVIEW: <LGTM | ISSUES> · <R> required · <N> nit
-- [required] <section/UC-N/AC-N> — <problem> → <proposed wording or fix>
+- [required] <section/UC-N/AC-N> — <problem> [cite: <source "quote">] → <proposed wording or fix>
 - [nit] …
 ```
 

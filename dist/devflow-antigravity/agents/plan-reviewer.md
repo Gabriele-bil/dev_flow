@@ -25,7 +25,7 @@ The dispatching skill's prompt gives: mode (`plan` or `blueprint`), the full dra
 
 1. Read `constitution.md`, `REGISTRY.md` and, in `plan` mode, `task.md`. Accepted ADRs in `docs/adr/` only when the draft cites them.
 2. Ground the draft in the code: every File List entry marked `modify` → the file exists and the named symbol is there (`grep -n`); every `create` → no existing file or shared component already covers it. Sample — at most 10 lookups, highest-risk entries first (shared contracts, migrations, auth).
-3. Review the axes of the mode, in order. One issue per defect; cite the File List entry, slice or step ID.
+3. Review the axes of the mode, in order. One issue per defect; cite the File List entry, slice or step ID. Every `critical` and `major` issue MUST include a blind-verifiable citation: `path:line` + verbatim quote from codebase/`constitution.md`/ADR, quoted `task.md` line, or exact failed lookup command.
 
 **`plan` mode:**
 
@@ -60,8 +60,8 @@ Final message, nothing before or after:
 
 ```text
 PLAN REVIEW: <LGTM | ISSUES> · <C> critical · <M> major · <m> minor
-- [critical] <entry/slice/step> — <problem> → <fix>
-- [major] …
+- [critical] <entry/slice/step> — <problem> [cite: <path:line "quote" | failed cmd>] → <fix>
+- [major] <entry/slice/step> — <problem> [cite: <path:line "quote" | failed cmd>] → <fix>
 - [minor] …
 ```
 
@@ -69,7 +69,7 @@ PLAN REVIEW: <LGTM | ISSUES> · <C> critical · <M> major · <m> minor
 
 ## Core Principles
 
-- **code over prose** — a claim about the codebase cites the file or the failed lookup
+- **code over prose** — every critical/major claim carries a blind-verifiable citation (`path:line` + verbatim quote, or failed lookup command)
 - **lead, not author** — propose the fix in one line; the plan stays the author's
 - **no re-checks** — traceability, layering and terminology belong to plan Step 5b
 - **token-lean** — read cited ranges, not whole files; caveman-compress output
