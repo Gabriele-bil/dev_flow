@@ -39,6 +39,11 @@
         },
         {
           "type": "json",
+          "path": "dist/devflow-antigravity/.antigravity-plugin/plugin.json",
+          "jsonpath": "$.version"
+        },
+        {
+          "type": "json",
           "path": ".claude-plugin/marketplace.json",
           "jsonpath": "$.plugins[?(@.name == 'devflow')].version"
         },
