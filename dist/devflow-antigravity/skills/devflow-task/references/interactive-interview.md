@@ -36,8 +36,8 @@ When running in unattended or automated mode (`.devflow-run.json` present):
 - Precedence order for defaults: repository precedent > `constitution.md` / `docs/product.md` > conservative / fail-closed design.
 - Record each assumed decision with its rationale in `task.md` (`## Notes` or `## Clarifications`) or `plan.md` (`## Decision flags`).
 
-## Deep Architectural Grilling (`/grill-me`)
+## Deep Architectural Grilling (optional external skill)
 
 When planning or discovering complex features where trade-offs span multiple services or data models:
 
-- Suggest the **/grill-me** slash command to the user if they wish to stress-test their requirements against failure modes, edge cases, and scale constraints before locking `task.md` or `plan.md`.
+- If an external grilling skill (such as `/grill-me`) is installed, suggest it to the user to stress-test requirements against failure modes, edge cases, and scale constraints before locking `task.md` or `plan.md`.
