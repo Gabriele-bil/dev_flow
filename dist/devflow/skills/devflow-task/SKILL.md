@@ -142,7 +142,7 @@ Load only on need — default path reads none:
 
 - [ ] **Goal & Value**: states concrete user pain point and falsifiable objective; zero empty boosters (`robust`, `seamless`, `comprehensive`, `intuitive`) without an observable mechanism or threshold
 - [ ] **Bug reproduction (`fix/` only)**: `## Reproduction` present with steps, observed, expected, and reproduced status (smallest existing runner first, zero tracked writes)
-- [ ] **Source fidelity**: zero invented metrics, personas, or domain rules; any model-inferred default is explicitly isolated in `## Assumptions & Risks`
+- [ ] **Source fidelity**: zero invented metrics, personas, or domain rules; each Use Case / AC tagged with its origin (`(Idea)`, `(Ticket)`, `(Clarification)`, `(Default)`) and every `(Default)` isolated in `## Assumptions & Risks`
 - [ ] **User Story**: strictly Connextra (`As a ... I want to ... So that ...`). Real human or external actor (never technical role); action has clean intent (no compound and/or); value has measurable benefit (no tautology)
 - [ ] **INVEST**: Independent, Negotiable, Valuable, Estimable, Small (2–5 scenarios; more → split vertically), Testable
 - [ ] **Use Cases**: structured with at least 1 Happy Path (`UC-1`) and 1-2 Alternative/Edge/Error cases (`UC-2`, `UC-3`). Read/View flows isolated from Action/Mutation flows

@@ -80,7 +80,7 @@ slices are strictly sequential (each depends on the previous). Same notation
 as the `devflow.blueprint` dependency graph, one level down. Read by
 `devflow.resume` (resume ordering), `devflow.backprop` (re-implementation
 scoped to affected slice + dependents), and any future parallel slice
-execution.
+execution. Prefer slice orderings whose first slice leaves the app exercisable by hand; under the first hands-on slice heading, add a `*Try it:* <screen to open | command to run | endpoint to hit>` line so the human has an immediate interactive checkpoint.
 
 **Contracts First rule:** Shared contracts (types, interfaces, DTOs, DB schemas, state contracts) shared across ≥2 slices or `[P]` files MUST sit in `Slice 1` (`deps: none`). Parallel slices/files consume contracts via `--after` / `deps:` and never copy or redeclare another slice's contract.
 
@@ -96,6 +96,7 @@ Under each `### [NNN].` heading, write four compact bullets so a cold agent can 
 - **Out of scope:** files, layers, or dependencies this entry must not touch
 
 **Slice 1 — [name]** (deps: none) [route: strong]
+*Try it:* [screen to open, command to run, or endpoint to hit once Slice 1 is done]
 
 ### [NNN]. `[path/to/file.ext]` - [create | modify] [pending]
 - **Change:** [what this file does and why it exists]

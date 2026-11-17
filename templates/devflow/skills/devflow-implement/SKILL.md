@@ -1,7 +1,7 @@
 ---
 name: devflow-implement
 description: Implements DevFlow plan files per architecture conventions, MCP-assisted validation. Use when user runs devflow.implement, executes plan.md, or third pipeline step.
-argument-hint: "[optional-plan-path] [--fix <findings|files>]"
+argument-hint: "[optional-plan-path] [--slice <N>] [--fix <findings|files>]"
 disable-model-invocation: true
 effort: medium
 ---
@@ -10,9 +10,10 @@ effort: medium
 
 ## Quick Start
 
-Run `/devflow.implement [optional plan path] [--fix <findings|files>]`.
+Run `/devflow.implement [optional plan path] [--slice <N>] [--fix <findings|files>]`.
 
 - If an argument is passed, use it as the `plan.md` path
+- `--slice <N>` → **slice-by-slice mode**: implement only `Slice <N>` (after confirming its `deps:` slices are `[done]`), run Step 5–6 checks and slice checkpoint, mark `Slice <N>` entries `[done]`, keep `plan.md` `**Status:** implementing` while `[pending]` slices remain, and stop for human review with a proposed commit subject (never commit automatically during implement)
 - `--fix` → **re-entry mode** (see below): targeted fixes only
 - If no argument is passed, resolve feature with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask)
 
