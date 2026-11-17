@@ -163,7 +163,7 @@ elif [ "$EVENT" = "post" ]; then
       if [ -z "$ERR_CAT" ]; then
         if [ "$KIND" = "shell" ]; then
           case "$DF_CMD" in
-            *test*|*vitest*|*jest*|*pytest*|*playwright*|*flutter\ test*|*dart\ test*) ERR_CAT="test_failure" ;;
+            *test*|*jest*|*playwright*) ERR_CAT="test_failure" ;;
             *) [ -n "$EXIT_CODE" ] && ERR_CAT="shell_error" || ERR_CAT="shell_failure" ;;
           esac
         else
