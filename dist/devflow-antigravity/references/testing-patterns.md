@@ -53,7 +53,7 @@ If behavior matters enough to keep, put a test on it. No "too simple to test" ex
 
 ## Prove-It Pattern (Bug Fixes)
 
-1. Write test that **reproduces** the bug — must fail before fix
+1. Write test that **reproduces** the bug — must be seen failing **on its assertion** before fix (compile, import, or fixture errors do not count; record the failure line)
 2. Implement fix
 3. Confirm test now passes
 4. Test is permanent proof the bug is fixed

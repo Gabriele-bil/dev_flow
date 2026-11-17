@@ -123,7 +123,7 @@ Before the first file (Status `ready` only — skip on `implementing` resume and
 
 Implement all files from the plan in the exact order defined in the **File List**. Slice headings carrying `deps:` annotations: enter a slice only when every listed dep slice is fully `[done]` — File List order already satisfies this on sequential plans; the annotation matters when slices were reordered or a dep slice still has `[pending]` entries.
 
-**Verify-criteria first:** per subtask, before writing code, state the check that proves it done — test name, command, or observable behavior. Implement loop is self-verifying, not clarification-driven.
+**Verify-criteria first:** per subtask, before writing code, state the check that proves it done — test name, command, or observable behavior. Implement loop is self-verifying, not clarification-driven. For `fix/` features where `### 001.` is the regression test, enforce observe-fail → fix → observe-pass: run `### 001.` before editing production code and confirm it fails **on its assertion** (compile/import/fixture errors do not count; if it passes or cannot fail on the assertion, stop before applying any fix).
 
 Each file must:
 

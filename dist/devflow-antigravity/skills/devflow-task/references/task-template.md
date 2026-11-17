@@ -23,6 +23,15 @@ Used by `devflow.task` Step 9 — write `devflow/features/[NNN]_[feature-name]/t
 
 ---
 
+## Reproduction
+<!-- Required when branch type is fix/ — omit for feat/chore/doc/perf -->
+- **Steps:** [minimal steps or existing test/command run]
+- **Observed:** [actual broken behavior or failure output]
+- **Expected:** [correct behavior]
+- **Reproduced:** [yes — `<command/test>` | no — `<why; environment/data/version asked>`]
+
+---
+
 ## User Story
 
 **As a** [specific user persona or external actor — never a technical role]  
@@ -96,6 +105,7 @@ Format rules:
 
 - **Product-only**: strictly functional and behavioral perspective; zero implementation detail (no class names, file paths, database schemas, or internal API routes).
 - **Goal & Value**: concise problem context and falsifiable outcome; no empty emphasis (`robust`, `seamless`, `comprehensive`) without a concrete mechanism.
+- **Reproduction (`fix/` tasks only)**: reproduce using existing project runners, smallest first (unit → integration → e2e); no tracked writes, side outputs only in scratch/gitignored paths; ask before touching shared/external state. Not reproduced → ask where it occurred (environment, data, version) in Step 4; never assume fixed or invalid.
 - **Source fidelity**: never invent metrics, SLAs, personas, or domain rules not grounded in user input or `docs/product.md`. Keep model-inferred defaults visibly separated in `## Assumptions & Risks`.
 - **User Story**: strictly Connextra format. Real persona (never tech role); intent-based action (no compound conjunctions); true value (no tautology).
 - **Use Cases**: at least 1 Happy Path (`UC-1`) and 1-2 Alternative/Error/Edge Case scenarios (`UC-2`, `UC-3`). Isolate Read/View from Action/Write.

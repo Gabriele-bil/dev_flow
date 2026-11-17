@@ -69,6 +69,7 @@ Stop and ask before writing task if:
 - Persona or actor is undefined (must be real human or external actor, never technical role)
 - Core workflow trigger or output format is ambiguous
 - Idea overlaps with existing feature in `docs/product.md`
+- Bug (`fix`) could not be reproduced locally — ask where it occurred (environment, data, version); never assume fixed or touch shared/external state without asking
 
 Structured elicitation rules:
 
@@ -138,6 +139,7 @@ Load only on need — default path reads none:
 ### Step 8 - Verification checklist (before write)
 
 - [ ] **Goal & Value**: states concrete user pain point and falsifiable objective; zero empty boosters (`robust`, `seamless`, `comprehensive`, `intuitive`) without an observable mechanism or threshold
+- [ ] **Bug reproduction (`fix/` only)**: `## Reproduction` present with steps, observed, expected, and reproduced status (smallest existing runner first, zero tracked writes)
 - [ ] **Source fidelity**: zero invented metrics, personas, or domain rules; any model-inferred default is explicitly isolated in `## Assumptions & Risks`
 - [ ] **User Story**: strictly Connextra (`As a ... I want to ... So that ...`). Real human or external actor (never technical role); action has clean intent (no compound and/or); value has measurable benefit (no tautology)
 - [ ] **INVEST**: Independent, Negotiable, Valuable, Estimable, Small (2–5 scenarios; more → split vertically), Testable
