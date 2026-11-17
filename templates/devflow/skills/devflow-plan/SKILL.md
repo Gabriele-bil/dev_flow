@@ -204,7 +204,9 @@ Respond with:
 [Feature summary in 1-2 lines]
 [N] files to create, [M] files to modify
 
-Continue to implementation? -> devflow.implement
+Continue to implementation (fresh context recommended for standard/thorough):
+  Reset session (/clear or new chat) → /devflow.implement
+  or in this session:                → /devflow.implement
 ```
 
 ## Parallelization (multi-session / multi-agent)
