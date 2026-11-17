@@ -39,12 +39,13 @@ Triggers live only in `steps/implement.md` → skill load decision matrix. This 
 - Required baseline for this adapter:
   - `context7`
   - `sequential-thinking` (MCP server: <https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking>)
+  - `code-review-graph` (code graph MCP — setup in `$HOME/.gemini/antigravity-cli/plugins/devflow/references/mcp-catalog.md`; index-first exploration, blast radius)
 - API design & contracts:
-  - `openapi` (OpenAPI MCP server) — inspect OpenAPI/Swagger specs, validate DTO boundaries and contract changes
+  - `openapi` (`@ivotoby/openapi-mcp-server`, `TOOLS_MODE=dynamic`, spec from `/api-json`) — inspect the app's Swagger spec, validate DTO boundaries and contract changes
 - Conditional (only when used in project):
   - `postgres` (`@microsoft/postgres-mcp` or `mcp-postgres-server`, read-only) — schema introspection, migration drift (add ONLY if project uses PostgreSQL; omit otherwise)
-  - `supabase` (Supabase MCP) — schema, RLS, tables (add ONLY if project uses Supabase as backend/DB; omit otherwise)
-  - `sentry` (`mcp.sentry.dev` / `getsentry/sentry-mcp`) — error triage and stack traces (add ONLY if project uses Sentry)
+  - `supabase` (`https://mcp.supabase.com/mcp?read_only=true`) — schema, RLS, tables (add ONLY if project uses Supabase as backend/DB; omit otherwise)
+  - `sentry` (`https://mcp.sentry.dev/mcp` / `getsentry/sentry-mcp`) — error triage and stack traces (add ONLY if project uses Sentry)
 - **Context7**: check current NestJS 12, TypeORM 1 / Prisma 7, BullMQ, Terminus docs before writing any API this adapter does not show — these change every minor.
 - **Sequential Thinking**: break module restructuring, auth flow changes, and multi-step migrations into small, testable steps.
 

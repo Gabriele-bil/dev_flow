@@ -193,6 +193,32 @@ assert_equals "run disarm: marker removed" "$([ -e .devflow-run.json ] && echo p
 assert_equals "run status: inactive" "$(st run status)" "run: inactive"
 teardown
 
+# ── lifecycle metrics & feedback ─────────────────────────────────────────────
+setup
+feature 001_funnel draft implementing
+st set plan implemented 001_funnel >/dev/null
+assert_equals "lifecycle: features.jsonl written" "$([ -f .devflow-metrics/features.jsonl ] && echo yes || echo no)" "yes"
+assert_equals "lifecycle: event status_change recorded" "$(jq -r .event .devflow-metrics/features.jsonl | head -1)" "status_change"
+st feedback 001_funnel "Smooth run!" >/dev/null
+assert_equals "feedback: feedback.jsonl written" "$([ -f .devflow-metrics/feedback.jsonl ] && echo yes || echo no)" "yes"
+assert_equals "feedback: note recorded" "$(jq -r .feedback .devflow-metrics/feedback.jsonl | head -1)" "Smooth run!"
+teardown
+
+# ── drift ────────────────────────────────────────────────────────────────────
+setup
+git config user.email t@t && git config user.name t
+mkdir -p src && printf 'export const a = 1;\n' > src/a.ts && printf 'export const b = 1;\n' > src/b.ts
+git add -A && git commit -q -m init
+SHA=$(git rev-parse --short HEAD)
+feature 013_drift clarified ready
+assert_contains "drift: no pinned commit" "$(st drift 013)" "drift: no pinned commit"
+awk -v s="**Verified at:** $SHA (2026-11-17)" '/^\*\*Status:\*\*/{print s} {print}' devflow/features/013_drift/plan.md > tmp && mv tmp devflow/features/013_drift/plan.md
+printf 'unrelated\n' > README.md && git add README.md && git commit -q -m docs
+assert_contains "drift: clean when only unrelated files change" "$(st drift 013)" "drift: clean ($SHA..HEAD)"
+printf 'export const b = 2;\n' > src/b.ts && git add src/b.ts && git commit -q -m edit_b
+assert_contains "drift: reports changed planned file" "$(st drift 013)" "drift: 1 planned file(s) changed since $SHA: src/b.ts"
+teardown
+
 echo ""
 echo "devflow-state: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]

@@ -6,6 +6,7 @@
 # Usage (from the project root; [F] = feature: NNN, NNN_name or a path inside it):
 #   devflow-state.sh resolve [F]          active feature NNN_name (exit 1 → ask the user)
 #   devflow-state.sh status [F]           one line: statuses, next step, progress
+#   devflow-state.sh drift [F]            planned files modified in git since **Verified at:** sha
 #   devflow-state.sh report [F]           report lines for run/auto: files, checks,
 #                                         verification, decision flags — computed, not recalled
 #   devflow-state.sh set plan|task <status> [F] [--force]
@@ -22,6 +23,8 @@
 #                                         origin/<base> (HEAD when offline — the line says so)
 #   devflow-state.sh run arm --orchestrator devflow.run|devflow.auto --from X --until Y [--feature F] [--iterations N]
 #   devflow-state.sh run feature <NNN_name> | bump | status | disarm
+#   devflow-state.sh feedback [F] <note...>
+#                                         record user experience feedback for the feature
 #
 # Exit codes: 0 ok · 1 nothing resolved / not found · 2 refused (illegal
 # transition, stale marker, failing verification) · 3 grader cap reached (run bump)
@@ -185,6 +188,83 @@ write_status() {
 verification_result() { _field "$FDIR/verification.md" Result | awk '{print $1}'; }
 
 # ── Commands ──────────────────────────────────────────────────────────────────
+record_lifecycle_metric() {
+  local feat="$1" kind="$2" from="$3" to="$4"
+  command -v df_metric >/dev/null 2>&1 || return 0
+  df_metrics_dir >/dev/null 2>&1 || return 0
+
+  local plan="$FDIR/plan.md"
+  local planned=0 touched=0 added=0 deleted=0 loc_test=0
+  if [ -f "$plan" ]; then
+    planned=$(grep -E '^###[[:space:]]+.*\`.*\`' "$plan" 2>/dev/null | wc -l | tr -d ' ')
+  fi
+  if command -v git >/dev/null 2>&1; then
+    local base; base=$(base_branch 2>/dev/null || echo "")
+    local base_commit=""
+    if [ -n "$base" ]; then
+      base_commit=$(git merge-base HEAD "origin/$base" 2>/dev/null || git merge-base HEAD "$base" 2>/dev/null || echo "")
+    fi
+    if [ -n "$base_commit" ]; then
+      local stat; stat=$(git diff --shortstat "$base_commit" HEAD 2>/dev/null || echo "")
+      if [ -n "$stat" ]; then
+        touched=$(printf '%s' "$stat" | grep -oE '[0-9]+ file' | awk '{print $1}')
+        added=$(printf '%s' "$stat" | grep -oE '[0-9]+ insertion' | awk '{print $1}')
+        deleted=$(printf '%s' "$stat" | grep -oE '[0-9]+ deletion' | awk '{print $1}')
+      fi
+      local test_stat; test_stat=$(git diff --shortstat "$base_commit" HEAD -- '*test*' '*spec*' 2>/dev/null || echo "")
+      if [ -n "$test_stat" ]; then
+        loc_test=$(printf '%s' "$test_stat" | grep -oE '[0-9]+ insertion' | awk '{print $1}')
+      fi
+    fi
+  fi
+  local event="status_change"
+  if [ "$to" = "pr-opened" ] || { [ "$kind" = "task" ] && [ "$to" = "done" ]; }; then
+    event="complete"
+  fi
+  local row; row=$(jq -cn \
+    --arg ts "$(now)" \
+    --arg feat "$feat" \
+    --arg kind "$kind" \
+    --arg from "$from" \
+    --arg to "$to" \
+    --arg event "$event" \
+    --argjson planned "${planned:-0}" \
+    --argjson touched "${touched:-0}" \
+    --argjson loc_added "${added:-0}" \
+    --argjson loc_deleted "${deleted:-0}" \
+    --argjson loc_test_added "${loc_test:-0}" \
+    '{ts: $ts, feature: $feat, kind: $kind, from: $from, to: $to, event: $event,
+      planned_files: (if $planned > 0 then $planned else null end),
+      touched_files: (if $touched > 0 then $touched else null end),
+      loc_added: (if $loc_added > 0 then $loc_added else null end),
+      loc_deleted: (if $loc_deleted > 0 then $loc_deleted else null end),
+      loc_test_added: (if $loc_test_added > 0 then $loc_test_added else null end)}
+     | with_entries(select(.value != "" and .value != null))' 2>/dev/null) || true
+  [ -n "$row" ] && df_metric features "$row"
+}
+
+cmd_feedback() {
+  local feat=""
+  if [ $# -ge 2 ] && [[ "$1" =~ ^[0-9]{3} ]]; then
+    feat="$1"
+    shift
+  else
+    feat=$(resolve_feature "" 2>/dev/null || echo "")
+  fi
+  local note="$*"
+  [ -n "$note" ] || die "usage: feedback [feature] <note...>"
+  command -v df_metric >/dev/null 2>&1 || return 0
+  df_metrics_dir >/dev/null 2>&1 || return 0
+  local row; row=$(jq -cn \
+    --arg ts "$(now)" \
+    --arg feat "$feat" \
+    --arg feedback "$note" \
+    '{ts: $ts, feature: $feat, feedback: $feedback}
+     | with_entries(select(.value != "" and .value != null))' 2>/dev/null) || true
+  [ -n "$row" ] && df_metric feedback "$row"
+  echo "feedback recorded for ${feat:-workspace}"
+}
+
 cmd_set() {
   local kind="$1" to="$2" arg="" force="" file from
   shift 2 || die "usage: set plan|task <status> [feature] [--force]"
@@ -206,6 +286,7 @@ cmd_set() {
   fi
   write_status "$FDIR/$file" "$to" || die "could not write $FDIR/$file"
   merge_state
+  record_lifecycle_metric "$FEATURE" "$kind" "$from" "$to"
   printf '%s: %s → %s · ' "$file" "${from:-—}" "$to"
   status_line
 }
@@ -276,6 +357,33 @@ cmd_checkpoint() {
 # count_items <file> <heading> — "- " bullets under "## <heading>".
 count_items() {
   awk -v h="## $2" '$0 == h || index($0, h " ") == 1 { on = 1; next } on && /^## / { exit } on && /^- / { n++ } END { print n + 0 }' "$1" 2>/dev/null
+}
+
+cmd_drift() {
+  need_feature "$1"
+  local plan="$FDIR/plan.md" raw sha paths changed p
+  [ -f "$plan" ] || die "$plan not found"
+  raw=$(_field "$plan" "Verified at")
+  sha=$(printf '%s' "$raw" | awk '{print $1}')
+  if [ -z "$sha" ] || ! git rev-parse --verify --quiet "$sha^{commit}" >/dev/null 2>&1; then
+    echo "drift: no pinned commit in $plan"
+    return 0
+  fi
+  paths=()
+  while IFS= read -r p; do
+    [ -n "$p" ] && paths+=("$p")
+  done < <(grep -E '^###[[:space:]]+.*`[^`]+`' "$plan" 2>/dev/null | sed -E 's/^###[^`]*`([^`]+)`.*/\1/')
+  if [ ${#paths[@]} -eq 0 ]; then
+    echo "drift: clean ($sha..HEAD)"
+    return 0
+  fi
+  changed=$(git diff --name-only "$sha"..HEAD -- "${paths[@]}" 2>/dev/null || true)
+  if [ -z "$changed" ]; then
+    echo "drift: clean ($sha..HEAD)"
+  else
+    printf 'drift: %d planned file(s) changed since %s: %s\n' \
+      "$(printf '%s\n' "$changed" | grep -c .)" "$sha" "$(printf '%s' "$changed" | paste -sd, -)"
+  fi
 }
 
 cmd_report() {
@@ -382,6 +490,7 @@ cmd_run() {
 case "$1" in
   resolve) resolve_feature "$2" && echo || exit 1 ;;
   status) need_feature "$2"; status_line ;;
+  drift) cmd_drift "$2" ;;
   report) cmd_report "$2" ;;
   base) base_branch ;;
   branch) cmd_branch "$2" ;;
@@ -389,6 +498,7 @@ case "$1" in
   mark-done) shift; cmd_mark_done "$@" ;;
   checkpoint) shift; cmd_checkpoint "$@" ;;
   sync) need_feature "$2"; merge_state; printf 'synced · '; status_line ;;
+  feedback) shift; cmd_feedback "$@" ;;
   run) shift; cmd_run "$@" ;;
   ""|-h|--help) sed -n '2,/^$/s/^# \{0,1\}//p' "$0" ;;
   *) die "unknown command '$1' (see --help)" ;;

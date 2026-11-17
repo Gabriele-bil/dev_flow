@@ -144,7 +144,7 @@ The three rules that make it save tokens: (a) index **first**, never as fallback
 
 **Token relevance:** exploratory tool-call churn is typically the biggest input-token sink in implement/plan sessions.
 
-**Portability:** high as *generalized guidance* — consumer projects may have tokensave, codegraph, serena, or nothing. The decision tree ports with a "whatever index this project has" abstraction; the specific tool is detected at session start.
+**Portability:** high as *generalized guidance* — consumer projects may have tokensave, codegraph, code-review-graph, or nothing. The decision tree ports with a "whatever index this project has" abstraction; the specific tool is detected at session start.
 
 ### 7. context-mode sandbox derivation
 
@@ -219,7 +219,7 @@ Mirror on the review side: add a *simplicity* check to the `devflow:code-reviewe
 Generalized from tokless's codegraph section, tool-agnostic:
 
 ```text
-Project has a code index (tokensave / codegraph / serena / LSP MCP)?
+Project has a code index (tokensave / codegraph / code-review-graph / LSP MCP)?
 ├─ YES → one semantic query FIRST for any structural question
 │        (how does X work, who calls Y, where is Z, blast radius).
 │        Trust the result: no re-grep, no re-read of returned source.

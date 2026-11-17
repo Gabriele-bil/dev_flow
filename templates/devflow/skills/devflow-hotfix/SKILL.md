@@ -47,7 +47,7 @@ Transitions: `ready → implementing → implemented → tested → shipped → 
 ### Step 2 - Failing test, then fix
 
 1. Resolve adapter + app per `@devflow/references/adapter-resolution.md`; read `steps/test.md`, `steps/implement.md`. Status `implementing`.
-2. Write regression test (AC-2); run it. Must FAIL for the reported reason (Prove-It). Passes → root cause wrong → back to Step 1.1.
+2. Write regression test (AC-2); run it. Must FAIL **on its assertion** for the reported reason (Prove-It — a broken import, compile error, or fixture error is not a failure seen; record the failure line). Passes or fails elsewhere → root cause or test wrong → back to Step 1.1.
 3. Minimal fix at root cause, File List files only. Needs >3 files or design → stop, route `devflow.task`.
 4. Regression test passes; adapter format + analyze clean (monorepo: `(cd "<app-path>" && …)`). Mark entries `[done]`; Status `implemented`.
 

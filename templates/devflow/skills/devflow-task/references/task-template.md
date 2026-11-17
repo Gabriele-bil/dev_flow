@@ -23,6 +23,15 @@ Used by `devflow.task` Step 9 — write `devflow/features/[NNN]_[feature-name]/t
 
 ---
 
+## Reproduction
+<!-- Required when branch type is fix/ — omit for feat/chore/doc/perf -->
+- **Steps:** [minimal steps or existing test/command run]
+- **Observed:** [actual broken behavior or failure output]
+- **Expected:** [correct behavior]
+- **Reproduced:** [yes — `<command/test>` | no — `<why; environment/data/version asked>`]
+
+---
+
 ## User Story
 
 **As a** [specific user persona or external actor — never a technical role]  
@@ -33,7 +42,7 @@ Used by `devflow.task` Step 9 — write `devflow/features/[NNN]_[feature-name]/t
 
 ## Use Cases & Scenarios
 
-### UC-1: [Main Flow Title] (Happy Path)
+### UC-1: [Main Flow Title] (Happy Path) [(Idea | Ticket | Clarification | Default)]
 - **Preconditions:** [State or requirements before interaction begins]
 - **User Flow:**
   1. [User does action 1]
@@ -56,7 +65,7 @@ Used by `devflow.task` Step 9 — write `devflow/features/[NNN]_[feature-name]/t
 <!-- BDD Gherkin format: Given / When / Then. Exactly one When per scenario. -->
 <!-- Default: compact single-line format for token efficiency; indented multiline allowed for complex assertions. -->
 
-- [ ] **AC-1 (UC-1) — [Scenario Title]:** GIVEN [initial state] WHEN [single trigger action] THEN [observable outcome]
+- [ ] **AC-1 (UC-1) — [Scenario Title]:** GIVEN [initial state] WHEN [single trigger action] THEN [observable outcome] *(Idea | Ticket | Clarification | Default)*
 - [ ] **AC-2 (UC-1) — [Async Loading & Protection]:** GIVEN [action initiated] WHEN [request in progress] THEN [loading indicator displayed] AND [submit controls disabled]
 - [ ] **AC-3 (UC-2) — [Edge / Empty State]:** GIVEN [empty condition] WHEN [viewed] THEN [informative fallback displayed]
 - [ ] **AC-4 (UC-3) — [Error & Recovery]:** GIVEN [invalid state or failure] WHEN [action attempted] THEN [clear error message displayed] AND [user can retry]
@@ -96,7 +105,8 @@ Format rules:
 
 - **Product-only**: strictly functional and behavioral perspective; zero implementation detail (no class names, file paths, database schemas, or internal API routes).
 - **Goal & Value**: concise problem context and falsifiable outcome; no empty emphasis (`robust`, `seamless`, `comprehensive`) without a concrete mechanism.
-- **Source fidelity**: never invent metrics, SLAs, personas, or domain rules not grounded in user input or `docs/product.md`. Keep model-inferred defaults visibly separated in `## Assumptions & Risks`.
+- **Reproduction (`fix/` tasks only)**: reproduce using existing project runners, smallest first (unit → integration → e2e); no tracked writes, side outputs only in scratch/gitignored paths; ask before touching shared/external state. Not reproduced → ask where it occurred (environment, data, version) in Step 4; never assume fixed or invalid.
+- **Source fidelity**: never invent metrics, SLAs, personas, or domain rules not grounded in user input or `docs/product.md`. Tag each Use Case and Acceptance Criterion with its origin (`(Idea)`, `(Ticket)`, `(Clarification)`, `(Default)`), and isolate every `(Default)` item in `## Assumptions & Risks`.
 - **User Story**: strictly Connextra format. Real persona (never tech role); intent-based action (no compound conjunctions); true value (no tautology).
 - **Use Cases**: at least 1 Happy Path (`UC-1`) and 1-2 Alternative/Error/Edge Case scenarios (`UC-2`, `UC-3`). Isolate Read/View from Action/Write.
 - **Acceptance criteria**: strict BDD Gherkin (`GIVEN ... WHEN ... THEN ...`), exactly one `When` per scenario. Mapped directly to Use Cases (e.g. `AC-1 (UC-1)`). Observable, falsifiable, binary pass/fail. Explicit async coverage (loading, disabled controls to prevent double submit, error recovery).

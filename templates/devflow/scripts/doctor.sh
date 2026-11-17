@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # doctor.sh — DevFlow Environment, MCP, and Pipeline Health Diagnostic
-# Usage: bash templates/devflow/scripts/doctor.sh [--json] [--fix]
+# Usage: bash templates/devflow/scripts/doctor.sh [--json] [--fix] [--context]
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -9,11 +9,13 @@ WORKSPACE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 
 JSON_MODE=false
 FIX_MODE=false
+CONTEXT_MODE=false
 
 for arg in "$@"; do
   case "$arg" in
     --json) JSON_MODE=true ;;
     --fix) FIX_MODE=true ;;
+    --context) CONTEXT_MODE=true ;;
   esac
 done
 
@@ -50,6 +52,7 @@ if [[ -n "${ANTIGRAVITY_CONVERSATION_ID:-}" || -n "${ANTIGRAVITY_APP_DIR:-}" || 
   DETECTED_CLIENT="Antigravity"
 fi
 [[ -f "$HOME/.gemini/config/mcp_config.json" ]] && MCP_CONFIG_PATHS+=("$HOME/.gemini/config/mcp_config.json")
+[[ -f "$HOME/.gemini/antigravity/mcp_config.json" ]] && MCP_CONFIG_PATHS+=("$HOME/.gemini/antigravity/mcp_config.json")
 [[ -f "$WORKSPACE_ROOT/.agents/mcp_config.json" ]] && MCP_CONFIG_PATHS+=("$WORKSPACE_ROOT/.agents/mcp_config.json")
 
 # Check Claude Code (CLAUDECODE=1 inside a session wins over file heuristics)
@@ -103,7 +106,8 @@ fi
 CONFIGURED_MCPS=()
 for CFG in "${MCP_CONFIG_PATHS[@]}"; do
   if [[ -f "$CFG" ]] && command -v jq >/dev/null 2>&1; then
-    SERVERS=$(jq -r '(.mcpServers // {}) | keys[]' "$CFG" 2>/dev/null || true)
+    # ~/.claude.json keeps `claude mcp add` (local scope) entries under .projects[<path>]
+    SERVERS=$(jq -r --arg ws "$WORKSPACE_ROOT" '((.mcpServers // {}) + (.projects[$ws].mcpServers // {})) | keys[]' "$CFG" 2>/dev/null || true)
     while IFS= read -r s; do
       [[ -n "$s" ]] && CONFIGURED_MCPS+=("$s")
     done <<< "$SERVERS"
@@ -152,7 +156,7 @@ record_mcp() {
 
 record_mcp "context7" "baseline" "Live library/API documentation"
 record_mcp "sequential-thinking" "baseline" "Multi-step reasoning & refactoring"
-record_mcp "serena" "baseline" "AST / semantic code index (or other LSP index)"
+record_mcp "code-review-graph" "baseline" "Code graph: index-first exploration & blast radius (setup: references/mcp-catalog.md)"
 
 case "$DETECTED_ADAPTER" in
   flutter)
@@ -178,6 +182,10 @@ fi
 
 if grep -qiE 'pg|postgres|typeorm' "$WORKSPACE_ROOT/package.json" 2>/dev/null; then
   record_mcp "postgres" "conditional" "Detected PostgreSQL / TypeORM in project"
+fi
+
+if [[ "$DETECTED_ADAPTER" == "nextjs" && -f "$WORKSPACE_ROOT/components.json" ]]; then
+  record_mcp "shadcn" "conditional" "Detected shadcn/ui (components.json)"
 fi
 
 if grep -qiE 'sentry' "$WORKSPACE_ROOT/package.json" 2>/dev/null || grep -qiE 'sentry' "$WORKSPACE_ROOT/pubspec.yaml" 2>/dev/null; then
@@ -253,6 +261,21 @@ case "$DETECTED_ADAPTER" in
     check_cli "node" "false" "-v"
     ;;
 esac
+
+# code-review-graph: CLI present + graph built (MCP entry checked in Section 3)
+if command -v code-review-graph >/dev/null 2>&1; then
+  if [[ -f "$WORKSPACE_ROOT/.code-review-graph/graph.db" ]]; then
+    CLI_RESULTS+=("code-review-graph|OK|graph built")
+  else
+    CLI_RESULTS+=("code-review-graph|OPTIONAL|Graph not built — index-first exploration disabled")
+    WARNINGS=$((WARNINGS + 1))
+    REMEDIATIONS+=("Build the code graph: code-review-graph build")
+  fi
+else
+  CLI_RESULTS+=("code-review-graph|OPTIONAL|Missing — index-first exploration disabled")
+  WARNINGS=$((WARNINGS + 1))
+  REMEDIATIONS+=("Install code-review-graph (pipx install code-review-graph, then install --platform claude-code|antigravity --no-skills --no-instructions -y) — see references/mcp-catalog.md")
+fi
 
 # Design skill (impeccable) — UI adapters only; absent → DESIGN.md-only fallback
 case "$DETECTED_ADAPTER" in
@@ -366,6 +389,96 @@ else
   PIPELINE_RESULTS+=("Instincts Engine|INFO|No project instincts recorded yet")
 fi
 
+# ── Section 6: Startup Context Audit (--context) ────────────────────────────
+CONTEXT_RESULTS=()
+CONTEXT_TOTAL_TOKENS=0
+if [[ "$CONTEXT_MODE" == true ]]; then
+  record_ctx() {
+    local src="$1" status="$2" tokens="$3" detail="$4"
+    CONTEXT_TOTAL_TOKENS=$((CONTEXT_TOTAL_TOKENS + tokens))
+    CONTEXT_RESULTS+=("$src|$status|$tokens|$detail")
+  }
+  est_tokens_bytes() {
+    local b="${1:-0}"
+    echo $(( (b + 3) / 4 ))
+  }
+  # 1. Governing docs in workspace
+  for doc in "CLAUDE.md" "AGENTS.md" "constitution.md" "REGISTRY.md" "docs/product.md"; do
+    DOC_PATH="$WORKSPACE_ROOT/$doc"
+    [[ -f "$DOC_PATH" ]] || continue
+    BYTES=$(wc -c < "$DOC_PATH" | tr -d ' ')
+    TOK=$(est_tokens_bytes "$BYTES")
+    C_STAT="OK"
+    C_NOTE="$BYTES bytes"
+    if [[ ( "$doc" == "CLAUDE.md" || "$doc" == "AGENTS.md" ) && $TOK -gt 2000 ]]; then
+      C_STAT="WARN"
+      C_NOTE="$BYTES bytes (>2000 tok budget)"
+      WARNINGS=$((WARNINGS + 1))
+      REMEDIATIONS+=("Trim $doc (~$TOK est. tokens > 2000): move reference detail to docs/ or skills")
+    elif [[ "$doc" == "REGISTRY.md" && $TOK -gt 3000 ]]; then
+      C_STAT="WARN"
+      C_NOTE="$BYTES bytes (>3000 tok budget)"
+      WARNINGS=$((WARNINGS + 1))
+      REMEDIATIONS+=("Trim REGISTRY.md (~$TOK est. tokens > 3000): keep one-line pattern pointers")
+    fi
+    record_ctx "$doc" "$C_STAT" "$TOK" "$C_NOTE"
+  done
+  # 2. Core skill frontmatter descriptions
+  CORE_DESC_BYTES=0
+  CORE_SKILL_COUNT=0
+  for sf in "$PLUGIN_ROOT"/skills/*/SKILL.md; do
+    [[ -f "$sf" ]] || continue
+    CORE_SKILL_COUNT=$((CORE_SKILL_COUNT + 1))
+    DB=$(awk '/^description:/{sub(/^description:[[:space:]]*/,""); print; exit}' "$sf" | wc -c | tr -d ' ')
+    CORE_DESC_BYTES=$((CORE_DESC_BYTES + DB))
+  done
+  record_ctx "Core skill descriptions ($CORE_SKILL_COUNT)" "OK" "$(est_tokens_bytes "$CORE_DESC_BYTES")" "$CORE_DESC_BYTES bytes"
+  # 3. Active adapter + common skill descriptions
+  ADAPTER_DESC_BYTES=0
+  ADAPTER_SKILL_COUNT=0
+  for sf in "$PLUGIN_ROOT"/adapters/common/skills/*/SKILL.md; do
+    [[ -f "$sf" ]] || continue
+    ADAPTER_SKILL_COUNT=$((ADAPTER_SKILL_COUNT + 1))
+    DB=$(awk '/^description:/{sub(/^description:[[:space:]]*/,""); print; exit}' "$sf" | wc -c | tr -d ' ')
+    ADAPTER_DESC_BYTES=$((ADAPTER_DESC_BYTES + DB))
+  done
+  if [[ "$DETECTED_ADAPTER" != "unknown" && -d "$PLUGIN_ROOT/adapters/$DETECTED_ADAPTER/skills" ]]; then
+    for sf in "$PLUGIN_ROOT/adapters/$DETECTED_ADAPTER"/skills/*/SKILL.md; do
+      [[ -f "$sf" ]] || continue
+      ADAPTER_SKILL_COUNT=$((ADAPTER_SKILL_COUNT + 1))
+      DB=$(awk '/^description:/{sub(/^description:[[:space:]]*/,""); print; exit}' "$sf" | wc -c | tr -d ' ')
+      ADAPTER_DESC_BYTES=$((ADAPTER_DESC_BYTES + DB))
+    done
+  fi
+  record_ctx "Adapter+common skill descriptions ($ADAPTER_SKILL_COUNT)" "OK" "$(est_tokens_bytes "$ADAPTER_DESC_BYTES")" "$ADAPTER_DESC_BYTES bytes"
+  # 4. Project instincts (local + shared)
+  INST_BYTES=0
+  INST_TOTAL=0
+  for inf in "$WORKSPACE_ROOT/.devflow-instincts.yaml" "$WORKSPACE_ROOT/.devflow-instincts.shared.yaml"; do
+    [[ -f "$inf" ]] || continue
+    IB=$(wc -c < "$inf" | tr -d ' ')
+    IC=$(grep -cE '^[[:space:]]*- id:' "$inf" 2>/dev/null || true)
+    INST_BYTES=$((INST_BYTES + IB))
+    INST_TOTAL=$((INST_TOTAL + IC))
+  done
+  if [[ $INST_TOTAL -gt 0 || $INST_BYTES -gt 0 ]]; then
+    ITOK=$(est_tokens_bytes "$INST_BYTES")
+    ISTAT="OK"
+    INOTE="$INST_TOTAL instinct(s), $INST_BYTES bytes"
+    if [[ $INST_TOTAL -gt 25 ]]; then
+      ISTAT="WARN"
+      INOTE="$INST_TOTAL instinct(s) (>25 budget)"
+      WARNINGS=$((WARNINGS + 1))
+      REMEDIATIONS+=("Prune/consolidate project instincts ($INST_TOTAL > 25): run /devflow.learn prune")
+    fi
+    record_ctx "Project instincts" "$ISTAT" "$ITOK" "$INOTE"
+  fi
+  # 5. Configured MCP server schema overhead heuristic (~400 tok/server)
+  MCP_COUNT=${#UNIQUE_MCPS[@]}
+  MCP_TOK=$((MCP_COUNT * 400))
+  record_ctx "Configured MCP schemas ($MCP_COUNT)" "OK" "$MCP_TOK" "~400 tok/server heuristic"
+fi
+
 # Overall Verdict
 OVERALL_STATUS="healthy"
 EXIT_CODE=0
@@ -395,10 +508,14 @@ if [[ "$JSON_MODE" == true ]]; then
     --argjson cli "$(rows_json name,status,detail ${CLI_RESULTS[@]+"${CLI_RESULTS[@]}"})" \
     --argjson pipeline "$(rows_json check,status,detail ${PIPELINE_RESULTS[@]+"${PIPELINE_RESULTS[@]}"})" \
     --argjson remediations "$(printf '%s\n' ${REMEDIATIONS[@]+"${REMEDIATIONS[@]}"} | jq -R 'select(length > 0)' | jq -s '.')" \
+    --argjson ctx_on "$CONTEXT_MODE" \
+    --argjson ctx_total "$CONTEXT_TOTAL_TOKENS" \
+    --argjson ctx "$(rows_json source,status,est_tokens,detail ${CONTEXT_RESULTS[@]+"${CONTEXT_RESULTS[@]}"})" \
     '{status: $status, exit_code: $exit_code, client: $client,
       adapter: {name: $adapter, status: $adapter_status},
       mcp_servers: $mcp, cli_tools: $cli, pipeline_health: $pipeline,
-      remediations: $remediations}'
+      remediations: $remediations}
+      + (if $ctx_on then {context_audit: $ctx, context_total_est_tokens: $ctx_total} else {} end)'
 
   exit $EXIT_CODE
 fi
@@ -470,7 +587,25 @@ for res in "${PIPELINE_RESULTS[@]}"; do
 done
 echo ""
 
-# 4. Summary & Remediations
+# 4. Startup Context Audit (--context)
+if [[ "$CONTEXT_MODE" == true ]]; then
+  echo -e "${C_BOLD}4. Startup Context Audit (--context)${C_RESET}"
+  for res in "${CONTEXT_RESULTS[@]}"; do
+    IFS='|' read -r src status tokens detail <<< "$res"
+    case "$status" in
+      OK)
+        echo -e "  ${C_GREEN}✓${C_RESET} ${C_BOLD}$src${C_RESET} — ~${tokens} est. tokens ${C_GRAY}($detail)${C_RESET}"
+        ;;
+      WARN)
+        echo -e "  ${C_YELLOW}⚠${C_RESET} ${C_BOLD}$src${C_RESET} — ~${tokens} est. tokens ${C_YELLOW}($detail)${C_RESET}"
+        ;;
+    esac
+  done
+  echo -e "  ${C_BOLD}Total estimated startup context:${C_RESET} ~${CONTEXT_TOTAL_TOKENS} tokens"
+  echo ""
+fi
+
+# 5. Summary & Remediations
 echo -e "${C_GRAY}──────────────────────────────────────────────────────${C_RESET}"
 if [[ "$OVERALL_STATUS" == "healthy" ]]; then
   echo -e "Status: ${C_GREEN}${C_BOLD}HEALTHY${C_RESET} — All systems ready for DevFlow pipeline."

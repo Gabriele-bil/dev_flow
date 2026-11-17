@@ -10,5 +10,7 @@ Branch: [feat/fix/chore/doc/ecc...]/[number-of-task-is-present]_[feature-name]
 
 docs/product.md: [updated | not found — create with devflow.setup]
 
-Continue to planning? → devflow.plan
+Continue to planning (fresh context recommended):
+  Reset session (/clear or new chat) → /devflow-plan
+  or in this session:                → /devflow-plan
 ```

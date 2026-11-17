@@ -129,14 +129,17 @@ Analyze:
 - Seed **Risks and mitigations** table directly from `task.md` `## Assumptions & Risks` (convert into concrete boundary checks)
 - Bullets in active adapter plan step file (`steps/plan.md`) applying to this feature (state, UI, DB, i18n, responsive layout)
 - Edge cases, error states, and required DB/external-system edits
-- Architectural trade-offs: state the concrete mechanism and strongest real limitation/trade-off for each decision (never empty boosters like `scalable` or `seamless`); when multiple viable designs exist, trigger `ask_question` checkpoint and recommend `/grill-me` for deep review
+- Architectural trade-offs: state the concrete mechanism and strongest real limitation/trade-off for each decision (never empty boosters like `scalable` or `seamless`); when multiple viable designs exist, trigger `ask_question` checkpoint and recommend an external grilling skill (e.g. `/grill-me`, if installed) for deep review
 - ADR alignment: verify architecture complies with decisions in `docs/adr/`; record in Architecture decisions
+- **Prior art & cascades:** prior art models shape, not content (check copied settings line-by-line; docs/ADRs outrank prior art); trace deleted symbols' last-users transitively (keep tests for surviving behavior); on renames/moves, grep docs, `AGENTS.md`/`CLAUDE.md`, CI, build scripts, and config across all case/separator variants and list every hit
+- **Live-state & release compatibility:** for staged migrations/backfills/swaps, walk every stop point (step, abort, timeout, re-run) and residual state; for separately deployed parts (BE/FE, callers, schema/code), prefer backward-compatible additions with old defaults or state release order in **Architecture decisions**
+- **Overlapping work:** read-only check of open PRs (`gh pr list --search "<path>"` when `gh` available) and active branches touching planned paths; note overlaps in the entry (`references/plan-anti-patterns.md` → **Planning Guardrails**)
 
 ### Step 4b - Dependency pass & Contracts First
 
-Verify **File list** order per Dependency ordering. **Contracts First:** migrations and shared contracts (types, schemas, state interfaces shared by ≥2 slices or `[P]` files) MUST sit in the first blocking slice (`deps: none`) before consumers; shared components before consumers. Never copy contracts across parallel slices. Never plan or cite `task.md` rows marked `[wont]` or `[retired]`.
+Verify **File list** order per Dependency ordering. **Contracts First:** migrations and shared contracts (types, schemas, state interfaces shared by ≥2 slices or `[P]` files) MUST sit in the first blocking slice (`deps: none`) before consumers; shared components before consumers. Never copy contracts across parallel slices. Never plan or cite `task.md` rows marked `[wont]` or `[retired]`. **Entry `001` is never discovery work** (for `fix/` features, `001` is the fail-first regression test).
 
-**Scope fidelity & 4-Part Brief:** every **File List** entry must map to ≥1 **Traceability** row (no gold-plating, one concern per entry) and include the 4-part brief (`Change`, `Contract`, `Test`, `Out of scope`) per `references/plan-template.md`. Optionally tag slices/entries with `[route: light|mid|strong]` per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/model-selection.md` (`light` requires a complete 4-part brief and exact test target).
+**Scope fidelity & 4-Part Brief:** every **File List** entry must map to ≥1 **Traceability** row (no gold-plating, one concern per entry) and include the 4-part brief (`Change`, `Contract`, `Test`, `Out of scope`) per `references/plan-template.md`. Optionally tag slices/entries with `[route: light|mid|strong]` per `$HOME/.gemini/antigravity-cli/plugins/devflow/references/model-selection.md` (`light` requires a complete 4-part brief and exact test target). Run or resolve-check cheap read-only `Test` commands (~1–2 min, no shared writes) while planning and rescope pre-existing failures (`references/plan-anti-patterns.md`).
 
 ### Step 4c - Data model extraction
 
@@ -169,14 +172,14 @@ Read by `devflow.implement` (routes `[ui]` batches to impeccable, else loads DES
 **Trigger:** Step 4d profile `standard` or `thorough`, not run mode. `quick` → skip. Run mode (`.devflow-run.json` present) → skip: plan runs inside a step-runner, which cannot dispatch subagents; Step 5b covers it.
 
 1. Dispatch `$HOME/.gemini/antigravity-cli/plugins/devflow/agents/plan-reviewer.md` once (Claude Code: Agent, `subagent_type: "devflow:plan-reviewer"`, `model: opus` on `thorough`; Antigravity: `invoke_subagent`, subagent `plan-reviewer`) with: mode `plan`, full draft `plan.md` inline, `task.md` path, Complexity profile.
-2. `LGTM` → Step 5. Critical / major → fix draft, re-dispatch. Minor → fix inline, no re-dispatch.
-3. Max two rounds. Critical or major left after round two → record each under **Open questions**, ask user before Step 5.
+2. `LGTM` → Step 5. Any `critical` / `major` → challenge pass: dispatch `$HOME/.gemini/antigravity-cli/plugins/devflow/agents/finding-validator.md` (mode `plan`, draft + numbered `critical`/`major` list). `DISCARDED` → drop and list in Step 6 notify with reason. `CONFIRMED (proven)` → fix draft (never override a documented deliberate decision on opinion alone). `CONFIRMED (suspected)` → ask user (`ask_question`). `minor` → fix inline, no re-dispatch.
+3. Max two rounds. If draft changed for a confirmed finding, re-dispatch `plan-reviewer` with the new draft only (never earlier findings; a re-raised finding matching a discarded one keeps its outcome unless it cites new evidence). Critical/major left after round two → record under **Open questions**, ask user before Step 5.
 
 ### Step 5 - Write plan file
 
 Create `devflow/features/[NNN]_[feature-name]/plan.md` using the template in `references/plan-template.md`. After write (`**Status:** ready`): `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" sync [NNN]` refreshes the state cache. Sections in order: Overview, Architecture decisions, Risks and mitigations, Open questions, Traceability, File List, Implementation checkpoints, Adapter-specific sections, Edge Cases & Error Handling, Pre-implement checklist.
 
-Header: copy `**App:**` from `task.md` verbatim when present; omit the line entirely when absent (single-app repos) — never invent it.
+Header: copy `**App:**` from `task.md` verbatim when present (omit entire line in single-app repos — never invent); write `**Verified at:** <short-sha> (<YYYY-MM-DD>)[, dirty tree]` from `git rev-parse --short HEAD` (append `, dirty tree` when `git status --porcelain` is non-empty outside `devflow/`).
 
 Format rules:
 
@@ -201,7 +204,9 @@ Respond with:
 [Feature summary in 1-2 lines]
 [N] files to create, [M] files to modify
 
-Continue to implementation? -> devflow.implement
+Continue to implementation (fresh context recommended for standard/thorough):
+  Reset session (/clear or new chat) → /devflow-implement
+  or in this session:                → /devflow-implement
 ```
 
 ## Parallelization (multi-session / multi-agent)
@@ -236,6 +241,6 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | Reads (conditional) | `docs/adr/` (if present — active ADRs referenced in `task.md`); `.devflow-run.json` (existence — run-mode switch, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/run-mode.md`) |
 | Reads (conditional) | `DESIGN.md` / `docs/design.md`, `$HOME/.gemini/antigravity-cli/plugins/devflow/references/design-skill.md` (Step 4e — design source + UI tagging) |
 | Writes (optional) | `devflow/features/[NNN]_[feature-name]/data-model.md` (Step 4c — triggered when feature touches persistent entities) |
-| Dispatches (conditional) | `plan-reviewer` (Step 4f — `standard`/`thorough`, interactive only) |
+| Dispatches (conditional) | `plan-reviewer`, `finding-validator` (Step 4f — `standard`/`thorough`, interactive only) |
 | Next step | `devflow.implement` |
 | Related skills | Per active `ADAPTER.md` → **Technology skills** |

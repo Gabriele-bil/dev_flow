@@ -23,5 +23,7 @@ Used by `devflow.implement` Step 8 — respond with this format after implementa
 - analyze/typecheck (per adapter): ✅ / ❌ (resolved after [N] attempts)
 
 Run beautify before test? (Recommended for standard/thorough · yes / no)
-Next: /devflow-test
+Next (fresh context recommended on standard/thorough plans):
+  Reset session (/clear or new chat) → /devflow-test
+  or in this session:                → /devflow-test
 ```

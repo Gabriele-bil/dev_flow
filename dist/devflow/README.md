@@ -34,14 +34,17 @@ Full setup:
 1. **Active stack** — edit [`config.md`](config.md); set **Adapter** to `flutter`, `angular`, `nextjs`, or `nestjs`.
 2. **Run setup once** — execute `devflow.setup` to generate root `AGENTS.md` and `REGISTRY.md` for the consumer project.
 3. **Run the pipeline** — each step is a skill: `/devflow:<step>` on Claude Code (e.g. `/devflow:task`), `/devflow-<step>` on Antigravity CLI.
-4. **Enable code-review-graph** — install and configure once for all detected hosts:
-   - `pipx install code-review-graph` (or `pip install code-review-graph`)
-   - `code-review-graph install`
+4. **Enable code-review-graph** — one graph per repo, one MCP entry per client (Claude Code and/or Antigravity):
+   - `pipx install code-review-graph`
+   - `code-review-graph install --platform claude-code --no-skills --no-instructions -y`
+   - `code-review-graph install --platform antigravity --no-skills --no-instructions -y`
    - `code-review-graph build`
+   - Flags, tool budget (`CRG_TOOLS`) and freshness: [`references/mcp-catalog.md`](references/mcp-catalog.md#code-review-graph-setup-claude-code--antigravity)
 5. **Ensure required MCP baseline**:
    - `context7`
    - `sequential-thinking` ([server reference](https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking))
-   - `dart` for Flutter adapters/projects
+   - `code-review-graph` (registered by step 4)
+   - `dart` (`dart mcp-server`) for Flutter adapters/projects
 
 Architecture and design rationale: [`docs/architecture.md`](../../docs/architecture.md) · honest comparison with Forge, spec-kit, and vanilla agents: [`docs/comparison.md`](../../docs/comparison.md).
 
@@ -68,7 +71,7 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 - Default behavior: update only `devflow-managed` blocks and preserve user content outside those blocks
 - Force rewrite: pass `--force` to overwrite full file contents
 - Template resolution: adapter `templates/` first, then `skills/devflow-setup/templates/` fallback
-- Generated `AGENTS.md` includes `code-review-graph` skill reference for graph-aware reviews.
+- Generated `AGENTS.md` lists `code-review-graph` in the MCP baseline; graph-aware exploration/review routing lives in `references/token-economy.md`.
 
 ## Claude Code
 
@@ -106,7 +109,7 @@ Each adapter folder contains `ADAPTER.md` (core: technology skills table + MCP h
 | `devflow.backprop` | Backpropagate escaped bug into spec — classify gap, tighten AC, add regression test |
 | `devflow.worktree` | Create / list / remove isolated git worktrees for parallel features, with dev-server port offset and overlap detection |
 | `devflow.learn` | Manage instincts — log / search / list / prune / boost / promote to team store |
-| `devflow.metrics` | Local telemetry dashboard (`.devflow-metrics/`, gitignored) — tokens, cost, command durations, context window and compactions, hook-injected context, tool/skill/subagent usage, pass@1 |
+| `devflow.metrics` | Local telemetry dashboard (`.devflow-metrics/`, gitignored) — tokens, cost, command durations, context window and compactions, hook-injected context, tool/skill/subagent usage, error categories, feature funnel & code delta, pass@1 |
 | `devflow.board` | Static, read-only, auto-updating HTML project board (`devflow/board/index.html`) — Kanban pipeline, dependency DAG critical path, Markdown viewer, and command timings |
 
 ## Hooks
@@ -124,11 +127,11 @@ Hook registrations (`hooks/hooks.json`) activate automatically — no user invoc
 | PreToolUse | `pre-fetch-cache.sh` | Serves cached `WebFetch` responses when fresh |
 | PreToolUse | `pre-agent-fanout-cap.sh` | Caps concurrent subagent fan-out per turn |
 | PreToolUse | `observe.sh pre` | Logs tool calls to `.devflow-observe.jsonl`; marks tool-call start for timing |
-| PostToolUse / PostToolUseFailure | `observe.sh post` | Logs tool results to `.devflow-observe.jsonl`; one telemetry row per call (duration, output size, skill/MCP/subagent) to `.devflow-metrics/tools.jsonl` |
+| PostToolUse / PostToolUseFailure | `observe.sh post` | Logs tool results to `.devflow-observe.jsonl`; one telemetry row per call (duration, output size, skill/MCP/subagent, exit code, error category) to `.devflow-metrics/tools.jsonl` |
 | PostToolUse | `post-bash-output-filter.sh` | Compresses verbose adapter command output (flutter/dart/pnpm/ng/git diff) past 2k chars: head + error/warning lines + tail |
 | PostToolUse | `post-edit-accumulate.sh` | Tracks modified files for batch format check |
 | PostToolUse | `post-edit-instinct-context.sh` | Injects matching domain instincts once per session when editing files |
-| PostToolUse | `post-task-create.sh` | Updates `next_feature_number` in `.devflow-state.json` after `task.md` writes |
+| PostToolUse | `post-task-create.sh` | Updates `next_feature_number` in `.devflow-state.json` and records feature start telemetry after `task.md` writes |
 | PostToolUse | `post-fetch-cache.sh` | Caches `WebFetch` responses for reuse |
 | PreModelSwitch / PostModelSwitch | `pre-model-switch.sh` · `post-model-switch.sh` | Guards and logs mid-session model switches (Claude Code) |
 | PreCompact | `pre-compact.sh` | Snapshots `plan.md` progress to `.devflow-state.json` |

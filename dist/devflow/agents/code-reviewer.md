@@ -52,6 +52,7 @@ Read tests first — they reveal intent and coverage.
 - **No silent catch (`silent-catch`):** no bare/empty `catch` or `.catch()` swallows an error without rethrowing, returning a typed error, or logging a specific subject line (**Required**)
 - Tests verify behavior (not implementation detail)
 - No race conditions, off-by-one errors, stale state
+- **Mirroring is not correctness:** when the change extends or copies an existing pattern in surrounding code, verify the pattern itself is sound — completing a broken rollout or copying a flawed guard inherits its defect
 
 ### 2. Readability
 
@@ -91,6 +92,7 @@ Skip this axis when the dispatch roster includes `security-auditor` (`standard`/
 - No speculative generality: unused parameters, config flags, premature abstractions "for later"
 - No silent assumptions where spec is ambiguous — flag; guessed behavior is a defect
 - **Zero internal leak:** user-facing copy, alerts, and UI never expose raw internal IDs, database column names, or technical jargon (**Required**)
+- **Contract omissions:** when a contract changes (file format, payload, schema, config key, CLI flag, env var), search by content (`grep` the old literal/key across the repo, not just the touched folder) to verify counterparts moved with it — fixtures, samples, seed data, templates, docs, generated clients (**Required**)
 - "While I'm here" refactors outside plan scope — flag; belongs in `devflow.learn` or a new task
 
 ### 7. Simplicity

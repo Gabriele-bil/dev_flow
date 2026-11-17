@@ -10,6 +10,7 @@ Used by `devflow.plan` Step 5 — write `devflow/features/[NNN]_[feature-name]/p
 **App:** [name] <!-- omit entire line in single-app repos (no ## Apps table in devflow/config.md) -->
 **ADRs:** [docs/adr/ADR-NNN-...md or "none"] <!-- copied from task.md or resolved during planning -->
 **Date:** [YYYY-MM-DD]
+**Verified at:** [short-sha] ([YYYY-MM-DD])[, dirty tree] <!-- from git rev-parse --short HEAD at Step 5 -->
 **Status:** ready
 **Complexity:** [N] ([quick | standard | thorough])
 
@@ -56,6 +57,8 @@ state the vertical-slice execution order here.]
 | [UC-N title from task.md] | [AC-N: GIVEN ... WHEN ... THEN ... from task.md] | [file path(s)] |
 | ... | ... | ... |
 
+**"None left" acceptance criteria (removals, renames, sweeps):** When an AC asserts absence of a removed flag, renamed symbol/API, or deprecated term, its **Acceptance criteria** cell must include: (1) exact whole-word search command covering every case/separator variant (`camelCase`, `snake_case`, `kebab-case`, `SCREAMING_SNAKE`), (2) allow-list of legitimate hits (changelogs, migrations, historical ADRs), and (3) non-empty hits found on default branch today (seen failing at plan time; 0 hits today → widen search; still 0 → record that nothing remains to remove).
+
 
 ---
 
@@ -77,9 +80,11 @@ slices are strictly sequential (each depends on the previous). Same notation
 as the `devflow.blueprint` dependency graph, one level down. Read by
 `devflow.resume` (resume ordering), `devflow.backprop` (re-implementation
 scoped to affected slice + dependents), and any future parallel slice
-execution.
+execution. Prefer slice orderings whose first slice leaves the app exercisable by hand; under the first hands-on slice heading, add a `*Try it:* <screen to open | command to run | endpoint to hit>` line so the human has an immediate interactive checkpoint.
 
 **Contracts First rule:** Shared contracts (types, interfaces, DTOs, DB schemas, state contracts) shared across ≥2 slices or `[P]` files MUST sit in `Slice 1` (`deps: none`). Parallel slices/files consume contracts via `--after` / `deps:` and never copy or redeclare another slice's contract.
+
+**Fail-first regression rule (`fix/` features):** When the feature branch type is `fix/`, `### 001.` MUST be the regression test. Its `Test` bullet must specify running the test before any production fix and observing it fail **on its assertion** (a compile, import, or fixture error is not a failure seen), recording the failure line; a test that cannot fail on its assertion blocks before any fix.
 
 **Subtask model routing (`[route: light | mid | strong]`, optional):** Tag slices or individual file entries with the cheapest model tier capable of building them (`$HOME/.gemini/antigravity-cli/plugins/devflow/references/model-selection.md`). Entries tagged `[route: light]` MUST include all 4 brief lines below (`Change`, `Contract`, `Test`, `Out of scope`); omit `[route: ...]` to use the default step model.
 
@@ -91,6 +96,7 @@ Under each `### [NNN].` heading, write four compact bullets so a cold agent can 
 - **Out of scope:** files, layers, or dependencies this entry must not touch
 
 **Slice 1 — [name]** (deps: none) [route: strong]
+*Try it:* [screen to open, command to run, or endpoint to hit once Slice 1 is done]
 
 ### [NNN]. `[path/to/file.ext]` - [create | modify] [pending]
 - **Change:** [what this file does and why it exists]

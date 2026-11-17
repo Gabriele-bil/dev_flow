@@ -132,6 +132,7 @@ Skills never edit `**Status:**` lines or state JSON by hand — `scripts/devflow
 | `… set plan <status> [F] --force` | user-confirmed backward reset outside **Legal transitions** (`devflow.resume` Step 2b, re-plan) |
 | `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" mark-done <path> [F]` | File List entry `[pending]` → `[done]`, progress refreshed |
 | `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" sync [F]` | rebuild the cache from `plan.md`/`task.md` (after writing a new `task.md`/`plan.md`; `devflow.resume` on drift) |
+| `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" drift [F]` | compare `plan.md` File List paths against `git diff <Verified-at-sha>..HEAD`; lists changed planned files or `drift: clean` |
 | `bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" status [F]` | one line: statuses, next step, progress |
 
 Merge, never overwrite: unknown keys preserved, legacy `active_feature` dropped. No `jq` → markdown still written, cache skipped. Corrupt cache → delete it, `sync` (`devflow.resume`). Full snapshot (file lists) still refreshed by `hooks/pre-compact.sh` at compaction.

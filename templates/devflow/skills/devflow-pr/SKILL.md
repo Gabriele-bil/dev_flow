@@ -132,6 +132,9 @@ rm -f "$BODY_FILE"
 Extract decision flags and discrepancies from `plan.md` (`## Decision flags`, `## Deviations`, `## Open questions`) and `task.md` (`## Assumptions & Risks`, `## Notes`). Under `devflow.auto` or whenever autonomous decisions/flags exist, populate `## Autonomous Decisions & Discrepancies` in the PR body so reviewers see every assumption, default, and non-critical exception.
 
 **PR prose fidelity:** Write concrete mechanisms, touched layers, and verified command outputs. Never use AI-slop boosters (`seamless`, `robust`, `comprehensive`, `transformative`, `in conclusion`) or claim checks passed unless they were executed in Step 3.
+- **Plan↔diff two-way match:** compare `plan.md` **File List** against `git diff --name-only "$BASE_BRANCH"...HEAD` both ways — explain planned files absent from diff and diff files absent from **File List** in **Decisions worth knowing** or **Autonomous Decisions & Discrepancies**.
+- **Repo PR template precedence:** if `.github/pull_request_template.md`, `.github/PULL_REQUEST_TEMPLATE.md`, `docs/pull_request_template.md`, or `pull_request_template.md` exists, map sections below into its matching headings, keep fixed footers, and tick checkboxes only with Step 3 stamp or Ship Gate evidence.
+- **Source every claim:** never infer rationale from silence — ask once (interactive) or flag `"nothing records why — worth confirming"`; cite only files the reviewer can open on the branch.
 
 ### PR title format
 
@@ -151,9 +154,13 @@ Examples:
 [2-4 sentences describing what the feature does, why it was built,
 and how it fits into the product.]
 
-## Implementation
-[Brief description of the technical approach:
-layers touched, key abstractions, notable patterns used.]
+## Decisions worth knowing
+[≤5 bullets: what was chosen or departed from plan.md, why (or "nothing records why — worth confirming"), and `path:line` in diff. Sourced from plan.md ## Deviations, ## Decision flags, and Architecture decisions.]
+
+## Review guide
+- **Where judgment matters:** [files/ranges requiring careful human review and why]
+- **Irreversible after merge:** [migrations, public API/contract changes, persisted data changes — or "none"]
+- **Mechanical changes:** [remaining files grouped as mechanical wiring/renames/codegen]
 
 ## Autonomous Decisions & Discrepancies
 <!-- Included when running under devflow.auto or when decision flags / discrepancies exist in plan.md / task.md -->
@@ -201,6 +208,16 @@ After successful `gh pr create`:
    [Left unstaged: <paths>]                                                                      ← only if any
 
    DevFlow pipeline complete for TASK-[NNN].
+   ```
+
+4. Optional workflow feedback prompt (interactive mode only — skip under `.devflow-run.json`):
+   Ask the user:
+   ```text
+   Did this feature workflow go smoothly? (yes / no / notes)
+   ```
+   If the user replies with feedback, record it:
+   ```bash
+   bash "@devflow/scripts/devflow-state.sh" feedback [NNN]_[feature-name] "<feedback text>"
    ```
 
 ---

@@ -86,12 +86,12 @@ Hooks are automation the agent doesn't have to remember. All in `templates/devfl
 | PreToolUse | `pre-bash-destructive-guard.sh` | Block catastrophic `rm -rf`, hard-reset/clean/discard, force-push to main/master, `commit --no-verify`/`--no-gpg-sign` |
 | PreToolUse | `pre-bash-stamp-guard.sh` | Run mode only: deny test/lint/analyze/format/e2e/build commands not wrapped by `verify-stamp.sh` (`DEVFLOW_STAMP_GUARD=off` disables) |
 | PreToolUse / PostToolUse | `pre-fetch-cache.sh` · `post-fetch-cache.sh` · `pre-agent-fanout-cap.sh` | WebFetch response cache and subagent fan-out cap |
-| PreToolUse / PostToolUse / PostToolUseFailure | `observe.sh` | Tool-call log (`.devflow-observe.jsonl`: edited and read paths, Bash commands), retry-loop detection, tool-call telemetry |
-| PostToolUse | `post-bash-output-filter.sh` · `post-edit-accumulate.sh` · `post-edit-instinct-context.sh` · `post-task-create.sh` | Compress verbose CLI output, track modified files, inject matching instincts, maintain feature-number counter |
+| PreToolUse / PostToolUse / PostToolUseFailure | `observe.sh` | Tool-call log (`.devflow-observe.jsonl`: edited and read paths, Bash commands), retry-loop detection, tool-call telemetry (durations, exit codes, error categories) |
+| PostToolUse | `post-bash-output-filter.sh` · `post-edit-accumulate.sh` · `post-edit-instinct-context.sh` · `post-task-create.sh` | Compress verbose CLI output, track modified files, inject matching instincts, maintain feature-number counter & feature lifecycle start |
 | PreModelSwitch / PostModelSwitch | `pre-model-switch.sh` · `post-model-switch.sh` | Guard and audit mid-session model switches |
 | PreCompact | `pre-compact.sh` | Snapshot plan progress → `.devflow-state.json` + resume reminder |
 | Stop | `stop-format-typecheck.sh` · `stop-debug-check.sh` · `stop-notify.sh` · `stop-learn-distill.sh` · `stop-metrics.sh` | Format/analyze, debug-print scan, notification, churn-based learning distillation, per-turn token/cost/timing telemetry |
-| Lifecycle events | `metrics-collect.sh` | Session, prompt, compaction, and subagent telemetry (`.devflow-metrics/`) |
+| Lifecycle events | `metrics-collect.sh` · `devflow-state.sh` | Session, prompt, compaction, subagent telemetry, feature funnel completion, and workflow feedback (`.devflow-metrics/`) |
 
 ## Adapter contract
 

@@ -47,6 +47,10 @@ Identify the sub-command from user message or argument, then execute it.
 
 Record a manual instinct in `.devflow-instincts.yaml` (local store).
 
+#### Step 0 — Discoverability diagnosis (check existing rules first)
+
+Grep `constitution.md`, `REGISTRY.md`, `.devflow-instincts.shared.yaml`, and `.devflow-instincts.yaml` for trigger/domain keywords before logging. Rule already exists and failed to steer → **discoverability gap is the lesson**: diagnose why it missed (buried in prose, wrong file/section, narrow trigger, or no deterministic `check_cmd`) and tighten/move that rule or attach `check_cmd` instead of duplicating.
+
 #### Step 1 — Collect information (if not provided)
 
 Ask:
@@ -240,6 +244,6 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 
 | | |
 | --- | --- |
-| Reads | `.devflow-instincts.yaml`, `.devflow-instincts.shared.yaml`, `REGISTRY.md` |
+| Reads | `constitution.md`, `REGISTRY.md`, `.devflow-instincts.yaml`, `.devflow-instincts.shared.yaml` |
 | Writes | `.devflow-instincts.yaml`, `.devflow-instincts.shared.yaml`, `REGISTRY.md` |
 | Related | `stop-learn-distill` hook (auto-detects churn), `session-start-learnings` hook (injects instincts) |

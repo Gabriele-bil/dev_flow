@@ -1,7 +1,7 @@
 ---
 name: devflow-implement
 description: Implements DevFlow plan files per architecture conventions, MCP-assisted validation. Use when user runs devflow.implement, executes plan.md, or third pipeline step.
-argument-hint: "[optional-plan-path] [--fix <findings|files>]"
+argument-hint: "[optional-plan-path] [--slice <N>] [--fix <findings|files>]"
 disable-model-invocation: true
 effort: medium
 ---
@@ -10,9 +10,10 @@ effort: medium
 
 ## Quick Start
 
-Run `/devflow.implement [optional plan path] [--fix <findings|files>]`.
+Run `/devflow.implement [optional plan path] [--slice <N>] [--fix <findings|files>]`.
 
 - If an argument is passed, use it as the `plan.md` path
+- `--slice <N>` → **slice-by-slice mode**: implement only `Slice <N>` (after confirming its `deps:` slices are `[done]`), run Step 5–6 checks and slice checkpoint, mark `Slice <N>` entries `[done]`, keep `plan.md` `**Status:** implementing` while `[pending]` slices remain, and stop for human review with a proposed commit subject (never commit automatically during implement)
 - `--fix` → **re-entry mode** (see below): targeted fixes only
 - If no argument is passed, resolve feature with `bash "@devflow/scripts/devflow-state.sh" resolve` (exit 1 → ask)
 
@@ -42,6 +43,7 @@ Before proceeding, verify:
 - [ ] `plan.md` **Status** ∈ `ready` | `implementing` (`implementing` = resume at first `[pending]` entry) — or any of `implemented` | `beautified` | `tested` | `shipped` **with** `--fix` (re-entry mode)
 - [ ] `plan.md` has a non-empty `## File List` section (at least one `###` file entry)
 - [ ] `plan.md` has a non-empty `## Traceability` table (every `task.md` subtask mapped to a file)
+- [ ] Drift check (`bash "@devflow/scripts/devflow-state.sh" drift`): if planned files changed since `**Verified at:**`, re-verify only those entries (symbol present, contract unchanged) before editing — contradiction routes back to `devflow.plan` (interactive) or adds a `## Decision flags` entry / blocks (run mode per `@devflow/references/run-mode.md`)
 
 If any item fails → stop, report which check failed, do not touch application code.
 
@@ -122,7 +124,7 @@ Before the first file (Status `ready` only — skip on `implementing` resume and
 
 Implement all files from the plan in the exact order defined in the **File List**. Slice headings carrying `deps:` annotations: enter a slice only when every listed dep slice is fully `[done]` — File List order already satisfies this on sequential plans; the annotation matters when slices were reordered or a dep slice still has `[pending]` entries.
 
-**Verify-criteria first:** per subtask, before writing code, state the check that proves it done — test name, command, or observable behavior. Implement loop is self-verifying, not clarification-driven.
+**Verify-criteria first:** per subtask, before writing code, state the check that proves it done — test name, command, or observable behavior. Implement loop is self-verifying, not clarification-driven. For `fix/` features where `### 001.` is the regression test, enforce observe-fail → fix → observe-pass: run `### 001.` before editing production code and confirm it fails **on its assertion** (compile/import/fixture errors do not count; if it passes or cannot fail on the assertion, stop before applying any fix).
 
 Each file must:
 
@@ -132,6 +134,7 @@ Each file must:
 - Use relative imports pointing to the nearest barrel file (or the import style mandated by `constitution.md`)
 - Be complete; do not leave placeholder comments such as `// TODO` or `// implement this`
 - **Trace to plan (scope fidelity):** every file and function traces to a **File List** or **Traceability** entry — build only what the acceptance criteria require. Urge to add a "while I'm here" improvement → log it via `devflow.learn`; do not write it
+- **Log deviations at settle time:** the moment a confined deviation from `plan.md` is settled, append `- \`[file]\`: [planned] → [actual] — [reason]` to `plan.md` `## Deviations` immediately (create heading on first entry); on resume, a logged deviation outranks the plan text it deviates from. Any **shape-changing** workaround (adds unplanned files/areas, alters a contract later slices/ACs rely on, delivers other than the 4-part brief, or abandons the prescribed approach) → stop immediately and escalate per `@devflow/references/escalation-ladder.md` Level 4/5
 - Satisfy **all implementation rules** in the adapter implement step file (responsive UI, localization, state architecture, accessibility, layout, contracts, data boundaries — load the referenced technology skills from the adapter table when touching those areas)
 
 #### Parallel leaf files (`[P]`)
@@ -188,17 +191,11 @@ Before Step 7, confirm every item in the **Pre-handoff checklist** section of th
 
 After all files implemented, update `REGISTRY.md` for every element written to shared folder or identified as reusable. Mandatory entries (shared components/helpers) written immediately; proposed entries (new patterns) only after user confirmation. Templates and rule: `references/registry-update-template.md`.
 
-### Step 7b - Write deviations to plan.md
+### Step 7b - Reconcile deviations in plan.md
 
-If any file differs from `plan.md` (structure, dependency, behavior), append to `plan.md` (single heading for all skills — create on first entry):
+Confined deviations are appended to `plan.md` `## Deviations` in Step 4 the moment they are settled. Run a final pass here: confirm every diverged file has its `- \`[file path]\`: [planned behavior] → [actual behavior] — [reason]` line, and mark any deviation from a later-abandoned attempt `[discarded]` (or remove it).
 
-```markdown
-## Deviations
-
-- `[file path]`: [planned behavior] → [actual behavior] — [reason]
-```
-
-Read by `devflow.beautify` and `devflow.pr`. Omit if fully aligned.
+Read by `devflow.beautify`, `devflow.resume`, and `devflow.pr`. Omit if fully aligned.
 
 ### Step 8 - Notify user
 
@@ -224,6 +221,7 @@ Full catalog — read when unsure, or before retrying after a failed contract: `
 | Reads | `devflow/features/[NNN]_[feature-name]/plan.md`, `constitution.md`, `REGISTRY.md`, `@devflow/references/adapter-resolution.md`, `@devflow/adapters/<adapter>/ADAPTER.md` (core) + `steps/implement.md`, `references/registry-update-template.md`, `references/notify-template.md` |
 | Reads | `@devflow/references/escalation-ladder.md` (failure handling), `@devflow/references/state-machine.md` (handoff format, context pressure only), `@devflow/references/token-economy.md` (index-first + derive-don't-dump) |
 | Reads (conditional) | `@devflow/references/design-skill.md` + skill `impeccable` (when available) or `DESIGN.md` / `docs/design.md` — UI design for `[ui]`-tagged batches; `.devflow-run.json` (existence — run-mode switch, contract `@devflow/references/run-mode.md`); `references/anti-patterns.md` (when unsure / retry) |
+| Runs | `@devflow/scripts/devflow-state.sh` (`resolve`, `drift`, `set`, `mark-done`, `checkpoint`, `branch`), `@devflow/scripts/verify-stamp.sh` |
 | Writes | all files defined in `plan.md` |
 | Writes | `plan.md` — `[done]` markers, `**Status:** implementing → implemented`, `## Deviations`, `## Decision flags` (run mode) |
 | Writes (conditional) | `devflow/features/[NNN]_[feature-name]/handoff.md` — on context pressure (state-machine.md → Handoff file) |

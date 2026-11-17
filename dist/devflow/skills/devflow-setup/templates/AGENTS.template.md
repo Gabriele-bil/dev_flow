@@ -18,5 +18,4 @@
 @devflow/skills/devflow-implement/SKILL.md
 @devflow/skills/devflow-test/SKILL.md
 @devflow/skills/devflow-pr/SKILL.md
-@code-review-graph/skills/code-review-graph/SKILL.md
 <!-- devflow-managed:end:skills -->

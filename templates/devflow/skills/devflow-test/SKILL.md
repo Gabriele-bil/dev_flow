@@ -118,7 +118,8 @@ After all tests pass, verify **backwards from the spec** per `@devflow/reference
    - **Level 4a (Runtime CLI/API)**: execute adapter `Verify (runtime)` target or integration spec.
    - **Level 4b (UI / Browser & Mobile Workflow)**: Web/UI adapters (`nextjs`, `angular`) and Mobile (`flutter`): run Playwright/e2e target, Maestro flow, or browser/device agent flow to verify mounting, DOM/widget presence, critical interactions, clean state transitions, and zero unhandled crash or console errors.
    - Depth per profile: `quick` → L1–L3; `standard` → L1–L3 + L4 targets when defined + clause pinning (`file:line`); `thorough` → L4 mandatory (missing target → PARTIAL) + break-it probe & canonical edges (`verification-levels.md`).
-3. Write `devflow/features/[NNN]_[feature-name]/verification.md` using the template in `verification-levels.md` (including `Pinned Assertion (file:line)` per AC).
+   - **"None left" ACs (removals/renames):** when a **Traceability** row carries a "none left" search command, run that exact command and verify zero hits outside its documented allow-list (record command + 0-hit result in `verification.md`; any remaining hit = **FAIL**).
+3. Write `devflow/features/[NNN]_[feature-name]/verification.md` using the template in `verification-levels.md` (including `Pinned Assertion (file:line)` per AC, plus `## Manual QA Steps` derived from the Gherkin ACs whenever the feature touches UI or has any PARTIAL `L4: N/A` verdict).
 4. Any **FAIL** verdict → do NOT set status `tested`. Implementation gap → fix (re-enter escalation ladder at Level 1) or report. Spec gap (AC missing/too weak) → suggest `devflow.backprop`.
 
 Passing tests do not skip this step — tests prove behavior forward; verification proves every AC satisfied, wired, reachable.

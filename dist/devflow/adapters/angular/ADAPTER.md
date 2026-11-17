@@ -22,7 +22,6 @@ Index only. Triggers (file path / content → skill) live in `steps/implement.md
 | `@devflow/adapters/angular/skills/angular-animations/SKILL.md` | `animate.enter`/`animate.leave`, CSS transitions, JS animation libs, legacy animation migration |
 | `@devflow/adapters/angular/skills/angular-theme/SKILL.md` | Tailwind v4 theme, `src/styles/` layers, tokens, dark mode, component stylesheets, encapsulation |
 | `@devflow/adapters/angular/skills/angular-testing/SKILL.md` | Zoneless Vitest + TestBed specs, timers, router/HTTP/store tests, harnesses, Playwright conventions |
-| `@code-review-graph/skills/code-review-graph/SKILL.md` | PR review, blast radius, architecture risk checks (ship/pr steps) |
 
 Common skills loaded by matrix rows: `common-state-patterns`, `common-web-interface-guidelines`, `common-clean-code` (`@devflow/adapters/common/skills/<name>/SKILL.md`).
 
@@ -31,12 +30,13 @@ Common skills loaded by matrix rows: `common-state-patterns`, `common-web-interf
 - Required baseline for this adapter:
   - `context7`
   - `sequential-thinking` (MCP server: <https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking>)
+  - `code-review-graph` (code graph MCP — setup in `@devflow/references/mcp-catalog.md`; index-first exploration, blast radius)
 - Native to Angular CLI:
   - Angular CLI MCP server — `npx @angular/cli mcp [-E tool]`
 - Testing & verification:
   - Playwright MCP server — `@playwright/mcp` (semantic accessibility snapshots + runtime E2E verification)
 - Conditional (only when used in project):
-  - `sentry` (`mcp.sentry.dev` / `getsentry/sentry-mcp`) — error triage and stack traces (add ONLY if project uses Sentry)
+  - `sentry` (`https://mcp.sentry.dev/mcp` / `getsentry/sentry-mcp`) — error triage and stack traces (add ONLY if project uses Sentry)
 - **Context7**: Angular and RxJS API docs and version deltas.
 - **Sequential Thinking**: break complex refactors into small, testable steps.
 - **Angular CLI MCP**: native tools — `get_best_practices` (current Angular conventions),
