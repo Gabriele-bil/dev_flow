@@ -185,8 +185,11 @@ After successful `gh pr create`:
 
 1. Update terminal statuses:
    ```bash
-   bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set plan pr-opened && bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set task done
+   F=$(bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" resolve) \
+     && bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set plan pr-opened "$F" \
+     && bash "$HOME/.gemini/antigravity-cli/plugins/devflow/scripts/devflow-state.sh" set task done "$F"
    ```
+   Resolve once and pass the feature to both calls: after `pr-opened` the feature is terminal, so a bare `set task done` would resolve to another open feature.
 
 2. Commit and push the status update so that the PR includes the final status and no modified files remain in the working tree:
    ```bash

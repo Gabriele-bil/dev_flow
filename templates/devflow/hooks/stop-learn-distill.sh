@@ -30,8 +30,11 @@ TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ") || true
 CHURNED_FILES=$(
   tail -n "$WINDOW_LINES" "$OBSERVE_LOG" 2>/dev/null \
   | jq -r 'select(.event=="pre" and ((.kind // "") == "write" or (.kind // "") == "edit" or .tool=="Write" or .tool=="Edit" or .tool=="MultiEdit") and (.file != null and .file != "")) | .file' 2>/dev/null \
-  | sort | uniq -c | awk -v thr="$CHURN_THRESHOLD" '$1 >= thr { print $2 }'
+  | sort | uniq -c | awk -v thr="$CHURN_THRESHOLD" '$1 >= thr { print $2 }' \
+  | grep -vE '(^|/)devflow/features/'
 ) || true
+# ↑ pipeline artefacts (plan.md [done] marks, status lines, verification.md)
+# are edited many times by design — churn there is not a signal
 
 if [ -z "$CHURNED_FILES" ]; then
   exit 0

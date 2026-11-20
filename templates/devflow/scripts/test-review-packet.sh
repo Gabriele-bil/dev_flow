@@ -90,7 +90,13 @@ setup
 for i in $(seq 1 400); do echo "line $i of a long generated file" ; done > src/big.ts
 bash "$RP" --max-diff-kb 2 --profile thorough --roster "code-reviewer security-auditor" >/dev/null 2>&1
 has "diff cap announced" .devflow-review-packet.md "Cut at 2 KB"
+has "diff cap: cut file named" .devflow-review-packet.md "- src/big.ts"
 has "profile and roster flags" .devflow-review-packet.md "Depth profile: thorough · roster: code-reviewer security-auditor"
+printf '# Notes\n' > NOTES.md && mkdir -p test && printf 'it();\n' > test/a_test.ts
+bash "$RP" >/dev/null 2>&1
+assert_equals "diff order: source, then tests, then docs" \
+  "$(grep '^diff --git' .devflow-review-packet.md | awk '{print $NF}' | tr '\n' ' ')" \
+  "b/a.ts b/src/big.ts b/src/user-card.tsx b/test/a_test.ts b/.gitignore b/NOTES.md "
 teardown
 
 setup
@@ -102,6 +108,20 @@ case "$out" in *"1 files"*) pass "since: only the file changed after the first r
 hasnt "since: earlier changes left out" .devflow-review-packet.md "+export const b = 1;"
 has "since: incremental header" .devflow-review-packet.md "**Incremental:**"
 bash "$RP" --since deadbeef >/dev/null 2>&1; assert_equals "since: bad tree → exit 1" "$?" "1"
+teardown
+
+setup
+for i in $(seq 1 400); do echo "  final int f$i = $i;"; done > src/model.freezed.dart
+printf 'lockfileVersion: 9\n' > pnpm-lock.yaml
+printf 'export const legacy = 1;\n' > src/vendor.ts && printf 'src/vendor.ts linguist-generated\n' > .gitattributes
+bash "$RP" --max-diff-kb 2 >/dev/null 2>&1
+P=.devflow-review-packet.md
+hasnt "generated: diff not cut by generated code" $P "Cut at 2 KB"
+hasnt "generated: freezed body left out" $P "final int f1 = 1;"
+has "generated: listed with the count" $P "Generated / lockfiles (3)"
+has "generated: lockfile listed" $P "- pnpm-lock.yaml"
+has "generated: linguist-generated listed" $P "- src/vendor.ts"
+has "generated: authored code still diffed" $P "+export const b = 1;"
 teardown
 
 T=$(mktemp -d); cd "$T" || exit 1; git init -q

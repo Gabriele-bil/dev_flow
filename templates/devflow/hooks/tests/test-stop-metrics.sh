@@ -215,6 +215,47 @@ run_hook "$d" "{\"transcript_path\":\"$d/transcript.jsonl\",\"session_id\":\"s-m
   || assert "T12: legacy rows moved, new row appended" fail
 rm -rf "$d"
 
+# ── T13: interleaved transcripts keep their own offsets (no cumulative re-read) ──
+d=$(tmpdir)
+printf '%s\n' '{"step_index":1,"type":"PLANNER_RESPONSE","input_tokens":100,"cache_read_tokens":0,"output_tokens":1}' > "$d/a.jsonl"
+printf '%s\n' '{"step_index":1,"type":"PLANNER_RESPONSE","input_tokens":7,"cache_read_tokens":0,"output_tokens":1}' > "$d/b.jsonl"
+run_hook "$d" "{\"conversationId\":\"a\",\"workspacePaths\":[\"$d\"],\"transcriptPath\":\"$d/a.jsonl\",\"modelName\":\"gemini-3.8-flash-high\"}"
+run_hook "$d" "{\"conversationId\":\"b\",\"workspacePaths\":[\"$d\"],\"transcriptPath\":\"$d/b.jsonl\",\"modelName\":\"gemini-3.8-flash-high\"}"
+printf '%s\n' '{"step_index":2,"type":"PLANNER_RESPONSE","input_tokens":30,"cache_read_tokens":0,"output_tokens":1}' >> "$d/a.jsonl"
+run_hook "$d" "{\"conversationId\":\"a\",\"workspacePaths\":[\"$d\"],\"transcriptPath\":\"$d/a.jsonl\",\"modelName\":\"gemini-3.8-flash-high\"}"
+IN=$(jq -s -c 'map(.input_tokens)' "$d/.devflow-metrics/turns.jsonl" 2>/dev/null)
+[ "$IN" = "[100,7,30]" ] \
+  && assert "T13: interleaved sessions record per-turn deltas" pass \
+  || assert "T13: interleaved sessions record per-turn deltas (got $IN)" fail
+rm -rf "$d"
+
+# ── T14: single offset pair (plugin ≤ 2.2.0) is honoured, then migrated to the map ───
+d=$(tmpdir)
+write_transcript "$d/transcript.jsonl"
+SIZE=$(wc -c < "$d/transcript.jsonl" | tr -d ' ')
+printf '{"metrics_transcript":"%s","metrics_offset":%s}\n' "$d/transcript.jsonl" "$SIZE" > "$d/.devflow-observe-state.json"
+run_hook "$d" "{\"transcript_path\":\"$d/transcript.jsonl\",\"session_id\":\"s-legacy\"}"
+[ ! -f "$d/.devflow-metrics/turns.jsonl" ] \
+  && [ "$(jq -r --arg t "$d/transcript.jsonl" '.metrics_offsets[$t]' "$d/.devflow-observe-state.json")" = "$SIZE" ] \
+  && [ "$(jq -r '.metrics_offset // "gone"' "$d/.devflow-observe-state.json")" = "gone" ] \
+  && assert "T14: legacy offset honoured and migrated" pass \
+  || assert "T14: legacy offset honoured and migrated" fail
+rm -rf "$d"
+
+# ── T15: step is the command the turn ran; next_step keeps the state pointer ──
+d=$(tmpdir)
+write_transcript "$d/transcript.jsonl"
+printf '%s\n' '{"feature":"001_x","next_step":"devflow.ship"}' > "$d/.devflow-state.json"
+printf '%s\n' '{"active_command":"test"}' > "$d/.devflow-observe-state.json"
+run_hook "$d" "{\"transcript_path\":\"$d/transcript.jsonl\",\"session_id\":\"s-step\"}"
+ROW=$(cat "$d/.devflow-metrics/turns.jsonl" 2>/dev/null)
+TROW=$(cat "$d/.devflow-metrics/timings.jsonl" 2>/dev/null)
+[ "$(jq -r '[.step,.next_step,.command]|join(",")' <<<"$ROW")" = "devflow.test,devflow.ship,test" ] \
+  && [ "$(jq -r '[.step,.next_step]|join(",")' <<<"$TROW")" = "devflow.test,devflow.ship" ] \
+  && assert "T15: step from command, next_step from state" pass \
+  || assert "T15: step from command, next_step from state (got $(jq -c '[.step,.next_step,.command]' <<<"$ROW"))" fail
+rm -rf "$d"
+
 echo ""
 echo "── test-stop-metrics.sh: $PASS passed, $FAIL failed ──"
 [ "$FAIL" -eq 0 ] && exit 0 || exit 1

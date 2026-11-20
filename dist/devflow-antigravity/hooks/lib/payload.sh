@@ -172,6 +172,25 @@ df_gitignore() {
   done
 }
 
+# df_generated_pathspecs — git exclude pathspecs (one per line) for generated
+# code and lockfiles: kept out of review diffs and LOC counts. Files marked
+# linguist-generated in .gitattributes are excluded too; DEVFLOW_GENERATED_GLOBS
+# (space-separated globs) adds project-specific patterns.
+df_generated_pathspecs() {
+  local g extra=()
+  # split on spaces without letting the shell expand the globs against cwd
+  [ -n "${DEVFLOW_GENERATED_GLOBS:-}" ] && read -r -a extra <<<"$DEVFLOW_GENERATED_GLOBS"
+  for g in '*.g.dart' '*.freezed.dart' '*.mocks.dart' '*.gr.dart' '*.pb.dart' '*.pbenum.dart' '*.pbjson.dart' \
+           '*.generated.ts' '*.min.js' '*.min.css' 'next-env.d.ts' \
+           'pubspec.lock' 'package-lock.json' 'yarn.lock' 'pnpm-lock.yaml' 'bun.lock' 'bun.lockb' \
+           ${extra[@]+"${extra[@]}"}; do
+    printf ':(exclude,glob)**/%s\n' "$g"
+  done
+  # attr magic needs git ≥ 2.13 — probe once, skip silently when unsupported
+  git ls-files -- ':(attr:linguist-generated)' >/dev/null 2>&1 \
+    && printf '%s\n' ':(exclude,attr:linguist-generated)'
+}
+
 # ── Local telemetry (.devflow-metrics/) ───────────────────────────────────────
 # One gitignored folder per workspace for every usage/cost/timing log.
 # DEVFLOW_METRICS_DIR=<path> relocates it, =off disables all telemetry.

@@ -5,15 +5,23 @@
 # on the same tree is skipped instead of re-run by the next pipeline step.
 #
 # Usage (from the project root):
-#   verify-stamp.sh run <name> [--cwd DIR] [--log FILE] [--force] -- <command> [args...]
+#   verify-stamp.sh run <name> [--cwd DIR] [--log FILE] [--force] [--timeout SECS] -- <command> [args...]
 #       fresh pass on this tree → prints "fresh … skipped", exit 0
 #       otherwise runs the command (full output → log), prints one result line
 #       (+ decisive lines on failure), stamps it, exits with the command's code
+#       --timeout: kill the run after SECS (exit 124, stamped "timeout"). Default
+#       900 for e2e* (a desktop/device run that waits on focus or a dialog
+#       hangs until killed), 1800 otherwise; DEVFLOW_VERIFY_TIMEOUT overrides
+#       the default, 0 disables it.
 #   verify-stamp.sh check [name]   exit 0 when <name> passed on the current tree ('test*':
 #                                  every stamp starting with test, at least one); no
 #                                  name: a lint/analyze stamp is on this tree and every
 #                                  stamp on this tree passed (used by the Stop hook)
-#   verify-stamp.sh show           one line per stamped check (fresh/stale, result, counts)
+#   verify-stamp.sh show [--relevant]
+#                                  one line per stamped check (fresh/stale, result, counts);
+#                                  --relevant: unscoped checks plus scoped ones on this tree
+#                                  (stale :<scope> stamps of earlier slices/features hidden)
+#   verify-stamp.sh prune          drop stale :<scope> stamps and their logs
 #   verify-stamp.sh tree           current tree hash
 #
 # <name>: format | lint | analyze | codegen | test | e2e | build, optionally
@@ -71,6 +79,28 @@ counts() {
 
 stamp_get() { [ -n "$HAS_JQ" ] && [ -s "$STAMP_FILE" ] && jq -r --arg n "$1" ".checks[\$n].$2 // empty" "$STAMP_FILE" 2>/dev/null; }
 
+# run_limited <secs> <log> <cmd...> — run in a subshell, output → log; after
+# <secs> (0 = no limit) the whole process group is killed and 124 returned.
+run_limited() {
+  local secs="$1" log="$2"; shift 2
+  if [ "$secs" -le 0 ] 2>/dev/null; then "$@" > "$log" 2>&1; return; fi
+  local to; to=$(command -v timeout || command -v gtimeout)
+  if [ -n "$to" ]; then "$to" -k 10 "$secs" "$@" > "$log" 2>&1; return; fi
+  # No timeout(1): job control gives the command its own process group
+  local pid wd rc start=$SECONDS
+  set -m
+  "$@" > "$log" 2>&1 &
+  pid=$!
+  set +m
+  ( sleep "$secs"; kill -TERM -- "-$pid" 2>/dev/null; sleep 10; kill -KILL -- "-$pid" 2>/dev/null ) >/dev/null 2>&1 &
+  wd=$!
+  { wait "$pid"; rc=$?; } 2>/dev/null  # no "Terminated" job notice
+  kill "$wd" 2>/dev/null; wait "$wd" 2>/dev/null
+  # killed by the watchdog's TERM/KILL → timeout
+  if [ $((SECONDS - start)) -ge "$secs" ] && { [ $rc -eq 143 ] || [ $rc -eq 137 ]; }; then rc=124; fi
+  return $rc
+}
+
 ago() {
   local at now_s
   at=$(jq -rn --arg t "$1" '$t | fromdateiso8601? // empty' 2>/dev/null)
@@ -80,7 +110,7 @@ ago() {
 }
 
 cmd_run() {
-  local name="$1" cwd="." log="" force=""
+  local name="$1" cwd="." log="" force="" limit=""
   shift || usage "run <name> -- <command>"
   printf '%s' "$name" | grep -qE "$NAME_RE" || usage "invalid check name '$name' — use format|lint|analyze|codegen|test|e2e|build, plus :<scope> for a subset and @<app> in a monorepo"
   while [ $# -gt 0 ]; do
@@ -88,12 +118,17 @@ cmd_run() {
       --cwd) cwd="$2"; shift 2 ;;
       --log) log="$2"; shift 2 ;;
       --force) force=1; shift ;;
+      --timeout) limit="$2"; shift 2 ;;
       --) shift; break ;;
       *) usage "unknown option '$1' (the command goes after --)" ;;
     esac
   done
   [ $# -gt 0 ] || usage "missing command after --"
   [ -d "$cwd" ] || usage "--cwd $cwd: no such directory"
+  if [ -z "$limit" ]; then
+    case "$name" in e2e*) limit="${DEVFLOW_VERIFY_TIMEOUT:-900}" ;; *) limit="${DEVFLOW_VERIFY_TIMEOUT:-1800}" ;; esac
+  fi
+  [[ "$limit" =~ ^[0-9]+$ ]] || usage "--timeout $limit: seconds expected"
   [ -n "$log" ] || log="$LOG_DIR/$(printf '%s' "$name" | tr ':@' '__').log"
   mkdir -p "$(dirname "$log")"
 
@@ -109,11 +144,12 @@ cmd_run() {
   fi
 
   local start=$SECONDS rc secs c status
-  ( cd "$cwd" && "$@" ) > "$log" 2>&1
+  local abs_log; case "$log" in /*) abs_log="$log" ;; *) abs_log="$PWD/$log" ;; esac
+  ( cd "$cwd" && run_limited "$limit" "$abs_log" "$@" )
   rc=$?
   secs=$((SECONDS - start))
   case "$name" in test*|e2e*) c=$(counts "$log") ;; *) c="" ;; esac
-  if [ $rc -eq 0 ]; then status=pass; else status=fail; fi
+  if [ $rc -eq 0 ]; then status=pass; elif [ $rc -eq 124 ] && [ "$limit" -gt 0 ] && [ "$secs" -ge "$limit" ]; then status=timeout; else status=fail; fi
 
   if [ -n "$HAS_JQ" ]; then
     tree=$(tree_hash)  # after the run: formatters and codegen change files
@@ -125,7 +161,12 @@ cmd_run() {
   if [ $rc -eq 0 ]; then
     echo "✓ $name: pass (${secs}s)${c:+ · $c} · log: $log"
   else
-    echo "✗ $name: FAIL exit $rc (${secs}s)${c:+ · $c} · log: $log"
+    if [ "$status" = timeout ]; then
+      echo "✗ $name: TIMEOUT after ${limit}s — killed${c:+ · $c} · log: $log"
+      echo "  a run that waits on window focus, a device or a dialog hangs until killed — check the log tail, then re-run (--timeout N to allow longer)"
+    else
+      echo "✗ $name: FAIL exit $rc (${secs}s)${c:+ · $c} · log: $log"
+    fi
     local total; total=$(wc -l < "$log" | tr -d ' ')
     if [ "$total" -le 40 ]; then cat "$log"
     else head -n 15 "$log"; echo "  … $((total - 40)) lines in $log …"; tail -n 25 "$log"; fi
@@ -161,15 +202,31 @@ cmd_check() {
 
 cmd_show() {
   [ -n "$HAS_JQ" ] && [ -s "$STAMP_FILE" ] || { echo "no stamps"; return 0; }
-  local tree; tree=$(tree_hash)
-  jq -r --arg t "$tree" '.checks | to_entries[] |
+  local tree relevant=false; tree=$(tree_hash)
+  [ "${1:-}" = "--relevant" ] && relevant=true
+  jq -r --arg t "$tree" --argjson rel "$relevant" '.checks | to_entries[]
+    | select(($rel | not) or (.key | contains(":") | not) or .value.tree == $t) |
     "\(if .value.status == "pass" then "✓" else "✗" end) \(.key): \(.value.status) · \(if .value.tree == $t then "fresh" else "stale" end)\(if (.value.counts // "") != "" then " · " + .value.counts else "" end) · \(.value.at)"' "$STAMP_FILE"
+}
+
+cmd_prune() {
+  [ -n "$HAS_JQ" ] && [ -s "$STAMP_FILE" ] || { echo "no stamps"; return 0; }
+  local tree stale n; tree=$(tree_hash)
+  stale=$(jq -r --arg t "$tree" '.checks | to_entries[] | select((.key | contains(":")) and .value.tree != $t) | "\(.key)\t\(.value.log // "")"' "$STAMP_FILE")
+  n=$(printf '%s' "$stale" | grep -c . || true)
+  [ "$n" -gt 0 ] || { echo "nothing to prune"; return 0; }
+  printf '%s\n' "$stale" | cut -f2 | while IFS= read -r l; do
+    case "$l" in "$LOG_DIR"/*) rm -f "$l" ;; esac
+  done
+  df_json_update "$STAMP_FILE" '.checks |= with_entries(select((.key | contains(":") | not) or .value.tree == $t))' --arg t "$tree"
+  echo "pruned $n stale scoped stamp(s)"
 }
 
 case "$1" in
   run) shift; cmd_run "$@" ;;
   check) cmd_check "$2" ;;
-  show) cmd_show ;;
+  show) cmd_show "${2:-}" ;;
+  prune) cmd_prune ;;
   tree) tree_hash || exit 1 ;;
   ""|-h|--help) sed -n '2,/^$/s/^# \{0,1\}//p' "$0" ;;
   *) usage "unknown command '$1' (see --help)" ;;

@@ -171,17 +171,19 @@ elif [ "$EVENT" = "post" ]; then
         fi
       fi
     fi
+    # step = the command the call belongs to; next_step = the state pointer
+    ROW_CMD=$(obs_get '.active_command // empty')
     TOOL_ROW=$(jq -cn \
       --arg ts "$TS" --arg session "$SESSION" --arg host "$DF_HOST" \
       --arg tool "$TOOL" --arg kind "$KIND" --arg skill "$DF_SKILL" \
       --arg subagent_type "$DF_SUBAGENT_TYPE" --arg mcp_server "$MCP_SERVER" \
-      --arg agent_type "$DF_AGENT_TYPE" --arg command "$(obs_get '.active_command // empty')" \
-      --arg step "$STEP" --arg feature "$FEATURE" --argjson is_error "$IS_ERROR" \
+      --arg agent_type "$DF_AGENT_TYPE" --arg command "$ROW_CMD" \
+      --arg step "${ROW_CMD:+devflow.$ROW_CMD}" --arg next_step "$STEP" --arg feature "$FEATURE" --argjson is_error "$IS_ERROR" \
       --arg duration_ms "$DUR_MS" --argjson output_chars "${DF_RESPONSE_CHARS:-0}" \
       --arg exit_code "$EXIT_CODE" --arg error_category "$ERR_CAT" --arg error_msg "$ERR_MSG" \
       '{ts:$ts, session:$session, host:$host, tool:$tool, kind:$kind, skill:$skill,
         subagent_type:$subagent_type, mcp_server:$mcp_server, agent_type:$agent_type,
-        command:$command, step:$step, feature:$feature, is_error:$is_error,
+        command:$command, step:$step, next_step:$next_step, feature:$feature, is_error:$is_error,
         duration_ms:($duration_ms | tonumber? // null),
         output_chars:$output_chars, output_tokens_est:(($output_chars / 4) | ceil),
         exit_code:($exit_code | tonumber? // null),

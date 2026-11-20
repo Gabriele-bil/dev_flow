@@ -14,7 +14,8 @@
 # packet printed) to now, for ship fix-loop re-reviews.
 # Writes .devflow-review-packet.md (gitignored) and prints one summary line.
 # Diff over --max-diff-kb (default 80) is cut; the packet names the files to
-# open instead. Exit 1: no feature resolved.
+# open instead. Generated code and lockfiles (lib/payload.sh
+# df_generated_pathspecs) are listed but never diffed. Exit 1: no feature resolved.
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # shellcheck source=../hooks/lib/payload.sh
@@ -64,9 +65,13 @@ df_gitignore "$OUT"  # first, so the .gitignore edit is not part of the next inc
 IDX=$(mktemp "${TMPDIR:-/tmp}/devflow-index.XXXXXX")
 REAL_IDX=$(git rev-parse --git-path index 2>/dev/null)
 if [ -n "$REAL_IDX" ] && [ -f "$REAL_IDX" ]; then cp -p "$REAL_IDX" "$IDX"; else rm -f "$IDX"; fi
-trap 'rm -f "$IDX"' EXIT
+ORDER=$(mktemp "${TMPDIR:-/tmp}/devflow-order.XXXXXX")
+trap 'rm -f "$IDX" "$ORDER"' EXIT
 GIT_INDEX_FILE="$IDX" git add -A -- . ':(exclude)devflow' ':(exclude).devflow-*' >/dev/null 2>&1
 PATHSPEC=(-- . ':(exclude)devflow' ':(exclude).devflow-*')
+# Generated code and lockfiles: listed, never diffed (they ate the diff budget)
+GEN_SPEC=()
+while IFS= read -r g; do GEN_SPEC+=("$g"); done < <(df_generated_pathspecs)
 TREE=$(GIT_INDEX_FILE="$IDX" git write-tree 2>/dev/null)
 if [ -n "$SINCE" ]; then
   git cat-file -e "$SINCE^{tree}" 2>/dev/null || { echo "review-packet: --since $SINCE is not a tree" >&2; exit 1; }
@@ -74,13 +79,26 @@ if [ -n "$SINCE" ]; then
 fi
 NAMES=$(GIT_INDEX_FILE="$IDX" git diff --cached --name-status "$MB" "${PATHSPEC[@]}" 2>/dev/null)
 SUMMARY=$(GIT_INDEX_FILE="$IDX" git diff --cached --shortstat "$MB" "${PATHSPEC[@]}" 2>/dev/null | sed 's/^ *//')
-DIFF=$(GIT_INDEX_FILE="$IDX" git diff --cached -U3 "$MB" "${PATHSPEC[@]}" 2>/dev/null)
+REVIEWED=$(GIT_INDEX_FILE="$IDX" git diff --cached --name-only "$MB" "${PATHSPEC[@]}" "${GEN_SPEC[@]}" 2>/dev/null)
+# Diff order: source first, then tests, then docs/config — when the cap cuts,
+# it cuts what reviewers need least
+printf '%s\n' "$REVIEWED" | awk 'NF {
+    c = 0
+    if ($0 ~ /(^|\/)(test|tests|spec|__tests__|integration_test|e2e)\// || $0 ~ /[._-](test|spec)\.[A-Za-z0-9]+$/) c = 1
+    else if ($0 ~ /^docs\// || $0 ~ /(^|\/)\./ || $0 ~ /\.(md|mdx|txt|json|ya?ml|toml|lock|xml|plist)$/) c = 2
+    print c "\t" $0 }' | sort -s -k1,1n | cut -f2- > "$ORDER"
+DIFF=$(GIT_INDEX_FILE="$IDX" git diff --cached -U3 -O"$ORDER" "$MB" "${PATHSPEC[@]}" "${GEN_SPEC[@]}" 2>/dev/null)
+GENERATED=$(printf '%s\n' "$NAMES" | awk -F'\t' 'NF {print $NF}' | grep -vxF -f <(printf '%s\n' "$REVIEWED") || true)
+NGEN=$(printf '%s' "$GENERATED" | grep -c . || true)
 NFILES=$(printf '%s' "$NAMES" | grep -c . || true)
 DIFF_BYTES=${#DIFF}
 CUT=""
 if [ "$DIFF_BYTES" -gt $((MAX_KB * 1024)) ]; then
-  DIFF=$(printf '%s' "$DIFF" | head -c $((MAX_KB * 1024)))
+  DIFF=$( { printf '%s' "$DIFF" | head -c $((MAX_KB * 1024)); } 2>/dev/null)
   CUT=1
+  # Files whose diff did not make it in whole: the last header is partial
+  IN_DIFF=$(printf '%s\n' "$DIFF" | sed -n 's|^diff --git a/.* b/||p' | sed '$d')
+  MISSING=$(printf '%s\n' "$REVIEWED" | grep -vxF -f <(printf '%s\n' "$IN_DIFF") || true)
 fi
 
 # ── Project rules ─────────────────────────────────────────────────────────────
@@ -101,7 +119,8 @@ fi
 
 [ -n "$PROFILE" ] || PROFILE=$(field "$FDIR/plan.md" Complexity | grep -oE 'quick|standard|thorough' | head -1)
 APP=$(field "$FDIR/plan.md" App)
-STAMPS=$(bash "$SCRIPT_DIR/verify-stamp.sh" show 2>/dev/null)
+# Stale :<scope> stamps of earlier slices/features are noise (and old ✗ read as alarms)
+STAMPS=$(bash "$SCRIPT_DIR/verify-stamp.sh" show --relevant 2>/dev/null)
 
 # ── Write ─────────────────────────────────────────────────────────────────────
 {
@@ -147,10 +166,15 @@ STAMPS=$(bash "$SCRIPT_DIR/verify-stamp.sh" show 2>/dev/null)
   echo
   echo '```text'; printf '%s\n' "$NAMES"; [ -n "$SUMMARY" ] && printf '\n%s\n' "$SUMMARY"; echo '```'
   echo
+  if [ "$NGEN" -gt 0 ]; then
+    echo "Generated / lockfiles ($NGEN) — diff omitted below; review their sources, regenerate instead of hand-editing:"
+    echo; printf '%s\n' "$GENERATED" | sed 's/^/- /'; echo
+  fi
   echo "## Diff"
   echo
   if [ -n "$CUT" ]; then
-    echo "Cut at ${MAX_KB} KB of $((DIFF_BYTES / 1024)) KB — for files missing below, run \`git diff $MB -- <file>\` (new files: read them)."
+    echo "Cut at ${MAX_KB} KB of $((DIFF_BYTES / 1024)) KB (source first, then tests, then docs/config). Not in the diff below, or only partly — run \`git diff $MB -- <file>\` (new files: read them):"
+    echo; printf '%s\n' "$MISSING" | sed '/^$/d; s/^/- /'
     echo
   fi
   echo '```diff'; printf '%s\n' "$DIFF"; echo '```'

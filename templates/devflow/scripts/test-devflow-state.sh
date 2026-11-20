@@ -100,6 +100,9 @@ st set plan wip >/dev/null; assert_equals "set: unknown status refused" "$?" "2"
 out=$(st set task "done")
 assert_contains "set: task status" "$out" "task.md: clarified → done"
 assert_equals "set: task_status cached" "$(jq -r .task_status .devflow-state.json)" "done"
+ROWS=$(wc -l < .devflow-metrics/features.jsonl 2>/dev/null | tr -d ' ')
+st set task "done" >/dev/null
+assert_equals "set: same status writes no lifecycle row" "$(wc -l < .devflow-metrics/features.jsonl 2>/dev/null | tr -d ' ')" "$ROWS"
 printf '{"feature":"004_cart","custom":"keep","active_feature":"x"}' > .devflow-state.json
 st set plan ready >/dev/null
 assert_equals "set: unknown keys preserved" "$(jq -r .custom .devflow-state.json)" "keep"
