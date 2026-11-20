@@ -205,13 +205,16 @@ record_lifecycle_metric() {
       base_commit=$(git merge-base HEAD "origin/$base" 2>/dev/null || git merge-base HEAD "$base" 2>/dev/null || echo "")
     fi
     if [ -n "$base_commit" ]; then
-      local stat; stat=$(git diff --shortstat "$base_commit" HEAD 2>/dev/null || echo "")
+      # Generated code and lockfiles are not authored LOC
+      local gen=() g
+      while IFS= read -r g; do gen+=("$g"); done < <(df_generated_pathspecs)
+      local stat; stat=$(git diff --shortstat "$base_commit" HEAD -- . "${gen[@]}" 2>/dev/null || echo "")
       if [ -n "$stat" ]; then
         touched=$(printf '%s' "$stat" | grep -oE '[0-9]+ file' | awk '{print $1}')
         added=$(printf '%s' "$stat" | grep -oE '[0-9]+ insertion' | awk '{print $1}')
         deleted=$(printf '%s' "$stat" | grep -oE '[0-9]+ deletion' | awk '{print $1}')
       fi
-      local test_stat; test_stat=$(git diff --shortstat "$base_commit" HEAD -- '*test*' '*spec*' 2>/dev/null || echo "")
+      local test_stat; test_stat=$(git diff --shortstat "$base_commit" HEAD -- '*test*' '*spec*' "${gen[@]}" 2>/dev/null || echo "")
       if [ -n "$test_stat" ]; then
         loc_test=$(printf '%s' "$test_stat" | grep -oE '[0-9]+ insertion' | awk '{print $1}')
       fi
@@ -286,7 +289,13 @@ cmd_set() {
   fi
   write_status "$FDIR/$file" "$to" || die "could not write $FDIR/$file"
   merge_state
-  record_lifecycle_metric "$FEATURE" "$kind" "$from" "$to"
+  # Same status → no lifecycle row: a re-run (or a feature resolved by
+  # fallback) must not stamp another feature's diff as a completion
+  [ "$from" = "$to" ] || record_lifecycle_metric "$FEATURE" "$kind" "$from" "$to"
+  # Feature closed: its slice stamps (test:slice1…) would only clutter the next packet
+  if [ "$kind" = plan ] && [ "$to" = pr-opened ]; then
+    bash "$SCRIPT_DIR/verify-stamp.sh" prune >/dev/null 2>&1 || true
+  fi
   printf '%s: %s → %s · ' "$file" "${from:-—}" "$to"
   status_line
 }

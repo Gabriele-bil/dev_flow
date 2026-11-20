@@ -134,9 +134,9 @@ case "$EVENT" in
     ROW=$(jq -cn --arg ts "$TS" --arg session "$DF_SESSION" --arg host "$DF_HOST" \
       --arg agent_type "$(field '.agent_type')" --arg agent_id "$(field '.agent_id')" \
       --argjson usage "$USAGE" --argjson cost "${COST:-null}" \
-      --arg command "$COMMAND" --arg step "$STEP" --arg feature "$FEATURE" \
+      --arg command "$COMMAND" --arg step "${COMMAND:+devflow.$COMMAND}" --arg next_step "$STEP" --arg feature "$FEATURE" \
       '{ts:$ts, session:$session, host:$host, agent_type:$agent_type, agent_id:$agent_id,
-        command:$command, step:$step, feature:$feature} + $usage + {estimated_cost_usd:$cost}
+        command:$command, step:$step, next_step:$next_step, feature:$feature} + $usage + {estimated_cost_usd:$cost}
        | with_entries(select(.value != "" and .value != null))' 2>/dev/null) || ROW=""
     df_metric subagents "$ROW"
     ;;

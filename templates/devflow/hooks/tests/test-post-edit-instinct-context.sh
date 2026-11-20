@@ -106,6 +106,19 @@ EOF
   echo "$out" | grep -qF "always type function returns explicitly" \
     && assert "new session sends it again" pass \
     || assert "new session sends it again (output: '$out')" fail
+
+  echo "--- T7: churn stubs on devflow/features artefacts are never surfaced ---"
+  cat >> "$TMPDIR/.devflow-instincts.yaml" <<'EOF'
+  - id: churn-plan
+    trigger: "when editing /p/devflow/features/003_x/plan.md"
+    confidence: 0.9
+    domain: devflow
+    action: "File edited multiple times — review full flow before patching"
+EOF
+  out=$(run_hook "devflow/features/007_y/plan.md" s3)
+  echo "$out" | grep -qF "003_x/plan.md" \
+    && assert "pipeline-artefact churn stub filtered (output: '$out')" fail \
+    || assert "pipeline-artefact churn stub filtered" pass
 fi
 
 echo "--- T5: degenerate input allowed silently ---"

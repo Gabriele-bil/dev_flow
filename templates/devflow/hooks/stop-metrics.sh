@@ -7,8 +7,11 @@
 # Async, no stdout.
 #
 # Per-turn usage: only the transcript bytes appended since the previous Stop
-# are parsed (offset kept in .devflow-observe-state.json), so each row is this
-# turn's usage — summing rows never double-counts. Deduped by message id.
+# of the same transcript are parsed (offsets per transcript in
+# .devflow-observe-state.json), so each row is this turn's usage — summing
+# rows never double-counts, even with interleaved sessions. Deduped by message id.
+# step = the command the turn ran (devflow.<command>); next_step = the step
+# .devflow-state.json pointed to (the pipeline's next one, not the current).
 # Claude Code transcript: assistant entries with .message.usage.
 # Antigravity transcript: PLANNER_RESPONSE entries with input/output/
 # cache_read_tokens (model from the Stop payload; no price → cost omitted).
@@ -63,14 +66,16 @@ if [ -f "$OBS_STATE" ]; then
 fi
 [[ "$PROMPT_MS" =~ ^[0-9]+$ ]] || PROMPT_MS=0
 
-# Normalize command name (task, clarify, plan, analyze, implement, beautify, test, ship, pr, hotfix)
+# Command the turn ran: active_command, else the /devflow.<step> typed in the
+# turn (parsed below), else — last resort — the step the state points to.
 COMMAND="$ACTIVE_CMD"
-if [ -z "$COMMAND" ] && [ -n "$STEP" ]; then
+command_from_next_step() {
+  [ -z "$COMMAND" ] && [ -n "$STEP" ] || return 0
   case "$STEP" in
     devflow.*) COMMAND="${STEP#devflow.}" ;;
     task|clarify|plan|analyze|implement|beautify|test|ship|pr|hotfix) COMMAND="$STEP" ;;
   esac
-fi
+}
 
 ENDED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ") || true
 ENDED_EPOCH=$(date +%s 2>/dev/null || echo 0)
@@ -111,18 +116,25 @@ if [ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ] && [ "$LOG_FILE" != "off" ]; the
   MAX_BYTES="${DEVFLOW_METRICS_TAIL_BYTES:-2000000}"
   SIZE=$(wc -c < "$TRANSCRIPT" 2>/dev/null | tr -d '[:space:]')
   [ -z "$SIZE" ] && SIZE=0
-  PREV_PATH=""
+  # One offset per transcript: Antigravity runs orchestrator and workers as
+  # separate sessions whose Stops interleave, and a single shared offset made
+  # every switch re-read the whole transcript (cumulative rows, inflated
+  # tokens and durations). Single-pair state from plugin 2.2.0 or earlier is still honoured.
   PREV_OFF=0
   if [ -f "$OBS_STATE" ]; then
-    PREV_PATH=$(jq -r '.metrics_transcript // empty' "$OBS_STATE" 2>/dev/null) || true
-    PREV_OFF=$(jq -r '.metrics_offset // 0' "$OBS_STATE" 2>/dev/null) || PREV_OFF=0
+    PREV_OFF=$(jq -r --arg t "$TRANSCRIPT" \
+      '(.metrics_offsets // {})[$t] // (if .metrics_transcript == $t then .metrics_offset else null end) // 0' \
+      "$OBS_STATE" 2>/dev/null) || PREV_OFF=0
   fi
   [[ "$PREV_OFF" =~ ^[0-9]+$ ]] || PREV_OFF=0
-  # New transcript or truncated file → start over
-  if [ "$PREV_PATH" != "$TRANSCRIPT" ] || [ "$PREV_OFF" -gt "$SIZE" ]; then PREV_OFF=0; fi
+  # Truncated file → start over
+  [ "$PREV_OFF" -gt "$SIZE" ] && PREV_OFF=0
   START=$PREV_OFF
   [ $((SIZE - START)) -gt "$MAX_BYTES" ] && START=$((SIZE - MAX_BYTES))
-  df_json_update "$OBS_STATE" '.metrics_transcript = $t | .metrics_offset = $o' \
+  # Most recently stopped transcript last; the map keeps the latest 20
+  df_json_update "$OBS_STATE" \
+    '.metrics_offsets = ((.metrics_offsets // {}) | del(.[$t]) | . + {($t): $o} | to_entries | .[-20:] | from_entries)
+     | del(.metrics_transcript, .metrics_offset)' \
     --arg t "$TRANSCRIPT" --argjson o "$SIZE"
 
   # Lines appended since the last Stop; a partial first line (mid-offset
@@ -186,12 +198,15 @@ if [ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ] && [ "$LOG_FILE" != "off" ]; the
        && [ "$NOW_MS" -ge "$FIRST_TS_MS" ] && [ $(( NOW_MS - FIRST_TS_MS )) -le 21600000 ]; then
       DURATION_MS=$(( NOW_MS - FIRST_TS_MS ))
       DURATION_SEC=$(( (DURATION_MS + 500) / 1000 ))
+      STARTED_AT=$(jq -rn --argjson s "$(( FIRST_TS_MS / 1000 ))" '$s | todate' 2>/dev/null) || STARTED_AT="$ENDED_AT"
     fi
     # Command typed as /devflow.<step> but not yet attributed → use it
     if [ -z "$COMMAND" ]; then
       COMMAND=$(printf '%s' "$USAGE_JSON" | jq -r '[.slash_commands[] | select(test("devflow"))] | first // empty' 2>/dev/null \
         | sed -E 's/^.*devflow[-.]//') || COMMAND=""
     fi
+    command_from_next_step
+    TURN_STEP=""; [ -n "$COMMAND" ] && TURN_STEP="devflow.$COMMAND"
 
     TOTAL_TOK=$(( ${INPUT_TOK:-0} + ${OUTPUT_TOK:-0} + ${CACHE_CREATE_TOK:-0} + ${CACHE_READ_TOK:-0} ))
     if [ "$TOTAL_TOK" -gt 0 ]; then
@@ -199,7 +214,7 @@ if [ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ] && [ "$LOG_FILE" != "off" ]; the
       COST=$(df_estimate_cost "$MODEL" "$INPUT_TOK" "$OUTPUT_TOK" "$CACHE_CREATE_TOK" "$CACHE_READ_TOK")
 
       ENTRY=$(jq -cn \
-        --arg ts "$ENDED_AT" --arg session "$SESSION" --arg step "$STEP" \
+        --arg ts "$ENDED_AT" --arg session "$SESSION" --arg step "$TURN_STEP" --arg next_step "$STEP" \
         --arg command "$COMMAND" --arg feature "$FEATURE" --arg active_feature "$ACTIVE_FEATURE" \
         --arg started_at "$STARTED_AT" --arg ended_at "$ENDED_AT" --argjson duration_sec "$DURATION_SEC" \
         --arg model "$MODEL" --argjson input "$INPUT_TOK" --argjson output "$OUTPUT_TOK" \
@@ -210,6 +225,7 @@ if [ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ] && [ "$LOG_FILE" != "off" ]; the
           host:(if $host!="" then $host else null end),
           plugin_version:(if $plugin_version!="" then $plugin_version else null end),
           step:(if $step!="" then $step else null end),
+          next_step:(if $next_step!="" then $next_step else null end),
           command:(if $command!="" then $command else null end),
           feature:(if $feature!="" then $feature else null end),
           active_feature:(if $active_feature!="" then $active_feature else null end),
@@ -228,6 +244,9 @@ if [ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ] && [ "$LOG_FILE" != "off" ]; the
   fi
 fi
 
+command_from_next_step
+TURN_STEP=""; [ -n "$COMMAND" ] && TURN_STEP="devflow.$COMMAND"
+
 # Record command timing entry in timings.jsonl when active feature or command is present
 # (or when transcript usage was recorded)
 if [ "$TIMINGS_FILE" != "off" ] && [ "$LOG_FILE" != "off" ]; then
@@ -236,7 +255,8 @@ if [ "$TIMINGS_FILE" != "off" ] && [ "$LOG_FILE" != "off" ]; then
       --arg ts "$ENDED_AT" \
       --arg session "$SESSION" \
       --arg command "${COMMAND:-unknown}" \
-      --arg step "$STEP" \
+      --arg step "$TURN_STEP" \
+      --arg next_step "$STEP" \
       --arg feature "$FEATURE" \
       --arg active_feature "$ACTIVE_FEATURE" \
       --arg started_at "$STARTED_AT" \
@@ -251,6 +271,7 @@ if [ "$TIMINGS_FILE" != "off" ] && [ "$LOG_FILE" != "off" ]; then
         session: (if $session != "" then $session else null end),
         command: $command,
         step: (if $step != "" then $step else null end),
+        next_step: (if $next_step != "" then $next_step else null end),
         feature: (if $feature != "" then $feature else null end),
         active_feature: (if $active_feature != "" then $active_feature else null end),
         started_at: $started_at,

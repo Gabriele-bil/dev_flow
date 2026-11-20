@@ -47,6 +47,8 @@ instinct_filter() {
   jq -r --arg domain "$DOMAIN" --arg file "$FILE_PATH" --arg base "$BASENAME" \
     --argjson min "$MIN_CONFIDENCE" --argjson max "$MAX_SHOW" '
     map(select((.confidence // 0) >= $min))
+    # churn stubs on pipeline artefacts (distilled before they were skipped) are noise
+    | map(select((.trigger // "") | test("(^when editing |/)devflow/features/") | not))
     | map(select(
         ((.domain // "general") == $domain)
         or ((.trigger // "") == ("when editing " + $file))

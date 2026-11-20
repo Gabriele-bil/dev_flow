@@ -94,6 +94,29 @@ vs run lint >/dev/null; assert_equals "name: missing command rejected (64)" "$?"
 vs run analyze@web --cwd nope -- true >/dev/null; assert_equals "cwd: missing dir rejected (64)" "$?" "64"
 teardown
 
+setup
+out=$(vs run e2e --timeout 1 -- sh -c 'sleep 20'); rc=$?
+assert_equals "timeout: exit 124" "$rc" "124"
+assert_contains "timeout: TIMEOUT line" "$out" "✗ e2e: TIMEOUT after 1s"
+assert_equals "timeout: stamped as timeout" "$(jq -r '.checks.e2e.status' .devflow-verify.json)" "timeout"
+vs run lint --timeout abc -- true >/dev/null; assert_equals "timeout: non-numeric rejected (64)" "$?" "64"
+out=$(DEVFLOW_VERIFY_TIMEOUT=0 vs run test -- true); assert_contains "timeout: 0 disables the limit" "$out" "✓ test: pass"
+teardown
+
+setup
+vs run test:slice1 -- true >/dev/null; vs run test -- true >/dev/null
+echo b > app.txt
+vs run test:slice2 -- true >/dev/null
+rel=$(vs show --relevant)
+assert_contains "show --relevant: unscoped stale kept" "$rel" "test: pass · stale"
+assert_contains "show --relevant: fresh scoped kept" "$rel" "test:slice2: pass · fresh"
+case "$rel" in *"test:slice1"*) fail "show --relevant: stale scoped hidden" "$rel" ;; *) pass "show --relevant: stale scoped hidden" ;; esac
+assert_contains "prune: count" "$(vs prune)" "pruned 1 stale scoped stamp(s)"
+assert_equals "prune: stamps left" "$(jq -r '.checks | keys | join(",")' .devflow-verify.json)" "test,test:slice2"
+assert_equals "prune: log removed" "$([ -f .devflow-verify/test_slice1.log ] && echo kept || echo gone)" "gone"
+assert_contains "prune: idempotent" "$(vs prune)" "nothing to prune"
+teardown
+
 T=$(mktemp -d); cd "$T" || exit 1
 assert_contains "no git: still runs" "$(vs run lint -- true)" "✓ lint: pass"
 assert_contains "no git: never fresh" "$(vs run lint -- true)" "✓ lint: pass"

@@ -362,6 +362,15 @@ else
 fi
 teardown
 
+# T14b: churn on devflow/features artefacts (status, [done] marks) → no instinct
+setup
+for i in 1 2 3 4; do
+  jq -cn '{event:"pre",tool:"Edit",file:"/p/devflow/features/001_x/plan.md",ts:"2026-05-03T10:00:01Z"}' >> .devflow-observe.jsonl
+done
+echo '{}' | bash "$HOOKS_DIR/stop-learn-distill.sh" > /dev/null
+assert_file_not_exists "pipeline artefact churn: no instinct" ".devflow-instincts.yaml"
+teardown
+
 # T15: Stop hook with churn emits no stdout (never echoes stdin)
 setup
 for i in 1 2 3 4; do
